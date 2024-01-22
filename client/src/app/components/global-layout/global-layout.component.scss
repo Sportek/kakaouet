@@ -1,3 +1,4 @@
+@import '../../../colors.scss';
 .global-wrapper {
     display: flex;
     flex-direction: column;
@@ -5,5 +6,6 @@
 
     .container {
         flex: 1;
+        background-color: $purple-700;
     }
 }
