@@ -1,14 +1,18 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { GamePageComponent } from '@app/pages/game-page/game-page.component';
+import { AdminLoginPageComponent } from '@app/pages/admin/admin-login-page/admin-login-page.component';
+import { AdminPageComponent } from '@app/pages/admin/admin-page/admin-page.component';
+import { CreatePageComponent } from '@app/pages/create-page/create-page.component';
+import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
-    { path: 'game', component: GamePageComponent },
-    { path: 'material', component: MaterialPageComponent },
+    { path: 'admin', component: AdminPageComponent },
+    { path: 'admin/login', component: AdminLoginPageComponent },
+    { path: 'create', component: CreatePageComponent },
+    { path: 'join', component: JoinPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

@@ -1,20 +1,70 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
-@use './app/pages/material-page/material-page.component.theme' as material-page;
 // Plus imports for other components in your app.
+@import 'colors.scss';
 
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
 @include mat.core();
 
+$purple-theme: (
+    50: $purple-50,
+    100: $purple-100,
+    200: $purple-200,
+    300: $purple-300,
+    400: $purple-400,
+    500: $purple-500,
+    600: $purple-600,
+    700: $purple-700,
+    800: $purple-800,
+    900: $purple-900,
+    contrast: (
+        50: $text-50,
+        100: $text-50,
+        200: $text-50,
+        300: $text-50,
+        400: $text-50,
+        500: $text-50,
+        600: $text-50,
+        700: $text-50,
+        800: $text-50,
+        900: $text-50,
+    ),
+);
+
+$magenta-theme: (
+    50: $magenta-50,
+    100: $magenta-100,
+    200: $magenta-200,
+    300: $magenta-300,
+    400: $magenta-400,
+    500: $magenta-500,
+    600: $magenta-600,
+    700: $magenta-700,
+    800: $magenta-800,
+    900: $magenta-900,
+    contrast: (
+        50: $text-50,
+        100: $text-50,
+        200: $text-50,
+        300: $text-50,
+        400: $text-50,
+        500: $text-50,
+        600: $text-50,
+        700: $text-50,
+        800: $text-50,
+        900: $text-50,
+    ),
+);
+
 $indigo-pink-theme: mat.define-light-theme(
     (
         color: (
-            primary: mat.define-palette(mat.$indigo-palette),
-            accent: mat.define-palette(mat.$pink-palette, A200, A100, A400),
-            warn: mat.define-palette(mat.$red-palette),
+            primary: mat.define-palette($purple-theme, 900),
+            accent: mat.define-palette($magenta-theme, 500),
+            warn: mat.define-palette($purple-theme),
         ),
     )
 );
@@ -23,58 +73,39 @@ $indigo-pink-theme: mat.define-light-theme(
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include mat.all-component-themes($indigo-pink-theme);
-@include material-page.theme($indigo-pink-theme);
-
-.indigo-pink-theme {
-    // Nothing to do. This is the default theme
-}
-
-.deeppurple-amber-theme {
-    $deeppurple-amber-theme: mat.define-light-theme(
-        (
-            color: (
-                primary: mat.define-palette(mat.$deep-purple-palette),
-                accent: mat.define-palette(mat.$amber-palette, A200, A100, A400),
-            ),
-        )
-    );
-    @include mat.all-component-colors($deeppurple-amber-theme);
-    @include material-page.theme($deeppurple-amber-theme);
-}
-
-.pink-bluegrey-theme {
-    $pink-bluegrey-theme: mat.define-dark-theme(
-        (
-            color: (
-                primary: mat.define-palette(mat.$pink-palette, 700, 500, 900),
-                accent: mat.define-palette(mat.$blue-grey-palette, A200, A100, A400),
-            ),
-        )
-    );
-    @include mat.all-component-colors($pink-bluegrey-theme);
-    @include material-page.theme($pink-bluegrey-theme);
-}
-
-.purple-green-theme {
-    $purple-green-theme: mat.define-dark-theme(
-        (
-            color: (
-                primary: mat.define-palette(mat.$purple-palette, 700, 500, 800),
-                accent: mat.define-palette(mat.$green-palette, A200, A100, A400),
-            ),
-        )
-    );
-    @include mat.all-component-colors($purple-green-theme);
-    @include material-page.theme($purple-green-theme);
-}
 
 /* You can add global styles to this file, and also import other style files */
 
+$text-size-xs: 0.75rem; // Extra Small Text
+$text-size-sm: 0.875rem; // Small Text
+$text-size-md: 1rem; // Medium Text (souvent la taille de base)
+$text-size-lg: 1.25rem; // Large Text
+$text-size-xl: 1.5rem; // Extra Large Text
+$text-size-xxl: 2rem; // Extra Extra Large Text
+$text-size-huge: 3rem; // Huge Text
+
 html,
 body {
+    background-color: $purple-700;
     height: 100%;
+    z-index: -2;
+    position: relative;
 }
 body {
     margin: 0;
-    font-family: Roboto, 'Helvetica Neue', sans-serif;
+    font-family: 'Nunito Sans', sans-serif;
+    color: $text-50;
+    font-size: $text-size-md;
+}
+
+.small-text {
+    font-size: $text-size-sm;
+}
+
+.large-text {
+    font-size: $text-size-lg;
+}
+
+.title-text {
+    font-size: $text-size-xxl;
 }
