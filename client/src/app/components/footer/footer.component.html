@@ -1,0 +1,21 @@
+<div class="footer">
+    <div class="left-side">
+        <div class="large-text">À propos</div>
+        <div class="about">
+            <div class="categories">
+                <div class="category">
+                    <div class="large-text">Frontend</div>
+                    <div class="members">
+                        <div class="member" *ngFor="let member of members.frontend">{{ member }}</div>
+                    </div>
+                </div>
+                <div class="category">
+                    <div>Backend</div>
+                    <div class="members">
+                        <div class="member" *ngFor="let member of members.backend">{{ member }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

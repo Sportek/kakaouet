@@ -109,3 +109,15 @@ body {
 .title-text {
     font-size: $text-size-xxl;
 }
+
+.clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    &:hover {
+        transform: scale(1.1);
+    }
+
+    &:active {
+        transform: scale(0.9);
+    }
+}
