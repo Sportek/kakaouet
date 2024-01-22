@@ -11,7 +11,8 @@
         "coverage": "ng test --code-coverage --source-map=true",
         "lint": "ng lint --format stylish",
         "lint:fix": "npm run lint -- --fix",
-        "pipeline": "npm run lint && npm run test && npm run build"
+        "test:no-watch": "ng test --watch=false --browsers=ChromeHeadless",
+        "pipeline": "npm run test:no-watch && npm run lint && npm run build"
     },
     "private": true,
     "dependencies": {
