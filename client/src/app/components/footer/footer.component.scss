@@ -1,0 +1,23 @@
+@import '../../../colors.scss';
+.footer {
+    background-color: $purple-900;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    .about {
+        .categories {
+            padding: 0.5rem 0.5rem;
+            display: flex;
+            flex-direction: row;
+            gap: 3rem;
+            .members {
+                padding: 0.5rem 0.5rem;
+                .member {
+                    color: $purple-200;
+                }
+            }
+        }
+    }
+}
