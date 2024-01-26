@@ -12,6 +12,7 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
+import { ImportGameComponent } from './components/import-game/import-game.component';
 import { AdminLoginPageComponent } from './pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from './pages/admin/admin-page/admin-page.component';
 import { CreatePageComponent } from './pages/create-page/create-page.component';
@@ -35,6 +36,7 @@ import { JoinPageComponent } from './pages/join-page/join-page.component';
         GlobalLayoutComponent,
         FooterComponent,
         HeaderComponent,
+        ImportGameComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
     providers: [],
