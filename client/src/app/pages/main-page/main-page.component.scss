@@ -1,39 +1,45 @@
 @import '../../../colors.scss';
-.content {
-    width: 100vw;
-    height: 100vh;
+.background-color {
     background-color: $purple-700;
-}
-
-.wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    width: 100%;
     height: 100%;
-    padding: 1rem;
-    box-sizing: border-box;
-    .select-game-wrapper {
+    .content {
+        width: 100%;
+        height: 100%;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 1rem;
-        height: 100%;
-        width: 100%;
-        .logo {
-            position: relative;
-            img {
-                width: 300px;
-                height: 300px;
-            }
-        }
-        .buttons {
+        .wrapper {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            width: 75%;
-            max-width: 500px;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+            .select-game-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+                height: 100%;
+                width: 100%;
+                .logo {
+                    position: relative;
+                    img {
+                        width: 300px;
+                        height: 300px;
+                    }
+                }
+                .buttons {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                    width: 75%;
+                    max-width: 500px;
+                }
+            }
         }
     }
 }
