@@ -15,7 +15,9 @@ import { HeaderComponent } from './components/header/header.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
 import { AdminLoginPageComponent } from './pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from './pages/admin/admin-page/admin-page.component';
-import { CreatePageComponent } from './pages/create-page/create-page.component';
+import { CreatePageComponent } from './pages/create-game/create-page/create-page.component';
+import { DescriptonPageComponent } from './pages/create-game/descripton-page/descripton-page.component';
+import { TestingGameComponent } from './pages/create-game/testing-game/testing-game.component';
 import { JoinPageComponent } from './pages/join-page/join-page.component';
 
 /**
@@ -37,6 +39,8 @@ import { JoinPageComponent } from './pages/join-page/join-page.component';
         FooterComponent,
         HeaderComponent,
         ImportGameComponent,
+        DescriptonPageComponent,
+        TestingGameComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
     providers: [],
