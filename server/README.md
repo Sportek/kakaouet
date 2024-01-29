@@ -1,81 +1,159 @@
-# Serveur NestJS
+# API Documentation 
+Important: Pour acceder aux routes /quiz et /question il faut rajouter le mot de passe de l'admin dans request.headers.authorization. Comme ca seulement l'admin a le droit de modifier ce qu'il faut. Pour l'instant le mot de passe est '1234'.
+## List of available routes:
 
-Ce projet est une implémentation du serveur de départ utilisant le cadriciel [NestJS](https://nestjs.com/). Ceci est une alternative à serveur de base qui vous est fournie et qui utilise NodeJS/Express. Vous pouvez utiliser le serveur NodeJS/Express fourni ou ce serveur pour votre projet.
+1. [Routes: /api/question](#question-routes)
+2. [Routes: /api/quiz](#quiz-routes)
 
-## NestJS
+# 1. Base URL : /question
+## Table of Contents
 
-NestJS est un cadriciel de développement de serveurs dynamiques utilisant NodeJS et Expess avec une architecture très similaire à celle d'Angular. Vous remarquerez l'utilisation de termes tels que `service`,`module` et autres similaires à Angular.
+1. [Get All Questions](#get-all-questions)
+2. [Get Question by ID](#get-question-by-id)
+3. [Create Question](#create-question)
+4. [Update Question](#update-question)
+5. [Delete Question](#delete-question)
+6. [Delete All Questions](#delete-all-questions)
 
-NestJS utilise des décorateurs (annotations avec le symbole `@`) pour attacher des fonctionnalités supplémentaires au code. Par exemple, la configuration d'un gestionnaire de route en NestJS :
+## Endpoints
 
-```ts
-@Get('/')
-dateInfo(): Message {
-    return {
-        body: this.dateService.currentTime(),
-    };
-}
-```
+### 1. Get All Questions
 
-est équivalente à la configuration suivante avec Express :
+- **URL:** `question/`
+- **Method:** `GET`
+- **Description:** Retrieve a list of all questions.
+- **Response:**
+  - Status Code: `200 OK`
+  - Body: Array of `Question` objects
 
-```ts
-this.router.get('/', (req: Request, res: Response) => {
-    this.dateService.currentTime().then((time: Message) => {
-        res.json(time);
-    });
-});
-```
+### 2. Get Question by ID
 
-## Intégration avec les autres exemples du cours
+- **URL:** `question/:id`
+- **Method:** `GET`
+- **Description:** Retrieve a specific question by its ID.
+- **Parameters:**
+  - `id` (Path parameter): ID of the question
+- **Response:**
+  - Status Code: `200 OK`
+  - Body: `Question` object
+  - Status Code: `404 Not Found` if the question with the given ID does not exist
 
-Afin de vous aider, ce projet inclut également le code nécessaire pour présenter les fonctionnalités de communication avec une base de données `MongoDB` et la communication avec `SocketIO`. Le code se base sur les projets suivants disponibles sur GitLab :
+### 3. Create Question
 
--   [`MongoDB`](https://gitlab.com/nikolayradoev/mongodb-example) : la route `/api/docs` du serveur NodeJS offre une interface qui vous permet de tester la connexion avec la base de données. Notez que NestJS utilise la librairie `Mongoose` pour la communication avec MongoDB.
+- **URL:** `question/`
+- **Method:** `POST`
+- **Description:** Create a new question.
+- **Request Body:**
+  - JSON object representing the new `Question`
+- **Response:**
+  - Status Code: `201 Created`
+  - Body: `Question` object representing the newly created question
 
-    **Important**: vous devez configurer la variable d'environnement `DATABASE_CONNECTION_STRING` disponible dans le fichier `.env` avant de pouvoir vous connecter à une base de données.
+### 4. Update Question
 
--   [`SocketIO`](https://gitlab.com/nikolayradoev/socket-io-exemple) : vous pouvez utiliser le site web (client) de cet exemple pour tester la communication par WebSocket avec le serveur NestJS. Notez que cet exemple assume que le serveur est disponible sur le port `5000` : vous devez modifier l'URI de vos requêtes.
+- **URL:** `question/:id`
+- **Method:** `PATCH`
+- **Description:** Update an existing question by its ID.
+- **Parameters:**
+  - `id` (Path parameter): ID of the question to be updated
+- **Request Body:**
+  - JSON object representing the updated `Question`
+- **Response:**
+  - Status Code: `204 No Content`
+  - Status Code: `404 Not Found` if the question with the given ID does not exist
 
-NestJS utilise la librairie `Jest` pour ses tests. L'ensemble du code qui est fourni est déjà testé avec plusieurs exemples de tests unitaires. Vous pouvez vous baser sur ces exemples pour tester vos propres fonctionnalités.
+### 5. Delete Question
 
-# Choix de serveur à utiliser
+- **URL:** `question/:id`
+- **Method:** `DELETE`
+- **Description:** Delete a question by its ID.
+- **Parameters:**
+  - `id` (Path parameter): ID of the question to be deleted
+- **Response:**
+  - Status Code: `204 No Content`
+  - Status Code: `404 Not Found` if the question with the given ID does not exist
 
-Vous devez choisir le serveur à utiliser dans votre projet : NodeJS/Express de base ou NestJS. Dans les deux cas, vous devez apporter quelques changements à votre entrepôt.
+### 6. Delete All Questions
 
-Notez que les configurations pour le déploiement et le pipeline de validation assument qu'il a seulement un répertoire `/server` dans votre entrepôt. Peu importe votre choix, le répertoire de votre serveur doit porter ce nom.
+- **URL:** `question/`
+- **Method:** `DELETE`
+- **Description:** Delete all questions.
+- **Response:**
+  - Status Code: `204 No Content`
 
-### Serveur NodeJS de base
+# 2. Base URL /quiz
 
-Si vous avez décidé de garder le serveur NodeJS de base, vous n'avez qu'à supprimer le répertoire `/server-nestjs` et pousser vos changements sur Git.
+## Table of Contents
 
-**Note : il est important de retirer le répertoire du serveur non utilisé pour ne pas avoir du _code mort_ qui n'est jamais utilisé dans votre entrepôt.**
+1. [Get All Quizzes](#get-all-quizzes)
+2. [Get Quiz by ID](#get-quiz-by-id)
+3. [Create Quiz](#create-quiz)
+4. [Update Quiz](#update-quiz)
+5. [Delete Quiz](#delete-quiz)
 
-### Serveur NestJS
+## Endpoints
 
-Si vous avez décidé de prendre le serveur NestJS, vous devez :
+### 1. Get All Quizzes
 
-- Supprimer le répertoire `/server` et renommer `/server-nestjs` à `/server`.
-- Modifier la valeur du champ `entryFile` pour `server/app/index` dans le fichier `nest-cli.json`.
-- Modifier la valeur du champ `@app` à `out/server/app` dans le fichier `/server/package.json`.
+- **URL:** `quiz/`
+- **Method:** `GET`
+- **Description:** Retrieve a list of all quizzes.
+- **Response:**
+  - Status Code: `200 OK`
+  - Body: Array of `Quiz` objects
 
-N'oubliez pas de pousser vos changements sur Git.
+### 2. Get Quiz by ID
 
-**Note : il est important de retirer le répertoire du serveur non utilisé pour ne pas avoir du _code mort_ qui n'est jamais utilisé dans votre entrepôt.**
+- **URL:** `quiz/:id`
+- **Method:** `GET`
+- **Description:** Retrieve a specific quiz by its ID.
+- **Parameters:**
+  - `id` (Path parameter): ID of the quiz
+- **Response:**
+  - Status Code: `200 OK`
+  - Body: `Quiz` object
+  - Status Code: `404 Not Found` if the quiz with the given ID does not exist
 
-### Serveur NestJS sans base de données
+### 3. Create Quiz
 
-Si vous voulez débuter avec le serveur NestJS sans une connexion à une instance MongoDB configurée, vous devez modifier le fichier [app.module.ts](./app/app.module.ts) et retirer les références à `MongooseModule`, `CourseController` et `CourseService`. Votre configuration devraient être la suivante :
+- **URL:** `quiz/`
+- **Method:** `POST`
+- **Description:** Create a new quiz.
+- **Request Body:**
+  - JSON object representing the new `Quiz`
+- **Response:**
+  - Status Code: `201 Created`
+  - Body: `Quiz` object representing the newly created quiz
 
-```ts
-@Module({
-    imports: [
-        ConfigModule.forRoot({ isGlobal: true })
-    ],
-    controllers: [DateController, ExampleController],
-    providers: [ChatGateway, DateService, ExampleService, Logger],
-})
-export class AppModule {}
-```
+### 4. Update Quiz
 
-**Note : l'utilisation de MongoDB sera éventuellement requise dans le projet. Il est recommandé de simplement mettre la configuration de `MongooseModule` en commentaire et retirer le contrôleur et le service d'exemple. Lorsque vous avez besoin de la base de données, vous pouvez simplement réactiver la configuration.**
+- **URL:** `quiz/:id`
+- **Method:** `PATCH`
+- **Description:** Update an existing quiz by its ID.
+- **Parameters:**
+  - `id` (Path parameter): ID of the quiz to be updated
+- **Request Body:**
+  - JSON object representing the updated `Quiz`
+- **Response:**
+  - Status Code: `204 No Content`
+  - Status Code: `404 Not Found` if the quiz with the given ID does not exist
+
+### 5. Delete Quiz
+
+- **URL:** `quiz/:id`
+- **Method:** `DELETE`
+- **Description:** Delete a quiz by its ID.
+- **Parameters:**
+  - `id` (Path parameter): ID of the quiz to be deleted
+- **Response:**
+  - Status Code: `204 No Content`
+  - Status Code: `404 Not Found` if the quiz with the given ID does not exist
+
+## Response Codes
+
+- `200 OK`: The request was successful, and the response body contains the requested data.
+- `201 Created`: The resource was successfully created.
+- `204 No Content`: The request was successful, and there is no additional content to send.
+- `404 Not Found`: The requested resource was not found.
+
+
