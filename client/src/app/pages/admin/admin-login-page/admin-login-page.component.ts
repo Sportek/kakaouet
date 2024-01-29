@@ -10,16 +10,16 @@ import { AdminLoginState, UserService } from '@app/services/user/user.service';
 export class AdminLoginPageComponent {
     password: string;
     loggedState: AdminLoginState;
-    private userService: UserService;
-    private router: Router;
-    constructor(router: Router, userService: UserService) {
+
+    constructor(
+        private router: Router,
+        private userService: UserService,
+    ) {
         this.userService = userService;
         this.router = router;
-        this.loggedState = userService.getLoginState();
     }
     submitPassword() {
         this.userService.login(this.router, this.password);
-        this.loggedState = this.userService.getLoginState();
     }
 
     onKeyEnter(event: KeyboardEvent) {
