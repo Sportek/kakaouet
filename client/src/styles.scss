@@ -59,12 +59,64 @@ $magenta-theme: (
     ),
 );
 
+$red-theme: (
+    50: $red-50,
+    100: $red-100,
+    200: $red-200,
+    300: $red-300,
+    400: $red-400,
+    500: $red-500,
+    600: $red-600,
+    700: $red-700,
+    800: $red-800,
+    900: $red-900,
+    contrast: (
+        50: $text-50,
+        100: $text-50,
+        200: $text-50,
+        300: $text-50,
+        400: $text-50,
+        500: $text-50,
+        600: $text-50,
+        700: $text-50,
+        800: $text-50,
+        900: $text-50,
+    ),
+);
+
+$green-theme: (
+    50: $green-50,
+    100: $green-100,
+    200: $green-200,
+    300: $green-300,
+    400: $green-400,
+    500: $green-500,
+    600: $green-600,
+    700: $green-700,
+    800: $green-800,
+    900: $green-900,
+    contrast: (
+        50: $text-50,
+        100: $text-50,
+        200: $text-50,
+        300: $text-50,
+        400: $text-50,
+        500: $text-50,
+        600: $text-50,
+        700: $text-50,
+        800: $text-50,
+        900: $text-50,
+    ),
+);
+
 $indigo-pink-theme: mat.define-light-theme(
     (
         color: (
             primary: mat.define-palette($purple-theme, 900),
             accent: mat.define-palette($magenta-theme, 500),
-            warn: mat.define-palette($purple-theme),
+            // warn: mat.define-palette($purple-theme),
+            success: mat.define-palette($green-theme, 700),
+            warn: mat.define-palette($red-theme, 700),
         ),
     )
 );

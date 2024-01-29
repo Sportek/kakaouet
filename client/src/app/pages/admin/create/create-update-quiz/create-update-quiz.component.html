@@ -1,0 +1,38 @@
+<app-global-layout>
+    <div class="wrapper">
+        <div class="container">
+            <div *ngIf="hasId; else createNewGame"><div class="title title-text">Modification d'un jeu</div></div>
+            <ng-template #createNewGame>
+                <div class="title title-text">Création d'un jeu</div>
+            </ng-template>
+            <form action="">
+                <div class="first">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Titre</mat-label>
+                        <input [(ngModel)]="title" matInput placeholder="Titre du jeu" name="title" />
+                    </mat-form-field>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Durée</mat-label>
+                        <input [(ngModel)]="time" type="number" matInput placeholder="Temps pour la réponse" name="time" />
+                    </mat-form-field>
+                </div>
+                <mat-form-field appearance="fill">
+                    <mat-label>Description</mat-label>
+                    <textarea [(ngModel)]="description" matInput placeholder="Description de votre jeu" name="description" maxlength="200"></textarea>
+                </mat-form-field>
+            </form>
+            <div class="questions-container">
+                <div class="questions"></div>
+                <div class="questions-buttons">
+                    <button mat-raised-button color="primary">Importer une question de la banque</button>
+                    <button mat-raised-button color="primary" routerLink="/create/quiz/new/question">Créer une nouvelle question</button>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button mat-raised-button color="primary" class="red">Annuler</button>
+                <button mat-raised-button color="primary" class="green">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</app-global-layout>

@@ -18,8 +18,8 @@ export interface Game {
     // Players still can join the game
     isLocked: boolean;
     code: string;
-    created_at: Date;
-    updated_at: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export enum GameRole {
@@ -54,28 +54,34 @@ interface BaseQuestion {
     id: string;
     label: string;
     points: number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
-export type Question = {
-    type: QuestionType.QCM;
-    choices: Choice[];
-} & BaseQuestion | {
-    type: QuestionType.QRL;
-} & BaseQuestion;
+export type Question =
+    | ({
+        type: QuestionType.QCM;
+        choices: Choice[];
+    } & BaseQuestion)
+    | ({
+        type: QuestionType.QRL;
+    } & BaseQuestion);
 
 interface BaseUserResponse {
     id: string;
     gameUserId: string;
-    created_at: Date;
-    updated_at: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
-export type UserResponse = {
-    type: QuestionType.QCM;
-    choicesId: string[];
-} & BaseUserResponse | {
-    type: QuestionType.QRL;
-    answer: string;
-}
+export type UserResponse =
+    | ({
+        type: QuestionType.QCM;
+        choicesId: string[];
+    } & BaseUserResponse)
+    | {
+        type: QuestionType.QRL;
+        answer: string;
+    };
 
 export interface Quiz {
     id: string;
@@ -85,12 +91,12 @@ export interface Quiz {
     // Quiz is accessible to all users
     visibility: boolean;
     questions: Question[];
-    created_at: Date;
-    updated_at: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Message {
     gameUserId: string;
     content: string;
-    created_at: Date;
+    createdAt: Date;
 }

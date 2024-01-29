@@ -1,0 +1,16 @@
+<app-global-layout>
+    <app-background>
+        <div class="wrapper">
+            <div class="container">
+                <div class="title-text">Banque de Questions</div>
+                <div class="selectors">
+                    <app-selector [label]="'Questions Visibles'" [choices]="['Toutes', 'Choix Multiples', 'Réponse Libre']"></app-selector>
+                </div>
+                <app-bank-question></app-bank-question>
+                <div class="button">
+                    <button mat-fab extended color="primary" class="large-text">Créer une question</button>
+                </div>
+            </div>
+        </div>
+    </app-background>
+</app-global-layout>

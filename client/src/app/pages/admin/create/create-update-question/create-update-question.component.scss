@@ -1,0 +1,64 @@
+@import '../../../../../colors.scss';
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    flex: 1;
+    .container {
+        height: 100%;
+        width: 90%;
+        max-width: 50rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .title {
+            padding: 1rem 0;
+        }
+
+        form {
+            .first {
+                display: grid;
+                grid-template-columns: 4fr 2fr 2fr;
+                grid-gap: 1rem;
+            }
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1rem 0;
+            .green {
+                background-color: $green-700;
+            }
+
+            .red {
+                background-color: $red-700;
+            }
+        }
+
+        .choices-container {
+            .choices {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr;
+                grid-gap: 1rem;
+                .choice {
+                    background-color: $magenta-600;
+                    height: 4rem;
+                    border-radius: 5px;
+                    text-align: center;
+                }
+            }
+
+            flex: 1;
+        }
+    }
+}
