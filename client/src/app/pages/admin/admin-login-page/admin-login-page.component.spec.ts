@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AdminLoginPageComponent } from './admin-login-page.component';
 
 describe('AdminLoginPageComponent', () => {
@@ -9,6 +11,7 @@ describe('AdminLoginPageComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [AdminLoginPageComponent],
+            imports: [HttpClientTestingModule, HttpClientModule],
         });
         fixture = TestBed.createComponent(AdminLoginPageComponent);
         component = fixture.componentInstance;
