@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 export class FooterComponent implements OnInit {
     members: { backend: string[]; frontend: string[] } = {
         backend: ['Gabriel Landry', 'Yacine Lawali', 'Eli Boulanger'],
-        frontend: ['Mohammad Jamil Miah', 'Dimitri Manguin', 'Thomas Petrie'],
+        frontend: ['Mohammad Jamil Miah', 'Dimitri Maguin', 'Thomas Petrie'],
     };
 
     ngOnInit(): void {
