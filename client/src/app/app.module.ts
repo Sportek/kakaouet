@@ -11,6 +11,7 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { BankQuestionComponent } from './components/bank-question/bank-question.component';
+import { ChatComponent } from './components/chat/chat.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
@@ -26,6 +27,8 @@ import { CreateUpdateQuizComponent } from './pages/admin/create/create-update-qu
 import { CreatePageComponent } from './pages/create-game/create-page/create-page.component';
 import { DescriptonPageComponent } from './pages/create-game/descripton-page/descripton-page.component';
 import { TestingGameComponent } from './pages/create-game/testing-game/testing-game.component';
+import { Error404Component } from './pages/error/error404/error404.component';
+import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
 import { JoinPageComponent } from './pages/join-page/join-page.component';
 
 /**
@@ -57,6 +60,9 @@ import { JoinPageComponent } from './pages/join-page/join-page.component';
         BankQuestionComponent,
         DescriptonPageComponent,
         TestingGameComponent,
+        GameVueComponent,
+        ChatComponent,
+        Error404Component,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
     providers: [],

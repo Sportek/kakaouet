@@ -8,7 +8,8 @@ import { CreateUpdateQuestionComponent } from '@app/pages/admin/create/create-up
 import { CreateUpdateQuizComponent } from '@app/pages/admin/create/create-update-quiz/create-update-quiz.component';
 import { CreatePageComponent } from '@app/pages/create-game/create-page/create-page.component';
 import { DescriptonPageComponent } from '@app/pages/create-game/descripton-page/descripton-page.component';
-import { TestingGameComponent } from '@app/pages/create-game/testing-game/testing-game.component';
+import { Error404Component } from '@app/pages/error/error404/error404.component';
+import { GameVueComponent } from '@app/pages/game/game-vue/game-vue.component';
 import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 
@@ -30,8 +31,12 @@ const routes: Routes = [
     { path: 'admin/create/quiz/:id/question/:question_id', component: CreateUpdateQuestionComponent },
     { path: 'join', component: JoinPageComponent },
     { path: 'create/description/:gameId', component: DescriptonPageComponent },
-    { path: 'testing/:gameId', component: TestingGameComponent },
-    { path: '**', redirectTo: '/home' },
+
+    // Tester un jeu via son id
+    { path: 'testing/:id', component: GameVueComponent },
+
+    { path: 'error-404', component: Error404Component },
+    { path: '**', redirectTo: '/error-404' },
 ];
 
 @NgModule({

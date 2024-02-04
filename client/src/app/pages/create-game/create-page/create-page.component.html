@@ -9,7 +9,7 @@
                         <div *ngFor="let game of games">
                             <!-- <button mat-fab extended color="accent" class="large-text"> -->
                             <div *ngIf="game.visibility">
-                                <a [routerLink]="['/create/description', game._id]">
+                                <a [routerLink]="['/create/description', game.id]">
                                     <button mat-fab extended color="accent" class="large-text">
                                         {{ game.name }}
                                     </button>

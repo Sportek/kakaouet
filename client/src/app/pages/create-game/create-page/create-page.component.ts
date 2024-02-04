@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 // import { games } from 'src/tempory-games';
-import { Quiz } from '@app/services/quiz/quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { Quiz } from '@common/types';
 
 @Component({
     selector: 'app-create-page',

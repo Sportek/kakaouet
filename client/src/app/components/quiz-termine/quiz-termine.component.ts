@@ -190,6 +190,7 @@ export class QuizTermineComponent implements OnInit {
         code: '9224',
         createdAt: new Date('2024-01-18T11:01:39+00:00'),
         updatedAt: new Date('2024-01-18T11:31:20+00:00'),
+        messages: [],
     };
     game2: Game = {
         id: 'b8anfo2',
@@ -200,6 +201,7 @@ export class QuizTermineComponent implements OnInit {
         code: '9225',
         createdAt: new Date('2024-01-22T14:55:27+00:00'),
         updatedAt: new Date('2024-01-22T15:24:03+00:00'),
+        messages: [],
     };
     game3: Game = {
         id: 'av0s9g1',
@@ -210,6 +212,7 @@ export class QuizTermineComponent implements OnInit {
         code: '9226',
         createdAt: new Date('2024-01-18T15:44:31+00:00'),
         updatedAt: new Date('2024-01-18T16:19:55+00:00'),
+        messages: [],
     };
 
     gameList: Game[] = [];
