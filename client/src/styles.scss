@@ -166,10 +166,14 @@ body {
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
     &:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 
     &:active {
-        transform: scale(0.9);
+        transform: scale(0.95);
     }
+}
+
+.not-clickable {
+    cursor: not-allowed;
 }

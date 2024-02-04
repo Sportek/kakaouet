@@ -1,0 +1,56 @@
+<app-global-layout>
+    <div class="container">
+        <div class="wrapper">
+            <div class="question-container">
+                <div class="icon-container">
+                    <mat-icon>
+                        <span class="material-symbols-outlined"> grade </span>
+                    </mat-icon>
+                    <div class="text large-text">{{ getQuestionPoints() | async }}</div>
+                </div>
+                <div class="question large-text">
+                    {{ getQuestionLabel() | async }}
+                </div>
+                <div class="icon-container">
+                    <mat-icon>
+                        <span class="material-symbols-outlined"> hourglass </span>
+                    </mat-icon>
+                    <div class="text large-text">{{ gameService.timer?.getTimer() || 0 }}</div>
+                </div>
+            </div>
+            <div class="responses-container">
+                <!-- Dans le cas où on gère une QCM, on va devoir rajouter les QCL par après -->
+                <div *ngIf="isQCMQuestion() | async">
+                    <ng-container *ngIf="getQCMChoices() | async as choices">
+                        <div
+                            *ngFor="let choice of choices; let i = index"
+                            [id]="'index-' + i"
+                            class="response large-text"
+                            [ngClass]="{
+                                selected: gameService.isSelected(i),
+                                clickable: gameService.canChangeChoices,
+                                'not-clickable': !gameService.canChangeChoices,
+                                'is-incorrect': !isCorrectAnswer(i)
+                            }"
+                            (click)="gameService.selectChoice(i)"
+                        >
+                            {{ i + 1 + '. ' + choice.label }}
+                        </div></ng-container
+                    >
+                </div>
+            </div>
+            <div class="buttons-container">
+                <button mat-raised-button color="primary" class="button" (click)="gameService.giveUp()">
+                    <span class="button-text">Abandonner</span>
+                </button>
+                <div class="user-data-container">Votre score actuel : {{ gameService.user.score || 0 }}</div>
+                <button mat-raised-button color="primary" class="button" (click)="setResponseAsFinal()">
+                    <span class="button-text">Valider</span>
+                </button>
+            </div>
+            <div class="chat">
+                <app-chat />
+            </div>
+        </div>
+    </div>
+</app-global-layout>

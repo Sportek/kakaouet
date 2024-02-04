@@ -28,7 +28,7 @@ export class Quiz {
 
     // TODO: Add questions
     @ApiProperty()
-    // @Prop({type: () => [Question]})
+    @Prop({ type: () => [Question] })
     questions: Question[];
 
     @ApiProperty()

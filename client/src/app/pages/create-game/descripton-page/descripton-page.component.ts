@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core'; // chat gpt Change
 import { ActivatedRoute } from '@angular/router';
 // import { Question } from '@app/services/quiz/question';
-import { Question, Quiz } from '@app/services/quiz/quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { Question, Quiz } from '@common/types';
 
 @Component({
     selector: 'app-descripton-page',

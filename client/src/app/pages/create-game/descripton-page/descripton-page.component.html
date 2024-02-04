@@ -1,25 +1,23 @@
 <app-global-layout>
     <div *ngIf="game" class="background">
-        <p class ="time-description">Temps alloué pour le jeu :   {{game.duration}} secondes </p>
+        <p class="time-description">Temps alloué pour le jeu : {{ game.duration }} secondes</p>
         <div class="wrapper">
             <h1>Détails du '{{ game.name }}'</h1>
             <div class="box-description">
-                <p class="select-game-wrapper">Description du jeu: </p>
-                <p>{{game.description}}</p>
+                <p class="select-game-wrapper">Description du jeu:</p>
+                <p>{{ game.description }}</p>
             </div>
             <div class="box-description">
-                <p class="select-game-wrapper">Liste des questions:</p> 
-                <div *ngFor="let question of game.questions" > 
-                    <p> {{question.text}} </p>
-                </div> 
+                <p class="select-game-wrapper">Liste des questions:</p>
+                <div *ngFor="let question of game.questions">
+                    <p>{{ question.label }}</p>
+                </div>
             </div>
         </div>
         <div class="button-container">
             <button routerLink="/create" mat-fab extended class="large-text quit-button">Retour</button>
-            <button [routerLink]="['/testing', game._id]" mat-fab extended color="accent" class="large-text middle">Tester le jeu</button>
+            <button [routerLink]="['/testing', game.id]" mat-fab extended color="accent" class="large-text middle">Tester le jeu</button>
             <button routerLink="/create" mat-fab extended color="accent" class="large-text">Créer une partie</button>
-        </div>     
+        </div>
     </div>
-
-    
 </app-global-layout>
