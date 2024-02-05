@@ -3,6 +3,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { mockQuestions } from './mock-question';
+
+const MIN_POINTS = 10;
+const MAX_POINTS = 100;
+const MIN_CHOICES = 2;
+const MAX_CHOICES = 4;
+
 @Injectable()
 export class QuestionService {
     constructor(
@@ -73,5 +79,42 @@ export class QuestionService {
         } catch (error) {
             this.logger.error('Error adding new question: ', error);
         }
+    }
+
+    async validateQuestionObject(question): Promise<boolean> {
+        const questionProperties = ['type', 'label', 'points', 'choices'];
+
+        if (
+            question &&
+            typeof question === 'object' &&
+            questionProperties.every((prop) => Object.keys(question).includes(prop)) &&
+            typeof question.type === 'string' &&
+            typeof question.label === 'string' &&
+            (question.type === 'QCM' || question.type === 'QCL') &&
+            typeof question.points === 'number' &&
+            question.points % MIN_POINTS === 0 &&
+            question.points >= MIN_POINTS &&
+            question.points <= MAX_POINTS &&
+            Array.isArray(question.choices) &&
+            question.choices.length >= MIN_CHOICES &&
+            question.choices.length <= MAX_CHOICES
+        ) {
+            const choicesValidation = await Promise.all(
+                question.choices.map(async (choice: unknown) => {
+                    return (
+                        choice &&
+                        typeof choice === 'object' &&
+                        'label' in choice &&
+                        'isCorrect' in choice &&
+                        typeof choice.label === 'string' &&
+                        typeof choice.isCorrect === 'boolean'
+                    );
+                }),
+            );
+
+            return choicesValidation.every(Boolean);
+        }
+
+        return false;
     }
 }

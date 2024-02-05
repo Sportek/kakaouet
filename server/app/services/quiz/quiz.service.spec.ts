@@ -153,4 +153,88 @@ describe('QuizService', () => {
             expect(loggerErrorSpy).toHaveBeenCalledWith('Error adding new quiz: ', expect.any(Error));
         });
     });
+
+    describe('validateQuizObject', () => {
+        it('should return true for a valid quiz object', async () => {
+            const validQuiz = {
+                name: 'Valid Quiz',
+                duration: 30,
+                description: 'This is a valid quiz description',
+                visibility: true,
+                questions: [
+                    {
+                        type: 'multiple_choice',
+                        label: 'What is 2 + 2?',
+                        points: 20,
+                        choices: [
+                            { label: '2', isCorrect: false },
+                            { label: '3', isCorrect: false },
+                            { label: '4', isCorrect: true },
+                        ],
+                    },
+                ],
+            };
+
+            const result = await service.validateQuizObject(validQuiz);
+            expect(result).toBe(true);
+        });
+
+        it('should return false for an invalid entry', async () => {
+            const invalidQuiz = {
+                name: 'Invalid Quiz',
+                duration: 100,
+                description: 'This is a descriptionn',
+                visibility: true,
+                questions: [
+                    {
+                        type: 'invalid_type',
+                        label: 'What is 2 + 2?',
+                        points: 20,
+                        choices: [
+                            { label: '2', isCorrect: false },
+                            { label: '3', isCorrect: false },
+                            { label: '4', isCorrect: true },
+                        ],
+                    },
+                ],
+            };
+
+            const result = await service.validateQuizObject(invalidQuiz);
+            expect(result).toBe(false);
+        });
+    });
+
+    describe('validateQuestionObject', () => {
+        it('should return true for a valid question object', async () => {
+            const validQuestion = {
+                type: 'QCM',
+                label: 'What is 2 + 2?',
+                points: 20,
+                choices: [
+                    { label: '2', isCorrect: false },
+                    { label: '3', isCorrect: false },
+                    { label: '4', isCorrect: true },
+                ],
+            };
+
+            const result = await service.validateQuestionObject(validQuestion);
+            expect(result).toBe(true);
+        });
+
+        it('should return false for an invalid question object', async () => {
+            const invalidQuestion = {
+                type: 'invalid_type',
+                label: 'What is 2 + 2?',
+                points: 20,
+                choices: [
+                    { label: '2', isCorrect: false },
+                    { label: '3', isCorrect: false },
+                    { label: '4', isCorrect: true },
+                ],
+            };
+
+            const result = await service.validateQuestionObject(invalidQuestion);
+            expect(result).toBe(false);
+        });
+    });
 });
