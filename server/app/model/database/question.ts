@@ -24,6 +24,13 @@ export class Question {
 
     @ApiProperty()
     choices?: Choice[];
+
+    @ApiProperty()
+    createdAt?: Date;
+
+    @ApiProperty()
+    updatedAt?: Date;
 }
 
 export const questionSchema = SchemaFactory.createForClass(Question);
+questionSchema.set('timestamps', true);
