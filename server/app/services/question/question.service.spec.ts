@@ -175,11 +175,11 @@ describe('QuestionService', () => {
         it('should return true for a valid question', async () => {
             const validQuestion = {
                 type: 'QCM',
-                text: 'What is the capital of France?',
+                label: 'What is the capital of France?',
                 points: 10,
                 choices: [
-                    { text: 'Paris', isCorrect: true },
-                    { text: 'Berlin', isCorrect: false },
+                    { label: 'Paris', isCorrect: true },
+                    { label: 'Berlin', isCorrect: false },
                 ],
             };
 
@@ -190,7 +190,7 @@ describe('QuestionService', () => {
         it('should return false for an invalid question with missing properties', async () => {
             const invalidQuestion = {
                 type: 'QCM',
-                text: 'What is the capital of France?',
+                label: 'What is the capital of France?',
             };
 
             const result = await service.validateQuestionObject(invalidQuestion);
@@ -200,11 +200,11 @@ describe('QuestionService', () => {
         it('should return false for an invalid entry', async () => {
             const invalidQuestion = {
                 type: 'QCM',
-                text: 'What is the capital of France?',
+                label: 'What is the capital of France?',
                 points: 110,
                 choices: [
-                    { text: 'Paris', isCorrect: true },
-                    { text: 'Berlin', isCorrect: false },
+                    { label: 'Paris', isCorrect: true },
+                    { label: 'Berlin', isCorrect: false },
                 ],
             };
 

@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class Choice {
     @ApiProperty()
     @Prop({ required: true })
-    text: string;
+    label: string;
 
     @ApiProperty()
     @Prop({ required: true })

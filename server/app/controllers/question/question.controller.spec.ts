@@ -10,7 +10,7 @@ describe('QuestionController', () => {
 
     const mockQuestion: Question = {
         type: 'QCM',
-        text: 'What is NestJS?',
+        label: 'What is NestJS?',
         points: 10,
         choices: [],
     };
@@ -25,7 +25,7 @@ describe('QuestionController', () => {
                         getAllQuestions: jest.fn().mockResolvedValue([mockQuestion]),
                         getQuestionById: jest.fn().mockResolvedValue(mockQuestion),
                         addNewQuestion: jest.fn().mockResolvedValue(mockQuestion),
-                        updateQuestionById: jest.fn().mockResolvedValue({ ...mockQuestion, text: 'Updated Question' }),
+                        updateQuestionById: jest.fn().mockResolvedValue({ ...mockQuestion, label: 'Updated Question' }),
                         deleteQuestionById: jest.fn().mockResolvedValue(undefined),
                         deleteAllQuestions: jest.fn().mockResolvedValue(undefined),
                         validateQuestionObject: jest.fn().mockResolvedValue(true),
@@ -69,7 +69,7 @@ describe('QuestionController', () => {
         it('should throw HttpException with status 400 if validation fails', async () => {
             const invalidQuestion: Question = {
                 type: 'QRL',
-                text: 'New Question',
+                label: 'New Question',
                 points: 5,
                 choices: [],
             };
@@ -84,7 +84,7 @@ describe('QuestionController', () => {
         it('should update a question if validation passes', async () => {
             const updatedQuestion: Question = {
                 ...mockQuestion,
-                text: 'Updated Question',
+                label: 'Updated Question',
             };
             jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(true);
             jest.spyOn(service, 'updateQuestionById').mockResolvedValue();
@@ -94,7 +94,7 @@ describe('QuestionController', () => {
         it('should throw HttpException with status 400 if validation fails', async () => {
             const invalidQuestion: Question = {
                 type: 'QRL',
-                text: 'New Question',
+                label: 'New Question',
                 points: 5,
                 choices: [],
             };

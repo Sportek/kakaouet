@@ -44,9 +44,36 @@ describe('QuizController', () => {
         expect(controller).toBeDefined();
     });
 
-    describe('getAllQuizzes', () => {
-        it('should return an array of quizzes', async () => {
-            await expect(controller.getAllQuizzes()).resolves.toEqual([mockQuiz]);
+    describe('getQuizById', () => {
+        it('should return entire quiz object if index is not provided', async () => {
+            jest.spyOn(service, 'getQuizById').mockResolvedValue(mockQuiz);
+            const result = await controller.getQuizById('1');
+            expect(result).toEqual(mockQuiz);
+        });
+
+        it('should return array of correct choices indices if index is provided', async () => {
+            jest.spyOn(service, 'getQuizById').mockResolvedValue({
+                name: 'Quiz 1',
+                duration: 60,
+                description: 'This is the description of question 1',
+                visibility: true,
+                questions: [
+                    {
+                        type: 'QCM',
+                        label: 'What is the capital of France?',
+                        points: 10,
+                        choices: [
+                            { label: 'Paris', isCorrect: true },
+                            { label: 'Berlin', isCorrect: false },
+                            { label: 'London', isCorrect: false },
+                            { label: 'Madrid', isCorrect: false },
+                        ],
+                    },
+                ],
+            });
+
+            const result = await controller.getQuizById('1', 0);
+            expect(result).toEqual([0]);
         });
     });
 

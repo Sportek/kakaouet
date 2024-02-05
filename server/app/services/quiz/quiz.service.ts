@@ -101,7 +101,7 @@ export class QuizService {
     }
 
     async validateQuestionObject(question): Promise<boolean> {
-        const questionProperties = ['type', 'text', 'points', 'choices'];
+        const questionProperties = ['type', 'label', 'points', 'choices'];
 
         if (
             question &&
@@ -109,7 +109,7 @@ export class QuizService {
             questionProperties.every((prop) => Object.keys(question).includes(prop)) &&
             typeof question.type === 'string' &&
             (question.type === 'QCM' || question.type === 'QCL') &&
-            typeof question.text === 'string' &&
+            typeof question.label === 'string' &&
             typeof question.points === 'number' &&
             question.points % MIN_POINTS === 0 &&
             question.points >= MIN_POINTS &&
@@ -123,9 +123,9 @@ export class QuizService {
                     return (
                         choice &&
                         typeof choice === 'object' &&
-                        'text' in choice &&
+                        'label' in choice &&
                         'isCorrect' in choice &&
-                        typeof choice.text === 'string' &&
+                        typeof choice.label === 'string' &&
                         typeof choice.isCorrect === 'boolean'
                     );
                 }),

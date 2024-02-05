@@ -164,12 +164,12 @@ describe('QuizService', () => {
                 questions: [
                     {
                         type: 'multiple_choice',
-                        text: 'What is 2 + 2?',
+                        label: 'What is 2 + 2?',
                         points: 20,
                         choices: [
-                            { text: '2', isCorrect: false },
-                            { text: '3', isCorrect: false },
-                            { text: '4', isCorrect: true },
+                            { label: '2', isCorrect: false },
+                            { label: '3', isCorrect: false },
+                            { label: '4', isCorrect: true },
                         ],
                     },
                 ],
@@ -188,12 +188,12 @@ describe('QuizService', () => {
                 questions: [
                     {
                         type: 'invalid_type',
-                        text: 'What is 2 + 2?',
+                        label: 'What is 2 + 2?',
                         points: 20,
                         choices: [
-                            { text: '2', isCorrect: false },
-                            { text: '3', isCorrect: false },
-                            { text: '4', isCorrect: true },
+                            { label: '2', isCorrect: false },
+                            { label: '3', isCorrect: false },
+                            { label: '4', isCorrect: true },
                         ],
                     },
                 ],
@@ -208,12 +208,12 @@ describe('QuizService', () => {
         it('should return true for a valid question object', async () => {
             const validQuestion = {
                 type: 'QCM',
-                text: 'What is 2 + 2?',
+                label: 'What is 2 + 2?',
                 points: 20,
                 choices: [
-                    { text: '2', isCorrect: false },
-                    { text: '3', isCorrect: false },
-                    { text: '4', isCorrect: true },
+                    { label: '2', isCorrect: false },
+                    { label: '3', isCorrect: false },
+                    { label: '4', isCorrect: true },
                 ],
             };
 
@@ -224,12 +224,12 @@ describe('QuizService', () => {
         it('should return false for an invalid question object', async () => {
             const invalidQuestion = {
                 type: 'invalid_type',
-                text: 'What is 2 + 2?',
+                label: 'What is 2 + 2?',
                 points: 20,
                 choices: [
-                    { text: '2', isCorrect: false },
-                    { text: '3', isCorrect: false },
-                    { text: '4', isCorrect: true },
+                    { label: '2', isCorrect: false },
+                    { label: '3', isCorrect: false },
+                    { label: '4', isCorrect: true },
                 ],
             };
 

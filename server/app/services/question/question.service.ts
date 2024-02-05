@@ -82,14 +82,14 @@ export class QuestionService {
     }
 
     async validateQuestionObject(question): Promise<boolean> {
-        const questionProperties = ['type', 'text', 'points', 'choices'];
+        const questionProperties = ['type', 'label', 'points', 'choices'];
 
         if (
             question &&
             typeof question === 'object' &&
             questionProperties.every((prop) => Object.keys(question).includes(prop)) &&
             typeof question.type === 'string' &&
-            typeof question.text === 'string' &&
+            typeof question.label === 'string' &&
             (question.type === 'QCM' || question.type === 'QCL') &&
             typeof question.points === 'number' &&
             question.points % MIN_POINTS === 0 &&
@@ -104,9 +104,9 @@ export class QuestionService {
                     return (
                         choice &&
                         typeof choice === 'object' &&
-                        'text' in choice &&
+                        'label' in choice &&
                         'isCorrect' in choice &&
-                        typeof choice.text === 'string' &&
+                        typeof choice.label === 'string' &&
                         typeof choice.isCorrect === 'boolean'
                     );
                 }),

@@ -9,13 +9,13 @@ export const mockQuizTable: Quiz[] = [
         questions: [
             {
                 type: 'QCM',
-                text: 'What is the capital of France?',
+                label: 'What is the capital of France?',
                 points: 10,
                 choices: [
-                    { text: 'Paris', isCorrect: true },
-                    { text: 'Berlin', isCorrect: false },
-                    { text: 'London', isCorrect: false },
-                    { text: 'Madrid', isCorrect: false },
+                    { label: 'Paris', isCorrect: true },
+                    { label: 'Berlin', isCorrect: false },
+                    { label: 'London', isCorrect: false },
+                    { label: 'Madrid', isCorrect: false },
                 ],
             },
         ],
@@ -28,13 +28,13 @@ export const mockQuizTable: Quiz[] = [
         questions: [
             {
                 type: 'QCM',
-                text: 'What is the capital of France?',
+                label: 'What is the capital of France?',
                 points: 10,
                 choices: [
-                    { text: 'Paris', isCorrect: true },
-                    { text: 'Berlin', isCorrect: false },
-                    { text: 'London', isCorrect: false },
-                    { text: 'Madrid', isCorrect: false },
+                    { label: 'Paris', isCorrect: true },
+                    { label: 'Berlin', isCorrect: false },
+                    { label: 'London', isCorrect: false },
+                    { label: 'Madrid', isCorrect: false },
                 ],
             },
         ],
