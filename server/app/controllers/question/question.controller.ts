@@ -2,7 +2,6 @@ import { Question } from '@app/model/database/question';
 import { QuestionService } from '@app/services/question/question.service';
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-
 @ApiTags('Questions')
 @Controller('question')
 export class QuestionController {
@@ -25,13 +24,23 @@ export class QuestionController {
 
     @Post('/')
     async createQuestion(@Body() question: Question) {
-        return await this.questionService.addNewQuestion(question);
+        if (await this.questionService.validateQuestionObject(question)) {
+            await this.questionService.addNewQuestion(question);
+            return 'Question created successfully';
+        } else {
+            throw new HttpException('Invalid question object', HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Patch('/:id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateQuestion(@Param('id') id: string, @Body() question: Question) {
-        await this.questionService.updateQuestionById(id, question);
+        if (await this.questionService.validateQuestionObject(question)) {
+            await this.questionService.updateQuestionById(id, question);
+            return 'Question updated successfully';
+        } else {
+            throw new HttpException('Invalid question object', HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Delete('/:id')

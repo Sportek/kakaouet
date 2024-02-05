@@ -28,6 +28,7 @@ describe('QuestionController', () => {
                         updateQuestionById: jest.fn().mockResolvedValue({ ...mockQuestion, text: 'Updated Question' }),
                         deleteQuestionById: jest.fn().mockResolvedValue(undefined),
                         deleteAllQuestions: jest.fn().mockResolvedValue(undefined),
+                        validateQuestionObject: jest.fn().mockResolvedValue(true),
                     },
                 },
             ],
@@ -59,24 +60,54 @@ describe('QuestionController', () => {
     });
 
     describe('createQuestion', () => {
-        it('should create and return a question', async () => {
+        it('should create and return a question if validation passes', async () => {
             const newQuestion: Question = {
                 type: 'QRL',
                 text: 'New Question',
                 points: 5,
                 choices: [],
             };
-            await expect(controller.createQuestion(newQuestion)).resolves.toEqual(mockQuestion);
+            jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(true);
+            jest.spyOn(service, 'addNewQuestion').mockResolvedValue();
+            await expect(controller.createQuestion(newQuestion)).resolves.toEqual('Question created successfully');
+        });
+
+        it('should throw HttpException with status 400 if validation fails', async () => {
+            const invalidQuestion: Question = {
+                type: 'QRL',
+                text: 'New Question',
+                points: 5,
+                choices: [],
+            };
+            jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(false);
+            await expect(controller.createQuestion(invalidQuestion)).rejects.toThrowError(
+                new HttpException('Invalid question object', HttpStatus.BAD_REQUEST),
+            );
         });
     });
 
     describe('updateQuestion', () => {
-        it('should update a question', async () => {
+        it('should update a question if validation passes', async () => {
             const updatedQuestion: Question = {
                 ...mockQuestion,
                 text: 'Updated Question',
             };
-            await expect(controller.updateQuestion('1', updatedQuestion)).resolves.toBeUndefined();
+            jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(true);
+            jest.spyOn(service, 'updateQuestionById').mockResolvedValue();
+            await expect(controller.updateQuestion('1', updatedQuestion)).resolves.toEqual('Question updated successfully');
+        });
+
+        it('should throw HttpException with status 400 if validation fails', async () => {
+            const invalidQuestion: Question = {
+                type: 'QRL',
+                text: 'New Question',
+                points: 5,
+                choices: [],
+            };
+            jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(false);
+            await expect(controller.updateQuestion('1', invalidQuestion)).rejects.toThrowError(
+                new HttpException('Invalid question object', HttpStatus.BAD_REQUEST),
+            );
         });
     });
 
@@ -91,4 +122,6 @@ describe('QuestionController', () => {
             await expect(controller.deleteAllQuestions()).resolves.toBeUndefined();
         });
     });
+
+    
 });
