@@ -19,6 +19,11 @@ export class UserService {
         private router: Router,
     ) {
         this.checkLoginStatus();
+        this.loggedState.subscribe((state) => {
+            if (state === AdminLoginState.LoggedIn && this.router.url === '/admin/login') this.router.navigateByUrl('/admin', { replaceUrl: true });
+            if (state !== AdminLoginState.LoggedIn && this.router.url.includes('/admin/'))
+                this.router.navigateByUrl('/admin/login', { replaceUrl: true });
+        });
     }
 
     checkLoginStatus(): void {
@@ -39,7 +44,6 @@ export class UserService {
             .pipe(
                 tap((response: HttpResponse<null>) => {
                     const isLogin = response.body ? response.body['success'] : false;
-                    if (isLogin) router.navigateByUrl('/admin', { replaceUrl: true });
                     this.loggedState.next(isLogin ? AdminLoginState.LoggedIn : AdminLoginState.Failed);
                 }),
             )
