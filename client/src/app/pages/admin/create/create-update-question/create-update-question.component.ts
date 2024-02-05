@@ -14,22 +14,22 @@ export class CreateUpdateQuestionComponent {
     description: string;
     choices: Choice[] = [
         {
-            id: 1,
+            _id: 1,
             label: 'Ma réponse',
             isCorrect: true,
         },
         {
-            id: 2,
+            _id: 2,
             label: 'Ma réponse 2',
             isCorrect: false,
         },
         {
-            id: 3,
+            _id: 3,
             label: 'Ma réponse 3',
             isCorrect: false,
         },
         {
-            id: 4,
+            _id: 4,
             label: 'Ma réponse 4',
             isCorrect: false,
         },
