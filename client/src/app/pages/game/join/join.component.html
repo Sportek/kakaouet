@@ -1,0 +1,13 @@
+<app-global-layout>
+    <div class="wrapper">
+        <img src="../../../../assets/img/kakaouet.png" alt="" />
+        <div class="join-container">
+            <form (submit)="joinGame()" name="codeForm">
+                <mat-form-field>
+                    <input matInput placeholder="Code du jeu" [(ngModel)]="code" name="code" />
+                </mat-form-field>
+                <button type="submit" mat-raised-button color="primary">Rejoindre</button>
+            </form>
+        </div>
+    </div>
+</app-global-layout>

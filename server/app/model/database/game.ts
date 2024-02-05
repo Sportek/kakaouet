@@ -1,8 +1,11 @@
-import { Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Message } from '@app/model/schema/message.schema';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 import { GameUser } from './game-user';
 import { Quiz } from './quiz';
+
+import { GameType } from '@common/types';
 
 export type GameDocument = Game & Document;
 
@@ -11,24 +14,28 @@ export class Game {
     @ApiProperty()
     _id?: string;
 
-    @ApiProperty({ type: () => [GameUser] })
-    users: GameUser[];
+    @ApiProperty({ type: () => [GameUser], default: [] })
+    @Prop()
+    users?: GameUser[];
 
     @ApiProperty()
+    @Prop()
     quiz: Quiz;
 
-    // TODO: Ajouter les différents types
-    // @ApiProperty({ enum: ['random', 'test', 'default'], default: 'default' })
-    // gameType: GameType
+    @ApiProperty({ enum: Object.values(GameType), default: 'default' })
+    @Prop()
+    gameType?: GameType;
 
     @ApiProperty()
+    @Prop()
     isLocked: boolean;
 
-    // TODO: Ajouter les messages
-    // @ApiProperty({type: () => [Message]})
-    // messages: Message[];
+    @ApiProperty({ type: () => [Message], default: [] })
+    @Prop()
+    messages?: Message[];
 
     @ApiProperty()
+    @Prop()
     code: string;
 
     @ApiProperty()

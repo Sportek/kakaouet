@@ -29,7 +29,7 @@ import { DescriptonPageComponent } from './pages/create-game/descripton-page/des
 import { TestingGameComponent } from './pages/create-game/testing-game/testing-game.component';
 import { Error404Component } from './pages/error/error404/error404.component';
 import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
-import { JoinPageComponent } from './pages/join-page/join-page.component';
+import { JoinComponent } from './pages/game/join/join.component';
 
 /**
  * Main module that is used in main.ts.
@@ -44,7 +44,6 @@ import { JoinPageComponent } from './pages/join-page/join-page.component';
         BackgroundComponent,
         CreatePageComponent,
         AdminPageComponent,
-        JoinPageComponent,
         AdminLoginPageComponent,
         GlobalLayoutComponent,
         FooterComponent,
@@ -63,6 +62,7 @@ import { JoinPageComponent } from './pages/join-page/join-page.component';
         GameVueComponent,
         ChatComponent,
         Error404Component,
+        JoinComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
     providers: [],

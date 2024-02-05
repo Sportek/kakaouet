@@ -10,7 +10,7 @@ import { CreatePageComponent } from '@app/pages/create-game/create-page/create-p
 import { DescriptonPageComponent } from '@app/pages/create-game/descripton-page/descripton-page.component';
 import { Error404Component } from '@app/pages/error/error404/error404.component';
 import { GameVueComponent } from '@app/pages/game/game-vue/game-vue.component';
-import { JoinPageComponent } from '@app/pages/join-page/join-page.component';
+import { JoinComponent } from '@app/pages/game/join/join.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 
 const routes: Routes = [
@@ -29,7 +29,9 @@ const routes: Routes = [
     { path: 'admin/create/quiz/:id/question', component: CreateUpdateQuestionComponent },
     // Modification d'une question d'un Quiz
     { path: 'admin/create/quiz/:id/question/:question_id', component: CreateUpdateQuestionComponent },
-    { path: 'join', component: JoinPageComponent },
+
+    { path: 'game/:code', component: GameVueComponent },
+    { path: 'join', component: JoinComponent },
     { path: 'create/description/:gameId', component: DescriptonPageComponent },
 
     // Tester un jeu via son id
