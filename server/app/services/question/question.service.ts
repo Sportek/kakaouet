@@ -85,6 +85,7 @@ export class QuestionService {
           questionProperties.every(prop => Object.keys(question).includes(prop)) &&
           typeof question.type === 'string' &&
           typeof question.text === 'string' &&
+          (question.type === 'QCM' || question.type === 'QCL') &&
           typeof question.points === 'number' &&
           question.points % 10 === 0 && 
           question.points >= 10 && question.points <= 100 && 
