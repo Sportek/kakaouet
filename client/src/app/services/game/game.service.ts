@@ -18,7 +18,7 @@ export class GameService {
     actualQuestion: BehaviorSubject<Question> = new BehaviorSubject<Question>({} as Question);
     timer: Timer | undefined;
     user: GameUser = {
-        id: 'player',
+        _id: 'player',
         isActive: true,
         isExcluded: false,
         name: 'Player',
@@ -54,7 +54,7 @@ export class GameService {
                 .pipe(catchError((error) => this.handleError(error)))
                 .subscribe((quiz) => {
                     this.game = {
-                        id: 'test',
+                        _id: 'test',
                         type: GameType.Test,
                         code: 'FAKE',
                         createdAt: new Date(),
@@ -64,7 +64,7 @@ export class GameService {
                         quiz,
                         users: [
                             {
-                                id: 'organisator',
+                                _id: 'organisator',
                                 isActive: true,
                                 isExcluded: false,
                                 name: 'Organisator',

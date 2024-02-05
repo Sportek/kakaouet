@@ -11,7 +11,7 @@ export enum GameType {
 }
 
 export interface Game {
-    id: string;
+    _id: string;
     users: GameUser[];
     quiz: Quiz;
     type: GameType;
@@ -29,7 +29,7 @@ export enum GameRole {
 }
 
 export interface GameUser {
-    id: string;
+    _id: string;
     name: string;
     score: number;
     // If user is excluded from the game (cannot join again)
@@ -46,13 +46,13 @@ export enum QuestionType {
 }
 
 export interface Choice {
-    id: number;
+    _id: number;
     label: string;
     isCorrect: boolean;
 }
 
 export interface BaseQuestion {
-    id: string;
+    _id: string;
     label: string;
     points: number;
     createdAt: Date;
@@ -69,7 +69,7 @@ export type Question =
     } & BaseQuestion);
 
 export interface BaseUserResponse {
-    id: string;
+    _id: string;
     gameUserId: string;
     createdAt: Date;
     updatedAt: Date;
@@ -85,7 +85,7 @@ export type UserResponse =
     };
 
 export interface Quiz {
-    id: string;
+    _id: string;
     name: string;
     description: string;
     duration: number;

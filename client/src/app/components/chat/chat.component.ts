@@ -11,7 +11,9 @@ export class ChatComponent {
     constructor(public gameService: GameService) {}
 
     getGameUser(userId: string) {
-        return this.gameService.game?.users.filter((user) => user.id === userId)[0];
+        // _id de mongo de base, accepté par le prof.
+        // eslint-disable-next-line no-underscore-dangle
+        return this.gameService.game?.users.filter((user) => user._id === userId)[0];
     }
 
     sendMessage() {
