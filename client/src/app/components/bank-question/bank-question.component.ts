@@ -9,27 +9,27 @@ import { Question, QuestionType } from '@common/types';
 export class BankQuestionComponent implements OnInit {
     question1: Question = {
         type: QuestionType.QCM,
-        id: 'q01',
+        _id: 'q01',
         label: 'Parmi les mots suivants, lesquels sont des mots clés réservés en JS?',
         points: 40,
         choices: [
             {
-                id: 1,
+                _id: 1,
                 label: 'var',
                 isCorrect: true,
             },
             {
-                id: 2,
+                _id: 2,
                 label: 'self',
                 isCorrect: false,
             },
             {
-                id: 3,
+                _id: 3,
                 label: 'this',
                 isCorrect: true,
             },
             {
-                id: 4,
+                _id: 4,
                 label: 'int',
                 isCorrect: true,
             },
@@ -39,7 +39,7 @@ export class BankQuestionComponent implements OnInit {
     };
     question2: Question = {
         type: QuestionType.QRL,
-        id: 'q02',
+        _id: 'q02',
         label: "Donnez la différence entre 'let' et 'var' pour la déclaration d'une variable en JS ?",
         points: 60,
         createdAt: new Date('2018-11-11T19:43:52+00:00'),
@@ -47,17 +47,17 @@ export class BankQuestionComponent implements OnInit {
     };
     question3: Question = {
         type: QuestionType.QCM,
-        id: 'q03',
+        _id: 'q03',
         label: "Est-ce qu'on le code suivant lance une erreur : const a = 1/NaN; ? ",
         points: 20,
         choices: [
             {
-                id: 1,
+                _id: 1,
                 label: 'Non',
                 isCorrect: true,
             },
             {
-                id: 2,
+                _id: 2,
                 label: 'Oui',
                 isCorrect: false,
             },

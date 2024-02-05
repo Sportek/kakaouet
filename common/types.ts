@@ -11,13 +11,14 @@ export enum GameType {
 }
 
 export interface Game {
-    id: string;
+    _id: string;
     users: GameUser[];
     quiz: Quiz;
     type: GameType;
     // Players still can join the game
     isLocked: boolean;
     code: string;
+    messages: Message[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -28,7 +29,7 @@ export enum GameRole {
 }
 
 export interface GameUser {
-    id: string;
+    _id: string;
     name: string;
     score: number;
     // If user is excluded from the game (cannot join again)
@@ -45,13 +46,13 @@ export enum QuestionType {
 }
 
 export interface Choice {
-    id: number;
+    _id: number;
     label: string;
     isCorrect: boolean;
 }
 
-interface BaseQuestion {
-    id: string;
+export interface BaseQuestion {
+    _id: string;
     label: string;
     points: number;
     createdAt: Date;
@@ -67,8 +68,8 @@ export type Question =
         type: QuestionType.QRL;
     } & BaseQuestion);
 
-interface BaseUserResponse {
-    id: string;
+export interface BaseUserResponse {
+    _id: string;
     gameUserId: string;
     createdAt: Date;
     updatedAt: Date;
@@ -84,7 +85,7 @@ export type UserResponse =
     };
 
 export interface Quiz {
-    id: string;
+    _id: string;
     name: string;
     description: string;
     duration: number;
@@ -99,4 +100,25 @@ export interface Message {
     gameUserId: string;
     content: string;
     createdAt: Date;
+}
+
+export enum GameState {
+    // 1 En attente de joueurs pour commencer le quiz
+    WaitingPlayers = 'waitingPlayers',
+
+    // 2 Phase de réponse aux questions par les joueurs
+    PlayersAnswerQuestion = 'playersAnswerQuestion',
+
+    // 3 Phase de correction des réponses
+    OrganisatorCorrectingAnswers = 'organisatorCorrectAnswers',
+
+    // 4 Afficher les résultats de la question
+    DisplayQuestionResults = 'displayQuestionResults',
+    // Boucle les étapes 2 à 4 jusqu'à la fin du quiz
+
+    // 5 Afficher les résultats du quiz, qui a gagné, etc.
+    DisplayQuizResults = 'displayQuizResults',
+
+    // 6 Le quiz est terminé
+    End = 'end',
 }
