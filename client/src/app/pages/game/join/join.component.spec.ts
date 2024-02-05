@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { JoinPageComponent } from './join-page.component';
+import { JoinComponent } from './join.component';
 
-describe('JoinPageComponent', () => {
-    let component: JoinPageComponent;
-    let fixture: ComponentFixture<JoinPageComponent>;
+describe('JoinComponent', () => {
+    let component: JoinComponent;
+    let fixture: ComponentFixture<JoinComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [JoinPageComponent],
+            declarations: [JoinComponent],
         });
-        fixture = TestBed.createComponent(JoinPageComponent);
+        fixture = TestBed.createComponent(JoinComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
