@@ -74,4 +74,39 @@ export class QuestionService {
             this.logger.error('Error adding new question: ', error);
         }
     }
+
+    async validateQuestionObject(question: any): Promise<boolean> {
+
+        const questionProperties = ['type', 'text', 'points', 'choices'];
+      
+        if (
+          question &&
+          typeof question === 'object' &&
+          questionProperties.every(prop => Object.keys(question).includes(prop)) &&
+          typeof question.type === 'string' &&
+          typeof question.text === 'string' &&
+          typeof question.points === 'number' &&
+          question.points % 10 === 0 && 
+          question.points >= 10 && question.points <= 100 && 
+          Array.isArray(question.choices) &&
+          question.choices.length >= 2 && question.choices.length <= 4 
+        ) {
+          const choicesValidation = await Promise.all(
+            question.choices.map(async (choice: any) => {
+              return (
+                choice &&
+                typeof choice === 'object' &&
+                'text' in choice &&
+                'isCorrect' in choice &&
+                typeof choice.text === 'string' &&
+                typeof choice.isCorrect === 'boolean'
+              );
+            })
+          );
+      
+          return choicesValidation.every(Boolean);
+        }
+      
+        return false;
+      }
 }
