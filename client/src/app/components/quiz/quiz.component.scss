@@ -30,6 +30,10 @@
     display: flex;
     justify-content: space-around;
     text-align: center;
+    align-items: center;
+    * {
+        vertical-align: middle;
+    }
 }
 .date {
     text-align: center;

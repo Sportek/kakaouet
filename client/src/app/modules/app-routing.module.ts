@@ -28,7 +28,9 @@ const routes: Routes = [
     // Création d'une nouvelle question d'un Quiz
     { path: 'admin/create/quiz/:id/question', component: CreateUpdateQuestionComponent },
     // Modification d'une question d'un Quiz
-    { path: 'admin/create/quiz/:id/question/:question_id', component: CreateUpdateQuestionComponent },
+    { path: 'admin/create/quiz/:id/question/:id', component: CreateUpdateQuestionComponent },
+    // Modification d'une question de la banque
+    { path: 'admin/create/question', component: CreateUpdateQuestionComponent },
 
     { path: 'game/:code', component: GameVueComponent },
     { path: 'join', component: JoinComponent },

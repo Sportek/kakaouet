@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { MatMenuModule } from '@angular/material/menu';
 import { SelectorComponent } from './selector.component';
 
 describe('SelectorComponent', () => {
@@ -9,6 +10,7 @@ describe('SelectorComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [SelectorComponent],
+            imports: [MatMenuModule],
         });
         fixture = TestBed.createComponent(SelectorComponent);
         component = fixture.componentInstance;

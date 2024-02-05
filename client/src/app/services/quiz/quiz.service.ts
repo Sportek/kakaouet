@@ -21,5 +21,9 @@ export class QuizService {
         return this.http.get<Quiz>(url);
     }
 
-    // getQuestionsById(id: string): Observable<>
+    deleteQuizById(id: string | undefined): void {
+        if (id) {
+            this.http.delete<Quiz>(`${BASE_URL}/quiz/${id}`);
+        }
+    }
 }

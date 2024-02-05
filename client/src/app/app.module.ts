@@ -15,6 +15,7 @@ import { ChatComponent } from './components/chat/chat.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
+import { QuestionOverlayComponent } from './components/question-overlay/question-overlay.component';
 import { QuizTermineComponent } from './components/quiz-termine/quiz-termine.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { SelectorComponent } from './components/selector/selector.component';
@@ -63,6 +64,7 @@ import { JoinComponent } from './pages/game/join/join.component';
         ChatComponent,
         Error404Component,
         JoinComponent,
+        QuestionOverlayComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
     providers: [],

@@ -12,19 +12,37 @@
     align-items: center;
     justify-content: center;
 }
+
+.questions-container {
+    height: 15rem; /* Adjust the height as needed */
+    width: 100%;
+    overflow-y: auto;
+    padding: 0rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 0.4rem solid black;
+}
+
 .question {
     width: 100%;
+    height: 3rem;
     display: flex;
     justify-content: space-around;
-    margin: 1rem 0;
     border: 0.25rem solid black;
     background-color: $purple-900;
     box-sizing: border-box;
     align-items: center;
+    padding: 1rem;
 }
 .question-name {
     flex: 3;
     text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .icons {
     display: flex;
@@ -35,4 +53,10 @@
 :host ::ng-deep .mat-icon {
     height: 100%;
     width: 100%;
+}
+
+.question-name .large-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }

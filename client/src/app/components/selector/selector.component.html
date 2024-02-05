@@ -1,6 +1,9 @@
 <div class="selector">
-    <div class="large-text">{{ label }}</div>
-    <div *ngFor="let choice of choices">
-        <div class="small-text">{{ choice }}</div>
-    </div>
+    <div class="title-text">{{ label }}</div>
+    <button mat-button [matMenuTriggerFor]="menu" color="white" class="large-text">{{ currentChoice }}</button>
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item *ngFor="let choice of choices" (click)="selectChoice(choice)" class="large-text">
+            {{ choice }}
+        </button>
+    </mat-menu>
 </div>
