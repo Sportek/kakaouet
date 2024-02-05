@@ -6,6 +6,10 @@ import { mockQuizTable } from './mock-quiz';
 
 const MIN_DURATION = 10;
 const MAX_DURATION = 60;
+const MIN_POINTS = 10;
+const MAX_POINTS = 100;
+const MIN_CHOICES = 2;
+const MAX_CHOICES = 4;
 
 @Injectable()
 export class QuizService {
@@ -96,39 +100,40 @@ export class QuizService {
         return false;
     }
 
-    async validateQuestionObject(question: any): Promise<boolean> {
-
+    async validateQuestionObject(question): Promise<boolean> {
         const questionProperties = ['type', 'text', 'points', 'choices'];
-      
+
         if (
-          question &&
-          typeof question === 'object' &&
-          questionProperties.every(prop => Object.keys(question).includes(prop)) &&
-          typeof question.type === 'string' &&
-          (question.type === 'QCM' || question.type === 'QCL') &&
-          typeof question.text === 'string' &&
-          typeof question.points === 'number' &&
-          question.points % 10 === 0 && 
-          question.points >= 10 && question.points <= 100 && 
-          Array.isArray(question.choices) &&
-          question.choices.length >= 2 && question.choices.length <= 4 
+            question &&
+            typeof question === 'object' &&
+            questionProperties.every((prop) => Object.keys(question).includes(prop)) &&
+            typeof question.type === 'string' &&
+            (question.type === 'QCM' || question.type === 'QCL') &&
+            typeof question.text === 'string' &&
+            typeof question.points === 'number' &&
+            question.points % MIN_POINTS === 0 &&
+            question.points >= MIN_POINTS &&
+            question.points <= MAX_POINTS &&
+            Array.isArray(question.choices) &&
+            question.choices.length >= MIN_CHOICES &&
+            question.choices.length <= MAX_CHOICES
         ) {
-          const choicesValidation = await Promise.all(
-            question.choices.map(async (choice: any) => {
-              return (
-                choice &&
-                typeof choice === 'object' &&
-                'text' in choice &&
-                'isCorrect' in choice &&
-                typeof choice.text === 'string' &&
-                typeof choice.isCorrect === 'boolean'
-              );
-            })
-          );
-      
-          return choicesValidation.every(Boolean);
+            const choicesValidation = await Promise.all(
+                question.choices.map(async (choice: unknown) => {
+                    return (
+                        choice &&
+                        typeof choice === 'object' &&
+                        'text' in choice &&
+                        'isCorrect' in choice &&
+                        typeof choice.text === 'string' &&
+                        typeof choice.isCorrect === 'boolean'
+                    );
+                }),
+            );
+
+            return choicesValidation.every(Boolean);
         }
-      
+
         return false;
-      }
+    }
 }

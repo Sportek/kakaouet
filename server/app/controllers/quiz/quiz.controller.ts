@@ -25,13 +25,23 @@ export class QuizController {
     @Post('/')
     @HttpCode(HttpStatus.CREATED)
     async createQuiz(@Body() quiz: Quiz) {
-        return await this.quizService.addNewQuiz(quiz);
+        if (await this.quizService.validateQuizObject(quiz)) {
+            await this.quizService.addNewQuiz(quiz);
+            return 'Quiz created successfully';
+        } else {
+            throw new HttpException('Invalid quiz object', HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Patch('/:id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateQuiz(@Param('id') id: string, @Body() quiz: Quiz) {
-        return await this.quizService.updateQuizById(id, quiz);
+        if (await this.quizService.validateQuizObject(quiz)) {
+            await this.quizService.updateQuizById(id, quiz);
+            return 'Quiz updated successfully';
+        } else {
+            throw new HttpException('Invalid quiz object', HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Delete('/:id')

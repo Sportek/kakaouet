@@ -61,15 +61,9 @@ describe('QuestionController', () => {
 
     describe('createQuestion', () => {
         it('should create and return a question if validation passes', async () => {
-            const newQuestion: Question = {
-                type: 'QRL',
-                text: 'New Question',
-                points: 5,
-                choices: [],
-            };
             jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(true);
             jest.spyOn(service, 'addNewQuestion').mockResolvedValue();
-            await expect(controller.createQuestion(newQuestion)).resolves.toEqual('Question created successfully');
+            await expect(controller.createQuestion(mockQuestion)).resolves.toEqual('Question created successfully');
         });
 
         it('should throw HttpException with status 400 if validation fails', async () => {
@@ -122,6 +116,4 @@ describe('QuestionController', () => {
             await expect(controller.deleteAllQuestions()).resolves.toBeUndefined();
         });
     });
-
-    
 });

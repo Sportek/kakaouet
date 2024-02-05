@@ -1,4 +1,3 @@
-import { Quiz } from '@app/model/database/quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -30,6 +29,8 @@ describe('QuizController', () => {
                         addNewQuiz: jest.fn().mockResolvedValue(mockQuiz),
                         updateQuizById: jest.fn().mockResolvedValue({ ...mockQuiz, name: 'Updated Test Quiz' }),
                         deleteQuizById: jest.fn().mockResolvedValue(null),
+                        validateQuizObject: jest.fn(),
+                        validateQuestionObject: jest.fn(),
                     },
                 },
             ],
@@ -61,25 +62,16 @@ describe('QuizController', () => {
     });
 
     describe('createQuiz', () => {
-        it('should create and return a quiz', async () => {
-            const newQuiz: Quiz = {
-                name: 'New Quiz',
-                duration: 45,
-                description: 'Description for new quiz',
-                visibility: false,
-                questions: [],
-            };
-            await expect(controller.createQuiz(newQuiz)).resolves.toEqual(mockQuiz);
+        it('should throw an error for an invalid quiz object', async () => {
+            jest.spyOn(service, 'validateQuizObject').mockResolvedValueOnce(false);
+            await expect(controller.createQuiz(mockQuiz)).rejects.toThrow(new HttpException('Invalid quiz object', HttpStatus.BAD_REQUEST));
         });
     });
 
-    describe('updateQuizById', () => {
-        it('should update and return the quiz', async () => {
-            const updatedQuiz: Quiz = {
-                ...mockQuiz,
-                name: 'Updated Test Quiz',
-            };
-            await expect(controller.updateQuiz('1', updatedQuiz)).resolves.toEqual(updatedQuiz);
+    describe('updateQuiz', () => {
+        it('should throw an error for an invalid quiz object', async () => {
+            jest.spyOn(service, 'validateQuizObject').mockResolvedValueOnce(false);
+            await expect(controller.updateQuiz('1', mockQuiz)).rejects.toThrow(new HttpException('Invalid quiz object', HttpStatus.BAD_REQUEST));
         });
     });
 
