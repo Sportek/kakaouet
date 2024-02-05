@@ -38,6 +38,8 @@ export interface GameUser {
     isActive: boolean;
     answerState: AnswerState;
     role: GameRole;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export enum QuestionType {
@@ -61,12 +63,12 @@ export interface BaseQuestion {
 
 export type Question =
     | ({
-        type: QuestionType.QCM;
-        choices: Choice[];
-    } & BaseQuestion)
+          type: QuestionType.QCM;
+          choices: Choice[];
+      } & BaseQuestion)
     | ({
-        type: QuestionType.QRL;
-    } & BaseQuestion);
+          type: QuestionType.QRL;
+      } & BaseQuestion);
 
 export interface BaseUserResponse {
     _id: string;
@@ -76,13 +78,13 @@ export interface BaseUserResponse {
 }
 export type UserResponse =
     | ({
-        type: QuestionType.QCM;
-        choicesId: string[];
-    } & BaseUserResponse)
+          type: QuestionType.QCM;
+          choicesId: string[];
+      } & BaseUserResponse)
     | {
-        type: QuestionType.QRL;
-        answer: string;
-    };
+          type: QuestionType.QRL;
+          answer: string;
+      };
 
 export interface Quiz {
     _id: string;

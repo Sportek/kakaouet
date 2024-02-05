@@ -1,7 +1,7 @@
+import { GameRole } from '@common/types';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
-
 export type GameUserDocument = GameUser & Document;
 
 @Schema()
@@ -28,6 +28,8 @@ export class GameUser {
     // TODO: Add types
     // @ApiProperty({ enum: ['waiting', 'playing', 'finished'], default: 'waiting' })
     // answerState: AnswerState;
+    @ApiProperty()
+    role: GameRole;
 
     @ApiProperty()
     createdAt?: Date;

@@ -1,12 +1,13 @@
 @import '../../../colors.scss';
-:host {
-    width: 100%;
-}
 
+:host {
+    display: block;
+}
 .selector {
     background-color: $purple-900;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-evenly;
+    gap: 2rem;
+    padding: 1rem;
 }

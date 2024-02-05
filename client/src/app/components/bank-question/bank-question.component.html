@@ -1,14 +1,16 @@
 <div class="background">
-    <div class="question" *ngFor="let question of questionList">
-        <div class="question-name">
-            <div class="large-text">{{ question.label }}</div>
-        </div>
-        <div class="icons">
-            <mat-icon class="title-text">edit</mat-icon>
-            <mat-icon class="title-text">ios_share</mat-icon>
-        </div>
-        <div class="date">
-            <div class="small-text">{{ 'Modifié le: ' + question.updatedAt.toDateString() }}</div>
+    <div class="questions-container">
+        <div class="question" *ngFor="let question of questionList">
+            <div class="question-name">
+                <div class="large-text">{{ question.label }}</div>
+            </div>
+            <div class="icons">
+                <mat-icon class="title-text">edit</mat-icon>
+                <mat-icon class="title-text">ios_share</mat-icon>
+            </div>
+            <div class="date">
+                <div class="small-text">{{ 'Modifié le: ' + (question.updatedAt | date: 'yyyy/MM/dd HH:mm') }}</div>
+            </div>
         </div>
     </div>
 </div>
