@@ -8,10 +8,10 @@
                 <p>{{ game.description }}</p>
             </div>
             <div class="box-description">
-                <p class="select-game-wrapper">Liste des questions:</p>
-                <div *ngFor="let question of game.questions">
-                    <p>{{ question.label }}</p>
-                </div>
+                <p class="select-game-wrapper">Liste des questions:</p> 
+                <div *ngFor="let quest of question; let i = index" > 
+                    <p>{{i + 1}}-{{quest.label}} ({{quest.type}}) </p>
+                </div> 
             </div>
         </div>
         <div class="button-container">

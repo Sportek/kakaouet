@@ -9,7 +9,6 @@ import { Quiz } from '@common/types';
     styleUrls: ['./create-page.component.scss'],
 })
 export class CreatePageComponent implements OnInit {
-    // games = [...games];
     games: Quiz[];
     constructor(private quizService: QuizService) {}
 

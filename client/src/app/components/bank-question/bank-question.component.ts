@@ -27,8 +27,8 @@ export class BankQuestionComponent implements OnInit {
             label: 'Your new question text here',
             points: 10,
             choices: [
-                { _id: 1, label: 'Option 1', isCorrect: false },
-                { _id: 1, label: 'Option 2', isCorrect: true },
+                { _id: 7, label: 'Option 1', isCorrect: false },
+                { _id: 8, label: 'Option 2', isCorrect: true },
             ],
             createdAt: new Date(),
             updatedAt: new Date(),
