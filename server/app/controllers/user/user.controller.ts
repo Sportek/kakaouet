@@ -19,7 +19,7 @@ export class UserController {
             const loginStatus = await this.userService.isLogin(userToken);
             return response.send({ isLogin: loginStatus });
         } catch (error) {
-            return response.status(HttpErrorCode.InternalServorError).send({ message: 'Error while checking login' });
+            return response.status(HttpErrorCode.InternalServerError).send({ message: 'Error while checking login' });
         }
     }
 
@@ -35,7 +35,7 @@ export class UserController {
             const loginStatus = await this.userService.login(userToken, password);
             return response.send({ success: loginStatus });
         } catch (error) {
-            return response.status(HttpErrorCode.InternalServorError).send({ message: 'Error while logging in' });
+            return response.status(HttpErrorCode.InternalServerError).send({ message: 'Error while logging in' });
         }
     }
 
@@ -50,7 +50,7 @@ export class UserController {
             await this.userService.logout(userToken);
             return response.send({ success: true });
         } catch (error) {
-            return response.status(HttpErrorCode.InternalServorError).send({ message: 'Error while logging out' });
+            return response.status(HttpErrorCode.InternalServerError).send({ message: 'Error while logging out' });
         }
     }
 }

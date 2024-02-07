@@ -8,7 +8,6 @@ const PASSWORD = 'LOG2990-109';
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-    // Associate an user with his token
     async register(token: string) {
         await this.userModel.create({ token });
     }
