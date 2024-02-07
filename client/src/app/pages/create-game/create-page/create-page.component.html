@@ -1,28 +1,19 @@
 <app-global-layout>
     <div class="background">
-        <app-background>
-            <div class="container">
                 <div class="wrapper">
                     <h1>Liste des jeux:</h1>
                     <div class="select-game-wrapper">
-                        <!-- <p *ngIf=""> </p>-->
+                        <!-- <p *ngIf=""> si plus de 5 question qcm crée type jeu aléatoire </p>-->
                         <div *ngFor="let game of games">
-                            <!-- <button mat-fab extended color="accent" class="large-text"> -->
                             <div *ngIf="game.visibility">
                                 <a [routerLink]="['/create/description', game._id]">
                                     <button mat-fab extended color="accent" class="large-text">
-                                        {{ game.name }}
+                                        {{ game.name }} 
                                     </button>
                                 </a>
                             </div>
-                            <!--</button>-->
                         </div>
                     </div>
-                    <div class="buttons">
-                        <button routerLink="/" mat-fab extended class="large-text quit-button">Quitter</button>
-                    </div>
                 </div>
-            </div>
-        </app-background>
     </div>
 </app-global-layout>

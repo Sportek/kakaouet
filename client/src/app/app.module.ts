@@ -65,6 +65,7 @@ import { JoinComponent } from './pages/game/join/join.component';
         Error404Component,
         JoinComponent,
         QuestionOverlayComponent,
+        QuestionOverlayComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
     providers: [],

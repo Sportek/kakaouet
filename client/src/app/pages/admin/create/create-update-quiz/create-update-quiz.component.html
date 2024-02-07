@@ -1,38 +1,113 @@
 <app-global-layout>
     <div class="wrapper">
         <div class="container">
-            <div *ngIf="hasId; else createNewGame"><div class="title title-text">Modification d'un jeu</div></div>
+            <div *ngIf="hasId; else createNewGame">
+                <div class="title title-text">Modification d'un jeu</div>
+            </div>
             <ng-template #createNewGame>
-                <div class="title title-text">Création d'un jeu</div>
+                <div class="title title-text">Création d'un nouveau jeu</div>
             </ng-template>
-            <form action="">
-                <div class="first">
+            <div class="box">
+                <form action="">
+                    <div class="first">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Titre</mat-label>
+                            <input [(ngModel)]="titleQuiz" matInput placeholder="Titre du jeu" name="title" required="false" />
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Durée</mat-label>
+                            <input
+                                [(ngModel)]="durationQuiz"
+                                type="number"
+                                matInput
+                                placeholder="10 à 60 secondes"
+                                name="duration"
+                                min="10"
+                                max="60"
+                                required="false"
+                            />
+                        </mat-form-field>
+                    </div>
                     <mat-form-field appearance="fill">
-                        <mat-label>Titre</mat-label>
-                        <input [(ngModel)]="title" matInput placeholder="Titre du jeu" name="title" />
+                        <mat-label>Description</mat-label>
+                        <textarea
+                            [(ngModel)]="descriptionQuiz"
+                            matInput
+                            placeholder="Description de votre jeu"
+                            name="description"
+                            maxlength="200"
+                            required="false"
+                        ></textarea>
                     </mat-form-field>
-                    <mat-form-field appearance="fill">
-                        <mat-label>Durée</mat-label>
-                        <input [(ngModel)]="time" type="number" matInput placeholder="Temps pour la réponse" name="time" />
-                    </mat-form-field>
-                </div>
-                <mat-form-field appearance="fill">
-                    <mat-label>Description</mat-label>
-                    <textarea [(ngModel)]="description" matInput placeholder="Description de votre jeu" name="description" maxlength="200"></textarea>
-                </mat-form-field>
-            </form>
+                </form>
+            </div>
             <div class="questions-container">
-                <div class="questions"></div>
+                <div class="questions large-text">
+                    <div *ngFor="let quest of questionsQuiz">{{ quest.label }} ({{ quest.type }})</div>
+                </div>
                 <div class="questions-buttons">
-                    <button mat-raised-button color="primary">Importer une question de la banque</button>
-                    <button mat-raised-button color="primary" routerLink="/create/quiz/new/question">Créer une nouvelle question</button>
+                    <button routerLink="" mat-raised-button color="primary">Importer une question de la banque</button>
+                    <button mat-raised-button color="primary">Créer une nouvelle question</button> <!-- (click)="addOverlay()" -->
                 </div>
             </div>
 
             <div class="buttons">
-                <button mat-raised-button color="primary" class="red">Annuler</button>
-                <button mat-raised-button color="primary" class="green">Enregistrer</button>
+                <button routerLink="/admin/login" mat-raised-button color="primary" class="red">Annuler</button>
+                <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()">Enregistrer</button>
             </div>
         </div>
     </div>
+
+    <!-- <div class="overlay" [ngStyle]="overlayStatus">
+        <div class="wrapper">
+            <div class="container">
+                <div *ngIf="hasQuestionId; else createNewGame"><div class="title large-text">Modification d'une question</div></div> 
+                <ng-template #createNewGame> 
+                    <div class="title large-text">Création d'une question</div>
+                </ng-template> 
+                <form action="">
+                    <div class="first">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Titre</mat-label>
+                            <input [(ngModel)]="title" matInput placeholder="Titre de la question" name="title" />
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Type de question</mat-label>
+                            <mat-select>
+                                <mat-option value="qcm">Choix multiples</mat-option>
+                                <mat-option value="qcl">Réponse courte</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Points</mat-label>
+                            <input [(ngModel)]="points" type="number" matInput placeholder="Points accordés" name="time" />
+                        </mat-form-field>
+                    </div>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Description</mat-label>
+                        <textarea
+                            [(ngModel)]="description"
+                            matInput
+                            placeholder="Description de la question"
+                            name="description"
+                            maxlength="200"
+                        ></textarea>
+                    </mat-form-field>
+                </form>
+                <div class="choices-container">
+                    <div class="choices">
+                        <div *ngFor="let choice of choices; let i = index" class="choice">{{ i + 1 }}. {{ choice.label }}</div>
+                    </div>
+                    <div class="choices-buttons" *ngIf="choices.length < 4">
+                        <button mat-raised-button color="primary">Ajouter une réponse</button>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button mat-raised-button color="primary" class="red" (click)="removeOverlay()">Annuler</button>
+                    <button mat-raised-button color="primary" class="green">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div> -->
 </app-global-layout>

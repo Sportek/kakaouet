@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root',
 })
 export class QuizService {
-    // private baseURL = 'http://localhost:3000/api/quiz';
+    private baseURL = 'http://localhost:3000/api/quiz';
 
     constructor(private http: HttpClient) {}
 
@@ -21,9 +21,17 @@ export class QuizService {
         return this.http.get<Quiz>(url);
     }
 
-    deleteQuizById(id: string | undefined): void {
-        if (id) {
-            this.http.delete<Quiz>(`${BASE_URL}/quiz/${id}`);
-        }
+    addNewQuiz(quiz: Quiz): Observable<Quiz> {
+        return this.http.post<Quiz>(this.baseURL, quiz);
+    }
+
+    updateQuizById(id: string, quiz: Quiz): Observable<Quiz> {
+        const url = `${BASE_URL}/quiz/${id}`;
+        return this.http.patch<Quiz>(url, quiz);
+    }
+
+    deleteQuizById(id: string): Observable<void> {
+        const url = `${BASE_URL}/quiz/${id}`;
+        return this.http.delete<void>(url);
     }
 }

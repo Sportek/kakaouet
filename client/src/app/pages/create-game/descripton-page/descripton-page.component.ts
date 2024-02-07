@@ -31,7 +31,8 @@ export class DescriptonPageComponent implements OnInit {
         this.quizService.getQuizById(id).subscribe({
             next: (quiz) => {
                 this.game = quiz;
-                this.cd.detectChanges(); // detecter les chargements apres assignation
+                this.question = quiz.questions;
+                this.cd.detectChanges();
             },
         });
     }
