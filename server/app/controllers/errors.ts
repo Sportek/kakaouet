@@ -4,5 +4,5 @@ export enum HttpErrorCode {
     Forbiden = 403,
     NotFound = 404,
     Conflict = 409,
-    InternalServorError = 500,
+    InternalServerError = 500,
 }

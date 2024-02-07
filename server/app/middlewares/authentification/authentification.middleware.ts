@@ -15,7 +15,6 @@ export class AuthentificationMiddleware implements NestMiddleware {
             req.signedCookies['user_token'] = userToken;
         }
 
-        // Update request time
         await this.userService.updateLastRequestAt(userToken);
         next();
     }
