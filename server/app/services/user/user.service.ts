@@ -31,4 +31,8 @@ export class UserService {
     async isLogin(token: string) {
         return (await this.userModel.findOne({ token })).isAdminAuthentified === true;
     }
+
+    async isTokenExist(token: string) {
+        return (await this.userModel.findOne({ token })) !== null;
+    }
 }

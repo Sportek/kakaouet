@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,13 +12,13 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { BankQuestionComponent } from './components/bank-question/bank-question.component';
 import { ChatComponent } from './components/chat/chat.component';
-import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
 import { QuestionOverlayComponent } from './components/question-overlay/question-overlay.component';
 import { QuizTermineComponent } from './components/quiz-termine/quiz-termine.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { SelectorComponent } from './components/selector/selector.component';
+import { AuthentificationInterceptor } from './interceptors/authentification.interceptor';
 import { AdminGameHistoryComponent } from './pages/admin/admin-game-history/admin-game-history.component';
 import { AdminLoginPageComponent } from './pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from './pages/admin/admin-page/admin-page.component';
@@ -47,7 +47,6 @@ import { JoinComponent } from './pages/game/join/join.component';
         AdminPageComponent,
         AdminLoginPageComponent,
         GlobalLayoutComponent,
-        FooterComponent,
         HeaderComponent,
         AdminQuestionBankComponent,
         AdminGameHistoryComponent,
@@ -68,7 +67,13 @@ import { JoinComponent } from './pages/game/join/join.component';
         QuestionOverlayComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
-    providers: [],
+    providers: [
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthentificationInterceptor,
+            multi: true,
+        },
+    ],
     bootstrap: [AppComponent],
 })
 export class AppModule {}
