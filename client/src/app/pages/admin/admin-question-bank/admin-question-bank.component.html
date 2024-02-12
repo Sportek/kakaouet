@@ -5,11 +5,15 @@
                 <app-question-overlay> </app-question-overlay>
                 <div class="title-text">Banque de Questions</div>
                 <div class="selectors">
-                    <app-selector [label]="'Questions Visibles'" [choices]="['Toutes', 'Choix Multiples', 'Réponse Libre']"></app-selector>
+                    <app-selector
+                        [label]="'Questions Visibles'"
+                        [choices]="visibilityOptions"
+                        (emitCurrentChoice)="changeVisibility($event)"
+                    ></app-selector>
                 </div>
-                <app-bank-question></app-bank-question>
+                <app-bank-question [visibility]="visibility"></app-bank-question>
                 <div class="button">
-                    <button mat-fab extended color="primary" (click)="questionOverlayComponent.addOverlay()" class="large-text">
+                    <button mat-fab extended color="primary" (click)="questionOverlayComponent.createQuestion()" class="large-text">
                         Créer une question
                     </button>
                 </div>

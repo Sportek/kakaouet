@@ -23,6 +23,7 @@ export class Question {
     points: number;
 
     @ApiProperty()
+    @Prop({ type: () => [Choice] })
     choices?: Choice[];
 
     @ApiProperty()

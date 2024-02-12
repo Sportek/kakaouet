@@ -1,19 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { QuestionService } from '@app/services/quiz/question.service';
-import { Choice, Question, QuestionType, Variables } from '@common/types';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { QuizService } from '@app/services/quiz/quiz.service';
+import { BaseQuestion, Choice, Question, Variables } from '@common/types';
 import { cloneDeep } from 'lodash';
 
 @Component({
-    selector: 'app-question-overlay',
-    templateUrl: './question-overlay.component.html',
-    styleUrls: ['./question-overlay.component.scss'],
+    selector: 'app-quiz-question-overlay',
+    templateUrl: './quiz-question-overlay.component.html',
+    styleUrls: ['./quiz-question-overlay.component.scss'],
 })
-export class QuestionOverlayComponent implements OnInit {
+export class QuizQuestionOverlayComponent implements OnInit {
+    @Output() questionEmitter = new EventEmitter<Question>();
     hasQuestionId: boolean = false;
-    questionId: string;
-    type: string = '';
-    title: string = '';
-    points: number;
     baseChoices: Choice[] = [
         {
             _id: 1,
@@ -37,46 +34,50 @@ export class QuestionOverlayComponent implements OnInit {
         },
     ];
     choices: Choice[] = cloneDeep(this.baseChoices);
+    baseQuestion: BaseQuestion = {
+        _id: '',
+        label: '',
+        points: Variables.MinScore,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    };
+    currentQuestion: Question = cloneDeep(this.baseQuestion as Question);
     choiceModifier: Map<Choice, boolean> = new Map<Choice, boolean>();
     index: number;
+    idTracker: number = 0;
 
     overlayStatus = {
         display: 'none',
     };
 
-    constructor(private questionService: QuestionService) {}
+    constructor(private quizService: QuizService) {}
 
     ngOnInit(): void {
-        this.questionService.getId().subscribe({
-            next: (id) => this.specifyQuestion(id),
-        });
         this.resetChoicesMap();
+        this.quizService.getAmountOfQuizzes().subscribe({
+            next: (length) => {
+                this.idTracker = length;
+            },
+        });
     }
 
     changeOverlay(): void {
         if (this.overlayStatus.display === 'flex') {
             this.overlayStatus.display = 'none';
-            this.resetChoices();
         } else if (this.overlayStatus.display === 'none') {
             this.overlayStatus.display = 'flex';
         }
     }
 
-    specifyQuestion(id: string): void {
-        this.questionService.getQuestionsById(id).subscribe({
-            next: (question: Question) => {
-                this.hasQuestionId = true;
-                this.questionId = id;
-                this.type = question.type;
-                this.title = question.label;
-                this.points = question.points;
-                if (question.type === QuestionType.QCM) {
-                    this.choices = question.choices;
-                    this.resetChoicesMap();
-                }
-                this.changeOverlay();
-            },
-        });
+    specifyQuestion(question: Question): void {
+        this.hasQuestionId = true;
+        // eslint-disable-next-line no-underscore-dangle
+        this.currentQuestion = question;
+        if (this.currentQuestion.type === 'QCM') {
+            this.choices = this.currentQuestion.choices;
+            this.resetChoicesMap();
+        }
+        this.changeOverlay();
     }
 
     changeChoiceCorrect(choice: Choice) {
@@ -85,23 +86,23 @@ export class QuestionOverlayComponent implements OnInit {
 
     createQuestion(): void {
         this.hasQuestionId = false;
-        this.questionId = '';
-        this.type = '';
-        this.title = '';
-        this.points = 10;
+        this.currentQuestion = cloneDeep(this.baseQuestion as Question);
+        // eslint-disable-next-line no-underscore-dangle
+        this.currentQuestion._id = this.idTracker.toString();
+        this.idTracker++;
         this.resetChoices();
         this.changeOverlay();
     }
 
     isError(): string | null {
         // Regular expression checking if the string has characters other than spaces
-        if (!/\S/.test(this.title)) {
+        if (!/\S/.test(this.currentQuestion.label)) {
             return 'La question doit avoir un titre';
         }
-        if (this.type !== 'QCM' && this.type !== 'QRL') {
+        if (this.currentQuestion.type !== 'QCM' && this.currentQuestion.type !== 'QRL') {
             return 'La question doit avoir un type';
         }
-        if (this.type === 'QCM' && this.choices.length < 2) {
+        if (this.currentQuestion.type === 'QCM' && this.choices.length < 2) {
             return 'La question doit avoir au moins deux choix';
         }
         const isModifyingChoicesArray = Array.from(this.choiceModifier.values());
@@ -117,8 +118,8 @@ export class QuestionOverlayComponent implements OnInit {
         if (this.choices.some((choice) => !/\S/.test(choice.label))) {
             return 'Les choix ne peuvent être vides';
         }
-        if (this.points >= Variables.MinScore && this.points <= Variables.MaxScore) {
-            if (this.points % Variables.MinScore === 0) {
+        if (this.currentQuestion.points >= Variables.MinScore && this.currentQuestion.points <= Variables.MaxScore) {
+            if (this.currentQuestion.points % Variables.MinScore === 0) {
                 return null;
             } else {
                 return 'Le nombre de points doit être un multiple de 10';
@@ -130,34 +131,10 @@ export class QuestionOverlayComponent implements OnInit {
 
     saveChangesToQuestion() {
         if (!this.isError()) {
-            let question: Partial<Question>;
-            if (this.type === 'QCM') {
-                question = {
-                    label: this.title,
-                    points: this.points,
-                    type: QuestionType.QCM,
-                    choices: this.choices,
-                };
-                if (this.hasQuestionId) {
-                    this.questionService.updateQuestion(this.questionId, question as Question).subscribe({});
-                } else {
-                    this.questionService.createQuestion(question as Question).subscribe({});
-                }
-                this.changeOverlay();
-            }
-            if (this.type === 'QRL') {
-                question = {
-                    label: this.title,
-                    points: this.points,
-                    type: QuestionType.QRL,
-                };
-                if (this.hasQuestionId) {
-                    this.questionService.updateQuestion(this.questionId, question as Question).subscribe({});
-                } else {
-                    this.questionService.createQuestion(question as Question).subscribe({});
-                }
-                this.changeOverlay();
-            }
+            if (this.currentQuestion.type === 'QCM') this.currentQuestion.choices = this.choices;
+            this.questionEmitter.emit(this.currentQuestion);
+            this.resetChoices();
+            this.changeOverlay();
         }
     }
 
@@ -185,6 +162,7 @@ export class QuestionOverlayComponent implements OnInit {
                 isCorrect: true,
             };
             this.choices.push(newChoice);
+            this.resetChoicesMap();
         }
     }
 
@@ -198,9 +176,5 @@ export class QuestionOverlayComponent implements OnInit {
         this.choices.forEach((choice) => {
             this.choiceModifier.set(choice, false);
         });
-    }
-
-    onSubmit() {
-        this.saveChangesToQuestion();
     }
 }

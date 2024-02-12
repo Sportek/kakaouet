@@ -13,6 +13,11 @@ export class QuizComponent implements OnInit {
     constructor(private quizService: QuizService) {}
 
     ngOnInit() {
+        this.getListQuestions();
+        this.quizService.getQuizUpdates().subscribe(() => this.getListQuestions());
+    }
+
+    getListQuestions() {
         this.quizService.getAllQuizzes().subscribe({
             next: (quizzes) => {
                 this.quizList = quizzes;
@@ -31,8 +36,17 @@ export class QuizComponent implements OnInit {
         // eslint-disable-next-line no-underscore-dangle
         this.quizService.deleteQuizById(this.quizList[index]._id).subscribe({});
         this.quizList.splice(index, 1);
-        // MongoDB renvoie _id donc on traite _id, le prof accepte cette solution
-        // eslint-disable-next-line no-underscore-dangle
-        this.quizService.deleteQuizById(quiz._id);
+    }
+
+    generateQuizAsFile(quiz: Quiz) {
+        const fileContent = JSON.stringify(quiz);
+        const blob = new Blob([fileContent], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = quiz.name + '.json';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 }

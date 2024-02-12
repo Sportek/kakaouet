@@ -4,7 +4,6 @@ import { AdminGameHistoryComponent } from '@app/pages/admin/admin-game-history/a
 import { AdminLoginPageComponent } from '@app/pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from '@app/pages/admin/admin-page/admin-page.component';
 import { AdminQuestionBankComponent } from '@app/pages/admin/admin-question-bank/admin-question-bank.component';
-import { CreateUpdateQuestionComponent } from '@app/pages/admin/create/create-update-question/create-update-question.component';
 import { CreateUpdateQuizComponent } from '@app/pages/admin/create/create-update-quiz/create-update-quiz.component';
 import { CreatePageComponent } from '@app/pages/create-game/create-page/create-page.component';
 import { DescriptonPageComponent } from '@app/pages/create-game/descripton-page/descripton-page.component';
@@ -20,17 +19,13 @@ const routes: Routes = [
     { path: 'admin/login', component: AdminLoginPageComponent },
     { path: 'admin/game-history', component: AdminGameHistoryComponent },
     { path: 'admin/question-bank', component: AdminQuestionBankComponent },
+    // Modification d'une question de la banque
+    { path: 'admin/question-bank/:id', component: AdminQuestionBankComponent },
     { path: 'create', component: CreatePageComponent },
     // Création d'un Quiz
     { path: 'admin/create/quiz', component: CreateUpdateQuizComponent },
     // Modification d'un Quiz
     { path: 'admin/create/quiz/:id', component: CreateUpdateQuizComponent },
-    // Création d'une nouvelle question d'un Quiz
-    { path: 'admin/create/quiz/:id/question', component: CreateUpdateQuestionComponent },
-    // Modification d'une question d'un Quiz
-    { path: 'admin/create/quiz/:id/question/:id', component: CreateUpdateQuestionComponent },
-    // Modification d'une question de la banque
-    { path: 'admin/create/question', component: CreateUpdateQuestionComponent },
 
     { path: 'game/:code', component: GameVueComponent },
     { path: 'join', component: JoinComponent },

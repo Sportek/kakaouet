@@ -15,18 +15,18 @@
                     <div class="first">
                         <mat-form-field appearance="fill">
                             <mat-label>Titre</mat-label>
-                            <input [(ngModel)]="title" matInput placeholder="Titre de la question" name="title" />
+                            <input [(ngModel)]="currentQuestion.label" matInput placeholder="Titre de la question" name="title" />
                         </mat-form-field>
                         <mat-form-field appearance="fill">
                             <mat-label>Type de question</mat-label>
-                            <mat-select [(ngModel)]="type" name="type">
+                            <mat-select [(ngModel)]="currentQuestion.type" name="type">
                                 <mat-option value="QCM">Choix multiples</mat-option>
                             </mat-select>
                         </mat-form-field>
                         <mat-form-field appearance="fill">
                             <mat-label>Points</mat-label>
                             <input
-                                [(ngModel)]="points"
+                                [(ngModel)]="currentQuestion.points"
                                 type="number"
                                 matInput
                                 placeholder="Points accordés"
@@ -38,7 +38,7 @@
                         </mat-form-field>
                     </div>
                 </form>
-                <div class="choices-container" *ngIf="type === 'QCM'">
+                <div class="choices-container" *ngIf="currentQuestion.type === 'QCM'">
                     <div class="choices">
                         <div *ngFor="let choice of choices; let i = index" class="choice">
                             <div class="correct-choice" (click)="changeChoiceCorrect(choice)">

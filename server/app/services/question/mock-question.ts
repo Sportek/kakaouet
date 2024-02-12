@@ -1,6 +1,6 @@
-import { Question } from '@app/model/database/question';
+import { QuestionDto } from '@app/model/dto/question/question.dto';
 
-export const mockQuestions: Question[] = [
+export const mockQuestions: QuestionDto[] = [
     {
         type: 'QCM',
         label: 'Who is the author of "The Lord of the Rings"?',

@@ -1,0 +1,11 @@
+<div class="question-import-overlay">
+    <h2>Importer des questions</h2>
+    <ul>
+        <li *ngFor="let question of questionsFromBank">
+            <input title="question" type="checkbox" (change)="toggleQuestionSelection(question)" [checked]="selectedQuestions.has(question)" />
+            {{ question.label }}
+        </li>
+    </ul>
+    <button class="importer-button" (click)="importQuestions()">Importer les Questions Sélectionnées</button>
+    <button (click)="cancelImportQuestions()" mat-raised-button class="cancel-button" color="warn">Annuler</button>
+</div>

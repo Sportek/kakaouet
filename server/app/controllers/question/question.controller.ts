@@ -1,4 +1,4 @@
-import { Question } from '@app/model/database/question';
+import { QuestionDto } from '@app/model/dto/question/question.dto';
 import { QuestionService } from '@app/services/question/question.service';
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -23,24 +23,15 @@ export class QuestionController {
     }
 
     @Post('/')
-    async createQuestion(@Body() question: Question) {
-        if (await this.questionService.validateQuestionObject(question)) {
-            await this.questionService.addNewQuestion(question);
-            return 'Question created successfully';
-        } else {
-            throw new HttpException('Invalid question object', HttpStatus.BAD_REQUEST);
-        }
+    @HttpCode(HttpStatus.CREATED)
+    async createQuestion(@Body() question: QuestionDto) {
+        return await this.questionService.addNewQuestion(question);
     }
 
     @Patch('/:id')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async updateQuestion(@Param('id') id: string, @Body() question: Question) {
-        if (await this.questionService.validateQuestionObject(question)) {
-            await this.questionService.updateQuestionById(id, question);
-            return 'Question updated successfully';
-        } else {
-            throw new HttpException('Invalid question object', HttpStatus.BAD_REQUEST);
-        }
+    @HttpCode(HttpStatus.OK)
+    async updateQuestion(@Param('id') id: string, @Body() question: QuestionDto) {
+        return await this.questionService.updateQuestionById(id, question);
     }
 
     @Delete('/:id')

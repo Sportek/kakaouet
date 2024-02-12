@@ -1,4 +1,4 @@
-import { Quiz } from '@app/model/database/quiz';
+import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -41,24 +41,14 @@ export class QuizController {
 
     @Post('/')
     @HttpCode(HttpStatus.CREATED)
-    async createQuiz(@Body() quiz: Quiz) {
-        if (await this.quizService.validateQuizObject(quiz)) {
-            await this.quizService.addNewQuiz(quiz);
-            return 'Quiz created successfully';
-        } else {
-            throw new HttpException('Invalid quiz object', HttpStatus.BAD_REQUEST);
-        }
+    async createQuiz(@Body() quiz: QuizDto) {
+        return await this.quizService.addNewQuiz(quiz);
     }
 
     @Patch('/:id')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async updateQuiz(@Param('id') id: string, @Body() quiz: Quiz) {
-        if (await this.quizService.validateQuizObject(quiz)) {
-            await this.quizService.updateQuizById(id, quiz);
-            return 'Quiz updated successfully';
-        } else {
-            throw new HttpException('Invalid quiz object', HttpStatus.BAD_REQUEST);
-        }
+    @HttpCode(HttpStatus.OK)
+    async updateQuiz(@Param('id') id: string, @Body() quiz: QuizDto) {
+        return await this.quizService.updateQuizById(id, quiz);
     }
 
     @Delete('/:id')

@@ -1,18 +1,19 @@
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { QuestionOverlayComponent } from './question-overlay.component';
 
-describe('QuestionOverlayComponent', () => {
-    let component: QuestionOverlayComponent;
-    let fixture: ComponentFixture<QuestionOverlayComponent>;
+import { QuizQuestionOverlayComponent } from './quiz-question-overlay.component';
+
+describe('QuizQuestionOverlayComponent', () => {
+    let component: QuizQuestionOverlayComponent;
+    let fixture: ComponentFixture<QuizQuestionOverlayComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [QuestionOverlayComponent],
+            declarations: [QuizQuestionOverlayComponent],
             imports: [HttpClientModule, HttpClientTestingModule],
         });
-        fixture = TestBed.createComponent(QuestionOverlayComponent);
+        fixture = TestBed.createComponent(QuizQuestionOverlayComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

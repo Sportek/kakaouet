@@ -1,6 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';
@@ -22,7 +23,7 @@ describe('CreateUpdateQuizComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [CreateUpdateQuizComponent],
-            imports: [HttpClientModule, HttpClientTestingModule],
+            imports: [HttpClientModule, HttpClientTestingModule, FormsModule],
             providers: [
                 {
                     provide: ActivatedRoute,
