@@ -9,11 +9,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.8); 
-    z-index: 2; 
-    cursor: pointer; 
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2;
+    cursor: pointer;
 }
-
 
 .wrapper {
     display: flex;
@@ -45,7 +44,6 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            
         }
 
         .questions-container {
@@ -81,22 +79,4 @@
             }
         }
     }
-}
-
-
-.choices-container {
-    .choices {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        grid-gap: 1rem;
-        .choice {
-            background-color: $magenta-600;
-            height: 4rem;
-            border-radius: 5px;
-            text-align: center;
-        }
-    }
-
-    flex: 1;
 }

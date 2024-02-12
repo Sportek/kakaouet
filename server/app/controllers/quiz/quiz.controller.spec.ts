@@ -1,3 +1,5 @@
+import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
+import { mockQuizTable } from '@app/services/quiz/mock-quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -89,16 +91,19 @@ describe('QuizController', () => {
     });
 
     describe('createQuiz', () => {
-        it('should throw an error for an invalid quiz object', async () => {
-            jest.spyOn(service, 'validateQuizObject').mockResolvedValueOnce(false);
-            await expect(controller.createQuiz(mockQuiz)).rejects.toThrow(new HttpException('Invalid quiz object', HttpStatus.BAD_REQUEST));
+        it('should create a new quiz', async () => {
+            const quizDto: QuizDto = mockQuizTable[0];
+            await controller.createQuiz(quizDto);
+            expect(service.addNewQuiz).toHaveBeenCalledWith(quizDto);
         });
     });
 
     describe('updateQuiz', () => {
-        it('should throw an error for an invalid quiz object', async () => {
-            jest.spyOn(service, 'validateQuizObject').mockResolvedValueOnce(false);
-            await expect(controller.updateQuiz('1', mockQuiz)).rejects.toThrow(new HttpException('Invalid quiz object', HttpStatus.BAD_REQUEST));
+        it('should create a new quiz', async () => {
+            const id = 'fakeID';
+            const quizDto: QuizDto = mockQuizTable[0];
+            await controller.updateQuiz(id, quizDto);
+            expect(service.updateQuizById).toHaveBeenCalledWith(id, quizDto);
         });
     });
 

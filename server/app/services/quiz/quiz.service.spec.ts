@@ -1,4 +1,5 @@
 import { Quiz } from '@app/model/database/quiz';
+import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -8,7 +9,7 @@ import { QuizService } from './quiz.service';
 const mockQuizModel = {
     find: jest.fn(),
     findById: jest.fn(),
-    replaceOne: jest.fn(),
+    updateOne: jest.fn(),
     deleteOne: jest.fn(),
     create: jest.fn(),
     countDocuments: jest.fn(),
@@ -100,16 +101,16 @@ describe('QuizService', () => {
     describe('updateQuizById', () => {
         it('should update a quiz by ID', async () => {
             const mockedId = 'fakeID';
-            const mockedQuiz: Quiz = mockQuizTable[0];
+            const mockedQuiz: QuizDto = mockQuizTable[1];
             const filter = { _id: mockedId };
             await service.updateQuizById(mockedId, mockedQuiz);
-            expect(mockQuizModel.replaceOne).toHaveBeenCalledWith(filter, mockedQuiz);
+            expect(mockQuizModel.updateOne).toHaveBeenCalledWith(filter, mockedQuiz);
         });
 
         it('should log an error if there is an exception', async () => {
             const mockedId = 'fakeID';
-            const mockedQuiz: Quiz = mockQuizTable[0];
-            mockQuizModel.replaceOne.mockImplementationOnce(() => {
+            const mockedQuiz: QuizDto = mockQuizTable[0];
+            mockQuizModel.updateOne.mockImplementationOnce(() => {
                 throw new Error('Mocked error');
             });
             const loggerErrorSpy = jest.spyOn(service['logger'], 'error');
@@ -138,103 +139,19 @@ describe('QuizService', () => {
 
     describe('addNewQuiz', () => {
         it('should add a new quiz', async () => {
-            const mockedQuiz: Quiz = mockQuizTable[0];
+            const mockedQuiz: QuizDto = mockQuizTable[0];
             await service.addNewQuiz(mockedQuiz);
             expect(mockQuizModel.create).toHaveBeenCalledWith(mockedQuiz);
         });
 
         it('should log an error if there is an exception', async () => {
-            const mockedQuiz: Quiz = mockQuizTable[0];
+            const mockedQuiz: QuizDto = mockQuizTable[0];
             mockQuizModel.create.mockImplementationOnce(() => {
                 throw new Error('Mocked error');
             });
             const loggerErrorSpy = jest.spyOn(service['logger'], 'error');
             await service.addNewQuiz(mockedQuiz);
             expect(loggerErrorSpy).toHaveBeenCalledWith('Error adding new quiz: ', expect.any(Error));
-        });
-    });
-
-    describe('validateQuizObject', () => {
-        it('should return true for a valid quiz object', async () => {
-            const validQuiz = {
-                name: 'Valid Quiz',
-                duration: 30,
-                description: 'This is a valid quiz description',
-                visibility: true,
-                questions: [
-                    {
-                        type: 'multiple_choice',
-                        label: 'What is 2 + 2?',
-                        points: 20,
-                        choices: [
-                            { label: '2', isCorrect: false },
-                            { label: '3', isCorrect: false },
-                            { label: '4', isCorrect: true },
-                        ],
-                    },
-                ],
-            };
-
-            const result = await service.validateQuizObject(validQuiz);
-            expect(result).toBe(true);
-        });
-
-        it('should return false for an invalid entry', async () => {
-            const invalidQuiz = {
-                name: 'Invalid Quiz',
-                duration: 100,
-                description: 'This is a descriptionn',
-                visibility: true,
-                questions: [
-                    {
-                        type: 'invalid_type',
-                        label: 'What is 2 + 2?',
-                        points: 20,
-                        choices: [
-                            { label: '2', isCorrect: false },
-                            { label: '3', isCorrect: false },
-                            { label: '4', isCorrect: true },
-                        ],
-                    },
-                ],
-            };
-
-            const result = await service.validateQuizObject(invalidQuiz);
-            expect(result).toBe(false);
-        });
-    });
-
-    describe('validateQuestionObject', () => {
-        it('should return true for a valid question object', async () => {
-            const validQuestion = {
-                type: 'QCM',
-                label: 'What is 2 + 2?',
-                points: 20,
-                choices: [
-                    { label: '2', isCorrect: false },
-                    { label: '3', isCorrect: false },
-                    { label: '4', isCorrect: true },
-                ],
-            };
-
-            const result = await service.validateQuestionObject(validQuestion);
-            expect(result).toBe(true);
-        });
-
-        it('should return false for an invalid question object', async () => {
-            const invalidQuestion = {
-                type: 'invalid_type',
-                label: 'What is 2 + 2?',
-                points: 20,
-                choices: [
-                    { label: '2', isCorrect: false },
-                    { label: '3', isCorrect: false },
-                    { label: '4', isCorrect: true },
-                ],
-            };
-
-            const result = await service.validateQuestionObject(invalidQuestion);
-            expect(result).toBe(false);
         });
     });
 });

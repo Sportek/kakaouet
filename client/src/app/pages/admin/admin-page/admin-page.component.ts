@@ -1,5 +1,7 @@
+// import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '@app/services/user/user.service';
+
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',

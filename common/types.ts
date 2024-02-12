@@ -43,8 +43,8 @@ export interface GameUser {
 }
 
 export enum QuestionType {
-    QRL = 'qrl',
-    QCM = 'qcm',
+    QRL = 'QRL',
+    QCM = 'QCM',
 }
 
 export interface Choice {
@@ -123,4 +123,12 @@ export enum GameState {
 
     // 6 Le quiz est terminé
     End = 'end',
+}
+
+export enum Variables {
+    MinTime = 10,
+    MaxTime = 60,
+    MinScore = 10,
+    MaxScore = 100,
+    MaxCharacters = 200,
 }

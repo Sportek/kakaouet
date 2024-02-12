@@ -10,11 +10,14 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+// eslint-disable-next-line import/no-deprecated
 import { BankQuestionComponent } from './components/bank-question/bank-question.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
+import { QuestionBankImportComponent } from './components/importer-questions-banque/importer-questions-banque.component';
 import { QuestionOverlayComponent } from './components/question-overlay/question-overlay.component';
+import { QuizQuestionOverlayComponent } from './components/quiz-question-overlay/quiz-question-overlay.component';
 import { QuizTermineComponent } from './components/quiz-termine/quiz-termine.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { SelectorComponent } from './components/selector/selector.component';
@@ -23,7 +26,6 @@ import { AdminGameHistoryComponent } from './pages/admin/admin-game-history/admi
 import { AdminLoginPageComponent } from './pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from './pages/admin/admin-page/admin-page.component';
 import { AdminQuestionBankComponent } from './pages/admin/admin-question-bank/admin-question-bank.component';
-import { CreateUpdateQuestionComponent } from './pages/admin/create/create-update-question/create-update-question.component';
 import { CreateUpdateQuizComponent } from './pages/admin/create/create-update-quiz/create-update-quiz.component';
 import { CreatePageComponent } from './pages/create-game/create-page/create-page.component';
 import { DescriptonPageComponent } from './pages/create-game/descripton-page/descripton-page.component';
@@ -52,7 +54,6 @@ import { JoinComponent } from './pages/game/join/join.component';
         AdminGameHistoryComponent,
         QuizComponent,
         ImportGameComponent,
-        CreateUpdateQuestionComponent,
         CreateUpdateQuizComponent,
         QuizTermineComponent,
         SelectorComponent,
@@ -64,7 +65,8 @@ import { JoinComponent } from './pages/game/join/join.component';
         Error404Component,
         JoinComponent,
         QuestionOverlayComponent,
-        QuestionOverlayComponent,
+        QuestionBankImportComponent,
+        QuizQuestionOverlayComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
     providers: [

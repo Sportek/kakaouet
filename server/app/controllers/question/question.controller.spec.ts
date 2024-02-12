@@ -1,4 +1,6 @@
 import { Question } from '@app/model/database/question';
+import { QuestionDto } from '@app/model/dto/question/question.dto';
+import { mockQuestions } from '@app/services/question/mock-question';
 import { QuestionService } from '@app/services/question/question.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -60,48 +62,25 @@ describe('QuestionController', () => {
     });
 
     describe('createQuestion', () => {
-        it('should create and return a question if validation passes', async () => {
-            jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(true);
-            jest.spyOn(service, 'addNewQuestion').mockResolvedValue();
-            await expect(controller.createQuestion(mockQuestion)).resolves.toEqual('Question created successfully');
-        });
+        it('should handle the failure to create a new question', async () => {
+            const questionDto: QuestionDto = mockQuestions[0];
+            const errorMessage = 'Failed to create question';
 
-        it('should throw HttpException with status 400 if validation fails', async () => {
-            const invalidQuestion: Question = {
-                type: 'QRL',
-                label: 'New Question',
-                points: 5,
-                choices: [],
-            };
-            jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(false);
-            await expect(controller.createQuestion(invalidQuestion)).rejects.toThrowError(
-                new HttpException('Invalid question object', HttpStatus.BAD_REQUEST),
-            );
+            (service.addNewQuestion as jest.Mock).mockRejectedValueOnce(new HttpException(errorMessage, HttpStatus.BAD_REQUEST));
+
+            await expect(controller.createQuestion(questionDto)).rejects.toThrowError(errorMessage);
         });
     });
 
     describe('updateQuestion', () => {
-        it('should update a question if validation passes', async () => {
-            const updatedQuestion: Question = {
-                ...mockQuestion,
-                label: 'Updated Question',
-            };
-            jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(true);
-            jest.spyOn(service, 'updateQuestionById').mockResolvedValue();
-            await expect(controller.updateQuestion('1', updatedQuestion)).resolves.toEqual('Question updated successfully');
-        });
+        it('should handle the failure to update an existing question', async () => {
+            const id = 'testId';
+            const questionDto: QuestionDto = mockQuestions[0];
+            const errorMessage = 'Failed to update question';
 
-        it('should throw HttpException with status 400 if validation fails', async () => {
-            const invalidQuestion: Question = {
-                type: 'QRL',
-                label: 'New Question',
-                points: 5,
-                choices: [],
-            };
-            jest.spyOn(service, 'validateQuestionObject').mockResolvedValue(false);
-            await expect(controller.updateQuestion('1', invalidQuestion)).rejects.toThrowError(
-                new HttpException('Invalid question object', HttpStatus.BAD_REQUEST),
-            );
+            (service.updateQuestionById as jest.Mock).mockRejectedValueOnce(new HttpException(errorMessage, HttpStatus.BAD_REQUEST));
+
+            await expect(controller.updateQuestion(id, questionDto)).rejects.toThrowError(errorMessage);
         });
     });
 

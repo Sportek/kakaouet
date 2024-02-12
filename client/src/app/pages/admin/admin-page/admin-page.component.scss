@@ -31,6 +31,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
+    padding: 1rem;
 }
 .import-button {
     height: 3rem;
@@ -42,6 +44,5 @@
 }
 .title {
     height: 25%;
-    justify-content: flex-end;
-    align-items: flex-end;
+    vertical-align: top;
 }

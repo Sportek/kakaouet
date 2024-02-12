@@ -1,59 +1,82 @@
 <app-global-layout>
     <div class="wrapper">
         <div class="container">
+            <app-quiz-question-overlay (questionEmitter)="onQuestionListUpdate($event)"></app-quiz-question-overlay>
             <div *ngIf="hasId; else createNewGame">
                 <div class="title title-text">Modification d'un jeu</div>
             </div>
+
             <ng-template #createNewGame>
                 <div class="title title-text">Création d'un nouveau jeu</div>
             </ng-template>
+            <div *ngIf="isError()" class="white-text">{{ isError() }}</div>
             <div class="box">
-                <form action="">
-                    <div class="first">
-                        <mat-form-field appearance="fill">
-                            <mat-label>Titre</mat-label>
-                            <input [(ngModel)]="titleQuiz" matInput placeholder="Titre du jeu" name="title" required="false" />
-                        </mat-form-field>
-                        <mat-form-field appearance="fill">
-                            <mat-label>Durée</mat-label>
-                            <input
-                                [(ngModel)]="durationQuiz"
-                                type="number"
-                                matInput
-                                placeholder="10 à 60 secondes"
-                                name="duration"
-                                min="10"
-                                max="60"
-                                required="false"
-                            />
-                        </mat-form-field>
-                    </div>
+                <form #quizForm="ngForm" (ngSubmit)="onSubmit()">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Titre</mat-label>
+                        <input [(ngModel)]="titleQuiz" matInput placeholder="Titre du jeu" name="title" required />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill">
+                        <mat-label>Durée</mat-label>
+                        <input
+                            [(ngModel)]="durationQuiz"
+                            matInput
+                            type="number"
+                            placeholder="10 à 60 secondes"
+                            name="durationQuiz"
+                            min="10"
+                            max="60"
+                            required
+                        />
+                    </mat-form-field>
+
                     <mat-form-field appearance="fill">
                         <mat-label>Description</mat-label>
-                        <textarea
+                        <input
                             [(ngModel)]="descriptionQuiz"
                             matInput
                             placeholder="Description de votre jeu"
-                            name="description"
+                            name="descriptionQuiz"
+                            minlength="10"
                             maxlength="200"
-                            required="false"
-                        ></textarea>
+                            required
+                        />
                     </mat-form-field>
                 </form>
             </div>
             <div class="questions-container">
-                <div class="questions large-text">
-                    <div *ngFor="let quest of questionsQuiz">{{ quest.label }} ({{ quest.type }})</div>
+                <div class="questions large-text" required="true">
+                    <div *ngFor="let quest of questionsQuiz; let i = index">
+                        <div class="question">{{ i + 1 }}. {{ quest.label }} ({{ quest.type }})</div>
+                        <div class="icons">
+                            <mat-icon (click)="moveUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
+                            <mat-icon (click)="moveDown(i)" *ngIf="i < questionsQuiz.length - 1">arrow_downward</mat-icon>
+                            <mat-icon class="large-text" (click)="quizQuestionOverlayComponent.specifyQuestion(quest)">edit</mat-icon>
+                            <mat-icon class="icons large-text" (click)="removeQuestion(quest)">delete</mat-icon>
+                        </div>
+                    </div>
                 </div>
                 <div class="questions-buttons">
-                    <button routerLink="" mat-raised-button color="primary">Importer une question de la banque</button>
-                    <button mat-raised-button color="primary">Créer une nouvelle question</button> <!-- (click)="addOverlay()" -->
+                    <button (click)="openImportOverlay()" mat-raised-button color="primary">Importer une question de la banque</button>
+                    <button mat-raised-button color="primary" (click)="quizQuestionOverlayComponent.createQuestion()">
+                        Créer une nouvelle question
+                    </button>
                 </div>
+                <app-question-bank-import-component
+                    *ngIf="showImportOverlay"
+                    (questionsImported)="handleQuestionsImported($event)"
+                    (cancelImport)="closeImportOverlay()"
+                >
+                </app-question-bank-import-component>
             </div>
 
             <div class="buttons">
                 <button routerLink="/admin/login" mat-raised-button color="primary" class="red">Annuler</button>
-                <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()">Enregistrer</button>
+                <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()" *ngIf="!isError()">
+                    Enregistrer
+                </button>
+                <button mat-raised-button [disabled]="true" class="disabled-button" *ngIf="isError()">Enregistrer</button>
             </div>
         </div>
     </div>

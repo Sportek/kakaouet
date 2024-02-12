@@ -1,4 +1,5 @@
 import { Question } from '@app/model/database/question';
+import { QuestionDto } from '@app/model/dto/question/question.dto';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -18,7 +19,7 @@ const mockQuestionModel = {
 
 describe('QuestionService', () => {
     let service: QuestionService;
-    let mockData: Question[];
+    let mockData: QuestionDto[];
 
     beforeAll(() => {
         mockData = mockQuestions;
@@ -101,7 +102,7 @@ describe('QuestionService', () => {
     describe('updateQuestionById', () => {
         it('should update a question by ID', async () => {
             const mockedId = 'fakeID';
-            const mockedQuestion: Question = mockQuestions[0];
+            const mockedQuestion: QuestionDto = mockQuestions[0];
             const filter = { _id: mockedId };
             await service.updateQuestionById(mockedId, mockedQuestion);
             expect(mockQuestionModel.replaceOne).toHaveBeenCalledWith(filter, mockedQuestion);
@@ -109,7 +110,7 @@ describe('QuestionService', () => {
 
         it('should log an error if there is an exception', async () => {
             const mockedId = 'fakeID';
-            const mockedQuestion: Question = mockQuestions[0];
+            const mockedQuestion: QuestionDto = mockQuestions[0];
             mockQuestionModel.replaceOne.mockImplementationOnce(() => {
                 throw new Error('Mocked error');
             });
@@ -155,61 +156,19 @@ describe('QuestionService', () => {
 
     describe('addNewQuestion', () => {
         it('should add a new question', async () => {
-            const mockedQuestion: Question = mockQuestions[0];
+            const mockedQuestion: QuestionDto = mockQuestions[0];
             await service.addNewQuestion(mockedQuestion);
             expect(mockQuestionModel.create).toHaveBeenCalledWith(mockedQuestion);
         });
 
         it('should log an error if there is an exception', async () => {
-            const mockedQuestion: Question = mockQuestions[0];
+            const mockedQuestion: QuestionDto = mockQuestions[0];
             mockQuestionModel.create.mockImplementationOnce(() => {
                 throw new Error('Mocked error');
             });
             const loggerErrorSpy = jest.spyOn(service['logger'], 'error');
             await service.addNewQuestion(mockedQuestion);
             expect(loggerErrorSpy).toHaveBeenCalledWith('Error adding new question: ', expect.any(Error));
-        });
-    });
-
-    describe('validateQuestionObject function', () => {
-        it('should return true for a valid question', async () => {
-            const validQuestion = {
-                type: 'QCM',
-                label: 'What is the capital of France?',
-                points: 10,
-                choices: [
-                    { label: 'Paris', isCorrect: true },
-                    { label: 'Berlin', isCorrect: false },
-                ],
-            };
-
-            const result = await service.validateQuestionObject(validQuestion);
-            expect(result).toBe(true);
-        });
-
-        it('should return false for an invalid question with missing properties', async () => {
-            const invalidQuestion = {
-                type: 'QCM',
-                label: 'What is the capital of France?',
-            };
-
-            const result = await service.validateQuestionObject(invalidQuestion);
-            expect(result).toBe(false);
-        });
-
-        it('should return false for an invalid entry', async () => {
-            const invalidQuestion = {
-                type: 'QCM',
-                label: 'What is the capital of France?',
-                points: 110,
-                choices: [
-                    { label: 'Paris', isCorrect: true },
-                    { label: 'Berlin', isCorrect: false },
-                ],
-            };
-
-            const result = await service.validateQuestionObject(invalidQuestion);
-            expect(result).toBe(false);
         });
     });
 });

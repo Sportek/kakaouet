@@ -1,8 +1,8 @@
-import { Quiz } from '@app/model/database/quiz';
+import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 
-export const mockQuizTable: Quiz[] = [
+export const mockQuizTable: QuizDto[] = [
     {
-        name: 'Quiz Seigneur des Anneaux - Partie 1',
+        name: 'Quiz Seigneur',
         duration: 10,
         description: 'Testez vos connaissances sur le Seigneur des Anneaux.',
         visibility: true,

@@ -21,13 +21,13 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 // import { MatSidenavModule } from '@angular/material/sidenav';
 // import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-// import { MatSliderModule } from '@angular/material/slider';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 // import { MatSortModule } from '@angular/material/sort';
 // import { MatStepperModule } from '@angular/material/stepper';
 // import { MatTableModule } from '@angular/material/table';
 // import { MatTabsModule } from '@angular/material/tabs';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -54,7 +54,7 @@ const modules = [
     MatRadioModule,
     MatSelectModule,
     // MatSidenavModule,
-    // MatSliderModule,
+    MatSliderModule,
     // MatSlideToggleModule,
     MatSnackBarModule,
     // MatSortModule,
@@ -64,6 +64,7 @@ const modules = [
     MatToolbarModule,
     MatTooltipModule,
     FormsModule,
+    ReactiveFormsModule,
 ];
 
 /**

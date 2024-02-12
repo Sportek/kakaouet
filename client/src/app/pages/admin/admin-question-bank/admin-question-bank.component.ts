@@ -8,4 +8,19 @@ import { QuestionOverlayComponent } from '@app/components/question-overlay/quest
 })
 export class AdminQuestionBankComponent {
     @ViewChild(QuestionOverlayComponent) questionOverlayComponent!: QuestionOverlayComponent;
+
+    visibilityOptions: string[] = ['Toutes', 'Choix Multiples', 'Réponse Libre'];
+    visibility: string[] = ['QCM', 'QRL'];
+
+    changeVisibility(label: string) {
+        if (label === 'Toutes') {
+            this.visibility = ['QCM', 'QRL'];
+        }
+        if (label === 'Choix Multiples') {
+            this.visibility = ['QCM'];
+        }
+        if (label === 'Réponse Libre') {
+            this.visibility = ['QRL'];
+        }
+    }
 }
