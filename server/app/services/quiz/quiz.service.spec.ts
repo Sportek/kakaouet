@@ -8,6 +8,7 @@ import { QuizService } from './quiz.service';
 
 const mockQuizModel = {
     find: jest.fn(),
+    findOne: jest.fn(),
     findById: jest.fn(),
     updateOne: jest.fn(),
     deleteOne: jest.fn(),
@@ -161,6 +162,20 @@ describe('QuizService', () => {
             const loggerErrorSpy = jest.spyOn(service['logger'], 'error');
             await service.addNewQuiz(mockedQuiz);
             expect(loggerErrorSpy).toHaveBeenCalledWith('Error adding new quiz: ', expect.any(Error));
+        });
+    });
+
+    describe('doesQuizExist', () => {
+        it('should return true if quiz exists', async () => {
+            mockQuizModel.findOne.mockResolvedValue(mockQuizTable[0]);
+            const result = await service.doesQuizExist('exampleQuiz');
+            expect(result).toBe(true);
+        });
+
+        it('should return false if quiz does not exist', async () => {
+            mockQuizModel.findOne.mockResolvedValue(null);
+            const result = await service.doesQuizExist('nonExistingQuiz');
+            expect(result).toBe(false);
         });
     });
 });

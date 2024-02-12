@@ -33,6 +33,7 @@ describe('QuizController', () => {
                         deleteQuizById: jest.fn().mockResolvedValue(null),
                         validateQuizObject: jest.fn(),
                         validateQuestionObject: jest.fn(),
+                        doesQuizExist: jest.fn(),
                     },
                 },
             ],
@@ -107,9 +108,16 @@ describe('QuizController', () => {
 
     describe('createQuiz', () => {
         it('should create a new quiz', async () => {
-            const quizDto: QuizDto = mockQuizTable[0];
-            await controller.createQuiz(quizDto);
-            expect(service.addNewQuiz).toHaveBeenCalledWith(quizDto);
+            const quiz: QuizDto = mockQuizTable[0];
+            await controller.createQuiz(quiz);
+            expect(service.addNewQuiz).toHaveBeenCalledWith(quiz);
+        });
+
+        it('should throw a BadRequest exception if quiz with the same name already exists', async () => {
+            const quiz: QuizDto = mockQuizTable[0];
+            jest.spyOn(service, 'doesQuizExist').mockResolvedValue(true);
+            await expect(controller.createQuiz(quiz)).rejects.toThrow(new HttpException('Quiz name has to be unique: ', HttpStatus.BAD_REQUEST));
+            expect(service.addNewQuiz).not.toHaveBeenCalled();
         });
     });
 

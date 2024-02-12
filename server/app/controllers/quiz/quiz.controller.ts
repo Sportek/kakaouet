@@ -42,7 +42,11 @@ export class QuizController {
     @Post('/')
     @HttpCode(HttpStatus.CREATED)
     async createQuiz(@Body() quiz: QuizDto) {
-        return await this.quizService.addNewQuiz(quiz);
+        if (!(await this.quizService.doesQuizExist(quiz.name))) {
+            return await this.quizService.addNewQuiz(quiz);
+        } else {
+            throw new HttpException('Quiz name has to be unique: ', HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Patch('/:id')

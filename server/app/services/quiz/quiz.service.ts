@@ -73,6 +73,13 @@ export class QuizService {
         }
     }
 
+    async doesQuizExist(name: string): Promise<boolean> {
+        const quiz = await this.quizModel.findOne({ name });
+        if (quiz) {
+            return true;
+        }
+        return false;
+    }
     async validateAnswers(quizId: string, questionId: number, answers: number[]): Promise<QuestionFeedback> {
         const quiz = await this.getQuizById(quizId);
         if (quiz) {
