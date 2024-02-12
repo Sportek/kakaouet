@@ -2,7 +2,7 @@
     <div class="wrapper">
         <div class="container">
             <app-quiz-question-overlay (questionEmitter)="onQuestionListUpdate($event)"></app-quiz-question-overlay>
-            <div *ngIf="hasId; else createNewGame">
+            <div *ngIf="quizId; else createNewGame">
                 <div class="title title-text">Modification d'un jeu</div>
             </div>
 
@@ -47,7 +47,7 @@
             </div>
             <div class="questions-container">
                 <div class="questions large-text" required="true">
-                    <div *ngFor="let quest of questionsQuiz; let i = index">
+                    <div *ngFor="let quest of questionsQuiz; let i = index" class="question-bar">
                         <div class="question">{{ i + 1 }}. {{ quest.label }} ({{ quest.type }})</div>
                         <div class="icons">
                             <mat-icon (click)="moveUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
@@ -57,12 +57,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="questions-buttons">
-                    <button (click)="openImportOverlay()" mat-raised-button color="primary">Importer une question de la banque</button>
-                    <button mat-raised-button color="primary" (click)="quizQuestionOverlayComponent.createQuestion()">
-                        Créer une nouvelle question
-                    </button>
-                </div>
                 <app-question-bank-import-component
                     *ngIf="showImportOverlay"
                     (questionsImported)="handleQuestionsImported($event)"
@@ -70,7 +64,10 @@
                 >
                 </app-question-bank-import-component>
             </div>
-
+            <div class="questions-buttons">
+                <button (click)="openImportOverlay()" mat-raised-button color="primary">Importer une question de la banque</button>
+                <button mat-raised-button color="primary" (click)="quizQuestionOverlayComponent.createQuestion()">Créer une nouvelle question</button>
+            </div>
             <div class="buttons">
                 <button routerLink="/admin/login" mat-raised-button color="primary" class="red">Annuler</button>
                 <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()" *ngIf="!isError()">

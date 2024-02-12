@@ -2,6 +2,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BackgroundComponent } from '@app/components/background/background.component';
@@ -13,6 +14,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 // eslint-disable-next-line import/no-deprecated
 import { BankQuestionComponent } from './components/bank-question/bank-question.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { ConfirmationDialogComponent } from './components/dialog-component/dialog-delete.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
 import { QuestionBankImportComponent } from './components/importer-questions-banque/importer-questions-banque.component';
@@ -32,6 +34,7 @@ import { DescriptonPageComponent } from './pages/create-game/descripton-page/des
 import { Error404Component } from './pages/error/error404/error404.component';
 import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
 import { JoinComponent } from './pages/game/join/join.component';
+import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.component';
 
 /**
  * Main module that is used in main.ts.
@@ -65,8 +68,19 @@ import { JoinComponent } from './pages/game/join/join.component';
         QuestionOverlayComponent,
         QuestionBankImportComponent,
         QuizQuestionOverlayComponent,
+        ConfirmationDialogComponent,
+        WaitingRoomComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        MatButtonModule,
+        MatDialogModule,
+    ],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,

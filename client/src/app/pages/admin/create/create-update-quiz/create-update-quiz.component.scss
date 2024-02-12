@@ -12,6 +12,9 @@
     background-color: rgba(0, 0, 0, 0.8);
     z-index: 2;
     cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2;
+    cursor: pointer;
 }
 
 .wrapper {
@@ -47,36 +50,99 @@
         }
 
         .questions-container {
+            min-height: 18.5rem;
+            max-height: 18.5rem;
+            width: 100%;
+            overflow-y: auto;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            flex: 1;
-            gap: 1rem;
-
-            .questions {
-                flex: 1;
-                color: black;
-                background-color: white;
-            }
-
-            .questions-buttons {
-                display: flex;
-                justify-content: center;
-                gap: 1rem;
-            }
+            align-items: stretch;
+            justify-content: flex-start;
+            border: 0.4rem solid black;
+            border-radius: 15px;
+            margin-top: 1rem;
+            background-color: $purple-900;
         }
 
-        .buttons {
+        .question-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            color: white;
+            border-bottom: 0.25rem solid black;
+        }
+
+        .questions-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .question {
+            min-height: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-name {
+            flex-grow: 1;
+            text-align: left;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            margin-right: 1rem;
+            padding-right: 1rem;
+        }
+
+        .icons {
             display: flex;
             justify-content: flex-end;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .icons .mat-icon {
+            color: white;
+            cursor: pointer;
+        }
+
+        :host ::ng-deep .mat-icon {
+            font-size: 24px;
+            width: auto;
+        }
+
+        .questions-buttons {
+            display: flex;
+            justify-content: center;
             gap: 1rem;
             padding: 1rem 0;
-            .green {
-                background-color: $green-700;
+        }
+
+        .choices-container {
+            .choices {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr;
+                grid-gap: 1rem;
+                .choice {
+                    background-color: $magenta-600;
+                    height: 4rem;
+                    border-radius: 5px;
+                    text-align: center;
+                }
             }
 
-            .red {
-                background-color: $red-700;
-            }
+            flex: 1;
+        }
+
+        .white-text {
+            color: white;
         }
     }
 }
