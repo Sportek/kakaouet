@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { z } from 'zod';
+import { Component } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { QuizService } from '@app/services/quiz/quiz.service';
+import { ValidateService } from '@app/services/validate/validate.service';
 
 @Component({
     selector: 'app-import-game',
@@ -7,81 +9,37 @@ import { z } from 'zod';
     styleUrls: ['./import-game.component.scss'],
 })
 export class ImportGameComponent {
-    @Output() errorEvent = new EventEmitter<string>();
+    constructor(
+        private validateService: ValidateService,
+        private quizService: QuizService,
+        private snackbar: MatSnackBar,
+    ) {}
 
     async onFileUpload(event: Event): Promise<void> {
+        // Récupération du fichier
         const input = event.target as HTMLInputElement;
         const file = input.files ? input.files[0] : null;
+        if (!file) return;
 
-        try {
-            const errorMessage = await this.verifyFile(file);
-            if (errorMessage === 'ok') {
-                this.errorEvent.emit('');
-            } else {
-                this.errorEvent.emit(errorMessage);
-            }
-        } catch (error) {
-            this.errorEvent.emit('Une erreur est survenue lors de la lecture du fichier!');
-        }
-    }
-
-    async verifyFile(file: File | null): Promise<string> {
-        return new Promise((resolve) => {
-            if (!file) {
-                resolve('Aucun fichier sélectionné!');
+        // Lecture du fichier
+        const fileReader = new FileReader();
+        fileReader.onload = async () => {
+            const rawText = fileReader.result as string;
+            const validatedObject = this.validateService.validateJSONQuiz(rawText);
+            if (validatedObject.isValid) {
+                this.quizService.addNewQuiz(validatedObject.object).subscribe({
+                    next: () => {
+                        this.snackbar.open('Quiz importé avec succès', '✅');
+                    },
+                    error: () => {
+                        this.snackbar.open("Erreur lors de l'import du quiz", '❌');
+                    },
+                });
                 return;
             }
+            this.snackbar.open(validatedObject.errors.join('\n'), '❌');
+        };
 
-            if (file.type !== 'application/json') {
-                resolve("Le fichier sélectionné n'est pas un fichier JSON!");
-                return;
-            }
-
-            // Commencer la lecture du fichier
-
-            const fileReader = new FileReader();
-
-            fileReader.onload = () => {
-                const rawText = fileReader.result as string;
-                try {
-                    const gameFile = JSON.parse(rawText);
-
-                    // TODO: Les changer pour les vrais types
-                    const answerSchema = z.object({
-                        text: z.string(),
-                        correct: z.boolean(),
-                    });
-
-                    const questionSchema = z.object({
-                        text: z.string(),
-                        answers: z.array(answerSchema),
-                    });
-
-                    const gameSchema = z.object({
-                        name: z.string(),
-                        description: z.string(),
-                        questions: z.array(questionSchema),
-                    });
-
-                    try {
-                        const game = gameSchema.parse(gameFile);
-                        // TODO: Envoie du fichier au serveur.
-                        // eslint-disable-next-line no-console
-                        console.log(game);
-                        resolve('ok');
-                    } catch (error) {
-                        if (error instanceof z.ZodError) {
-                            resolve('Le fichier JSON est invalide!\n' + error.issues.map((issue) => issue.path + ' ' + issue.message).join('\n'));
-                        }
-                    }
-                } catch (error) {
-                    if (error instanceof SyntaxError) {
-                        resolve('La syntaxe du JSON est invalide!\n' + error.message);
-                    }
-                }
-            };
-
-            fileReader.readAsText(file);
-        });
+        fileReader.readAsText(file);
     }
 }

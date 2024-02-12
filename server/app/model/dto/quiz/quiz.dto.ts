@@ -17,7 +17,8 @@ export class QuizDto {
     description: string;
 
     @IsBoolean()
-    visibility: boolean;
+    @IsOptional()
+    visibility?: boolean;
 
     @IsArray()
     @ValidateNested({ each: true })
