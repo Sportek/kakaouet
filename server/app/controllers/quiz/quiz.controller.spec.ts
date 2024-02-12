@@ -46,6 +46,12 @@ describe('QuizController', () => {
         expect(controller).toBeDefined();
     });
 
+    describe('getAllQuizzes', () => {
+        it('should return an array of questions', async () => {
+            await expect(controller.getAllQuizzes()).resolves.toEqual([mockQuiz]);
+        });
+    });
+
     describe('getQuizById', () => {
         it('should return entire quiz object if index is not provided', async () => {
             jest.spyOn(service, 'getQuizById').mockResolvedValue(mockQuiz);
@@ -77,9 +83,7 @@ describe('QuizController', () => {
             const result = await controller.getQuizById('1', 0);
             expect(result).toEqual([0]);
         });
-    });
 
-    describe('getQuizById', () => {
         it('should return a quiz if found', async () => {
             await expect(controller.getQuizById('1')).resolves.toEqual(mockQuiz);
         });
@@ -87,6 +91,17 @@ describe('QuizController', () => {
         it('should throw an error if the quiz is not found', async () => {
             jest.spyOn(service, 'getQuizById').mockResolvedValueOnce(null);
             await expect(controller.getQuizById('2')).rejects.toThrow(new HttpException('Quiz not found', HttpStatus.NOT_FOUND));
+        });
+
+        it('should throw an error if the quiz is not found', async () => {
+            jest.spyOn(service, 'getQuizById').mockResolvedValue(mockQuiz);
+            try {
+                await controller.getQuizById('quizId', 2);
+            } catch (error) {
+                expect(error).toBeInstanceOf(HttpException);
+                expect(error.message).toBe('Question not found');
+                expect(error.getStatus()).toBe(HttpStatus.NOT_FOUND);
+            }
         });
     });
 

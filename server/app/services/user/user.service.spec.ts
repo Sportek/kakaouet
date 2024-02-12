@@ -1,10 +1,17 @@
-import { User } from '@app/model/database/user';
+import { User, UserDocument } from '@app/model/database/user';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 
 describe('UserService', () => {
     let service: UserService;
+
+    const mockUser: UserDocument = {
+        _id: 'mockUserId',
+        token: 'sample-token',
+        isAdminAuthentified: true,
+        lastRequestAt: new Date(),
+    } as UserDocument;
 
     const mockUserModel = {
         create: jest.fn(),
@@ -88,6 +95,22 @@ describe('UserService', () => {
         it('should handle errors during isLogin', async () => {
             mockUserModel.findOne.mockRejectedValueOnce(new Error('User not found'));
             await expect(service.isLogin('sample-token')).rejects.toThrowError('User not found');
+        });
+    });
+
+    describe('isTokenExist', () => {
+        it('should return true if the token exists', async () => {
+            jest.spyOn(mockUserModel, 'findOne').mockResolvedValueOnce(mockUser);
+            const result = await service.isTokenExist('sample-token');
+            expect(result).toBe(true);
+            expect(mockUserModel.findOne).toHaveBeenCalledWith({ token: 'sample-token' });
+        });
+
+        it('should return false if the token does not exist', async () => {
+            jest.spyOn(mockUserModel, 'findOne').mockResolvedValueOnce(null);
+            const result = await service.isTokenExist('non-existing-token');
+            expect(result).toBe(false);
+            expect(mockUserModel.findOne).toHaveBeenCalledWith({ token: 'non-existing-token' });
         });
     });
 });

@@ -62,6 +62,15 @@ describe('QuestionService', () => {
             await service.populateDB();
             expect(spyOnInsertMany).toHaveBeenCalledWith(mockQuestions);
         });
+
+        it('should log an error if inserting questions fails', async () => {
+            mockQuestionModel.insertMany.mockImplementationOnce(() => {
+                throw new Error('Mocked error');
+            });
+            const loggerErrorSpy = jest.spyOn(service['logger'], 'error');
+            await service.populateDB();
+            expect(loggerErrorSpy).toHaveBeenCalledWith('Error populating db with questions: ', expect.any(Error));
+        });
     });
 
     describe('getAllQuestions', () => {
