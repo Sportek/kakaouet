@@ -1,4 +1,4 @@
-import { Message } from '@app/model/schema/message.schema';
+import { Message } from '@app/model/schema/message/message.schema';
 import { DateService } from '@app/services/date/date.service';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
