@@ -21,6 +21,7 @@ export class ValidateService {
         const quizToValidate = ValidatedObject.fromObject<Quiz>(quiz);
         quizToValidate.check(QuizValidation.checkRequiredName);
         quizToValidate.check(QuizValidation.checkMaxDescriptionLength);
+        quizToValidate.check(QuizValidation.checkMinDescriptionLength);
         quizToValidate.check(QuizValidation.checkRequiredDescription);
         quizToValidate.check(QuizValidation.checkRequiredQuestions);
         quizToValidate.check(QuizValidation.checkMaxResponseTime);
@@ -48,7 +49,7 @@ export class ValidateService {
                 const validatedChoice = this.validateChoice(choice);
                 if (!validatedChoice.isValid) {
                     questionToValidate.isValid = false;
-                    questionToValidate.errors.push(...validatedChoice.errors.map((error) => `\n Choix ${index}: ${error}`));
+                    questionToValidate.errors.push(...validatedChoice.errors.map((error) => `Choix ${index}: ${error}`));
                 }
             });
         }
