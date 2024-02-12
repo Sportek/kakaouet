@@ -87,9 +87,9 @@ export class QuizQuestionOverlayComponent implements OnInit {
     createQuestion(): void {
         this.hasQuestionId = false;
         this.currentQuestion = cloneDeep(this.baseQuestion as Question);
-        this.idTracker++;
         // eslint-disable-next-line no-underscore-dangle
         this.currentQuestion._id = this.idTracker.toString();
+        this.idTracker++;
         this.resetChoices();
         this.changeOverlay();
     }
@@ -176,5 +176,23 @@ export class QuizQuestionOverlayComponent implements OnInit {
         this.choices.forEach((choice) => {
             this.choiceModifier.set(choice, false);
         });
+    }
+
+    moveChoiceUp(index: number): void {
+        if (index > 0) {
+            const temp = this.choices[index];
+            this.choices[index] = this.choices[index - 1];
+            this.choices[index - 1] = temp;
+            this.choices = [...this.choices];
+        }
+    }
+
+    moveChoiceDown(index: number): void {
+        if (index < this.choices.length - 1) {
+            const temp = this.choices[index];
+            this.choices[index] = this.choices[index + 1];
+            this.choices[index + 1] = temp;
+            this.choices = [...this.choices];
+        }
     }
 }

@@ -203,4 +203,22 @@ export class QuestionOverlayComponent implements OnInit {
     onSubmit() {
         this.saveChangesToQuestion();
     }
+
+    moveChoiceUp(index: number): void {
+        if (index > 0) {
+            const temp = this.choices[index];
+            this.choices[index] = this.choices[index - 1];
+            this.choices[index - 1] = temp;
+            this.choices = [...this.choices]; // This line is to trigger change detection
+        }
+    }
+
+    moveChoiceDown(index: number): void {
+        if (index < this.choices.length - 1) {
+            const temp = this.choices[index];
+            this.choices[index] = this.choices[index + 1];
+            this.choices[index + 1] = temp;
+            this.choices = [...this.choices]; // This line is to trigger change detection
+        }
+    }
 }
