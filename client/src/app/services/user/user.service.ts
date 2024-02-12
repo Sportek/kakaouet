@@ -28,7 +28,7 @@ export class UserService {
 
     checkLoginStatus(): void {
         this.http
-            .get<null>(`${BASE_URL}/user/auth/login`, { observe: 'response', withCredentials: true })
+            .get<null>(`${BASE_URL}/user/auth/login`, { observe: 'response' })
             .pipe(
                 tap((response: HttpResponse<null>) => {
                     const isLogin = response.body ? response.body['isLogin'] : false;
@@ -40,7 +40,7 @@ export class UserService {
 
     login(router: Router, password: string) {
         this.http
-            .post<null>(`${BASE_URL}/user/auth/login`, { password }, { observe: 'response', withCredentials: true })
+            .post<null>(`${BASE_URL}/user/auth/login`, { password }, { observe: 'response' })
             .pipe(
                 tap((response: HttpResponse<null>) => {
                     const isLogin = response.body ? response.body['success'] : false;
@@ -52,7 +52,7 @@ export class UserService {
 
     logout(router: Router) {
         this.http
-            .get<null>(`${BASE_URL}/user/auth/logout`, { observe: 'response', withCredentials: true })
+            .get<null>(`${BASE_URL}/user/auth/logout`, { observe: 'response' })
             .pipe(
                 tap((response: HttpResponse<null>) => {
                     const hasSuccess = response.body ? response.body['success'] : false;
@@ -69,7 +69,6 @@ export class UserService {
         return this.http
             .get<null>(`${BASE_URL}/user/auth/login`, {
                 observe: 'response',
-                withCredentials: true,
             })
             .pipe(
                 map((response: HttpResponse<null>) => (response.status === HttpStatusCode.Ok && response.body?.['isLogin']) ?? false),

@@ -15,6 +15,10 @@ class MockUserService {
             throw new Error('Update failed');
         }
     });
+
+    isTokenExist = jest.fn().mockImplementation((token: string) => {
+        return token !== 'another-token';
+    });
 }
 
 describe('AuthentificationMiddleware', () => {
