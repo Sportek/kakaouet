@@ -5,6 +5,7 @@ import * as cookieParser from 'cookie-parser';
 import { QuestionController } from './controllers/question/question.controller';
 import { QuizController } from './controllers/quiz/quiz.controller';
 import { AuthentificationMiddleware } from './middlewares/authentification/authentification.middleware';
+// import { Game, gameSchema } from './model/database/game';
 import { Question, questionSchema } from './model/database/question';
 import { Quiz, quizSchema } from './model/database/quiz';
 import { UserModule } from './modules/user/user.module';
@@ -23,6 +24,7 @@ import { QuizService } from './services/quiz/quiz.service';
         }),
         MongooseModule.forFeature([{ name: Quiz.name, schema: quizSchema }]),
         MongooseModule.forFeature([{ name: Question.name, schema: questionSchema }]),
+        // MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
         UserModule,
     ],
     controllers: [QuizController, QuestionController],

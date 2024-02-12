@@ -30,7 +30,7 @@
                                 selected: gameService.isSelected(i),
                                 clickable: gameService.canChangeChoices,
                                 'not-clickable': !gameService.canChangeChoices,
-                                'is-incorrect': !isCorrectAnswer(i)
+                                'is-incorrect': isIncorrectAnswer(i) | async
                             }"
                             (click)="gameService.selectChoice(i)"
                         >

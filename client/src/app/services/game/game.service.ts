@@ -5,8 +5,9 @@ import { QuizService } from '@app/services/quiz/quiz.service';
 import { TimeService } from '@app/services/timer/time.service';
 import { Timer } from '@app/services/timer/timer';
 import { AnswerState, Game, GameRole, GameState, GameType, GameUser, Question } from '@common/types';
-import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, firstValueFrom, throwError } from 'rxjs';
 
+const INCREMENTE_SCORE = 1.2;
 @Injectable({
     providedIn: 'root',
 })
@@ -37,6 +38,7 @@ export class GameService {
     ) {}
 
     async init(id: string | null) {
+        this.resetGame();
         this.id = id;
         if (this.router.url.includes('testing') && id) {
             await this.setupFakeGame(id);
@@ -45,10 +47,49 @@ export class GameService {
         this.executeState(this.gameState);
     }
 
+    sendMessage(message: string) {
+        // TODO: Pour l'instant c'est un "faux" message, aucun envoie en backend, en attente pour le sprint 2 ou 3.
+        this.game?.messages.push({
+            content: message,
+            createdAt: new Date(),
+            // eslint-disable-next-line no-underscore-dangle
+            gameUserId: 'organisator',
+        });
+    }
+
+    resetGame() {
+        this.id = null;
+        this.game = undefined;
+        this.gameState = GameState.WaitingPlayers;
+        this.actualQuestionIndex = 0;
+        this.actualQuestion.next({} as Question);
+        this.timer = undefined;
+        this.user = {
+            _id: 'player',
+            isActive: true,
+            isExcluded: false,
+            name: 'Player',
+            answerState: AnswerState.Waiting,
+            role: GameRole.Player,
+            score: 0,
+        };
+    }
+
     /**
      * Permet de créer une game de test avec un quiz contenue dans l'URL. */
     async setupFakeGame(id: string) {
         return new Promise<void>((resolve) => {
+            const organisator = {
+                _id: 'organisator',
+                isActive: true,
+                isExcluded: false,
+                name: 'Organisator',
+                answerState: AnswerState.Waiting,
+                role: GameRole.Player,
+                score: 0,
+            };
+            this.user = organisator;
+
             this.quizService
                 .getQuizById(id)
                 .pipe(catchError((error) => this.handleError(error)))
@@ -62,17 +103,7 @@ export class GameService {
                         isLocked: true,
                         messages: [],
                         quiz,
-                        users: [
-                            {
-                                _id: 'organisator',
-                                isActive: true,
-                                isExcluded: false,
-                                name: 'Organisator',
-                                answerState: AnswerState.Waiting,
-                                role: GameRole.Player,
-                                score: 0,
-                            },
-                        ],
+                        users: [organisator],
                     };
                     resolve();
                 });
@@ -95,8 +126,10 @@ export class GameService {
                 this.displayQuestionResults();
                 break;
             case GameState.DisplayQuizResults:
+                this.displayQuizResults();
                 break;
             case GameState.End:
+                this.gameEnd();
                 break;
             default:
                 throw new Error('Invalid game state');
@@ -139,11 +172,6 @@ export class GameService {
         }
     }
 
-    // Envoyer les choix sélectionnés par le joueur au serveur
-    sendSelectedChoices() {
-        return true;
-    }
-
     giveUp() {
         // TODO: Traiter le cas où le joueur abandonne (sprint 2)
         if (!this.id) return;
@@ -170,21 +198,44 @@ export class GameService {
         this.executeState(GameState.DisplayQuestionResults);
     }
 
-    private correctAnswers() {
-        // TODO: Faire la requête au serveur pour savoir quel réponses sont bonnes.
-        if (this.user) {
-            this.sendSelectedChoices();
-            this.user.score += this.actualQuestion.value.points;
+    private async correctAnswers() {
+        if (this.user && this.game) {
+            const values = await firstValueFrom(
+                // eslint-disable-next-line no-underscore-dangle
+                this.quizService.correctQuizAnswers(this.game.quiz._id, this.actualQuestionIndex, this.selectedChoices),
+            );
+            this.answers.next(values.correctChoicesIndices);
+            this.user.score += values.points * INCREMENTE_SCORE;
         }
     }
 
     private displayQuestionResults() {
         if (this.game?.type === GameType.Test) this.correctAnswers();
-        // TODO: Faire la requête au serveur pour savoir quel réponses sont bonnes.
         this.answers.next([0]);
-        const hasNextQuestion = this.nextQuestion();
-        if (hasNextQuestion) return this.executeState(GameState.PlayersAnswerQuestion);
-        return this.executeState(GameState.DisplayQuizResults);
+
+        this.timer = this.timeService.createTimer(
+            'cooldown',
+            new Timer(3, {
+                whenDone: () => {
+                    const hasNextQuestion = this.nextQuestion();
+                    let nextGameState = GameState.DisplayQuizResults;
+                    if (hasNextQuestion) nextGameState = GameState.PlayersAnswerQuestion;
+                    this.executeState(nextGameState);
+                },
+            }),
+        );
+    }
+
+    private displayQuizResults() {
+        this.executeState(GameState.End);
+    }
+
+    private gameEnd() {
+        if (!this.game) return;
+        if (this.game.type === GameType.Test) {
+            // eslint-disable-next-line no-underscore-dangle
+            this.router.navigateByUrl('/create/description/' + this.game.quiz._id);
+        }
     }
 
     private handleError(error: HttpErrorResponse) {
