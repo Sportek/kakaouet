@@ -52,6 +52,7 @@ export class BankQuestionComponent implements OnInit {
                 message: 'Êtes-vous sûr de vouloir supprimer cette question?',
             },
         });
+
         dialogRef.afterClosed().subscribe((confirm) => {
             if (confirm) {
                 // eslint-disable-next-line no-underscore-dangle

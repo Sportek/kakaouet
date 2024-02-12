@@ -28,6 +28,7 @@ export class CreateUpdateQuizComponent implements OnInit {
 
     constructor(
         private quizService: QuizService,
+        // private questionService: QuestionService,
         private route: ActivatedRoute,
         private questionService: QuestionService,
     ) {}
