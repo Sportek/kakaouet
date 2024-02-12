@@ -2,7 +2,7 @@
     <div class="wrapper">
         <div class="container">
             <app-quiz-question-overlay (questionEmitter)="onQuestionListUpdate($event)"></app-quiz-question-overlay>
-            <div *ngIf="quizId; else createNewGame">
+            <div *ngIf="hasId; else createNewGame">
                 <div class="title title-text">Modification d'un jeu</div>
             </div>
 
@@ -54,6 +54,7 @@
                             <mat-icon (click)="moveDown(i)" *ngIf="i < questionsQuiz.length - 1">arrow_downward</mat-icon>
                             <mat-icon class="large-text" (click)="quizQuestionOverlayComponent.specifyQuestion(quest)">edit</mat-icon>
                             <mat-icon class="icons large-text" (click)="removeQuestion(quest)">delete</mat-icon>
+                            <mat-icon class="icons large-text" (click)="importQuestionToBank(quest)">ios_share</mat-icon>
                         </div>
                     </div>
                 </div>
@@ -73,61 +74,8 @@
                 <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()" *ngIf="!isError()">
                     Enregistrer
                 </button>
-                <button mat-raised-button [disabled]="true" class="disabled-button" *ngIf="isError()">Enregistrer</button>
+                <button mat-raised-button [disabled]="true" class="disabled-button" class="green" *ngIf="isError()">Enregistrer</button>
             </div>
         </div>
     </div>
-
-    <!-- <div class="overlay" [ngStyle]="overlayStatus">
-        <div class="wrapper">
-            <div class="container">
-                <div *ngIf="hasQuestionId; else createNewGame"><div class="title large-text">Modification d'une question</div></div> 
-                <ng-template #createNewGame> 
-                    <div class="title large-text">Création d'une question</div>
-                </ng-template> 
-                <form action="">
-                    <div class="first">
-                        <mat-form-field appearance="fill">
-                            <mat-label>Titre</mat-label>
-                            <input [(ngModel)]="title" matInput placeholder="Titre de la question" name="title" />
-                        </mat-form-field>
-                        <mat-form-field appearance="fill">
-                            <mat-label>Type de question</mat-label>
-                            <mat-select>
-                                <mat-option value="qcm">Choix multiples</mat-option>
-                                <mat-option value="qcl">Réponse courte</mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                        <mat-form-field appearance="fill">
-                            <mat-label>Points</mat-label>
-                            <input [(ngModel)]="points" type="number" matInput placeholder="Points accordés" name="time" />
-                        </mat-form-field>
-                    </div>
-                    <mat-form-field appearance="fill">
-                        <mat-label>Description</mat-label>
-                        <textarea
-                            [(ngModel)]="description"
-                            matInput
-                            placeholder="Description de la question"
-                            name="description"
-                            maxlength="200"
-                        ></textarea>
-                    </mat-form-field>
-                </form>
-                <div class="choices-container">
-                    <div class="choices">
-                        <div *ngFor="let choice of choices; let i = index" class="choice">{{ i + 1 }}. {{ choice.label }}</div>
-                    </div>
-                    <div class="choices-buttons" *ngIf="choices.length < 4">
-                        <button mat-raised-button color="primary">Ajouter une réponse</button>
-                    </div>
-                </div>
-
-                <div class="buttons">
-                    <button mat-raised-button color="primary" class="red" (click)="removeOverlay()">Annuler</button>
-                    <button mat-raised-button color="primary" class="green">Enregistrer</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
 </app-global-layout>
