@@ -2,24 +2,32 @@ import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { Quiz } from '@common/types';
+import { Question, Quiz } from '@common/types';
 import { of } from 'rxjs';
 import { CreateUpdateQuizComponent } from './create-update-quiz.component';
 
 describe('CreateUpdateQuizComponent', () => {
     let component: CreateUpdateQuizComponent;
     let fixture: ComponentFixture<CreateUpdateQuizComponent>;
-    // let mockActivatedRoute;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let quizServiceMock: any;
-    let mockQuizzes: Quiz[];
+    let quizServiceMock: jasmine.SpyObj<QuizService>;
+    let mockQuizzes: Quiz;
+    let mockQuestions: Question[];
 
     beforeEach(async () => {
-        /* mockActivatedRoute = {
-            paramMap: of(paramMap),
-        };*/
+        mockQuizzes = {
+            _id: 'fakeID',
+            name: 'name',
+            description: 'description',
+            duration: 10,
+            visibility: true,
+            // eslint-disable-next-line no-undef
+            questions: mockQuestions,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
 
         TestBed.configureTestingModule({
             declarations: [CreateUpdateQuizComponent],
@@ -31,6 +39,7 @@ describe('CreateUpdateQuizComponent', () => {
                         snapshot: { paramMap: new Map().set('gameId', 1) },
                     },
                 },
+                { provide: MatSnackBar, useValue: jasmine.createSpyObj('MatSnackBar', ['open']) },
             ],
         });
 

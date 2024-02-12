@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BackgroundComponent } from '@app/components/background/background.component';
@@ -79,6 +80,7 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         FormsModule,
         HttpClientModule,
         MatButtonModule,
+        MatSnackBarModule,
         MatDialogModule,
     ],
     providers: [

@@ -45,5 +45,6 @@ export class QuestionDto {
     @IsOptional()
     updatedAt?: Date;
 
+    @Type(() => String)
     _id?: string;
 }
