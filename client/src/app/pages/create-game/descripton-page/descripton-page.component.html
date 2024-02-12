@@ -8,16 +8,16 @@
                 <p>{{ game.description }}</p>
             </div>
             <div class="box-description">
-                <p class="select-game-wrapper">Liste des questions:</p> 
-                <div *ngFor="let quest of question; let i = index" > 
-                    <p>{{i + 1}}-{{quest.label}} ({{quest.type}}) </p>
-                </div> 
+                <p class="select-game-wrapper">Liste des questions:</p>
+                <div *ngFor="let quest of question; let i = index">
+                    <p>{{ i + 1 }}-{{ quest.label }} ({{ quest.type }})</p>
+                </div>
             </div>
         </div>
         <div class="button-container">
             <button routerLink="/create" mat-fab extended class="large-text quit-button">Retour</button>
             <button [routerLink]="['/testing', game._id]" mat-fab extended color="accent" class="large-text middle">Tester le jeu</button>
-            <button routerLink="/create" mat-fab extended color="accent" class="large-text">Créer une partie</button>
+            <button routerLink="/waiting-room" mat-fab extended color="accent" class="large-text">Créer une partie</button>
         </div>
     </div>
 </app-global-layout>

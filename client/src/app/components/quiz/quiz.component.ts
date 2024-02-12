@@ -39,7 +39,15 @@ export class QuizComponent implements OnInit {
     }
 
     generateQuizAsFile(quiz: Quiz) {
-        const fileContent = JSON.stringify(quiz);
+        const quizNoVisibilityNoId: Partial<Quiz> = {
+            name: quiz.name,
+            description: quiz.description,
+            duration: quiz.duration,
+            questions: quiz.questions,
+            createdAt: quiz.createdAt,
+            updatedAt: quiz.updatedAt,
+        };
+        const fileContent = JSON.stringify(quizNoVisibilityNoId);
         const blob = new Blob([fileContent], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');

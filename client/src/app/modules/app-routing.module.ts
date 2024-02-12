@@ -10,6 +10,7 @@ import { DescriptonPageComponent } from '@app/pages/create-game/descripton-page/
 import { Error404Component } from '@app/pages/error/error404/error404.component';
 import { GameVueComponent } from '@app/pages/game/game-vue/game-vue.component';
 import { JoinComponent } from '@app/pages/game/join/join.component';
+import { WaitingRoomComponent } from '@app/pages/game/waiting-room/waiting-room.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 
 const routes: Routes = [
@@ -27,9 +28,8 @@ const routes: Routes = [
     // Modification d'un Quiz
     { path: 'admin/create/quiz/:id', component: CreateUpdateQuizComponent },
 
-    // Vue d'un jeu via son code, désactivé pour le sprint 1, ce sera pour le sprint 2
-    // { path: 'game/:code', component: GameVueComponent },
-
+    { path: 'game/:code', component: GameVueComponent },
+    { path: 'waiting-room', component: WaitingRoomComponent },
     { path: 'join', component: JoinComponent },
     { path: 'create/description/:gameId', component: DescriptonPageComponent },
 

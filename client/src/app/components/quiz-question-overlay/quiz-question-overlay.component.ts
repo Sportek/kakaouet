@@ -87,9 +87,9 @@ export class QuizQuestionOverlayComponent implements OnInit {
     createQuestion(): void {
         this.hasQuestionId = false;
         this.currentQuestion = cloneDeep(this.baseQuestion as Question);
+        this.idTracker++;
         // eslint-disable-next-line no-underscore-dangle
         this.currentQuestion._id = this.idTracker.toString();
-        this.idTracker++;
         this.resetChoices();
         this.changeOverlay();
     }
