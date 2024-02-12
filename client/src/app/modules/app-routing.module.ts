@@ -27,7 +27,9 @@ const routes: Routes = [
     // Modification d'un Quiz
     { path: 'admin/create/quiz/:id', component: CreateUpdateQuizComponent },
 
-    { path: 'game/:code', component: GameVueComponent },
+    // Vue d'un jeu via son code, désactivé pour le sprint 1, ce sera pour le sprint 2
+    // { path: 'game/:code', component: GameVueComponent },
+
     { path: 'join', component: JoinComponent },
     { path: 'create/description/:gameId', component: DescriptonPageComponent },
 

@@ -29,7 +29,6 @@ import { AdminQuestionBankComponent } from './pages/admin/admin-question-bank/ad
 import { CreateUpdateQuizComponent } from './pages/admin/create/create-update-quiz/create-update-quiz.component';
 import { CreatePageComponent } from './pages/create-game/create-page/create-page.component';
 import { DescriptonPageComponent } from './pages/create-game/descripton-page/descripton-page.component';
-import { TestingGameComponent } from './pages/create-game/testing-game/testing-game.component';
 import { Error404Component } from './pages/error/error404/error404.component';
 import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
 import { JoinComponent } from './pages/game/join/join.component';
@@ -59,7 +58,6 @@ import { JoinComponent } from './pages/game/join/join.component';
         SelectorComponent,
         BankQuestionComponent,
         DescriptonPageComponent,
-        TestingGameComponent,
         GameVueComponent,
         ChatComponent,
         Error404Component,

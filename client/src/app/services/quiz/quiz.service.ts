@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
-import { Quiz } from '@common/types';
+import { QuestionFeedback, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -39,6 +39,16 @@ export class QuizService {
     deleteQuizById(id: string): Observable<void> {
         const url = `${BASE_URL}/quiz/${id}`;
         return this.http.delete<void>(url);
+    }
+
+    requestCorrectAnswers(quizId: string, index: number): Observable<number[]> {
+        const url = `${BASE_URL}/quiz/${quizId}?index=${index}`;
+        return this.http.get<number[]>(url);
+    }
+
+    correctQuizAnswers(quizId: string, questionId: number, answers: number[]): Observable<QuestionFeedback> {
+        const url = `${BASE_URL}/quiz/validate/${quizId}/${questionId}`;
+        return this.http.post<QuestionFeedback>(url, { answers });
     }
 
     updateQuizzes() {

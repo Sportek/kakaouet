@@ -19,6 +19,12 @@ export class GameVueComponent implements OnInit {
 
     @HostListener('document:keydown', ['$event'])
     keyboardChoices(event: KeyboardEvent) {
+        // Vérifie si l'élément actuellement en focus est un champ de saisie de texte
+        const target = event.target as HTMLElement;
+        if (target.tagName === 'INPUT' && target.getAttribute('type') === 'text') {
+            return;
+        }
+
         // Gestion de la sélection des choix
         this.isQCMQuestion().subscribe((isQCM) => {
             if (isQCM && this.gameService.canChangeChoices) {
@@ -47,7 +53,6 @@ export class GameVueComponent implements OnInit {
             return;
         }
         this.gameService.canChangeChoices = false;
-        this.gameService.sendSelectedChoices();
     }
 
     isQCMQuestion(): Observable<boolean> {
@@ -76,10 +81,14 @@ export class GameVueComponent implements OnInit {
         return this.gameService.actualQuestion.pipe(map((question) => question.points));
     }
 
-    isCorrectAnswer(index: number) {
+    isIncorrectAnswer(index: number): Observable<boolean> {
         if (this.gameService.gameState !== GameState.DisplayQuestionResults) {
             return of(false);
         }
-        return this.gameService.getCorrectAnswers().pipe(map((answers) => answers.includes(index)));
+        return this.gameService.getCorrectAnswers().pipe(
+            map((answers) => {
+                return !answers.includes(index);
+            }),
+        );
     }
 }

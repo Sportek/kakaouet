@@ -56,4 +56,12 @@ export class QuizController {
     async deleteQuiz(@Param('id') id: string) {
         return await this.quizService.deleteQuizById(id);
     }
+
+    @Post('/validate/:quizId/:questionId')
+    @HttpCode(HttpStatus.OK)
+    async validateAnswers(@Param('quizId') quizId: string, @Param('questionId') questionId: number, @Body() body: { answers: number[] }) {
+        const feedback = await this.quizService.validateAnswers(quizId, questionId, body.answers);
+        if (feedback) return feedback;
+        throw new HttpException('Impossible to find answers matching quizId and questionId', HttpStatus.BAD_REQUEST);
+    }
 }

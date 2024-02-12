@@ -17,6 +17,7 @@ export class ChatComponent {
     }
 
     sendMessage() {
-        // TODO: Envoyer le message au backend
+        this.gameService.sendMessage(this.message);
+        this.message = '';
     }
 }

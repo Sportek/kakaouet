@@ -1,5 +1,6 @@
 import { Quiz, QuizDocument } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
+import { QuestionFeedback } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -70,5 +71,26 @@ export class QuizService {
         } catch (error) {
             this.logger.error('Error adding new quiz: ', error);
         }
+    }
+
+    async validateAnswers(quizId: string, questionId: number, answers: number[]): Promise<QuestionFeedback> {
+        const quiz = await this.getQuizById(quizId);
+        if (quiz) {
+            const question = quiz.questions[questionId];
+            if (question) {
+                // TODO: Seulement pour les QCM, les QRL ne sont pas encore supportées
+                const correctChoicesIndices = question.choices.filter((choice) => choice.isCorrect).map((choice, index) => index);
+                const isCorrect = correctChoicesIndices.length === answers.length && correctChoicesIndices.every((index) => answers.includes(index));
+                return {
+                    correctChoicesIndices,
+                    isCorrect,
+                    incorrectSelectedChoicesIndices: answers.filter((index) => !correctChoicesIndices.includes(index)),
+                    correctSelectedChoicesIndices: answers.filter((index) => correctChoicesIndices.includes(index)),
+                    points: isCorrect ? question.points : 0,
+                };
+            }
+        }
+
+        return null;
     }
 }
