@@ -31,7 +31,6 @@ export class CreateUpdateQuizComponent implements OnInit {
     // eslint-disable-next-line max-params
     constructor(
         private quizService: QuizService,
-        // private questionService: QuestionService,
         private route: ActivatedRoute,
         private questionService: QuestionService,
         private validateService: ValidateService,
@@ -48,15 +47,16 @@ export class CreateUpdateQuizComponent implements OnInit {
     openImportOverlay(): void {
         this.showImportOverlay = true;
     }
+
     closeImportOverlay(): void {
         this.showImportOverlay = false;
     }
+
     moveUp(index: number): void {
         if (index > 0) {
             const temp = this.questionsQuiz[index];
             this.questionsQuiz[index] = this.questionsQuiz[index - 1];
             this.questionsQuiz[index - 1] = temp;
-            // Cette ligne est optionnelle, elle force la mise à jour de la vue si nécessaire
             this.questionsQuiz = [...this.questionsQuiz];
         }
     }
@@ -66,7 +66,6 @@ export class CreateUpdateQuizComponent implements OnInit {
             const temp = this.questionsQuiz[index];
             this.questionsQuiz[index] = this.questionsQuiz[index + 1];
             this.questionsQuiz[index + 1] = temp;
-            // Cette ligne est optionnelle, elle force la mise à jour de la vue si nécessaire
             this.questionsQuiz = [...this.questionsQuiz];
         }
     }
@@ -118,7 +117,7 @@ export class CreateUpdateQuizComponent implements OnInit {
 
     removeQuestion(question: Question): void {
         const index: number = this.questionsQuiz.indexOf(question);
-        this.questionsQuiz.splice(index, 1);
+        if (index >= 0) this.questionsQuiz.splice(index, 1);
     }
 
     createQuiz(): void {
