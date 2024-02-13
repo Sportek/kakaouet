@@ -202,6 +202,7 @@ export class QuestionOverlayComponent implements OnInit {
                 isCorrect: true,
             };
             this.choices.push(newChoice);
+            this.resetChoicesMap();
         }
     }
 
@@ -217,12 +218,8 @@ export class QuestionOverlayComponent implements OnInit {
         });
     }
 
-    onSubmit() {
-        this.saveChangesToQuestion();
-    }
-
     moveChoiceUp(index: number): void {
-        if (index > 0) {
+        if (index > 0 && index < this.choices.length) {
             const temp = this.choices[index];
             this.choices[index] = this.choices[index - 1];
             this.choices[index - 1] = temp;
@@ -231,7 +228,7 @@ export class QuestionOverlayComponent implements OnInit {
     }
 
     moveChoiceDown(index: number): void {
-        if (index < this.choices.length - 1) {
+        if (index >= 0 && index < this.choices.length - 1) {
             const temp = this.choices[index];
             this.choices[index] = this.choices[index + 1];
             this.choices[index + 1] = temp;
