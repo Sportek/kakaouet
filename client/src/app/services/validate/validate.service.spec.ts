@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
+import { Quiz } from '@common/types';
+import { BAD_QUIZ, WORKING_QUIZ } from './fake-quizzes';
 import { ValidateService } from './validate.service';
 
 describe('ValidateService', () => {
@@ -12,5 +14,39 @@ describe('ValidateService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('should validate quiz correctly', () => {
+        const validate = service.validateQuiz(WORKING_QUIZ as Quiz);
+        expect(validate.isValid).toBe(true);
+    });
+
+    it('should not validate quiz correctly', () => {
+        const validate = service.validateQuiz(BAD_QUIZ as Quiz);
+        const expectedErrors = [
+            'Le temps de réponse doit être un multiple de 10 secondes',
+            "Question 0: Le label d'une question est requis",
+            'Question 0: Le nombre de points doit être un multiple de 10',
+            'Question 0: Une question QCM doit avoir au moins une réponse correcte et une réponse incorrecte',
+            "Question 1: Choix 0: Le label d'une réponse est requis",
+        ];
+        expect(validate.errors).toEqual(expectedErrors);
+    });
+
+    it('should trim quiz correctly', () => {
+        const validate = service.validateJSONQuiz(JSON.stringify({ ...WORKING_QUIZ, bobinours: 'boubi' }));
+        expect(validate.isValid).toBe(true);
+        expect(validate.object).toEqual(WORKING_QUIZ as Quiz);
+    });
+
+    it('incorrect json file', () => {
+        const validate = service.validateJSONQuiz('{ bobi');
+        expect(validate.isValid).toBe(false);
+        expect(validate.errors).toEqual(["Le fichier sélectionné n'est pas un fichier JSON valide"]);
+    });
+
+    it('should have a description', () => {
+        const validate = service.validateJSONQuiz(JSON.stringify({ ...WORKING_QUIZ, description: undefined }));
+        expect(validate.isValid).toBe(false);
     });
 });

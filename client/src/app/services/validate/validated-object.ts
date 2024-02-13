@@ -22,6 +22,7 @@ export class ValidatedObject<T> {
                 return new ValidatedObject<T>(false, undefined, errors);
             }
 
+            // Ligne non testée, car on n'arrive pas à simuler une autre erreur que ZodError.
             return new ValidatedObject<T>(false, undefined, ['Erreur inattendue lors de la validation.']);
         }
     }
