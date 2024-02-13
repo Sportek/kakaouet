@@ -79,11 +79,11 @@ describe('DescriptonPageComponent', () => {
         expect(spy).toHaveBeenCalledWith(['/testing', 'valid-id']);
     });
 
-    it('should navigate to /create on createGame with valid quiz', () => {
+    it('should navigate to /waiting-room on createGame with valid quiz', () => {
         const spy = spyOn(router, 'navigate');
         fixture.detectChanges();
         component.createGame('valid-id');
-        expect(spy).toHaveBeenCalledWith(['/create']);
+        expect(spy).toHaveBeenCalledWith(['./waiting-room']);
     });
 
     it('should handle hidden quiz in checkQuizBeforeNavigation', () => {
