@@ -1,6 +1,7 @@
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { mockQuizTable } from '@app/services/quiz/mock-quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { QuestionFeedback } from '@common/types';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { QuizController } from './quiz.controller';
@@ -33,6 +34,7 @@ describe('QuizController', () => {
                         deleteQuizById: jest.fn().mockResolvedValue(null),
                         validateQuizObject: jest.fn(),
                         validateQuestionObject: jest.fn(),
+                        validateAnswers: jest.fn(),
                         doesQuizExist: jest.fn(),
                     },
                 },
@@ -133,6 +135,34 @@ describe('QuizController', () => {
     describe('deleteQuiz', () => {
         it('should delete the quiz', async () => {
             await expect(controller.deleteQuiz('1')).resolves.toBeNull();
+        });
+    });
+
+    describe('validateAnswers', () => {
+        it('should return correct feedback for a valid request', async () => {
+            // Mock the service method to return a valid feedback
+            const mockFeedback: QuestionFeedback = {
+                correctChoicesIndices: [0],
+                isCorrect: true,
+                incorrectSelectedChoicesIndices: [],
+                correctSelectedChoicesIndices: [0],
+                points: 10,
+            };
+            jest.spyOn(service, 'validateAnswers').mockResolvedValueOnce(mockFeedback);
+
+            // Act
+            const result = await controller.validateAnswers('quizId', 1, { answers: [0] });
+
+            // Assert
+            expect(result).toEqual(mockFeedback);
+        });
+
+        it('should throw an HttpException for an invalid request', async () => {
+            // Mock the service method to return null (invalid request)
+            jest.spyOn(service, 'validateAnswers').mockResolvedValueOnce(null);
+
+            // Act and Assert
+            await expect(controller.validateAnswers('invalidQuizId', 1, { answers: [0] })).rejects.toThrowError(HttpException);
         });
     });
 });

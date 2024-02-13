@@ -37,9 +37,9 @@ export class QuizService {
         }
     }
 
-    async getQuizById(id: string): Promise<Quiz> {
+    async getQuizById(id: string): Promise<QuizDto> {
         try {
-            const quiz: QuizDocument = await this.quizModel.findById(id);
+            const quiz: QuizDto = await this.quizModel.findById(id);
             return quiz;
         } catch (error) {
             this.logger.error('Error getting quiz by id: ', error);
@@ -97,7 +97,6 @@ export class QuizService {
                 };
             }
         }
-
         return null;
     }
 }
