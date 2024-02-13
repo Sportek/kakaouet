@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { BaseQuestion, Choice, Question, Variables } from '@common/types';
+import { ChoiceValidation, QuestionValidation, ValidateService } from '@app/services/validate/validate.service';
+import { BaseQuestion, Choice, Question, QuestionType, Variables } from '@common/types';
 import { cloneDeep } from 'lodash';
 
 @Component({
@@ -50,7 +51,10 @@ export class QuizQuestionOverlayComponent implements OnInit {
         display: 'none',
     };
 
-    constructor(private quizService: QuizService) {}
+    constructor(
+        private quizService: QuizService,
+        private validationService: ValidateService,
+    ) {}
 
     ngOnInit(): void {
         this.resetChoicesMap();
@@ -95,44 +99,54 @@ export class QuizQuestionOverlayComponent implements OnInit {
     }
 
     isError(): string | null {
-        // Regular expression checking if the string has characters other than spaces
-        if (!/\S/.test(this.currentQuestion.label)) {
-            return 'La question doit avoir un titre';
+        if (!QuestionValidation.checkRequiredLabel.callback({ label: this.currentQuestion.label })) {
+            return QuestionValidation.checkRequiredLabel.errorMessage;
         }
-        if (this.currentQuestion.type !== 'QCM' && this.currentQuestion.type !== 'QRL') {
-            return 'La question doit avoir un type';
+
+        if (!QuestionValidation.checkRequiredType.callback({ type: this.currentQuestion.type })) {
+            return QuestionValidation.checkRequiredType.errorMessage;
         }
-        if (this.currentQuestion.type === 'QCM' && this.choices.length < 2) {
-            return 'La question doit avoir au moins deux choix';
+
+        if (this.currentQuestion.type === QuestionType.QCM) {
+            if (!QuestionValidation.checkEnoughChoices.callback({ type: QuestionType.QCM, choices: this.choices })) {
+                return QuestionValidation.checkEnoughChoices.errorMessage;
+            }
+            if (!QuestionValidation.checkRequiredAnswers.callback({ type: QuestionType.QCM, choices: this.choices })) {
+                return QuestionValidation.checkRequiredAnswers.errorMessage;
+            }
         }
+
         const isModifyingChoicesArray = Array.from(this.choiceModifier.values());
         if (isModifyingChoicesArray.some((bool) => bool)) {
             return 'Tous les choix doivent être enregistrés';
         }
-        if (!this.choices.some((choice) => choice.isCorrect)) {
-            return 'Il doit y avoir au moins un choix correct';
-        }
-        if (!this.choices.some((choice) => !choice.isCorrect)) {
-            return 'Il doit y avoir au moins un choix incorrect';
-        }
-        if (this.choices.some((choice) => !/\S/.test(choice.label))) {
-            return 'Les choix ne peuvent être vides';
-        }
-        if (this.currentQuestion.points >= Variables.MinScore && this.currentQuestion.points <= Variables.MaxScore) {
-            if (this.currentQuestion.points % Variables.MinScore === 0) {
-                return null;
-            } else {
-                return 'Le nombre de points doit être un multiple de 10';
+
+        for (const choice of this.choices) {
+            if (!ChoiceValidation.checkRequiredLabel.callback(choice)) {
+                return ChoiceValidation.checkRequiredLabel.errorMessage;
             }
-        } else {
-            return 'Le nombre de points doit être entre 10 et 100';
         }
+
+        if (!QuestionValidation.checkMinPoints.callback({ points: this.currentQuestion.points })) {
+            return QuestionValidation.checkMinPoints.errorMessage;
+        }
+
+        if (!QuestionValidation.checkMaxPoints.callback({ points: this.currentQuestion.points })) {
+            return QuestionValidation.checkMaxPoints.errorMessage;
+        }
+
+        if (!QuestionValidation.checkFormatPoints.callback({ points: this.currentQuestion.points })) {
+            return QuestionValidation.checkFormatPoints.errorMessage;
+        }
+
+        return null;
     }
 
     saveChangesToQuestion() {
         if (!this.isError()) {
             if (this.currentQuestion.type === 'QCM') this.currentQuestion.choices = this.choices;
-            this.questionEmitter.emit(this.currentQuestion);
+            const validatedQuestion = this.validationService.validateQuestion(this.currentQuestion).object;
+            this.questionEmitter.emit(validatedQuestion);
             this.resetChoices();
             this.changeOverlay();
         }
