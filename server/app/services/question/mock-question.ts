@@ -6,8 +6,8 @@ export const mockQuestions: QuestionDto[] = [
         label: 'Who is the author of "The Lord of the Rings"?',
         points: 10,
         choices: [
-            { label: 'J.K. Rowling', isCorrect: false },
-            { label: 'J.R.R. Tolkien', isCorrect: true },
+            { label: 'J.K. Rowling', isCorrect: true },
+            { label: 'J.R.R. Tolkien', isCorrect: false },
             { label: 'George R.R. Martin', isCorrect: false },
             { label: 'C.S. Lewis', isCorrect: false },
         ],

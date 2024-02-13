@@ -1,5 +1,6 @@
 import { Quiz } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
+import { mockQuestions } from '@app/services/question/mock-question';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -162,6 +163,58 @@ describe('QuizService', () => {
             const loggerErrorSpy = jest.spyOn(service['logger'], 'error');
             await service.addNewQuiz(mockedQuiz);
             expect(loggerErrorSpy).toHaveBeenCalledWith('Error adding new quiz: ', expect.any(Error));
+        });
+    });
+
+    describe('validateAnswers', () => {
+        it('should return correct feedback for a correct QCM answer', async () => {
+            const mockedQuiz: QuizDto = mockQuizTable[0];
+            const quizId = 'your-quiz-id';
+            const questionId = 0;
+            const answers = [0];
+
+            jest.spyOn(service, 'getQuizById').mockResolvedValue(mockedQuiz);
+
+            const result = await service.validateAnswers(quizId, questionId, answers);
+
+            expect(result).toEqual({
+                correctChoicesIndices: [0],
+                isCorrect: true,
+                incorrectSelectedChoicesIndices: [],
+                correctSelectedChoicesIndices: [0],
+                points: mockQuestions[0].points,
+            });
+        });
+
+        it('should return correct feedback for an incorrect QCM answer', async () => {
+            const mockedQuiz: QuizDto = mockQuizTable[0];
+            const quizId = 'your-quiz-id';
+            const questionId = 0;
+            const answers = [3];
+
+            jest.spyOn(service, 'getQuizById').mockResolvedValue(mockedQuiz);
+
+            const result = await service.validateAnswers(quizId, questionId, answers);
+
+            expect(result).toEqual({
+                correctChoicesIndices: [0],
+                isCorrect: false,
+                incorrectSelectedChoicesIndices: [3],
+                correctSelectedChoicesIndices: [],
+                points: 0,
+            });
+        });
+
+        it('should return null for an invalid quiz or question', async () => {
+            const quizId = 'invalid-quiz-id';
+            const questionId = 0;
+            const answers = [0, 1];
+
+            jest.spyOn(service, 'getQuizById').mockResolvedValue(null);
+
+            const result = await service.validateAnswers(quizId, questionId, answers);
+
+            expect(result).toBeNull();
         });
     });
 
