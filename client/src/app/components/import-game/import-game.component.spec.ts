@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { BAD_QUIZ, WORKING_QUIZ } from '@app/services/validate/fake-quizzes';
@@ -20,7 +22,7 @@ describe('ImportGameComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [ImportGameComponent],
-            imports: [HttpClientTestingModule],
+            imports: [HttpClientTestingModule, MatDialogModule],
             providers: [
                 { provide: ValidateService, useValue: validateServiceSpy },
                 { provide: QuizService, useValue: quizServiceSpy },
@@ -82,6 +84,28 @@ describe('ImportGameComponent', () => {
         const event = { target: {} };
 
         const fileUpload = await component.onFileUpload(event as unknown as Event);
+
+        expect(fileUpload).toBe(false);
+    });
+
+    it('should handle file upload with already existing name', async () => {
+        const testFile = new File([JSON.stringify(WORKING_QUIZ)], 'test.json', { type: 'application/json' });
+        const event = { target: { files: [testFile] } };
+
+        const validateService = TestBed.inject(ValidateService) as jasmine.SpyObj<ValidateService>;
+        validateService.validateJSONQuiz.and.returnValue({ isValid: true, object: WORKING_QUIZ, errors: [] } as unknown as ValidatedObject<Quiz>);
+
+        const quizService = TestBed.inject(QuizService) as jasmine.SpyObj<QuizService>;
+        quizService.addNewQuiz.and.returnValue({
+            // @ts-ignore
+            subscribe: (observer: { next: () => void; error: (error) => void }) => {
+                observer.error(new HttpErrorResponse({ status: 400, error: { message: 'Quiz name has to be unique: ' } }));
+            },
+        });
+
+        const fileUpload = await component.onFileUpload(event as unknown as Event);
+
+        fixture.detectChanges(); // Permet de réagir aux changements déclenchés par les promesses
 
         expect(fileUpload).toBe(false);
     });

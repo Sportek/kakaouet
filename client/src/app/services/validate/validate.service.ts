@@ -40,6 +40,7 @@ export class ValidateService {
                 quizToValidate.errors.push(...validatedQuestion.errors.map((error) => `Question ${index}: ${error}`));
             }
         });
+
         return quizToValidate;
     }
 
@@ -89,6 +90,14 @@ export class ValidateService {
     }
 }
 
+const isoDateValidator = (dateString: string | undefined) => {
+    if (dateString === undefined) {
+        // Retourner true ou false selon la logique de votre application pour les valeurs undefined
+        return true; // ou false si vous voulez que undefined soit considéré comme invalide
+    }
+    return !isNaN(Date.parse(dateString));
+};
+
 export const choiceSchema = z
     .object({
         label: z.string(),
@@ -98,25 +107,25 @@ export const choiceSchema = z
 
 export const questionSchema = z
     .object({
-        _id: z.string().optional(),
         label: z.string(),
         type: z.nativeEnum(QuestionType),
         points: z.number(),
         choices: z.array(choiceSchema),
-        createdAt: z.date().optional(),
-        updatedAt: z.date().optional(),
+        createdAt: z.string().optional().refine(isoDateValidator, {
+            message: 'createdAt doit être une date sous format ISO valide',
+        }),
     })
     .strip();
 
 export const quizSchema = z
     .object({
-        _id: z.string().optional(),
         name: z.string(),
         description: z.string(),
         duration: z.number(),
         questions: z.array(questionSchema),
-        createdAt: z.date().optional(),
-        updatedAt: z.date().optional(),
+        createdAt: z.string().optional().refine(isoDateValidator, {
+            message: 'createdAt doit être une date sous format ISO valide',
+        }),
     })
     .strip();
 

@@ -36,6 +36,7 @@ import { Error404Component } from './pages/error/error404/error404.component';
 import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
 import { JoinComponent } from './pages/game/join/join.component';
 import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.component';
+import { UpdateNameComponent } from './components/update-name/update-name.component';
 
 /**
  * Main module that is used in main.ts.
@@ -71,6 +72,7 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         QuizQuestionOverlayComponent,
         ConfirmationDialogComponent,
         WaitingRoomComponent,
+        UpdateNameComponent,
     ],
     imports: [
         AppMaterialModule,
