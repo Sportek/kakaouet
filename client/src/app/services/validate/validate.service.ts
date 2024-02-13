@@ -4,11 +4,15 @@ import { ZodSchema, z } from 'zod';
 import { Validate } from './validate';
 import { ValidatedObject } from './validated-object';
 
+const TITLE_MAX_LENGTH = 150;
 const DESCRIPTION_MAX_LENGTH = 200;
 const DESCRIPTION_MIN_LENGTH = 10;
+const WORD_MAX_LENGTH = 27;
 const MAX_RESPONSE_TIME = 60;
 const MIN_RESPONSE_TIME = 10;
 const RESPONSE_TIME_STEP = 10;
+const MIN_CHOICES_AMOUNT = 2;
+const MAX_CHOICES_AMOUNT = 4;
 const MAX_QUESTION_POINTS = 100;
 const MIN_QUESTION_POINTS = 10;
 const QUESTION_POINTS_STEP = 10;
@@ -20,6 +24,8 @@ export class ValidateService {
     validateQuiz(quiz: Quiz): ValidatedObject<Quiz> {
         const quizToValidate = ValidatedObject.fromObject<Quiz>(quiz);
         quizToValidate.check(QuizValidation.checkRequiredName);
+        quizToValidate.check(QuizValidation.checkMaxTitleLength);
+        quizToValidate.check(QuizValidation.checkMaxWordLength);
         quizToValidate.check(QuizValidation.checkMaxDescriptionLength);
         quizToValidate.check(QuizValidation.checkMinDescriptionLength);
         quizToValidate.check(QuizValidation.checkRequiredDescription);
@@ -40,7 +46,9 @@ export class ValidateService {
     validateQuestion(question: Question): ValidatedObject<Question> {
         const questionToValidate = ValidatedObject.fromObject<Question>(question);
         questionToValidate.check(QuestionValidation.checkRequiredLabel);
+        questionToValidate.check(QuestionValidation.checkRequiredType);
         questionToValidate.check(QuestionValidation.checkMaxPoints);
+        questionToValidate.check(QuestionValidation.checkEnoughChoices);
         questionToValidate.check(QuestionValidation.checkMinPoints);
         questionToValidate.check(QuestionValidation.checkFormatPoints);
         questionToValidate.check(QuestionValidation.checkRequiredAnswers);
@@ -115,6 +123,22 @@ export const quizSchema = z
 export namespace QuizValidation {
     export const checkRequiredName = new Validate((quiz: Quiz) => !!quiz.name.trim(), "Le nom d'un quiz est requis");
 
+    export const checkMaxTitleLength = new Validate(
+        (quiz: Quiz) => quiz.name.trim().length < TITLE_MAX_LENGTH,
+        'Le titre doit avoir moins de 150 caractères',
+    );
+
+    export const checkMaxWordLength = new Validate((quiz: Quiz) => {
+        let isValidated = true;
+        const words = quiz.name.split(' ');
+        for (const word of words) {
+            if (word.length > WORD_MAX_LENGTH) {
+                isValidated = false;
+            }
+        }
+        return isValidated;
+    }, 'Le titre ne doit pas contenir de mots plus grands que 27 caractères');
+
     export const checkMaxDescriptionLength = new Validate(
         (quiz: Quiz) => quiz.description.trim().length < DESCRIPTION_MAX_LENGTH,
         `La description doit faire moins de ${DESCRIPTION_MAX_LENGTH} caractères`,
@@ -148,6 +172,16 @@ export namespace QuizValidation {
 export namespace QuestionValidation {
     export const checkRequiredLabel = new Validate((question: Question) => !!question.label.trim(), "Le label d'une question est requis");
 
+    export const checkRequiredType = new Validate(
+        (question: Question) => question.type === QuestionType.QCM || question.type === QuestionType.QRL,
+        "Le type d'une question est requis",
+    );
+
+    export const checkEnoughChoices = new Validate((question: Question) => {
+        if (question.type !== QuestionType.QCM) return true;
+        return question.choices.length >= MIN_CHOICES_AMOUNT && question.choices.length <= MAX_CHOICES_AMOUNT;
+    }, 'Une question QCM doit avoir de deux à quatre réponses');
+
     export const checkMaxPoints = new Validate(
         (question: Question) => question.points <= MAX_QUESTION_POINTS,
         `Le nombre de points doit être inférieur à ${MAX_QUESTION_POINTS}`,
@@ -171,5 +205,7 @@ export namespace QuestionValidation {
 }
 
 export namespace ChoiceValidation {
-    export const checkRequiredLabel = new Validate((choice: Choice) => !!choice.label.trim(), "Le label d'une réponse est requis");
+    export const checkRequiredLabel = new Validate((choice: Choice) => {
+        return !!choice.label.trim();
+    }, "Le label d'une réponse est requis");
 }

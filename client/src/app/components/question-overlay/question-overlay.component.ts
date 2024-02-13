@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { QuestionService } from '@app/services/quiz/question.service';
-import { Choice, Question, QuestionType, Variables } from '@common/types';
+import { ChoiceValidation, QuestionValidation, ValidateService } from '@app/services/validate/validate.service';
+import { Choice, Question, QuestionType } from '@common/types';
 import { cloneDeep } from 'lodash';
 
 @Component({
@@ -44,7 +45,10 @@ export class QuestionOverlayComponent implements OnInit {
         display: 'none',
     };
 
-    constructor(private questionService: QuestionService) {}
+    constructor(
+        private questionService: QuestionService,
+        private validationService: ValidateService,
+    ) {}
 
     ngOnInit(): void {
         this.questionService.getId().subscribe({
@@ -94,38 +98,47 @@ export class QuestionOverlayComponent implements OnInit {
     }
 
     isError(): string | null {
-        // Regular expression checking if the string has characters other than spaces
-        if (!/\S/.test(this.title)) {
-            return 'La question doit avoir un titre';
+        if (!QuestionValidation.checkRequiredLabel.callback({ label: this.title })) {
+            return QuestionValidation.checkRequiredLabel.errorMessage;
         }
-        if (this.type !== 'QCM' && this.type !== 'QRL') {
-            return 'La question doit avoir un type';
+
+        if (!QuestionValidation.checkRequiredType.callback({ type: this.type })) {
+            return QuestionValidation.checkRequiredType.errorMessage;
         }
-        if (this.type === 'QCM' && this.choices.length < 2) {
-            return 'La question doit avoir au moins deux choix';
+
+        if (this.type === QuestionType.QCM) {
+            if (!QuestionValidation.checkEnoughChoices.callback({ type: QuestionType.QCM, choices: this.choices })) {
+                return QuestionValidation.checkEnoughChoices.errorMessage;
+            }
+            if (!QuestionValidation.checkRequiredAnswers.callback({ type: QuestionType.QCM, choices: this.choices })) {
+                return QuestionValidation.checkRequiredAnswers.errorMessage;
+            }
         }
+
         const isModifyingChoicesArray = Array.from(this.choiceModifier.values());
         if (isModifyingChoicesArray.some((bool) => bool)) {
             return 'Tous les choix doivent être enregistrés';
         }
-        if (!this.choices.some((choice) => choice.isCorrect)) {
-            return 'Il doit y avoir au moins un choix correct';
-        }
-        if (!this.choices.some((choice) => !choice.isCorrect)) {
-            return 'Il doit y avoir au moins un choix incorrect';
-        }
-        if (this.choices.some((choice) => !/\S/.test(choice.label))) {
-            return 'Les choix ne peuvent être vides';
-        }
-        if (this.points >= Variables.MinScore && this.points <= Variables.MaxScore) {
-            if (this.points % Variables.MinScore === 0) {
-                return null;
-            } else {
-                return 'Le nombre de points doit être un multiple de 10';
+
+        for (const choice of this.choices) {
+            if (!ChoiceValidation.checkRequiredLabel.callback(choice)) {
+                return ChoiceValidation.checkRequiredLabel.errorMessage;
             }
-        } else {
-            return 'Le nombre de points doit être entre 10 et 100';
         }
+
+        if (!QuestionValidation.checkMinPoints.callback({ points: this.points })) {
+            return QuestionValidation.checkMinPoints.errorMessage;
+        }
+
+        if (!QuestionValidation.checkMaxPoints.callback({ points: this.points })) {
+            return QuestionValidation.checkMaxPoints.errorMessage;
+        }
+
+        if (!QuestionValidation.checkFormatPoints.callback({ points: this.points })) {
+            return QuestionValidation.checkFormatPoints.errorMessage;
+        }
+
+        return null;
     }
 
     saveChangesToQuestion() {
@@ -138,10 +151,12 @@ export class QuestionOverlayComponent implements OnInit {
                     type: QuestionType.QCM,
                     choices: this.choices,
                 };
+                const validatedQuestion = this.validationService.validateQuestion(question as Question).object;
                 if (this.hasQuestionId) {
-                    this.questionService.updateQuestion(this.questionId, question as Question).subscribe({});
+                    // eslint-disable-next-line no-underscore-dangle
+                    this.questionService.updateQuestion(this.questionId, validatedQuestion).subscribe({});
                 } else {
-                    this.questionService.createQuestion(question as Question).subscribe({});
+                    this.questionService.createQuestion(validatedQuestion).subscribe({});
                 }
                 this.changeOverlay();
             }
@@ -151,10 +166,12 @@ export class QuestionOverlayComponent implements OnInit {
                     points: this.points,
                     type: QuestionType.QRL,
                 };
+                const validatedQuestion = this.validationService.validateQuestion(question as Question).object;
                 if (this.hasQuestionId) {
-                    this.questionService.updateQuestion(this.questionId, question as Question).subscribe({});
+                    // eslint-disable-next-line no-underscore-dangle
+                    this.questionService.updateQuestion(this.questionId, validatedQuestion).subscribe({});
                 } else {
-                    this.questionService.createQuestion(question as Question).subscribe({});
+                    this.questionService.createQuestion(validatedQuestion).subscribe({});
                 }
                 this.changeOverlay();
             }

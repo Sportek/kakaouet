@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { QuizValidation, ValidateService } from '@app/services/validate/validate.service';
 import { Variables } from '@common/enum-variables';
 import { Question, Quiz } from '@common/types';
 
@@ -33,6 +34,7 @@ export class CreateUpdateQuizComponent implements OnInit {
         // private questionService: QuestionService,
         private route: ActivatedRoute,
         private questionService: QuestionService,
+        private validateService: ValidateService,
         private dialog: MatSnackBar,
     ) {}
 
@@ -83,46 +85,6 @@ export class CreateUpdateQuizComponent implements OnInit {
         this.showImportOverlay = false;
     }
 
-    // openImportOverlay(): void {
-    //     this.showImportOverlay = true;
-    // }
-    // closeImportOverlay(): void {
-    //     this.showImportOverlay = false;
-    // }
-    // moveUp(index: number): void {
-    //     if (index > 0) {
-    //         const temp = this.questionsQuiz[index];
-    //         this.questionsQuiz[index] = this.questionsQuiz[index - 1];
-    //         this.questionsQuiz[index - 1] = temp;
-    //         // Cette ligne est optionnelle, elle force la mise à jour de la vue si nécessaire
-    //         this.questionsQuiz = [...this.questionsQuiz];
-    //     }
-    // }
-
-    // moveDown(index: number): void {
-    //     if (index < this.questionsQuiz.length - 1) {
-    //         const temp = this.questionsQuiz[index];
-    //         this.questionsQuiz[index] = this.questionsQuiz[index + 1];
-    //         this.questionsQuiz[index + 1] = temp;
-    //         // Cette ligne est optionnelle, elle force la mise à jour de la vue si nécessaire
-    //         this.questionsQuiz = [...this.questionsQuiz];
-    //     }
-    // }
-
-    // modifyQuestion(id: string): void {
-    //     this.questionService.sendId(id);
-    // }
-
-    // handleQuestionsImported(importedQuestions: Question[]): void {
-    //     const newQuestions = importedQuestions.filter(
-    //         // eslint-disable-next-line no-underscore-dangle
-    //         (iq) => !this.questionsQuiz.some((q) => q._id === iq._id),
-    //     );
-    //     // eslint-disable-next-line no-underscore-dangle
-    //     this.questionsQuiz = [...this.questionsQuiz, ...newQuestions].sort((a, b) => a._id.localeCompare(b._id));
-    //     this.showImportOverlay = false;
-    // }
-
     getQuiz(id: string): void {
         this.quizService.getQuizById(id).subscribe({
             next: (quiz) => {
@@ -149,8 +111,9 @@ export class CreateUpdateQuizComponent implements OnInit {
         updatedQuiz.questions = this.questionsQuiz;
         updatedQuiz.updatedAt = new Date();
         updatedQuiz.visibility = this.quizVisibility;
+        const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
         // eslint-disable-next-line no-underscore-dangle
-        this.quizService.updateQuizById(updatedQuiz._id, updatedQuiz).subscribe({});
+        this.quizService.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
     }
 
     removeQuestion(question: Question): void {
@@ -213,30 +176,36 @@ export class CreateUpdateQuizComponent implements OnInit {
     }
 
     isError(): string | null {
-        if (this.titleQuiz.length < Variables.MinTitleLength) {
-            return 'Le titre doit avoir au moins 1 caractères';
-        }
-        if (this.titleQuiz.length > Variables.MaxTitleCharacters) {
-            return 'Le titre doit avoir moins de 150 caractères';
-        }
-        if (!/\S/.test(this.titleQuiz)) {
-            return 'Le titre doit contenir des caractères autres que des espaces';
+        if (!QuizValidation.checkRequiredName.callback({ name: this.titleQuiz })) {
+            return QuizValidation.checkRequiredName.errorMessage;
         }
 
-        if (!this.wordLength()) {
-            return 'Le titre ne doit pas contenir de mots plus grand que 27 caractères';
+        if (!QuizValidation.checkMaxTitleLength.callback({ name: this.titleQuiz })) {
+            return QuizValidation.checkMaxTitleLength.errorMessage;
         }
 
-        if (!(this.durationQuiz >= Variables.MinTime && this.durationQuiz <= Variables.MaxTime)) {
-            return 'La durée doit être entre 10 et 60 secondes';
+        if (!QuizValidation.checkMaxWordLength.callback({ name: this.titleQuiz })) {
+            return QuizValidation.checkMaxWordLength.errorMessage;
         }
 
-        if (this.descriptionQuiz.length > Variables.MaxCharacters || this.descriptionQuiz.length < Variables.MinCharacters) {
-            return 'La description doit avoir entre 10 et 200 caractères inclusivement';
+        if (!QuizValidation.checkMinResponseTime.callback({ duration: this.durationQuiz })) {
+            return QuizValidation.checkMinResponseTime.errorMessage;
         }
 
-        if (this.questionsQuiz.length <= 0) {
-            return 'Le jeu doit avoir au moins une question';
+        if (!QuizValidation.checkMaxResponseTime.callback({ duration: this.durationQuiz })) {
+            return QuizValidation.checkMaxResponseTime.errorMessage;
+        }
+
+        if (!QuizValidation.checkMinDescriptionLength.callback({ description: this.descriptionQuiz })) {
+            return QuizValidation.checkMinDescriptionLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxDescriptionLength.callback({ description: this.descriptionQuiz })) {
+            return QuizValidation.checkMaxDescriptionLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkRequiredQuestions.callback({ questions: this.questionsQuiz })) {
+            return QuizValidation.checkRequiredQuestions.errorMessage;
         }
         return null;
     }
