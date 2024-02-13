@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Observable, of, throwError } from 'rxjs';
@@ -26,6 +26,7 @@ describe('DescriptonPageComponent', () => {
     let fixture: ComponentFixture<DescriptonPageComponent>;
     let snackBar: MatSnackBar;
     let router: Router;
+    let quizService: QuizService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -49,9 +50,9 @@ describe('DescriptonPageComponent', () => {
 
         fixture = TestBed.createComponent(DescriptonPageComponent);
         component = fixture.componentInstance;
-        // quizService = TestBed.inject(QuizService);
         snackBar = TestBed.inject(MatSnackBar);
         router = TestBed.inject(Router);
+        quizService = TestBed.inject(QuizService);
     });
 
     it('should create', () => {
@@ -93,4 +94,13 @@ describe('DescriptonPageComponent', () => {
         expect(spySnackBar).toHaveBeenCalledWith('Ce jeu est actuellement invisible.', 'Fermer', { duration: 5000 });
         expect(spyRouter).toHaveBeenCalledWith(['/create']);
     });
+    it('should handle other errors in checkQuizBeforeNavigation', fakeAsync(() => {
+        const spySnackBarOpen = spyOn(snackBar, 'open');
+        const spyRouterNavigate = spyOn(router, 'navigate');
+        spyOn(quizService, 'getQuizById').and.returnValue(throwError(() => new Error()));
+        component.checkQuizBeforeNavigation('invalid-id', '/create', true);
+        tick();
+        expect(spySnackBarOpen).toHaveBeenCalledWith('Ce jeu a été supprimé, veuillez sélectionner un autre jeu', 'Fermer', { duration: 5000 });
+        expect(spyRouterNavigate).toHaveBeenCalled();
+    }));
 });
