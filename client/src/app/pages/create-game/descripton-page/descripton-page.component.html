@@ -16,8 +16,8 @@
         </div>
         <div class="button-container">
             <button routerLink="/create" mat-fab extended class="large-text quit-button">Retour</button>
-            <button [routerLink]="['/testing', game._id]" mat-fab extended color="accent" class="large-text middle">Tester le jeu</button>
-            <button routerLink="/waiting-room" mat-fab extended color="accent" class="large-text">Créer une partie</button>
+            <button (click)="testGame(game._id)" mat-fab extended color="accent" class="large-text middle">Tester le jeu</button>
+            <button mat-fab extended color="accent" (click)="createGame(game._id)" class="large-text">Créer une partie</button>
         </div>
     </div>
 </app-global-layout>

@@ -8,4 +8,5 @@ export enum Variables {
     MinTitleLength = 1,
     MaxTitleCharacters = 150,
     MaxWordLength = 27,
+    NotFound = 404,
 }

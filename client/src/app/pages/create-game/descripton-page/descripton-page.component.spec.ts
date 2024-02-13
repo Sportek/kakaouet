@@ -1,76 +1,96 @@
-import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Observable, of, throwError } from 'rxjs';
+
+import { HttpErrorResponse } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { of } from 'rxjs';
-import { Quiz } from './../../../../../../common/types';
 import { DescriptonPageComponent } from './descripton-page.component';
+
+class MockQuizService {
+    getQuizById(id: string): Observable<unknown> {
+        if (id === 'valid-id') {
+            return of({ _id: 'valid-id', name: 'Valid Quiz', visibility: true, questions: [] });
+        } else if (id === 'hidden-id') {
+            return of({ _id: 'hidden-id', name: 'Hidden Quiz', visibility: false, questions: [] });
+        } else {
+            return throwError(() => new HttpErrorResponse({ status: 404, statusText: 'Not Found' }));
+        }
+    }
+}
 
 describe('DescriptonPageComponent', () => {
     let component: DescriptonPageComponent;
     let fixture: ComponentFixture<DescriptonPageComponent>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let quizServiceMock: any;
-    let mockQuizzes: Quiz[];
+    let snackBar: MatSnackBar;
+    let router: Router;
 
     beforeEach(async () => {
-        mockQuizzes = [
-            {
-                _id: '007',
-                name: 'Quiz 1',
-                duration: 60,
-                description: 'This is the description of question 1',
-                visibility: true,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                questions: [
-                    /* {
-                        type: QuestionType.QCM,
-                        choices: [
-                            {
-                            id: number,
-                            label: string;
-                            isCorrect: boolean,
-                            }
-                        ],
-                    },*/
-                ],
-            },
-        ];
-
-        TestBed.configureTestingModule({
+        await TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule, RouterTestingModule],
             declarations: [DescriptonPageComponent],
-            imports: [HttpClientModule, HttpClientTestingModule],
             providers: [
+                { provide: QuizService, useClass: MockQuizService },
+                MatSnackBar,
                 {
                     provide: ActivatedRoute,
                     useValue: {
-                        snapshot: { paramMap: new Map().set('gameId', 1) },
+                        snapshot: {
+                            paramMap: {
+                                get: () => 'valid-id',
+                            },
+                        },
                     },
                 },
             ],
-        });
-
-        // Properly type the mock using jasmine.SpyObj
-        quizServiceMock = jasmine.createSpyObj('QuizService', ['getQuizById']);
-        quizServiceMock.getQuizById.and.returnValue(of(mockQuizzes));
-
-        await TestBed.configureTestingModule({
-            declarations: [DescriptonPageComponent],
-            providers: [{ provide: QuizService, useValue: quizServiceMock }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(DescriptonPageComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
+        // quizService = TestBed.inject(QuizService);
+        snackBar = TestBed.inject(MatSnackBar);
+        router = TestBed.inject(Router);
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call getQuiz on init', () => {
-        expect(quizServiceMock.getQuizById).toHaveBeenCalled();
+    it('should call getQuiz on init with valid id', () => {
+        const spyGetQuiz = spyOn(component, 'getQuiz').and.callThrough();
+        fixture.detectChanges();
+        expect(spyGetQuiz).toHaveBeenCalledWith('valid-id');
+    });
+
+    it('should set game data on valid quiz fetch', () => {
+        fixture.detectChanges();
+        expect(component.game).toBeTruthy();
+        // eslint-disable-next-line no-underscore-dangle
+        expect(component.game._id).toEqual('valid-id');
+    });
+
+    it('should navigate to /testing on testGame with valid quiz', () => {
+        const spy = spyOn(router, 'navigate');
+        fixture.detectChanges();
+        component.testGame('valid-id');
+        expect(spy).toHaveBeenCalledWith(['/testing', 'valid-id']);
+    });
+
+    it('should navigate to /create on createGame with valid quiz', () => {
+        const spy = spyOn(router, 'navigate');
+        fixture.detectChanges();
+        component.createGame('valid-id');
+        expect(spy).toHaveBeenCalledWith(['/create']);
+    });
+
+    it('should handle hidden quiz in checkQuizBeforeNavigation', () => {
+        const spySnackBar = spyOn(snackBar, 'open');
+
+        const spyRouter = spyOn(router, 'navigate');
+        component.checkQuizBeforeNavigation('hidden-id', '/create', false);
+        expect(spySnackBar).toHaveBeenCalledWith('Ce jeu est actuellement invisible.', 'Fermer', { duration: 5000 });
+        expect(spyRouter).toHaveBeenCalledWith(['/create']);
     });
 });
