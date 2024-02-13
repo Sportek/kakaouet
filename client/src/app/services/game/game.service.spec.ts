@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-unused-vars */
 import { TestBed } from '@angular/core/testing';
@@ -289,5 +290,60 @@ describe('GameService', () => {
                 expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/error-404', { replaceUrl: true });
             },
         });
+    });
+
+    it('handle next question without index', () => {
+        const result = service.nextQuestion();
+        expect(result).toBeTrue();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect(service.actualQuestion.value).toEqual(service.game!.quiz.questions[1]);
+    });
+
+    it('should call executeState with PlayersAnswerQuestion if there is no next question', () => {
+        spyOn(service, 'executeState');
+        spyOn(service, 'nextQuestion').and.returnValue(false);
+        // @ts-ignore: Accès à une méthode privée pour le test
+        service.goNextQuestion();
+        expect(service.executeState).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
+    });
+
+    it('should call executeState with OrganisatorCorrectingAnswers if there is a next question', () => {
+        spyOn(service, 'executeState');
+        spyOn(service, 'nextQuestion').and.returnValue(true);
+        // @ts-ignore: Accès à une méthode privée pour le test
+        service.goNextQuestion();
+        expect(service.executeState).toHaveBeenCalledWith(GameState.OrganisatorCorrectingAnswers);
+    });
+
+    it('should call executeState with correct function', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'playersAnswerQuestion');
+        service.executeState(GameState.PlayersAnswerQuestion);
+        // @ts-ignore: Accès à une méthode privée pour le test
+        expect(service.playersAnswerQuestion).toHaveBeenCalled();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'organisatorCorrectingAnswers');
+        service.executeState(GameState.OrganisatorCorrectingAnswers);
+        // @ts-ignore: Accès à une méthode privée pour le test
+        expect(service.organisatorCorrectingAnswers).toHaveBeenCalled();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'displayQuestionResults');
+        service.executeState(GameState.DisplayQuestionResults);
+        // @ts-ignore: Accès à une méthode privée pour le test
+        expect(service.displayQuestionResults).toHaveBeenCalled();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'displayQuizResults');
+        service.executeState(GameState.DisplayQuizResults);
+        // @ts-ignore: Accès à une méthode privée pour le test
+        expect(service.displayQuizResults).toHaveBeenCalled();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(service, 'gameEnd');
+        service.executeState(GameState.End);
+        // @ts-ignore: Accès à une méthode privée pour le test
+        expect(service.gameEnd).toHaveBeenCalled();
     });
 });

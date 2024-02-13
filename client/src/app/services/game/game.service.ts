@@ -209,6 +209,13 @@ export class GameService {
         }
     }
 
+    private goNextQuestion() {
+        const hasNextQuestion = this.nextQuestion();
+        let nextGameState = GameState.PlayersAnswerQuestion;
+        if (hasNextQuestion) nextGameState = GameState.OrganisatorCorrectingAnswers;
+        this.executeState(nextGameState);
+    }
+
     private displayQuestionResults() {
         if (this.game?.type === GameType.Test) this.correctAnswers();
         this.answers.next([0]);
@@ -217,10 +224,7 @@ export class GameService {
             'cooldown',
             new Timer(3, {
                 whenDone: () => {
-                    const hasNextQuestion = this.nextQuestion();
-                    let nextGameState = GameState.DisplayQuizResults;
-                    if (hasNextQuestion) nextGameState = GameState.PlayersAnswerQuestion;
-                    this.executeState(nextGameState);
+                    this.goNextQuestion();
                 },
             }),
         );
