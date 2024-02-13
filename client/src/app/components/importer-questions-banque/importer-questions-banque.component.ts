@@ -40,6 +40,6 @@ export class QuestionBankImportComponent implements OnInit {
 
     importQuestions(): void {
         this.questionsImported.emit(Array.from(this.selectedQuestions));
-        this.selectedQuestions.clear(); // Optionnel: Effacer la sélection actuelle
+        this.selectedQuestions.clear();
     }
 }
