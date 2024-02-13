@@ -15,31 +15,35 @@ export class ImportGameComponent {
         private snackbar: MatSnackBar,
     ) {}
 
-    async onFileUpload(event: Event): Promise<void> {
-        // Récupération du fichier
-        const input = event.target as HTMLInputElement;
-        const file = input.files ? input.files[0] : null;
-        if (!file) return;
+    async onFileUpload(event: Event): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+            // Récupération du fichier
+            const input = event.target as HTMLInputElement;
+            const file = input.files ? input.files[0] : null;
+            if (!file) return resolve(false);
 
-        // Lecture du fichier
-        const fileReader = new FileReader();
-        fileReader.onload = async () => {
-            const rawText = fileReader.result as string;
-            const validatedObject = this.validateService.validateJSONQuiz(rawText);
-            if (validatedObject.isValid) {
-                this.quizService.addNewQuiz(validatedObject.object).subscribe({
-                    next: () => {
-                        this.snackbar.open('Quiz importé avec succès', '✅');
-                    },
-                    error: () => {
-                        this.snackbar.open("Erreur lors de l'import du quiz", '❌');
-                    },
-                });
-                return;
-            }
-            this.snackbar.open(validatedObject.errors.join('\n'), '❌');
-        };
+            // Lecture du fichier
+            const fileReader = new FileReader();
+            fileReader.onload = async () => {
+                const rawText = fileReader.result as string;
+                const validatedObject = this.validateService.validateJSONQuiz(rawText);
+                if (validatedObject.isValid) {
+                    this.quizService.addNewQuiz(validatedObject.object).subscribe({
+                        next: () => {
+                            this.snackbar.open('Quiz importé avec succès', '✅');
+                            return resolve(true);
+                        },
+                        error: () => {
+                            this.snackbar.open("Erreur lors de l'import du quiz", '❌');
+                            return resolve(false);
+                        },
+                    });
+                }
+                this.snackbar.open(validatedObject.errors.join('\n'), '❌');
+                return resolve(false);
+            };
 
-        fileReader.readAsText(file);
+            fileReader.readAsText(file);
+        });
     }
 }
