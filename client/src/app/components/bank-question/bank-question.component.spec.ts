@@ -1,10 +1,11 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question, QuestionType } from '@common/types';
-import { EMPTY, of } from 'rxjs';
+import { of } from 'rxjs';
 import { BankQuestionComponent } from './bank-question.component';
+
 describe('BankQuestionComponent', () => {
     let component: BankQuestionComponent;
     let fixture: ComponentFixture<BankQuestionComponent>;
@@ -74,16 +75,112 @@ describe('BankQuestionComponent', () => {
         const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of(true), close: null });
         spyOn(dialog, 'open').and.returnValue(dialogRefSpyObj);
 
-        spyOn(questionService, 'deleteQuestionById').and.callFake((id: string) => {
-            // eslint-disable-next-line no-underscore-dangle
-            component.questionList = component.questionList.filter((q) => q._id !== id);
-            return EMPTY;
-        });
+        spyOn(questionService, 'deleteQuestionById').and.returnValue(of(void 0));
+
+        component.deleteQuestion(questionMock);
+        flush();
+        fixture.detectChanges();
+
+        expect(dialog.open).toHaveBeenCalled();
+        // eslint-disable-next-line no-underscore-dangle
+        expect(questionService.deleteQuestionById).toHaveBeenCalledWith(questionMock._id);
+        expect(component.questionList).not.toContain(questionMock);
+    }));
+
+    it('should not delete a question if confirmation dialog is declined', fakeAsync(() => {
+        const questionMock: Question = {
+            _id: '1',
+            label: 'Question 1',
+            type: QuestionType.QRL,
+            points: 10,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+        component.questionList = [questionMock];
+
+        const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of(false), close: null });
+        spyOn(dialog, 'open').and.returnValue(dialogRefSpyObj);
 
         component.deleteQuestion(questionMock);
         tick();
+        flush();
+
+        fixture.detectChanges();
 
         expect(dialog.open).toHaveBeenCalled();
-        expect(component.questionList.length).toBe(0);
+        expect(component.questionList.length).toBe(1);
+    }));
+
+    it('should return false if the question type is not in the visibility list', () => {
+        component.visibility = [QuestionType.QCM];
+        const questionMock: Question = {
+            _id: '1',
+            label: 'Question 1',
+            type: QuestionType.QRL,
+            points: 10,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+
+        expect(component.isVisible(questionMock)).toBeFalse();
+    });
+
+    it('should sort questions by updatedAt in descending order', fakeAsync(() => {
+        const questionMocks: Question[] = [
+            {
+                _id: '1',
+                label: 'Question 1',
+                type: QuestionType.QRL,
+                points: 10,
+                createdAt: new Date('2024-02-12T19:00:00.000Z'),
+                updatedAt: new Date('2024-02-12T19:05:00.000Z'),
+            },
+            {
+                _id: '2',
+                label: 'Question 2',
+                type: QuestionType.QRL,
+                points: 20,
+                createdAt: new Date('2024-02-12T19:00:00.000Z'),
+                updatedAt: new Date('2024-02-12T19:10:00.000Z'),
+            },
+        ];
+        spyOn(questionService, 'getQuestions').and.returnValue(of(questionMocks));
+
+        component.getAllQuestions();
+        flush();
+
+        // eslint-disable-next-line no-underscore-dangle
+        expect(component.questionList[0]._id).toBe('2');
+        // eslint-disable-next-line no-underscore-dangle
+        expect(component.questionList[1]._id).toBe('1');
+    }));
+
+    it('should handle invalid dates when sorting questions', fakeAsync(() => {
+        const questionMocks: Question[] = [
+            {
+                _id: '1',
+                label: 'Question 1',
+                type: QuestionType.QRL,
+                points: 10,
+                createdAt: new Date('2024-02-12T19:00:00.000Z'),
+                updatedAt: new Date('2024-02-12T19:05:00.000Z'), // Valid date
+            },
+            {
+                _id: '2',
+                label: 'Question 2',
+                type: QuestionType.QRL,
+                points: 20,
+                createdAt: new Date('2024-02-12T19:00:00.000Z'),
+                updatedAt: new Date('invalid-date'), // Invalid date
+            },
+        ];
+        spyOn(questionService, 'getQuestions').and.returnValue(of(questionMocks));
+
+        component.getAllQuestions();
+        flush();
+        // eslint-disable-next-line no-underscore-dangle
+        expect(component.questionList[0]._id).toBe('1');
+        // eslint-disable-next-line no-underscore-dangle
+        expect(component.questionList[1]._id).toBe('2');
     }));
 });
