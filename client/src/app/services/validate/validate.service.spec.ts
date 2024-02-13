@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Quiz } from '@common/types';
+import { QuestionType, Quiz } from '@common/types';
 import { BAD_QUIZ, WORKING_QUIZ } from './fake-quizzes';
 import { ValidateService } from './validate.service';
 
@@ -48,5 +48,33 @@ describe('ValidateService', () => {
     it('should have a description', () => {
         const validate = service.validateJSONQuiz(JSON.stringify({ ...WORKING_QUIZ, description: undefined }));
         expect(validate.isValid).toBe(false);
+    });
+
+    it('should validate quiz title length correctly', () => {
+        const quizWithLongWord: Quiz = {
+            _id: '1',
+            name: 'ThisIsAVeryLongWordThatExceedsTheLimit',
+            description: 'Valid description',
+            duration: 30,
+            questions: [
+                {
+                    _id: '1',
+                    label: 'Question 1',
+                    type: QuestionType.QCM,
+                    points: 20,
+                    choices: [],
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ],
+            visibility: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+
+        const validate = service.validateQuiz(quizWithLongWord);
+
+        expect(validate.isValid).toBe(false);
+        expect(validate.errors).toContain('Le titre ne doit pas contenir de mots plus grands que 27 caractères');
     });
 });

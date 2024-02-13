@@ -47,6 +47,7 @@ export class QuestionService {
     async updateQuestionById(id: string, question: QuestionDto) {
         try {
             const filter = { _id: id };
+            question.updatedAt = new Date();
             await this.questionModel.replaceOne(filter, question);
             // eslint-disable-next-line no-underscore-dangle
             return await this.questionModel.findOne({ _id: question._id });
@@ -73,6 +74,8 @@ export class QuestionService {
 
     async addNewQuestion(question: QuestionDto) {
         try {
+            question.updatedAt = new Date();
+            question.createdAt = new Date();
             return await this.questionModel.create(question);
         } catch (error) {
             this.logger.error('Error adding new question: ', error);

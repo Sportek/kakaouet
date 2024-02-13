@@ -49,6 +49,7 @@ export class QuizService {
     async updateQuizById(id: string, quiz: QuizDto) {
         try {
             const filter = { _id: id };
+            quiz.updatedAt = new Date();
             await this.quizModel.updateOne(filter, quiz);
             // eslint-disable-next-line no-underscore-dangle
             return await this.quizModel.findOne({ _id: quiz._id });
@@ -67,6 +68,8 @@ export class QuizService {
 
     async addNewQuiz(quiz: QuizDto) {
         try {
+            quiz.createdAt = new Date();
+            quiz.updatedAt = new Date();
             return await this.quizModel.create(quiz);
         } catch (error) {
             this.logger.error('Error adding new quiz: ', error);
