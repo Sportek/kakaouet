@@ -48,7 +48,7 @@ export class DescriptonPageComponent implements OnInit {
     }
 
     createGame(gameId: string) {
-        this.checkQuizBeforeNavigation(gameId, '/create', false);
+        this.checkQuizBeforeNavigation(gameId, './waiting-room', false);
     }
 
     checkQuizBeforeNavigation(gameId: string, path: string, includeId: boolean = true) {
