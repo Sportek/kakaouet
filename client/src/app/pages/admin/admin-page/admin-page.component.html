@@ -1,3 +1,27 @@
 <app-global-layout>
-    <p>admin-page works!</p>
+    <app-background>
+        <div class="container">
+            <div class="grid-container">
+                <div class="grid-item1">
+                    <div class="title">
+                        <div class="title-text">Actions</div>
+                    </div>
+                    <div class="buttons">
+                        <button routerLink="/admin/create/quiz" mat-fab extended color="primary" class="large-text">Créer un jeu</button>
+                        <div class="import-button">
+                            <app-import-game></app-import-game>
+                        </div>
+                        <button routerLink="/admin/question-bank" mat-fab extended color="primary" class="large-text">Banque de questions</button>
+                        <button routerLink="/admin/game-history" mat-fab extended color="primary" class="large-text">Historique des parties</button>
+                    </div>
+                </div>
+                <div class="grid-item2">
+                    <div class="title">
+                        <div class="title-text">Liste des Jeux</div>
+                    </div>
+                    <app-quiz></app-quiz>
+                </div>
+            </div>
+        </div>
+    </app-background>
 </app-global-layout>

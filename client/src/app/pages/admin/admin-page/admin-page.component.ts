@@ -1,16 +1,16 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+// import { Location } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from '@app/services/user/user.service';
+
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
 })
-export class AdminPageComponent {
-    constructor(
-        private router: Router,
-        private userService: UserService,
-    ) {
-        if (!this.userService.isLogin()) this.router.navigateByUrl('/admin/login', { replaceUrl: true });
+export class AdminPageComponent implements OnInit {
+    constructor(private userService: UserService) {}
+
+    ngOnInit() {
+        this.userService.checkAndRedirect('/admin/login');
     }
 }

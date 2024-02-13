@@ -1,18 +1,20 @@
-<div class="content">
+<div class="background-color">
     <app-background>
-        <div class="wrapper">
-            <div class="select-game-wrapper">
-                <div class="logo">
-                    <img src="./../../../assets/img/kakaouet.png" alt="Logo" />
+        <div class="content">
+            <div class="wrapper">
+                <div class="select-game-wrapper">
+                    <div class="logo">
+                        <img src="./../../../assets/img/kakaouet.png" alt="Logo" />
+                    </div>
+                    <div class="buttons">
+                        <button routerLink="/join" mat-fab extended color="accent" class="large-text">Joindre une partie</button>
+                        <button routerLink="/create" mat-fab extended color="primary" class="large-text">Créer une partie</button>
+                        <button routerLink="/admin" mat-fab extended color="primary" class="large-text">Administrer les jeux</button>
+                    </div>
                 </div>
-                <div class="buttons">
-                    <button routerLink="/join" mat-fab extended color="accent" class="large-text">Joindre une partie</button>
-                    <button routerLink="/create" mat-fab extended color="primary" class="large-text">Créer une partie</button>
-                    <button routerLink="/admin" mat-fab extended color="primary" class="large-text">Administrer les jeux</button>
+                <div class="footer">
+                    <div>{{ 'Équipe ' + teamNumber + ': ' + teamMembers.join(', ') }}</div>
                 </div>
-            </div>
-            <div class="footer">
-                <div>{{ 'Équipe ' + teamNumber + ': ' + teamMembers.join(', ') }}</div>
             </div>
         </div>
     </app-background>

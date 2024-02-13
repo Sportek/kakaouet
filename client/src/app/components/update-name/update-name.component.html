@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="title large-text">Sélectionnez un nouveau nom pour le Quiz</div>
+    <mat-dialog-content>
+        <mat-form-field>
+            <mat-label>Nouveau nom</mat-label>
+            <input matInput [(ngModel)]="newName" />
+        </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <div class="buttons">
+            <button mat-raised-button [mat-dialog-close]="newName" color="warn">Annuler</button>
+            <button class="" mat-raised-button (click)="sendNewName()" color="success" class="green">Confirmer</button>
+        </div>
+    </mat-dialog-actions>
+</div>

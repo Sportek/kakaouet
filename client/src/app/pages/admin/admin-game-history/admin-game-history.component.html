@@ -1,0 +1,14 @@
+<app-global-layout>
+    <app-background>
+        <div class="wrapper">
+            <div class="container">
+                <div class="title-text">Historique des parties</div>
+                <div class="selectors">
+                    <app-selector [label]="'Trier selon'" [choices]="['Temps de début de partie', 'Nom de Jeu']"></app-selector>
+                    <app-selector [label]="'Ordre'" [choices]="['Ascendant', 'Descendant']"></app-selector>
+                </div>
+                <app-quiz-termine></app-quiz-termine>
+            </div>
+        </div>
+    </app-background>
+</app-global-layout>

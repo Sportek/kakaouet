@@ -1,0 +1,15 @@
+@import '../../../colors.scss';
+.games {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.game {
+    box-sizing: border-box;
+    display: flex;
+    background-color: $purple-900;
+    width: 100%;
+    justify-content: space-around;
+    margin: 1rem 0 0 0;
+    border: 0.25rem solid black;
+}

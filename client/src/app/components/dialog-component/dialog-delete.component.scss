@@ -1,0 +1,66 @@
+@import '../../../colors.scss';
+
+:host {
+    .confirm-dialog-container {
+        background-color: #5716e6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+    }
+
+    .confirm-dialog-bubble {
+        background: transparent;
+    }
+
+    .confirm-dialog-content {
+        padding: 1rem;
+        color: white;
+        text-align: center;
+    }
+
+    .confirm-dialog-actions {
+        justify-content: center;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .confirm-dialog-title {
+        color: white;
+        font-size: 2rem;
+        font-style: bold;
+        text-align: center;
+    }
+
+    button {
+        height: 2rem;
+        width: 6rem;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        align-items: center;
+    }
+
+    .confirm-dialog-cancel {
+        background-color: #75668c;
+        color: white;
+    }
+
+    .confirm-dialog-cancel:hover {
+        background-color: #605580;
+    }
+
+    .confirm-dialog-confirm {
+        background-color: #d9534f;
+        color: white;
+    }
+
+    .confirm-dialog-confirm:hover {
+        background-color: #c12e2a;
+    }
+}

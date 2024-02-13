@@ -1,0 +1,96 @@
+<div class="overlay" [ngStyle]="overlayStatus">
+    <div class="wrapper">
+        <div class="container">
+            <div class="box">
+                <div class="grid">
+                    <div *ngIf="hasQuestionId; else createNewGame"><div class="title large-text">Modification d'une question</div></div>
+                    <div class="error-message small-text">
+                        {{ isError() }}
+                    </div>
+                </div>
+                <ng-template #createNewGame>
+                    <div class="title large-text">Création d'une question</div>
+                </ng-template>
+                <form>
+                    <div class="first">
+                        <mat-form-field appearance="fill">
+                            <mat-label>Titre</mat-label>
+                            <input [(ngModel)]="currentQuestion.label" matInput placeholder="Titre de la question" name="title" />
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Type de question</mat-label>
+                            <mat-select [(ngModel)]="currentQuestion.type" name="type">
+                                <mat-option value="QCM">Choix multiples</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Points</mat-label>
+                            <input
+                                [(ngModel)]="currentQuestion.points"
+                                type="number"
+                                matInput
+                                placeholder="Points accordés"
+                                name="points"
+                                min="10"
+                                max="100"
+                                step="10"
+                            />
+                        </mat-form-field>
+                    </div>
+                </form>
+                <div class="choices-container" *ngIf="currentQuestion.type === 'QCM'">
+                    <div class="choices">
+                        <div *ngFor="let choice of choices; let i = index" class="choice">
+                            <div class="correct-choice" (click)="changeChoiceCorrect(choice)">
+                                <div class="small-text">Correct Answer</div>
+                                <mat-icon *ngIf="!choice.isCorrect"
+                                    ><span class="material-symbols-outlined"> check_box_outline_blank </span></mat-icon
+                                >
+                                <mat-icon *ngIf="choice.isCorrect"><span class="material-symbols-outlined"> check_box </span></mat-icon>
+                            </div>
+                            <div>
+                                {{ i + 1 + '. ' }}
+                            </div>
+                            <div *ngIf="!choiceModifier.get(choice) || !choiceModifier.has(choice)">
+                                {{ choice.label }}
+                            </div>
+                            <div *ngIf="choiceModifier.get(choice) && choiceModifier.has(choice)">
+                                <input [(ngModel)]="choice.label" matInput placeholder="Titre de la question" name="title" class="input" />
+                            </div>
+                            <div class="icons">
+                                <mat-icon
+                                    *ngIf="!choiceModifier.get(choice) || !choiceModifier.has(choice)"
+                                    class="large-text"
+                                    (click)="modifyChoice(choice)"
+                                    >edit</mat-icon
+                                >
+                                <mat-icon
+                                    *ngIf="!choiceModifier.get(choice) || !choiceModifier.has(choice)"
+                                    class="large-text"
+                                    (click)="deleteChoice(choice)"
+                                    >delete</mat-icon
+                                >
+                                <mat-icon
+                                    *ngIf="choiceModifier.get(choice) && choiceModifier.has(choice)"
+                                    class="large-text"
+                                    (click)="modifyChoice(choice)"
+                                    ><span class="material-symbols-outlined"> check </span></mat-icon
+                                >
+                                <mat-icon (click)="moveChoiceUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
+                                <mat-icon (click)="moveChoiceDown(i)" *ngIf="i < choices.length - 1">arrow_downward</mat-icon>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="choices-buttons" *ngIf="choices.length < 4">
+                        <button mat-raised-button color="primary" (click)="addChoice()">Ajouter une réponse</button>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <button mat-raised-button color="primary" class="red" (click)="changeOverlay()">Annuler</button>
+                    <button mat-raised-button color="primary" class="green" (click)="saveChangesToQuestion()" *ngIf="!isError()">Enregistrer</button>
+                    <button mat-raised-button [disabled]="true" class="disabled-button" *ngIf="isError()">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

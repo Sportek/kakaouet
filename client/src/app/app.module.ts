@@ -1,7 +1,9 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BackgroundComponent } from '@app/components/background/background.component';
@@ -10,13 +12,31 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { FooterComponent } from './components/footer/footer.component';
+// eslint-disable-next-line import/no-deprecated
+import { BankQuestionComponent } from './components/bank-question/bank-question.component';
+import { ChatComponent } from './components/chat/chat.component';
+import { ConfirmationDialogComponent } from './components/dialog-component/dialog-delete.component';
 import { HeaderComponent } from './components/header/header.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
+import { QuestionBankImportComponent } from './components/importer-questions-banque/importer-questions-banque.component';
+import { QuestionOverlayComponent } from './components/question-overlay/question-overlay.component';
+import { QuizQuestionOverlayComponent } from './components/quiz-question-overlay/quiz-question-overlay.component';
+import { QuizTermineComponent } from './components/quiz-termine/quiz-termine.component';
+import { QuizComponent } from './components/quiz/quiz.component';
+import { SelectorComponent } from './components/selector/selector.component';
+import { AuthentificationInterceptor } from './interceptors/authentification.interceptor';
+import { AdminGameHistoryComponent } from './pages/admin/admin-game-history/admin-game-history.component';
 import { AdminLoginPageComponent } from './pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from './pages/admin/admin-page/admin-page.component';
-import { CreatePageComponent } from './pages/create-page/create-page.component';
-import { JoinPageComponent } from './pages/join-page/join-page.component';
+import { AdminQuestionBankComponent } from './pages/admin/admin-question-bank/admin-question-bank.component';
+import { CreateUpdateQuizComponent } from './pages/admin/create/create-update-quiz/create-update-quiz.component';
+import { CreatePageComponent } from './pages/create-game/create-page/create-page.component';
+import { DescriptonPageComponent } from './pages/create-game/descripton-page/descripton-page.component';
+import { Error404Component } from './pages/error/error404/error404.component';
+import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
+import { JoinComponent } from './pages/game/join/join.component';
+import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.component';
+import { UpdateNameComponent } from './components/update-name/update-name.component';
 
 /**
  * Main module that is used in main.ts.
@@ -31,15 +51,47 @@ import { JoinPageComponent } from './pages/join-page/join-page.component';
         BackgroundComponent,
         CreatePageComponent,
         AdminPageComponent,
-        JoinPageComponent,
         AdminLoginPageComponent,
         GlobalLayoutComponent,
-        FooterComponent,
         HeaderComponent,
+        AdminQuestionBankComponent,
+        AdminGameHistoryComponent,
+        QuizComponent,
         ImportGameComponent,
+        CreateUpdateQuizComponent,
+        QuizTermineComponent,
+        SelectorComponent,
+        BankQuestionComponent,
+        DescriptonPageComponent,
+        GameVueComponent,
+        ChatComponent,
+        Error404Component,
+        JoinComponent,
+        QuestionOverlayComponent,
+        QuestionBankImportComponent,
+        QuizQuestionOverlayComponent,
+        ConfirmationDialogComponent,
+        WaitingRoomComponent,
+        UpdateNameComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatButtonModule],
-    providers: [],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        MatButtonModule,
+        MatSnackBarModule,
+        MatDialogModule,
+    ],
+    providers: [
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthentificationInterceptor,
+            multi: true,
+        },
+    ],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

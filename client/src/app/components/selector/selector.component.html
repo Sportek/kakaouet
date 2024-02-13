@@ -1,0 +1,12 @@
+<div class="selector">
+    <div class="title-text">{{ label }}</div>
+    <button mat-button [matMenuTriggerFor]="menu" color="white" class="large-text choice-selector" (click)="modifyDropdown()">
+        {{ currentChoice }} <span class="material-symbols-outlined" *ngIf="!dropdownOpen"> arrow_downward </span>
+        <span class="material-symbols-outlined" *ngIf="dropdownOpen"> arrow_upward </span>
+    </button>
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item *ngFor="let choice of choices" (click)="selectChoice(choice)" class="large-text">
+            {{ choice }}
+        </button>
+    </mat-menu>
+</div>
