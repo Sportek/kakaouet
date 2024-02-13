@@ -1,12 +1,16 @@
-import { DateController } from '@app/controllers/date/date.controller';
-import { ExampleController } from '@app/controllers/example/example.controller';
-import { ChatGateway } from '@app/gateways/chat/chat.gateway';
-import { Course, courseSchema } from '@app/model/database/course';
-import { DateService } from '@app/services/date/date.service';
-import { ExampleService } from '@app/services/example/example.service';
-import { Logger, Module } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import * as cookieParser from 'cookie-parser';
+import { QuestionController } from './controllers/question/question.controller';
+import { QuizController } from './controllers/quiz/quiz.controller';
+import { AuthentificationMiddleware } from './middlewares/authentification/authentification.middleware';
+// import { Game, gameSchema } from './model/database/game';
+import { Question, questionSchema } from './model/database/question';
+import { Quiz, quizSchema } from './model/database/quiz';
+import { UserModule } from './modules/user/user.module';
+import { QuestionService } from './services/question/question.service';
+import { QuizService } from './services/quiz/quiz.service';
 
 @Module({
     imports: [
@@ -18,9 +22,17 @@ import { MongooseModule } from '@nestjs/mongoose';
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
             }),
         }),
-        MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
+        MongooseModule.forFeature([{ name: Quiz.name, schema: quizSchema }]),
+        MongooseModule.forFeature([{ name: Question.name, schema: questionSchema }]),
+        // MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
+        UserModule,
     ],
-    controllers: [DateController, ExampleController],
-    providers: [ChatGateway, DateService, ExampleService, Logger],
+    controllers: [QuizController, QuestionController],
+    providers: [QuizService, QuestionService, Logger, AuthentificationMiddleware],
 })
-export class AppModule {}
+export class AppModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(cookieParser(process.env.COOKIE_SECRET)).forRoutes('*');
+        consumer.apply(AuthentificationMiddleware).forRoutes('*');
+    }
+}

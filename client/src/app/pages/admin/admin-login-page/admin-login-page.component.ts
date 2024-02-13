@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdminLoginState, UserService } from '@app/services/user/user.service';
 
@@ -7,19 +7,26 @@ import { AdminLoginState, UserService } from '@app/services/user/user.service';
     templateUrl: './admin-login-page.component.html',
     styleUrls: ['./admin-login-page.component.scss'],
 })
-export class AdminLoginPageComponent {
+export class AdminLoginPageComponent implements OnInit {
     password: string;
     loggedState: AdminLoginState;
-    private userService: UserService;
-    private router: Router;
-    constructor(router: Router, userService: UserService) {
+
+    constructor(
+        private router: Router,
+        private userService: UserService,
+    ) {
         this.userService = userService;
         this.router = router;
-        this.loggedState = userService.getLoginState();
     }
+
+    ngOnInit(): void {
+        this.userService.loggedState.subscribe((state) => {
+            if (state === AdminLoginState.LoggedIn) this.router.navigateByUrl('/admin', { replaceUrl: true });
+        });
+    }
+
     submitPassword() {
         this.userService.login(this.router, this.password);
-        this.loggedState = this.userService.getLoginState();
     }
 
     onKeyEnter(event: KeyboardEvent) {

@@ -1,0 +1,28 @@
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="title">Clavardage</div>
+    </div>
+
+    <div class="chat-messages">
+        <div *ngFor="let message of this.gameService.game?.messages; let i = index" [id]="'index-' + i" class="message-container">
+            <div class="data">
+                <div class="username">
+                    {{ getGameUser(message.gameUserId)?.name }}
+                </div>
+                <div class="date">
+                    {{ message.createdAt | date: 'yyyy/MM/dd HH:mm' }}
+                </div>
+            </div>
+            <div class="message">
+                {{ message.content }}
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-footer">
+        <form (ngSubmit)="sendMessage()">
+            <input type="text" placeholder="Discutez avec d'autres joueurs..." [(ngModel)]="message" name="message" />
+            <button mat-raised-button color="primary" type="submit">Envoyer</button>
+        </form>
+    </div>
+</div>

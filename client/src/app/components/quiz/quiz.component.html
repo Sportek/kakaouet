@@ -1,0 +1,21 @@
+<div class="background">
+    <div class="game" *ngFor="let quiz of quizList">
+        <div class="quiz-name">
+            <div class="large-text">{{ quiz.name }}</div>
+        </div>
+        <div class="icons">
+            <mat-icon [routerLink]="['/admin/create/quiz', quiz._id]" class="title-text">edit</mat-icon>
+            <mat-icon class="title-text" (click)="generateQuizAsFile(quiz)">ios_share</mat-icon>
+            <mat-icon class="title-text" (click)="removeQuiz(quiz)">delete</mat-icon>
+            <mat-icon class="title-text" *ngIf="quiz.visibility" (click)="changeVisibility(quiz)">
+                <span class="material-symbols-outlined title-text"> visibility </span></mat-icon
+            >
+            <mat-icon class="title-text" *ngIf="!quiz.visibility" (click)="changeVisibility(quiz)"
+                ><span class="material-symbols-outlined title-text"> visibility_off </span></mat-icon
+            >
+        </div>
+        <div class="date">
+            <div class="small-text">{{ 'Modifié le: ' + (quiz.updatedAt | date: 'yyyy/MM/dd HH:mm') }}</div>
+        </div>
+    </div>
+</div>

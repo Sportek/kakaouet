@@ -1,0 +1,18 @@
+<div class="background">
+    <div class="questions-container">
+        <div *ngFor="let question of questionList">
+            <div *ngIf="isVisible(question)" class="question">
+                <div class="question-name">
+                    <div class="large-text">{{ question.label }}</div>
+                </div>
+                <div class="icons">
+                    <mat-icon class="title-text" (click)="modifyQuestionById(question._id)">edit</mat-icon>
+                    <mat-icon class="title-text delete-icon" (click)="deleteQuestion(question)">delete</mat-icon>
+                </div>
+                <div class="date">
+                    <div class="small-text">{{ 'Modifié le: ' + (question.updatedAt | date: 'yyyy/MM/dd HH:mm') }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

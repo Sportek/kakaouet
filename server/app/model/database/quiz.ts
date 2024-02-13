@@ -1,13 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
+import { Question } from './question';
 
 export type QuizDocument = Quiz & Document;
 
 @Schema()
 export class Quiz {
     @ApiProperty()
-    _id?: string;
+    _id?: ObjectId;
 
     @ApiProperty()
     @Prop({ required: true })
@@ -26,9 +27,9 @@ export class Quiz {
     visibility: boolean;
 
     // TODO: Add questions
-    // @ApiProperty()
-    // @Prop({type: () => [Question]})
-    // questions: Question[];
+    @ApiProperty()
+    @Prop({ type: () => [Question] })
+    questions: Question[];
 
     @ApiProperty()
     createdAt?: Date;

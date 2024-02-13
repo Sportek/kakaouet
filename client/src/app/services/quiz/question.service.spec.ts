@@ -1,0 +1,137 @@
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { Question, QuestionType } from '@common/types';
+import { Observable } from 'rxjs';
+import { QuestionService } from './question.service';
+
+describe('QuestionService', () => {
+    let service: QuestionService;
+    let httpTestingController: HttpTestingController;
+
+    const mockQuestion: Question = {
+        _id: '123',
+        type: QuestionType.QCM,
+        label: 'Who is the author of "The Lord of the Rings"?',
+        points: 10,
+        choices: [
+            { _id: 0, label: 'J.K. Rowling', isCorrect: true },
+            { _id: 1, label: 'J.R.R. Tolkien', isCorrect: false },
+            { _id: 2, label: 'George R.R. Martin', isCorrect: false },
+            { _id: 3, label: 'C.S. Lewis', isCorrect: false },
+        ],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    };
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule],
+            providers: [QuestionService],
+        });
+
+        service = TestBed.inject(QuestionService);
+        httpTestingController = TestBed.inject(HttpTestingController);
+    });
+
+    afterEach(() => {
+        httpTestingController.verify();
+    });
+
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
+
+    describe('getQuestions', () => {
+        it('should get questions', () => {
+            const mockQuestions: Question[] = [mockQuestion];
+
+            service.getQuestions().subscribe((questions) => {
+                expect(questions).toEqual(mockQuestions);
+            });
+
+            const req = httpTestingController.expectOne('http://localhost:3000/api/question');
+            expect(req.request.method).toEqual('GET');
+            req.flush(mockQuestions);
+        });
+    });
+
+    describe('getQuestionsById', () => {
+        it('should get a question by id', () => {
+            service.getQuestionsById('1').subscribe((question) => {
+                expect(question).toEqual(mockQuestion);
+            });
+            const req = httpTestingController.expectOne('http://localhost:3000/api/question/1');
+            expect(req.request.method).toEqual('GET');
+            req.flush(mockQuestion);
+        });
+    });
+
+    describe('createQuestion', () => {
+        it('should create a question', () => {
+            service.createQuestion(mockQuestion).subscribe((createdQuestion) => {
+                expect(createdQuestion).toEqual(mockQuestion);
+            });
+
+            const req = httpTestingController.expectOne('http://localhost:3000/api/question');
+            expect(req.request.method).toEqual('POST');
+            req.flush(mockQuestion);
+        });
+    });
+
+    describe('updateQuestion', () => {
+        it('should update a question', () => {
+            service.updateQuestion('1', mockQuestion).subscribe((updateQuestion) => {
+                expect(updateQuestion).toEqual(mockQuestion);
+            });
+
+            const req = httpTestingController.expectOne('http://localhost:3000/api/question/1');
+            expect(req.request.method).toEqual('PATCH');
+            req.flush(mockQuestion);
+        });
+    });
+
+    describe('updateQuestions', () => {
+        it('should update questions', () => {
+            const result = service.updateQuestions();
+            expect(result).toBeUndefined();
+        });
+    });
+
+    describe('getQuestionUpdates', () => {
+        it('should emit updates when questions are created', fakeAsync(() => {
+            service.getQuestionUpdates().subscribe(() => {
+                expect(service.createQuestion).toHaveBeenCalledWith(mockQuestion);
+            });
+        }));
+    });
+
+    describe('sendId', () => {
+        // eslint-disable-next-line no-undef
+        it('should send the provided id', (done: DoneFn) => {
+            const mockId = '123';
+            const resultObservable: Observable<string> = service.getId();
+            resultObservable.subscribe((result) => {
+                expect(result).toEqual(mockId);
+                done();
+            });
+            service.sendId(mockId);
+        });
+    });
+
+    describe('getId', () => {
+        it('should return an observable of string', () => {
+            const resultObservable: Observable<string> = service.getId();
+            expect(resultObservable).toBeTruthy();
+        });
+    });
+
+    describe('deleteQuestionById', () => {
+        it('should send a DELETE request to the correct URL', fakeAsync(() => {
+            service.deleteQuestionById('1').subscribe();
+            tick();
+            const req = httpTestingController.expectOne('http://localhost:3000/api/question/1');
+            expect(req.request.method).toEqual('DELETE');
+            req.flush(null);
+        }));
+    });
+});

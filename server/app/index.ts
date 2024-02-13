@@ -7,7 +7,10 @@ const bootstrap = async () => {
     const app = await NestFactory.create(AppModule);
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe());
-    app.enableCors();
+    app.enableCors({
+        origin: true,
+        credentials: true,
+    });
 
     const config = new DocumentBuilder()
         .setTitle('Cadriciel Serveur')
