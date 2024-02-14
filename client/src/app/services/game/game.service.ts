@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -53,6 +52,7 @@ export class GameService {
         this.game?.messages.push({
             content: message,
             createdAt: new Date(),
+            // eslint-disable-next-line no-underscore-dangle
             gameUserId: 'organisator',
         });
     }
@@ -182,6 +182,7 @@ export class GameService {
      * Phase de réponse aux questions par les joueurs*/
     private playersAnswerQuestion() {
         if (!this.game) return;
+        // Démarrer le timer de réponse à la question
         this.timer = this.timeService.createTimer(
             'game',
             new Timer(this.game.quiz.duration, {
@@ -200,6 +201,7 @@ export class GameService {
     private async correctAnswers() {
         if (this.user && this.game) {
             const values = await firstValueFrom(
+                // eslint-disable-next-line no-underscore-dangle
                 this.quizService.correctQuizAnswers(this.game.quiz._id, this.actualQuestionIndex, this.selectedChoices),
             );
             this.answers.next(values.correctChoicesIndices);
@@ -207,10 +209,10 @@ export class GameService {
         }
     }
 
-    private goNextQuestion() {
+    private async goNextQuestion() {
         const hasNextQuestion = this.nextQuestion();
-        let nextGameState = GameState.PlayersAnswerQuestion;
-        if (hasNextQuestion) nextGameState = GameState.OrganisatorCorrectingAnswers;
+        let nextGameState = GameState.DisplayQuizResults;
+        if (hasNextQuestion) nextGameState = GameState.PlayersAnswerQuestion;
         this.executeState(nextGameState);
     }
 
@@ -222,6 +224,10 @@ export class GameService {
             'cooldown',
             new Timer(3, {
                 whenDone: () => {
+                    // const hasNextQuestion = this.nextQuestion();
+                    // let nextGameState = GameState.DisplayQuizResults;
+                    // if (hasNextQuestion) nextGameState = GameState.PlayersAnswerQuestion;
+                    // this.executeState(nextGameState);
                     this.goNextQuestion();
                 },
             }),
@@ -235,6 +241,7 @@ export class GameService {
     private gameEnd() {
         if (!this.game) return;
         if (this.game.type === GameType.Test) {
+            // eslint-disable-next-line no-underscore-dangle
             this.router.navigateByUrl('/create/description/' + this.game.quiz._id);
         }
     }

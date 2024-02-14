@@ -302,7 +302,7 @@ describe('GameService', () => {
         spyOn(service, 'nextQuestion').and.returnValue(false);
         // @ts-ignore: Accès à une méthode privée pour le test
         service.goNextQuestion();
-        expect(service.executeState).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
+        expect(service.executeState).toHaveBeenCalledWith(GameState.DisplayQuizResults);
     });
 
     it('should call executeState with OrganisatorCorrectingAnswers if there is a next question', () => {
@@ -310,7 +310,7 @@ describe('GameService', () => {
         spyOn(service, 'nextQuestion').and.returnValue(true);
         // @ts-ignore: Accès à une méthode privée pour le test
         service.goNextQuestion();
-        expect(service.executeState).toHaveBeenCalledWith(GameState.OrganisatorCorrectingAnswers);
+        expect(service.executeState).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
     });
 
     it('should call executeState with correct function', () => {

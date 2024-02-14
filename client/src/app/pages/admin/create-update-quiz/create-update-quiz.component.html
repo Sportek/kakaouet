@@ -2,7 +2,7 @@
     <div class="wrapper">
         <div class="container">
             <app-quiz-question-overlay (questionEmitter)="onQuestionListUpdate($event)"></app-quiz-question-overlay>
-            <div *ngIf="hasId; else createNewGame">
+            <div *ngIf="quizId; else createNewGame">
                 <div class="title title-text">Modification d'un jeu</div>
             </div>
 

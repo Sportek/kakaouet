@@ -23,7 +23,7 @@ export class CreateUpdateQuizComponent implements OnInit {
     titleQuiz: string = '';
     durationQuiz: number;
     descriptionQuiz: string = '';
-    hasId: string;
+    quizId: string;
     questionsQuiz: Question[] = [];
     quizVisibility: boolean;
     quizUpdate: Date;
@@ -87,7 +87,7 @@ export class CreateUpdateQuizComponent implements OnInit {
                 this.titleQuiz = quiz.name;
                 this.durationQuiz = quiz.duration;
                 this.descriptionQuiz = quiz.description;
-                this.hasId = quiz._id;
+                this.quizId = quiz._id;
                 this.questionsQuiz = quiz.questions;
                 this.quizVisibility = quiz.visibility;
                 this.quizUpdate = quiz.updatedAt;
@@ -151,8 +151,15 @@ export class CreateUpdateQuizComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.hasId) {
-            this.updateQuiz(this.quiz);
+        if (this.quizId) {
+            this.quizService.getQuizById(this.quizId).subscribe({
+                next: (quiz) => {
+                    this.updateQuiz(quiz);
+                },
+                error: () => {
+                    this.createQuiz();
+                },
+            });
         } else {
             this.createQuiz();
         }
