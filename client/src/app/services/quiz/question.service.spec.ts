@@ -110,8 +110,7 @@ describe('QuestionService', () => {
     });
 
     describe('sendId', () => {
-        // eslint-disable-next-line no-undef
-        it('should send the provided id', (done: DoneFn) => {
+        it('should send the provided id', (done) => {
             const mockId = '123';
             const resultObservable: Observable<string> = service.getId();
             resultObservable.subscribe((result) => {

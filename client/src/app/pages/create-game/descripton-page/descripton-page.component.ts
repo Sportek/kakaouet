@@ -1,7 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core'; // chat gpt Change
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-// import { Question } from '@app/services/quiz/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Variables } from '@common/enum-variables';
 import { Question, Quiz } from '@common/types';
@@ -22,7 +21,7 @@ export class DescriptonPageComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         private snackBar: MatSnackBar,
-        private cd: ChangeDetectorRef, // injecter ChangerDetectorRef
+        private cd: ChangeDetectorRef,
     ) {}
 
     ngOnInit() {

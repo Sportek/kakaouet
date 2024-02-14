@@ -91,9 +91,8 @@ export class ValidateService {
 }
 
 const isoDateValidator = (dateString: string | undefined) => {
-    if (dateString === undefined) {
-        // Retourner true ou false selon la logique de votre application pour les valeurs undefined
-        return true; // ou false si vous voulez que undefined soit considéré comme invalide
+    if (!dateString) {
+        return true;
     }
     return !isNaN(Date.parse(dateString));
 };

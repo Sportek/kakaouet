@@ -1,19 +1,16 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { QuizService } from '@app/services/quiz/quiz.service';
-import { of } from 'rxjs';
-import { Quiz } from './../../../../../../common/types';
-// import { Question } from './../../../../../../common/types';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { QuizService } from '@app/services/quiz/quiz.service';
+import { Quiz } from '@common/types';
+import { of } from 'rxjs';
 import { CreatePageComponent } from './create-page.component';
 
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let quizServiceMock: any;
+    let quizServiceMock: jasmine.SpyObj<QuizService>;
     let mockQuizzes: Quiz[];
-    // let mockQuestions: Question[];
 
     beforeEach(async () => {
         mockQuizzes = [
@@ -39,7 +36,6 @@ describe('CreatePageComponent', () => {
             },
         ];
 
-        // Properly type the mock using jasmine.SpyObj
         quizServiceMock = jasmine.createSpyObj('QuizService', ['getAllQuizzes']);
         quizServiceMock.getAllQuizzes.and.returnValue(of(mockQuizzes));
 
@@ -66,8 +62,7 @@ describe('CreatePageComponent', () => {
         expect(quizServiceMock.getAllQuizzes).toHaveBeenCalled();
     });
 
-    // eslint-disable-next-line no-undef
-    it('should set games to quizzes returned by the service', (done: DoneFn) => {
+    it('should set games to quizzes returned by the service', (done) => {
         component.getQuizzes();
         fixture.whenStable().then(() => {
             expect(component.games).toEqual(mockQuizzes);

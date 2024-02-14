@@ -39,7 +39,6 @@ describe('TimeService', () => {
         timer.start();
         setTimeout(() => {
             expect(timer.getTimer()).toBe(0);
-            // Comme le temps est set à 2 (et change à tous les 1000ms), on est supposé avoir terminé après (2000ms, donc on check à 3000ms)
         }, 3000);
 
         flush();

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -52,7 +53,6 @@ export class GameService {
         this.game?.messages.push({
             content: message,
             createdAt: new Date(),
-            // eslint-disable-next-line no-underscore-dangle
             gameUserId: 'organisator',
         });
     }
@@ -182,7 +182,6 @@ export class GameService {
      * Phase de réponse aux questions par les joueurs*/
     private playersAnswerQuestion() {
         if (!this.game) return;
-        // Démarrer le timer de réponse à la question
         this.timer = this.timeService.createTimer(
             'game',
             new Timer(this.game.quiz.duration, {
@@ -201,7 +200,6 @@ export class GameService {
     private async correctAnswers() {
         if (this.user && this.game) {
             const values = await firstValueFrom(
-                // eslint-disable-next-line no-underscore-dangle
                 this.quizService.correctQuizAnswers(this.game.quiz._id, this.actualQuestionIndex, this.selectedChoices),
             );
             this.answers.next(values.correctChoicesIndices);
@@ -237,7 +235,6 @@ export class GameService {
     private gameEnd() {
         if (!this.game) return;
         if (this.game.type === GameType.Test) {
-            // eslint-disable-next-line no-underscore-dangle
             this.router.navigateByUrl('/create/description/' + this.game.quiz._id);
         }
     }

@@ -12,7 +12,6 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-// eslint-disable-next-line import/no-deprecated
 import { BankQuestionListComponent } from './components/bank-question-list/bank-question-list.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { ConfirmationDialogComponent } from './components/dialog-component/dialog-delete.component';
