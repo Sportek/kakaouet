@@ -63,7 +63,7 @@ describe('UserService', () => {
 
     describe('login', () => {
         it('should login a user with correct password', async () => {
-            await service.login('sample-token', 'LOG2990-109');
+            await service.login('sample-token', 'log2990-109');
             expect(mockUserModel.updateOne).toHaveBeenCalledWith({ token: 'sample-token' }, { $set: { isAdminAuthentified: true } });
         });
 
