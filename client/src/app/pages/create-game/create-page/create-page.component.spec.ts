@@ -3,6 +3,8 @@ import { QuizService } from '@app/services/quiz/quiz.service';
 import { of } from 'rxjs';
 import { Quiz } from './../../../../../../common/types';
 // import { Question } from './../../../../../../common/types';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CreatePageComponent } from './create-page.component';
 
 describe('CreatePageComponent', () => {
@@ -43,7 +45,12 @@ describe('CreatePageComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [CreatePageComponent],
-            providers: [{ provide: QuizService, useValue: quizServiceMock }],
+            providers: [
+                { provide: QuizService, useValue: quizServiceMock },
+                { provide: ActivatedRoute, useValue: {} },
+            ],
+            schemas: [CUSTOM_ELEMENTS_SCHEMA],
+            imports: [RouterModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(CreatePageComponent);

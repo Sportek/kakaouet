@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { WaitingRoomComponent } from './waiting-room.component';
 
 describe('WaitingRoomComponent', () => {
@@ -8,7 +11,8 @@ describe('WaitingRoomComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [WaitingRoomComponent],
+            declarations: [WaitingRoomComponent, GlobalLayoutComponent, HeaderComponent],
+            imports: [HttpClientTestingModule],
         });
         fixture = TestBed.createComponent(WaitingRoomComponent);
         component = fixture.componentInstance;

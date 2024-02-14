@@ -2,6 +2,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule } from '@angular/forms';
 import { GameService } from '@app/services/game/game.service';
 import { ChatComponent } from './chat.component';
 
@@ -26,7 +27,7 @@ describe('ChatComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [ChatComponent],
-            imports: [HttpClientTestingModule],
+            imports: [HttpClientTestingModule, FormsModule],
             providers: [{ provide: GameService, useClass: MockGameService }],
         });
         fixture = TestBed.createComponent(ChatComponent);

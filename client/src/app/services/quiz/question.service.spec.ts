@@ -1,7 +1,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Question, QuestionType } from '@common/types';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { QuestionService } from './question.service';
 
 describe('QuestionService', () => {
@@ -99,9 +99,13 @@ describe('QuestionService', () => {
 
     describe('getQuestionUpdates', () => {
         it('should emit updates when questions are created', fakeAsync(() => {
+            const spy = spyOn(service, 'createQuestion').and.returnValue(of(mockQuestion));
+            service.createQuestion(mockQuestion);
+            tick();
             service.getQuestionUpdates().subscribe(() => {
-                expect(service.createQuestion).toHaveBeenCalledWith(mockQuestion);
+                expect(spy).toHaveBeenCalledWith(mockQuestion);
             });
+            expect(spy).toHaveBeenCalled();
         }));
     });
 

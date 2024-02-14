@@ -1,8 +1,13 @@
 /* eslint-disable max-lines */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
@@ -59,7 +64,8 @@ describe('CreateUpdateQuizComponent', () => {
     beforeEach(async () => {
         TestBed.configureTestingModule({
             declarations: [CreateUpdateQuizComponent],
-            imports: [HttpClientTestingModule, FormsModule],
+            imports: [HttpClientTestingModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, BrowserAnimationsModule],
+            schemas: [CUSTOM_ELEMENTS_SCHEMA],
             providers: [
                 {
                     provide: ActivatedRoute,

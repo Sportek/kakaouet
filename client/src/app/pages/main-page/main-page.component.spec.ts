@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BackgroundComponent } from '@app/components/background/background.component';
 import { MainPageComponent } from './main-page.component';
 
 describe('JoinComponent', () => {
@@ -7,7 +8,7 @@ describe('JoinComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [MainPageComponent],
+            declarations: [MainPageComponent, BackgroundComponent],
         });
         fixture = TestBed.createComponent(MainPageComponent);
         component = fixture.componentInstance;

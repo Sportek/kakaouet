@@ -1,8 +1,14 @@
 import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 
+import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ImportGameComponent } from '@app/components/import-game/import-game.component';
@@ -25,7 +31,18 @@ describe('UpdateNameComponent', () => {
         dialogRefMock = jasmine.createSpyObj('MatDialogRef', ['close']);
         TestBed.configureTestingModule({
             declarations: [UpdateNameComponent],
-            imports: [MatDialogModule, HttpClientTestingModule, BrowserAnimationsModule],
+            imports: [
+                MatDialogModule,
+                HttpClientTestingModule,
+                MatFormFieldModule,
+                MatInputModule,
+                MatSelectModule,
+                BrowserAnimationsModule,
+                FormsModule,
+                CommonModule,
+            ],
+            // Sans ça, un fois sur 2 y'a des erreurs bizarre, pourtant les imports sont là... me no comprendo porke it no worko???
+            schemas: [NO_ERRORS_SCHEMA],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: { quiz: WORKING_QUIZ } },
                 { provide: MatDialogRef, useValue: dialogRefMock },

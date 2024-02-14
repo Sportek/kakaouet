@@ -29,9 +29,7 @@ describe('TimeService', () => {
         service.stopTimer('testTimer');
         expect(service['timerMap'].has('testTimer')).toBeFalse();
     });
-});
 
-describe('Timer', () => {
     it('should count down and stop', (done) => {
         const timer = new Timer(2, { whenDone: done });
         timer.start();

@@ -1,7 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
+import { BackgroundComponent } from '@app/components/background/background.component';
+import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
 import { AdminLoginState, UserService } from '@app/services/user/user.service';
 import { of } from 'rxjs';
 import { AdminLoginPageComponent } from './admin-login-page.component';
@@ -12,8 +20,9 @@ describe('AdminLoginPageComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [AdminLoginPageComponent],
-            imports: [HttpClientTestingModule],
+            declarations: [AdminLoginPageComponent, BackgroundComponent, GlobalLayoutComponent],
+            imports: [HttpClientTestingModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, BrowserAnimationsModule],
+            schemas: [CUSTOM_ELEMENTS_SCHEMA],
             providers: [
                 {
                     provide: Router,

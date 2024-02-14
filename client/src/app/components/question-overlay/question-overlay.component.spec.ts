@@ -2,6 +2,11 @@
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { ChoiceValidation, QuestionValidation, ValidateService } from '@app/services/validate/validate.service';
 import { ValidatedObject } from '@app/services/validate/validated-object';
@@ -19,7 +24,15 @@ describe('QuestionOverlayComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [QuestionOverlayComponent],
-            imports: [HttpClientModule, HttpClientTestingModule],
+            imports: [
+                HttpClientModule,
+                HttpClientTestingModule,
+                FormsModule,
+                MatFormFieldModule,
+                MatInputModule,
+                MatSelectModule,
+                BrowserAnimationsModule,
+            ],
         }).compileComponents();
     }));
 

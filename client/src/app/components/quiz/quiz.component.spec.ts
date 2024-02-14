@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatIconModule } from '@angular/material/icon';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';
 import { of } from 'rxjs';
@@ -43,7 +45,11 @@ describe('QuizComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [QuizComponent],
-            providers: [{ provide: QuizService, useValue: quizServiceSpy }],
+            imports: [MatIconModule, RouterModule],
+            providers: [
+                { provide: QuizService, useValue: quizServiceSpy },
+                { provide: ActivatedRoute, useValue: {} },
+            ],
         }).compileComponents();
     });
 
