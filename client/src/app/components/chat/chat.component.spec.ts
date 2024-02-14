@@ -2,6 +2,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule } from '@angular/forms';
 import { GameService } from '@app/services/game/game.service';
 import { Game, GameUser } from '@common/types';
 import { ChatComponent } from './chat.component';
@@ -14,7 +15,7 @@ describe('ChatComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [ChatComponent],
-            imports: [HttpClientTestingModule],
+            imports: [HttpClientTestingModule, FormsModule],
         });
         fixture = TestBed.createComponent(ChatComponent);
         gameService = TestBed.inject(GameService);
