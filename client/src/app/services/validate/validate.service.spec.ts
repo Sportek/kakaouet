@@ -35,6 +35,7 @@ describe('ValidateService', () => {
 
     it('should trim quiz correctly', () => {
         const validate = service.validateJSONQuiz(JSON.stringify({ ...WORKING_QUIZ, bobinours: 'boubi' }));
+
         expect(validate.isValid).toBe(true);
         expect(validate.object).toEqual(WORKING_QUIZ as Quiz);
     });
