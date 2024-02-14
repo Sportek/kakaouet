@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Observable, of, throwError } from 'rxjs';
 
 import { HttpErrorResponse } from '@angular/common/http';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { DescriptonPageComponent } from './descripton-page.component';
@@ -32,6 +33,7 @@ describe('DescriptonPageComponent', () => {
         await TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
             declarations: [DescriptonPageComponent],
+            schemas: [CUSTOM_ELEMENTS_SCHEMA],
             providers: [
                 { provide: QuizService, useClass: MockQuizService },
                 MatSnackBar,

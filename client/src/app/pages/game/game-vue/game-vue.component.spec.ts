@@ -2,8 +2,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { GameService } from '@app/services/game/game.service';
 import { GameState } from '@common/types';
 import { of } from 'rxjs';
@@ -41,8 +46,8 @@ describe('GameVueComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [GameVueComponent],
-            imports: [HttpClientTestingModule],
+            declarations: [GameVueComponent, ChatComponent, GlobalLayoutComponent, HeaderComponent],
+            imports: [HttpClientTestingModule, MatIconModule, FormsModule],
             providers: [
                 { provide: GameService, useClass: MockGameService },
                 { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } },

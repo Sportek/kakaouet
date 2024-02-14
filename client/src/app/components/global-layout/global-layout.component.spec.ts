@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { GlobalLayoutComponent } from './global-layout.component';
 
 describe('GlobalLayoutComponent', () => {
@@ -8,7 +10,8 @@ describe('GlobalLayoutComponent', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [GlobalLayoutComponent],
+            declarations: [GlobalLayoutComponent, HeaderComponent],
+            imports: [HttpClientTestingModule],
         });
         fixture = TestBed.createComponent(GlobalLayoutComponent);
         component = fixture.componentInstance;

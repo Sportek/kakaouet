@@ -1,6 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question, QuestionType } from '@common/types';
 import { of } from 'rxjs';
@@ -15,7 +16,7 @@ describe('BankQuestionComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [BankQuestionComponent],
-            imports: [HttpClientTestingModule, MatDialogModule],
+            imports: [HttpClientTestingModule, MatDialogModule, MatIconModule],
             providers: [QuestionService],
         }).compileComponents();
 

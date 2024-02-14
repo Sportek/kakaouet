@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { BAD_QUIZ, WORKING_QUIZ } from '@app/services/validate/fake-quizzes';
@@ -22,7 +23,7 @@ describe('ImportGameComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [ImportGameComponent],
-            imports: [HttpClientTestingModule, MatDialogModule],
+            imports: [HttpClientTestingModule, MatDialogModule, MatIconModule],
             providers: [
                 { provide: ValidateService, useValue: validateServiceSpy },
                 { provide: QuizService, useValue: quizServiceSpy },
