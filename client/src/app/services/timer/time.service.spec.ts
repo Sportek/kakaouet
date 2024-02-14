@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { TestBed } from '@angular/core/testing';
+import { TestBed, discardPeriodicTasks, fakeAsync, flush, tick } from '@angular/core/testing';
 
 import { TimeService } from './time.service';
 import { Timer } from './timer';
@@ -30,20 +30,34 @@ describe('TimeService', () => {
         expect(service['timerMap'].has('testTimer')).toBeFalse();
     });
 
-    it('should count down and stop', (done) => {
-        const timer = new Timer(2, { whenDone: done });
+    it('should count down and stop', fakeAsync(() => {
+        const timer = new Timer(2, {
+            whenDone: () => {
+                return true;
+            },
+        });
         timer.start();
         setTimeout(() => {
             expect(timer.getTimer()).toBe(0);
             // Comme le temps est set à 2 (et change à tous les 1000ms), on est supposé avoir terminé après (2000ms, donc on check à 3000ms)
         }, 3000);
-    });
 
-    it('should accelerate if isAccelerated is true', (done) => {
-        const timer = new Timer(50, { whenDone: done, isAccelerated: true, accelerationMultiplicator: 2, tick: 100 });
+        flush();
+    }));
+
+    it('should accelerate if isAccelerated is true', fakeAsync(() => {
+        const timer = new Timer(50, {
+            whenDone: () => {
+                return true;
+            },
+            isAccelerated: true,
+            accelerationMultiplicator: 2,
+            tick: 100,
+        });
         timer.start();
-        setTimeout(() => {
-            expect(timer.getTimer()).toBeLessThan(30);
-        }, 2000);
-    });
+        tick(2000);
+        discardPeriodicTasks();
+
+        expect(timer.getTimer()).toBeLessThan(30);
+    }));
 });

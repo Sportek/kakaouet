@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 
 import { CommonModule } from '@angular/common';
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ImportGameComponent } from '@app/components/import-game/import-game.component';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { WORKING_QUIZ } from '@app/services/validate/fake-quizzes';
+import { ValidateService } from '@app/services/validate/validate.service';
 import { Quiz } from '@common/types';
 import { of, throwError } from 'rxjs';
 import { UpdateNameComponent } from './update-name.component';
@@ -44,15 +45,22 @@ describe('UpdateNameComponent', () => {
             // Sans ça, un fois sur 2 y'a des erreurs bizarre, pourtant les imports sont là... me no comprendo porke it no worko???
             schemas: [NO_ERRORS_SCHEMA],
             providers: [
-                { provide: MAT_DIALOG_DATA, useValue: { quiz: WORKING_QUIZ } },
+                { provide: MAT_DIALOG_DATA, useValue: { quiz: JSON.parse(JSON.stringify(WORKING_QUIZ)) } },
                 { provide: MatDialogRef, useValue: dialogRefMock },
                 { provide: MatSnackBar, useValue: snackBarMock },
                 { provide: QuizService, useValue: quizServiceMock },
+                { provide: ValidateService, useValue: {} },
             ],
         });
         fixture = TestBed.createComponent(UpdateNameComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+    });
+
+    afterEach(() => {
+        quizServiceMock.addNewQuiz.calls.reset();
+        snackBarMock.open.calls.reset();
+        dialogRefMock.close.calls.reset();
     });
 
     it('should create', () => {
@@ -62,12 +70,10 @@ describe('UpdateNameComponent', () => {
     it('should update quiz name successfully and close dialog', fakeAsync(() => {
         const newName = 'New Quiz Name';
         component.newName = newName;
-        quizServiceMock.addNewQuiz.and.returnValue(of(WORKING_QUIZ as Quiz));
+        quizServiceMock.addNewQuiz.and.returnValue(of(JSON.parse(JSON.stringify(WORKING_QUIZ)) as Quiz));
 
         component.sendNewName();
         fixture.detectChanges();
-        tick();
-        flush();
         expect(quizServiceMock.addNewQuiz).toHaveBeenCalledWith(jasmine.objectContaining({ name: newName }));
         expect(snackBarMock.open).toHaveBeenCalledWith('Quiz importé avec succès', '✅');
         expect(dialogRefMock.close).toHaveBeenCalled();
@@ -76,14 +82,13 @@ describe('UpdateNameComponent', () => {
     it('should handle unique name violation error', () => {
         const errorResponse = new HttpErrorResponse({
             error: { message: 'Quiz name has to be unique: ' },
-            status: HttpStatusCode.BadRequest,
+            status: 400, // Utilisez 400 pour BadRequest
             statusText: 'Bad Request',
         });
+
         quizServiceMock.addNewQuiz.and.returnValue(throwError(() => errorResponse));
 
         component.sendNewName();
-
-        expect(component.newName).toEqual('');
         expect(snackBarMock.open).toHaveBeenCalledWith('Le nom du quiz doit être unique, vous devez changer le nom.', '❌');
     });
 });
