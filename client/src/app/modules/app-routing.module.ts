@@ -4,7 +4,7 @@ import { AdminGameHistoryComponent } from '@app/pages/admin/admin-game-history/a
 import { AdminLoginPageComponent } from '@app/pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from '@app/pages/admin/admin-page/admin-page.component';
 import { AdminQuestionBankComponent } from '@app/pages/admin/admin-question-bank/admin-question-bank.component';
-import { CreateUpdateQuizComponent } from '@app/pages/admin/create/create-update-quiz/create-update-quiz.component';
+import { CreateUpdateQuizComponent } from '@app/pages/admin/create-update-quiz/create-update-quiz.component';
 import { CreatePageComponent } from '@app/pages/create-game/create-page/create-page.component';
 import { DescriptonPageComponent } from '@app/pages/create-game/descripton-page/descripton-page.component';
 import { Error404Component } from '@app/pages/error/error404/error404.component';

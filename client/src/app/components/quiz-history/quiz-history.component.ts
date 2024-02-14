@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-quiz-termine',
-    templateUrl: './quiz-termine.component.html',
-    styleUrls: ['./quiz-termine.component.scss'],
+    templateUrl: './quiz-history.component.html',
+    styleUrls: ['./quiz-history.component.scss'],
 })
-export class QuizTermineComponent /* implements OnInit*/ {
+export class QuizHistoryComponent /* implements OnInit*/ {
     // quiz1: Quiz = {
     //     _id: '1a2b3c',
     //     name: 'Questionnaire sur HTML',

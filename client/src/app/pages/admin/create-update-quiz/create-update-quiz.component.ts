@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
@@ -75,11 +76,7 @@ export class CreateUpdateQuizComponent implements OnInit {
     }
 
     handleQuestionsImported(importedQuestions: Question[]): void {
-        const newQuestions = importedQuestions.filter(
-            // eslint-disable-next-line no-underscore-dangle
-            (iq) => !this.questionsQuiz.some((q) => q._id === iq._id),
-        );
-        // eslint-disable-next-line no-underscore-dangle
+        const newQuestions = importedQuestions.filter((iq) => !this.questionsQuiz.some((q) => q._id === iq._id));
         this.questionsQuiz = [...this.questionsQuiz, ...newQuestions].sort((a, b) => a._id.localeCompare(b._id));
         this.showImportOverlay = false;
     }
@@ -90,7 +87,6 @@ export class CreateUpdateQuizComponent implements OnInit {
                 this.titleQuiz = quiz.name;
                 this.durationQuiz = quiz.duration;
                 this.descriptionQuiz = quiz.description;
-                // eslint-disable-next-line no-underscore-dangle
                 this.hasId = quiz._id;
                 this.questionsQuiz = quiz.questions;
                 this.quizVisibility = quiz.visibility;
@@ -111,7 +107,6 @@ export class CreateUpdateQuizComponent implements OnInit {
         updatedQuiz.updatedAt = new Date();
         updatedQuiz.visibility = this.quizVisibility;
         const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
-        // eslint-disable-next-line no-underscore-dangle
         this.quizService.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
     }
 
@@ -164,10 +159,9 @@ export class CreateUpdateQuizComponent implements OnInit {
     }
 
     wordLength(): boolean {
-        const word = this.titleQuiz.split(' ');
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < word.length; i++) {
-            if (word[i].length > Variables.MaxWordLength) {
+        const words: string[] = this.titleQuiz.split(' ');
+        for (const word of words) {
+            if (word.length > Variables.MaxWordLength) {
                 return false;
             }
         }
@@ -210,7 +204,6 @@ export class CreateUpdateQuizComponent implements OnInit {
     }
 
     onQuestionListUpdate(modifiedQuestion: Question) {
-        // eslint-disable-next-line no-underscore-dangle
         const index = this.questionsQuiz.findIndex((question) => question._id === modifiedQuestion._id);
         if (index < 0) {
             this.questionsQuiz.push(modifiedQuestion);

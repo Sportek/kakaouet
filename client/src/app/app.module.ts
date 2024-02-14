@@ -13,30 +13,30 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 // eslint-disable-next-line import/no-deprecated
-import { BankQuestionComponent } from './components/bank-question/bank-question.component';
+import { BankQuestionListComponent } from './components/bank-question-list/bank-question-list.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { ConfirmationDialogComponent } from './components/dialog-component/dialog-delete.component';
 import { HeaderComponent } from './components/header/header.component';
+import { QuestionBankImportComponent } from './components/import-bank-question/import-bank-question.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
-import { QuestionBankImportComponent } from './components/importer-questions-banque/importer-questions-banque.component';
 import { QuestionOverlayComponent } from './components/question-overlay/question-overlay.component';
+import { QuizHistoryComponent } from './components/quiz-history/quiz-history.component';
 import { QuizQuestionOverlayComponent } from './components/quiz-question-overlay/quiz-question-overlay.component';
-import { QuizTermineComponent } from './components/quiz-termine/quiz-termine.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { SelectorComponent } from './components/selector/selector.component';
+import { UpdateNameComponent } from './components/update-name/update-name.component';
 import { AuthentificationInterceptor } from './interceptors/authentification.interceptor';
 import { AdminGameHistoryComponent } from './pages/admin/admin-game-history/admin-game-history.component';
 import { AdminLoginPageComponent } from './pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from './pages/admin/admin-page/admin-page.component';
 import { AdminQuestionBankComponent } from './pages/admin/admin-question-bank/admin-question-bank.component';
-import { CreateUpdateQuizComponent } from './pages/admin/create/create-update-quiz/create-update-quiz.component';
+import { CreateUpdateQuizComponent } from './pages/admin/create-update-quiz/create-update-quiz.component';
 import { CreatePageComponent } from './pages/create-game/create-page/create-page.component';
 import { DescriptonPageComponent } from './pages/create-game/descripton-page/descripton-page.component';
 import { Error404Component } from './pages/error/error404/error404.component';
 import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
 import { JoinComponent } from './pages/game/join/join.component';
 import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.component';
-import { UpdateNameComponent } from './components/update-name/update-name.component';
 
 /**
  * Main module that is used in main.ts.
@@ -59,9 +59,9 @@ import { UpdateNameComponent } from './components/update-name/update-name.compon
         QuizComponent,
         ImportGameComponent,
         CreateUpdateQuizComponent,
-        QuizTermineComponent,
+        QuizHistoryComponent,
         SelectorComponent,
-        BankQuestionComponent,
+        BankQuestionListComponent,
         DescriptonPageComponent,
         GameVueComponent,
         ChatComponent,

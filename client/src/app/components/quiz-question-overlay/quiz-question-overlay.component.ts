@@ -76,7 +76,7 @@ export class QuizQuestionOverlayComponent implements OnInit {
     specifyQuestion(question: Question): void {
         this.hasQuestionId = true;
         this.currentQuestion = question;
-        if (this.currentQuestion.type === 'QCM') {
+        if (this.currentQuestion.type === QuestionType.QCM) {
             this.choices = this.currentQuestion.choices;
             this.resetChoicesMap();
         }
@@ -143,7 +143,7 @@ export class QuizQuestionOverlayComponent implements OnInit {
 
     saveChangesToQuestion() {
         if (!this.isError()) {
-            if (this.currentQuestion.type === 'QCM') this.currentQuestion.choices = this.choices;
+            if (this.currentQuestion.type === QuestionType.QCM) this.currentQuestion.choices = this.choices;
             const validatedQuestion = this.validationService.validateQuestion(this.currentQuestion).object;
             this.questionEmitter.emit(validatedQuestion);
             this.resetChoices();

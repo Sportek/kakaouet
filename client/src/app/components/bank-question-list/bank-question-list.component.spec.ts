@@ -5,22 +5,22 @@ import { MatIconModule } from '@angular/material/icon';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question, QuestionType } from '@common/types';
 import { of } from 'rxjs';
-import { BankQuestionComponent } from './bank-question.component';
+import { BankQuestionListComponent } from './bank-question-list.component';
 
-describe('BankQuestionComponent', () => {
-    let component: BankQuestionComponent;
-    let fixture: ComponentFixture<BankQuestionComponent>;
+describe('BankQuestionListComponent', () => {
+    let component: BankQuestionListComponent;
+    let fixture: ComponentFixture<BankQuestionListComponent>;
     let questionService: QuestionService;
     let dialog: MatDialog;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [BankQuestionComponent],
+            declarations: [BankQuestionListComponent],
             imports: [HttpClientTestingModule, MatDialogModule, MatIconModule],
             providers: [QuestionService],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(BankQuestionComponent);
+        fixture = TestBed.createComponent(BankQuestionListComponent);
         component = fixture.componentInstance;
         questionService = TestBed.inject(QuestionService);
         dialog = TestBed.inject(MatDialog);

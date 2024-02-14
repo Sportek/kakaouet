@@ -6,10 +6,10 @@ import { Question } from '@common/types';
 
 @Component({
     selector: 'app-bank-question',
-    templateUrl: './bank-question.component.html',
-    styleUrls: ['./bank-question.component.scss'],
+    templateUrl: './bank-question-list.component.html',
+    styleUrls: ['./bank-question-list.component.scss'],
 })
-export class BankQuestionComponent implements OnInit {
+export class BankQuestionListComponent implements OnInit {
     @Input() visibility: string[];
     questionList: Question[] = [];
 

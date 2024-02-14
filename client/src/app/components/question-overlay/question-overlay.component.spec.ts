@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -142,7 +144,6 @@ describe('QuestionOverlayComponent', () => {
         expect(getQuestionsByIdSpy).toHaveBeenCalledWith('testId');
 
         expect(component.hasQuestionId).toBe(true);
-        // eslint-disable-next-line no-underscore-dangle
         expect(component.questionId).toBe(mockQuestion._id);
         expect(component.type).toBe(mockQuestion.type);
         expect(component.title).toBe(mockQuestion.label);
@@ -179,7 +180,6 @@ describe('QuestionOverlayComponent', () => {
         expect(component.questionId).toBe('');
         expect(component.type).toBe('');
         expect(component.title).toBe('');
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(component.points).toBe(10);
 
         expect(resetChoicesSpy).toHaveBeenCalled();
@@ -363,7 +363,6 @@ describe('QuestionOverlayComponent', () => {
         };
 
         component.hasQuestionId = true;
-        // eslint-disable-next-line no-underscore-dangle
         component.questionId = testQuestion._id;
         component.title = testQuestion.label;
         component.type = testQuestion.type;
@@ -378,7 +377,6 @@ describe('QuestionOverlayComponent', () => {
 
         component.saveChangesToQuestion();
 
-        // eslint-disable-next-line no-underscore-dangle
         expect(updateQuestionSpy).toHaveBeenCalledWith(testQuestion._id, testQuestion);
         expect(changeOverlaySpy).toHaveBeenCalled();
     });
@@ -422,7 +420,6 @@ describe('QuestionOverlayComponent', () => {
         };
 
         component.hasQuestionId = true;
-        // eslint-disable-next-line no-underscore-dangle
         component.questionId = testQuestion._id;
         component.title = testQuestion.label;
         component.type = testQuestion.type;
@@ -436,7 +433,6 @@ describe('QuestionOverlayComponent', () => {
 
         component.saveChangesToQuestion();
 
-        // eslint-disable-next-line no-underscore-dangle
         expect(updateQuestionSpy).toHaveBeenCalledWith(testQuestion._id, testQuestion);
         expect(changeOverlaySpy).toHaveBeenCalled();
     });
@@ -492,7 +488,6 @@ describe('QuestionOverlayComponent', () => {
 
         component.addChoice();
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(component.choices.length).toEqual(4);
     });
 
@@ -543,7 +538,6 @@ describe('QuestionOverlayComponent', () => {
         component.choices = cloneDeep(choices);
 
         component.moveChoiceUp(0);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.moveChoiceUp(4);
 
         expect(component.choices).toEqual(choices);
@@ -579,9 +573,7 @@ describe('QuestionOverlayComponent', () => {
         ];
         component.choices = cloneDeep(choices);
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.moveChoiceDown(3);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.moveChoiceDown(4);
 
         expect(component.choices).toEqual(choices);

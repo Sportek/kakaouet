@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question, QuestionType } from '@common/types';
 import { of } from 'rxjs';
-import { QuestionBankImportComponent } from './importer-questions-banque.component';
+import { QuestionBankImportComponent } from './import-bank-question.component';
 
 describe('QuestionBankImportComponent', () => {
     let component: QuestionBankImportComponent;

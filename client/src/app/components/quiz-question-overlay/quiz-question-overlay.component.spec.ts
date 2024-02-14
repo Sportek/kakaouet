@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -338,7 +339,6 @@ describe('QuizQuestionOverlayComponent', () => {
 
         component.addChoice();
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(component.choices.length).toEqual(4);
     });
 
@@ -389,7 +389,6 @@ describe('QuizQuestionOverlayComponent', () => {
         component.choices = cloneDeep(choices);
 
         component.moveChoiceUp(0);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.moveChoiceUp(4);
         expect(component.choices).toEqual(choices);
     });
@@ -424,9 +423,7 @@ describe('QuizQuestionOverlayComponent', () => {
         ];
         component.choices = cloneDeep(choices);
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.moveChoiceDown(3);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         component.moveChoiceDown(4);
 
         expect(component.choices).toEqual(choices);

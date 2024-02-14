@@ -2,64 +2,55 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormsModule } from '@angular/forms';
 import { GameService } from '@app/services/game/game.service';
+import { Game, GameUser } from '@common/types';
 import { ChatComponent } from './chat.component';
-
-class MockGameService {
-    game = {
-        users: [
-            { _id: '123', name: 'John Doe' },
-            { _id: '456', name: 'Jane Doe' },
-        ],
-    };
-
-    // eslint-disable-next-line no-unused-vars
-    sendMessage(message: string) {
-        // Simuler l'envoi d'un message
-    }
-}
 
 describe('ChatComponent', () => {
     let component: ChatComponent;
     let fixture: ComponentFixture<ChatComponent>;
+    let gameService: GameService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [ChatComponent],
-            imports: [HttpClientTestingModule, FormsModule],
-            providers: [{ provide: GameService, useClass: MockGameService }],
+            imports: [HttpClientTestingModule],
         });
         fixture = TestBed.createComponent(ChatComponent);
+        gameService = TestBed.inject(GameService);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
-    });
-
     it('should return the correct game user by id', () => {
-        // @ts-ignore
-        component.gameService = new MockGameService();
+        component.gameService.game = {
+            users: [{ _id: '123', name: 'John Doe' } as GameUser, { _id: '456', name: 'Jane Doe' } as GameUser],
+        } as Game;
+
         const user = component.getGameUser('123');
-        expect(user).toBeTruthy();
-        // @ts-ignore
+
         expect(user._id).toEqual('123');
-        // @ts-ignore
         expect(user.name).toEqual('John Doe');
     });
 
-    it('should send a message and clear the message input', () => {
-        const mockGameService = new MockGameService();
-        spyOn(mockGameService, 'sendMessage');
+    it('should return empty user if incorrect id', () => {
+        component.gameService.game = {
+            users: [{ _id: '123', name: 'John Doe' } as GameUser, { _id: '456', name: 'Jane Doe' } as GameUser],
+        } as Game;
 
-        // @ts-ignore
-        component.gameService = mockGameService;
+        const user = component.getGameUser('155');
+
+        expect(user._id).toEqual('');
+        expect(user.name).toEqual('');
+    });
+
+    it('should send a message and clear the message input', () => {
+        const sendMessageSpy = spyOn(gameService, 'sendMessage');
+
         component.message = 'Hello world!';
         component.sendMessage();
 
-        expect(mockGameService.sendMessage).toHaveBeenCalledWith('Hello world!');
+        expect(sendMessageSpy).toHaveBeenCalledWith('Hello world!');
         expect(component.message).toBe('');
     });
 });
