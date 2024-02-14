@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-// import { games } from 'src/tempory-games';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';
 

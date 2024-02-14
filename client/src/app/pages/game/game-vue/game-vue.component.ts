@@ -19,13 +19,11 @@ export class GameVueComponent implements OnInit {
 
     @HostListener('document:keydown', ['$event'])
     keyboardChoices(event: KeyboardEvent) {
-        // Vérifie si l'élément actuellement en focus est un champ de saisie de texte
         const target = event.target as HTMLElement;
         if (target.tagName === 'INPUT' && target.getAttribute('type') === 'text') {
             return;
         }
 
-        // Gestion de la sélection des choix
         this.isQCMQuestion().subscribe((isQCM) => {
             if (isQCM && this.gameService.canChangeChoices) {
                 this.getQCMChoices().subscribe((choices) => {
@@ -37,7 +35,6 @@ export class GameVueComponent implements OnInit {
             }
         });
 
-        // Gestion de l'envoie des réponses
         if (event.key === 'Enter' && this.gameService.canChangeChoices) {
             this.setResponseAsFinal();
         }
@@ -61,8 +58,7 @@ export class GameVueComponent implements OnInit {
 
     getQCMChoices(): Observable<Choice[]> {
         return this.gameService.actualQuestion.pipe(
-            // TODO: Il faudra trouver une convention pour le QCM, si on le met en maj ou en minuscule.
-            filter((question) => question.type === QuestionType.QCM.toUpperCase()),
+            filter((question) => question.type === QuestionType.QCM),
             map((question) => {
                 const qcmQuestion = question as { type: QuestionType.QCM; choices: Choice[] } & BaseQuestion;
                 return qcmQuestion.choices;

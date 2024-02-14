@@ -10,7 +10,6 @@ export class JoinComponent {
     code: string = '';
     constructor(private router: Router) {}
     joinGame() {
-        // TODO: Sprint 2 d'autres vérifications devront être effectuées
         this.router.navigate(['/game', this.code]);
     }
 }

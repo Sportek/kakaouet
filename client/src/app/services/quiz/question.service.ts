@@ -32,7 +32,6 @@ export class QuestionService {
     }
 
     updateQuestion(id: string, question: Question): Observable<Question> {
-        // eslint-disable-next-line no-underscore-dangle
         const url = `${this.baseURL}/${id}`;
         return this.http.patch<Question>(url, question).pipe(tap(() => this.updateQuestions()));
     }

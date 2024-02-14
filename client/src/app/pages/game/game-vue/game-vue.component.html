@@ -19,7 +19,6 @@
                 </div>
             </div>
             <div class="responses-container">
-                <!-- Dans le cas où on gère une QCM, on va devoir rajouter les QCL par après -->
                 <div *ngIf="isQCMQuestion() | async">
                     <ng-container *ngIf="getQCMChoices() | async as choices">
                         <div

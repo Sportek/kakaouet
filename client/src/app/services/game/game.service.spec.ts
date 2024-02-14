@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable no-unused-vars */
 import { TestBed } from '@angular/core/testing';
 
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
@@ -16,9 +15,7 @@ const INCREMENTE_SCORE = 1.2;
 
 describe('GameService', () => {
     let service: GameService;
-    // @ts-ignore
     let quizService: jasmine.SpyObj<QuizService>;
-    // @ts-ignore
     let timeService: jasmine.SpyObj<TimeService>;
 
     let routerSpy: jasmine.SpyObj<Router>;
@@ -104,6 +101,7 @@ describe('GameService', () => {
     it('should set the next question correctly', () => {
         const result = service.nextQuestion(1);
         expect(result).toBeTrue();
+
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expect(service.actualQuestion.value).toEqual(service.game!.quiz.questions[1]);
     });

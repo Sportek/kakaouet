@@ -45,7 +45,7 @@ describe('QuizService', () => {
     });
 
     afterEach(() => {
-        httpTestingController.verify(); // Verify that there are no outstanding requests.
+        httpTestingController.verify();
     });
 
     it('should retrieve all quizzes', () => {
@@ -157,10 +157,8 @@ describe('QuizService', () => {
     it('should call next on the amountOfQuestionsSubject with the specified length', () => {
         const spy = spyOn(service as QuizService, 'specifyAmountOfQuizzes').and.callThrough();
 
-        // Call the public method that indirectly triggers the next method on the private Subject
         service.specifyAmountOfQuizzes(1);
 
-        // Check that the private method was called with the expected arguments
         expect(spy).toHaveBeenCalledWith(1);
     });
 });
