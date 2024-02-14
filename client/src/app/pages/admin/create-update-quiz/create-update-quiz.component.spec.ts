@@ -15,7 +15,7 @@ import { QuizValidation, ValidateService } from '@app/services/validate/validate
 import { ValidatedObject } from '@app/services/validate/validated-object';
 import { Question, QuestionType, Quiz } from '@common/types';
 import { cloneDeep } from 'lodash';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { CreateUpdateQuizComponent } from './create-update-quiz.component';
 
 const currentDate = new Date();
@@ -293,12 +293,32 @@ describe('CreateUpdateQuizComponent', () => {
             const quizToUpdate: Quiz = cloneDeep(mockQuiz);
 
             // eslint-disable-next-line no-underscore-dangle
-            component.hasId = mockQuiz._id;
+            component.quizId = mockQuiz._id;
             component.quiz = quizToUpdate;
 
             const updateQuizSpy = spyOn(component, 'updateQuiz').and.callThrough();
+            const getQuizSpy = spyOn(quizService, 'getQuizById').and.returnValue(of(quizToUpdate));
+
             component.onSubmit();
+
+            expect(getQuizSpy).toHaveBeenCalled();
             expect(updateQuizSpy).toHaveBeenCalledWith(quizToUpdate);
+        });
+
+        it('should create quiz if no longer in database', () => {
+            const quizToUpdate: Quiz = cloneDeep(mockQuiz);
+
+            // eslint-disable-next-line no-underscore-dangle
+            component.quizId = mockQuiz._id;
+            component.quiz = quizToUpdate;
+
+            const createQuizSpy = spyOn(component, 'createQuiz').and.callThrough();
+            const getQuizSpy = spyOn(quizService, 'getQuizById').and.returnValue(throwError(() => new Error()));
+
+            component.onSubmit();
+
+            expect(getQuizSpy).toHaveBeenCalled();
+            expect(createQuizSpy).toHaveBeenCalled();
         });
 
         it('should call createQuiz if hasId doesnt exist', () => {
@@ -453,7 +473,7 @@ describe('CreateUpdateQuizComponent', () => {
             expect(component.durationQuiz).toEqual(mockQuiz.duration);
             expect(component.descriptionQuiz).toEqual(mockQuiz.description);
             // eslint-disable-next-line no-underscore-dangle
-            expect(component.hasId).toEqual(mockQuiz._id);
+            expect(component.quizId).toEqual(mockQuiz._id);
             expect(component.questionsQuiz).toEqual(mockQuiz.questions);
             expect(component.quizVisibility).toEqual(mockQuiz.visibility);
             expect(component.quizUpdate).toEqual(mockQuiz.updatedAt);
