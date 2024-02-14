@@ -5,7 +5,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { BackgroundComponent } from '@app/components/background/background.component';
 import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { QuizTermineComponent } from '@app/components/quiz-termine/quiz-termine.component';
+import { QuizHistoryComponent } from '@app/components/quiz-history/quiz-history.component';
 import { SelectorComponent } from '@app/components/selector/selector.component';
 import { AdminGameHistoryComponent } from './admin-game-history.component';
 
@@ -18,7 +18,7 @@ describe('AdminGameHistoryComponent', () => {
             declarations: [
                 AdminGameHistoryComponent,
                 SelectorComponent,
-                QuizTermineComponent,
+                QuizHistoryComponent,
                 BackgroundComponent,
                 GlobalLayoutComponent,
                 HeaderComponent,

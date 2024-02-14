@@ -4,8 +4,8 @@ import { Question } from '@common/types';
 
 @Component({
     selector: 'app-question-bank-import-component',
-    templateUrl: './importer-questions-banque.component.html',
-    styleUrls: ['./importer-questions-banque.component.scss'],
+    templateUrl: './import-bank-question.component.html',
+    styleUrls: ['./import-bank-question.component.scss'],
 })
 export class QuestionBankImportComponent implements OnInit {
     @Output() questionsImported: EventEmitter<Question[]> = new EventEmitter();

@@ -153,7 +153,6 @@ export class QuestionOverlayComponent implements OnInit {
                 };
                 const validatedQuestion = this.validationService.validateQuestion(question as Question).object;
                 if (this.hasQuestionId) {
-                    // eslint-disable-next-line no-underscore-dangle
                     this.questionService.updateQuestion(this.questionId, validatedQuestion).subscribe({});
                 } else {
                     this.questionService.createQuestion(validatedQuestion).subscribe({});
@@ -168,7 +167,6 @@ export class QuestionOverlayComponent implements OnInit {
                 };
                 const validatedQuestion = this.validationService.validateQuestion(question as Question).object;
                 if (this.hasQuestionId) {
-                    // eslint-disable-next-line no-underscore-dangle
                     this.questionService.updateQuestion(this.questionId, validatedQuestion).subscribe({});
                 } else {
                     this.questionService.createQuestion(validatedQuestion).subscribe({});
@@ -223,7 +221,7 @@ export class QuestionOverlayComponent implements OnInit {
             const temp = this.choices[index];
             this.choices[index] = this.choices[index - 1];
             this.choices[index - 1] = temp;
-            this.choices = [...this.choices]; // This line is to trigger change detection
+            this.choices = [...this.choices];
         }
     }
 
@@ -232,7 +230,7 @@ export class QuestionOverlayComponent implements OnInit {
             const temp = this.choices[index];
             this.choices[index] = this.choices[index + 1];
             this.choices[index + 1] = temp;
-            this.choices = [...this.choices]; // This line is to trigger change detection
+            this.choices = [...this.choices];
         }
     }
 }

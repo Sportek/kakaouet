@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { QuizTermineComponent } from './quiz-termine.component';
+import { QuizHistoryComponent } from './quiz-history.component';
 
-describe('QuizTermineComponent', () => {
-    let component: QuizTermineComponent;
-    let fixture: ComponentFixture<QuizTermineComponent>;
+describe('QuizHistoryComponent', () => {
+    let component: QuizHistoryComponent;
+    let fixture: ComponentFixture<QuizHistoryComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [QuizTermineComponent],
+            declarations: [QuizHistoryComponent],
         });
-        fixture = TestBed.createComponent(QuizTermineComponent);
+        fixture = TestBed.createComponent(QuizHistoryComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

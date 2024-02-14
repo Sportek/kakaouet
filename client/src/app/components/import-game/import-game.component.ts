@@ -23,12 +23,10 @@ export class ImportGameComponent {
 
     async onFileUpload(event: Event): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            // Récupération du fichier
             const input = event.target as HTMLInputElement;
             const file = input.files ? input.files[0] : null;
             if (!file) return resolve(false);
 
-            // Lecture du fichier
             const fileReader = new FileReader();
             fileReader.onload = async () => {
                 const rawText = fileReader.result as string;

@@ -5,14 +5,14 @@ import { ConfirmationDialogComponent } from './dialog-delete.component';
 describe('ConfirmationDialogComponent', () => {
     let component: ConfirmationDialogComponent;
     let fixture: ComponentFixture<ConfirmationDialogComponent>;
-    const mockDialogRef = { close: jasmine.createSpy('close') }; // Correctly scoped mockDialogRef
+    const mockDialogRef = { close: jasmine.createSpy('close') };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [ConfirmationDialogComponent],
             imports: [MatDialogModule],
             providers: [
-                { provide: MatDialogRef, useValue: mockDialogRef }, // Use the mockDialogRef here
+                { provide: MatDialogRef, useValue: mockDialogRef },
                 { provide: MAT_DIALOG_DATA, useValue: {} },
             ],
         }).compileComponents();
