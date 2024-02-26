@@ -12,7 +12,7 @@ export class AuthentificationMiddleware implements NestMiddleware {
         if (!userToken || !isTokenExist) {
             userToken = uuidv4();
             this.userService.register(userToken);
-            res.cookie('user_token', userToken, { signed: true, httpOnly: true, secure: true, sameSite: 'strict' });
+            res.cookie('user_token', userToken, { signed: true, httpOnly: true });
             req.signedCookies['user_token'] = userToken;
         }
         await this.userService.updateLastRequestAt(userToken);

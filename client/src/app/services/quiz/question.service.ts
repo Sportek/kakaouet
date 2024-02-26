@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { BASE_URL } from '@app/constants';
 import { Question } from '@common/types';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -14,7 +15,7 @@ export class QuestionService {
     private questionUpdateSubject = new Subject<void>();
     private questionUpdates: Observable<void> = this.questionUpdateSubject.asObservable();
 
-    private baseURL = 'http://localhost:3000/api/question';
+    private baseURL = BASE_URL + '/question';
 
     constructor(private http: HttpClient) {}
 
