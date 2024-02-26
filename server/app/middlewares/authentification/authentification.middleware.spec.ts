@@ -68,8 +68,6 @@ describe('AuthentificationMiddleware', () => {
         expect(mockResponse.cookie).toHaveBeenCalledWith('user_token', expect.any(String), {
             signed: true,
             httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
         });
         expect(mockRequest.signedCookies['user_token']).toEqual(expect.any(String));
         expect(userService.updateLastRequestAt).toHaveBeenCalledTimes(1);

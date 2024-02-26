@@ -9,7 +9,7 @@ import { tap } from 'rxjs/operators';
     providedIn: 'root',
 })
 export class QuizService {
-    private baseURL = 'http://localhost:3000/api/quiz';
+    private baseURL = BASE_URL + '/quiz';
     private quizUpdateSubject = new Subject<void>();
     private quizUpdates: Observable<void> = this.quizUpdateSubject.asObservable();
 
