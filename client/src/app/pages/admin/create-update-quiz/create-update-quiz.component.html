@@ -2,7 +2,7 @@
     <div class="wrapper">
         <div class="container">
             <app-quiz-question-overlay (questionEmitter)="onQuestionListUpdate($event)"></app-quiz-question-overlay>
-            <div *ngIf="quizId; else createNewGame">
+            <div *ngIf="quiz._id; else createNewGame">
                 <div class="title title-text">Modification d'un jeu</div>
             </div>
 
@@ -14,13 +14,13 @@
                 <form #quizForm="ngForm" (ngSubmit)="onSubmit()">
                     <mat-form-field appearance="fill">
                         <mat-label>Titre</mat-label>
-                        <input [(ngModel)]="titleQuiz" matInput placeholder="Titre du jeu" name="title" required />
+                        <input [(ngModel)]="quiz.name" matInput placeholder="Titre du jeu" name="title" required />
                     </mat-form-field>
 
                     <mat-form-field appearance="fill">
                         <mat-label>Durée</mat-label>
                         <input
-                            [(ngModel)]="durationQuiz"
+                            [(ngModel)]="quiz.duration"
                             matInput
                             type="number"
                             placeholder="10 à 60 secondes"
@@ -34,7 +34,7 @@
                     <mat-form-field appearance="fill">
                         <mat-label>Description</mat-label>
                         <input
-                            [(ngModel)]="descriptionQuiz"
+                            [(ngModel)]="quiz.description"
                             matInput
                             placeholder="Description de votre jeu"
                             name="descriptionQuiz"
@@ -47,11 +47,11 @@
             </div>
             <div class="questions-container">
                 <div class="questions large-text" required="true">
-                    <div *ngFor="let quest of questionsQuiz; let i = index" class="question-bar">
+                    <div *ngFor="let quest of quiz.questions; let i = index" class="question-bar">
                         <div class="question">{{ i + 1 }}. {{ quest.label }} ({{ quest.type }})</div>
                         <div class="icons">
                             <mat-icon (click)="moveUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
-                            <mat-icon (click)="moveDown(i)" *ngIf="i < questionsQuiz.length - 1">arrow_downward</mat-icon>
+                            <mat-icon (click)="moveDown(i)" *ngIf="i < quiz.questions.length - 1">arrow_downward</mat-icon>
                             <mat-icon class="large-text" (click)="quizQuestionOverlayComponent.specifyQuestion(quest)">edit</mat-icon>
                             <mat-icon class="icons large-text" (click)="removeQuestion(quest)">delete</mat-icon>
                             <mat-icon class="icons large-text" (click)="importQuestionToBank(quest)">ios_share</mat-icon>
