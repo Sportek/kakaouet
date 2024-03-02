@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
@@ -7,13 +7,14 @@ import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { QuizValidation, ValidateService } from '@app/services/validate/validate.service';
 import { Question, Quiz } from '@common/types';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-create-update-quiz',
     templateUrl: './create-update-quiz.component.html',
     styleUrls: ['./create-update-quiz.component.scss'],
 })
-export class CreateUpdateQuizComponent implements OnInit {
+export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     @ViewChild(QuizQuestionOverlayComponent) quizQuestionOverlayComponent!: QuizQuestionOverlayComponent;
 
     showImportOverlay = false;
@@ -28,6 +29,10 @@ export class CreateUpdateQuizComponent implements OnInit {
         createdAt: new Date(),
         updatedAt: new Date(),
     };
+
+    private quizSubscription: Subscription | undefined;
+    private questionSubscription: Subscription | undefined;
+    // private subscription: Subscription;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -45,6 +50,16 @@ export class CreateUpdateQuizComponent implements OnInit {
             this.getQuiz(gameIdFromRoute);
         }
     }
+
+    ngOnDestroy() {
+        if (this.quizSubscription) {
+            this.quizSubscription.unsubscribe();
+        }
+        if (this.questionSubscription) {
+            this.questionSubscription.unsubscribe();
+        }
+    }
+
     openImportOverlay(): void {
         this.showImportOverlay = true;
     }
@@ -84,7 +99,7 @@ export class CreateUpdateQuizComponent implements OnInit {
     }
 
     getQuiz(id: string): void {
-        this.quizService.getQuizById(id).subscribe({
+        this.quizSubscription = this.quizService.getQuizById(id).subscribe({
             next: (quizToGet) => {
                 this.quiz.name = quizToGet.name;
                 this.quiz.duration = quizToGet.duration;
@@ -109,7 +124,7 @@ export class CreateUpdateQuizComponent implements OnInit {
         updatedQuiz.updatedAt = new Date();
         updatedQuiz.visibility = this.quiz.visibility;
         const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
-        this.quizService.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
+        this.quizSubscription = this.quizService.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
     }
 
     removeQuestion(question: Question): void {
@@ -125,7 +140,7 @@ export class CreateUpdateQuizComponent implements OnInit {
             visibility: false,
             questions: this.quiz.questions,
         };
-        this.quizService.addNewQuiz(newQuiz as Quiz).subscribe({});
+        this.quizSubscription = this.quizService.addNewQuiz(newQuiz as Quiz).subscribe({});
     }
 
     importQuestionToBank(question: Question): void {
@@ -137,7 +152,7 @@ export class CreateUpdateQuizComponent implements OnInit {
             type: question.type,
         };
         if (partialQuestionNoId.type === 'QCM' && question.type === 'QCM') partialQuestionNoId.choices = question.choices;
-        this.questionService.getQuestions().subscribe((questionsFromBank: Question[]) => {
+        this.questionSubscription = this.questionService.getQuestions().subscribe((questionsFromBank: Question[]) => {
             const questionExistsInBank = questionsFromBank.some((q: Question) => q.label === partialQuestionNoId.label);
             if (!questionExistsInBank) {
                 this.questionService.createQuestion(partialQuestionNoId as Question).subscribe({});
