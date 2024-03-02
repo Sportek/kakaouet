@@ -151,7 +151,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         };
         if (partialQuestionNoId.type === 'QCM' && question.type === 'QCM') partialQuestionNoId.choices = question.choices;
         this.questionSubscription = this.questionService.getQuestions().subscribe((questionsFromBank: Question[]) => {
-            const questionExistsInBank = questionsFromBank.some((q: Question) => q.label === partialQuestionNoId.label);
+            const questionExistsInBank = questionsFromBank.some((existingQuestion: Question) => existingQuestion.label === partialQuestionNoId.label);
             if (!questionExistsInBank) {
                 this.questionService.createQuestion(partialQuestionNoId as Question).subscribe({});
                 this.dialog.open('La question a bien était importé à la banque de question', 'Fermer', {
