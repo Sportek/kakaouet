@@ -17,8 +17,6 @@ import { Subscription } from 'rxjs';
 export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     @ViewChild(QuizQuestionOverlayComponent) quizQuestionOverlayComponent!: QuizQuestionOverlayComponent;
 
-    showImportOverlay = false;
-
     quiz: Quiz = {
         name: '',
         description: '',
@@ -30,9 +28,9 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         updatedAt: new Date(),
     };
 
+    showImportOverlay = false;
     private quizSubscription: Subscription | undefined;
     private questionSubscription: Subscription | undefined;
-    // private subscription: Subscription;
 
     // eslint-disable-next-line max-params
     constructor(
