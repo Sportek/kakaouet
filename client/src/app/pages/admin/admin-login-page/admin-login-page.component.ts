@@ -14,10 +14,7 @@ export class AdminLoginPageComponent implements OnInit {
     constructor(
         private router: Router,
         private userService: UserService,
-    ) {
-        this.userService = userService;
-        this.router = router;
-    }
+    ) {}
 
     ngOnInit(): void {
         this.userService.loggedState.subscribe((state) => {

@@ -28,7 +28,7 @@ describe('ChatComponent', () => {
             users: [{ _id: '123', name: 'John Doe' } as GameUser, { _id: '456', name: 'Jane Doe' } as GameUser],
         } as Game;
 
-        const user = component.getGameUser('123');
+        const user = component.getGameUser('123') as GameUser;
 
         expect(user._id).toEqual('123');
         expect(user.name).toEqual('John Doe');
@@ -41,8 +41,7 @@ describe('ChatComponent', () => {
 
         const user = component.getGameUser('155');
 
-        expect(user._id).toEqual('');
-        expect(user.name).toEqual('');
+        expect(user).toBeUndefined();
     });
 
     it('should send a message and clear the message input', () => {

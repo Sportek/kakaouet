@@ -6,8 +6,8 @@
     <div class="chat-messages">
         <div *ngFor="let message of this.gameService.game?.messages; let i = index" [id]="'index-' + i" class="message-container">
             <div class="data">
-                <div ngIf="getGameUser(message.gameUserId).name !== ''" class="username">
-                    {{ getGameUser(message.gameUserId).name }}
+                <div *ngIf="getGameUser(message.gameUserId)" class="username">
+                    {{ getGameUser(message.gameUserId)!.name }}
                 </div>
                 <div class="date">
                     {{ message.createdAt | date: 'yyyy/MM/dd HH:mm' }}
