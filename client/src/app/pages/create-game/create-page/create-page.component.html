@@ -1,19 +1,16 @@
 <app-global-layout>
-    <div class="background">
-                <div class="wrapper">
-                    <h1>Liste des jeux:</h1>
-                    <div class="select-game-wrapper">
-                        <!-- <p *ngIf=""> si plus de 5 question qcm crée type jeu aléatoire </p>-->
-                        <div *ngFor="let game of games">
-                            <div *ngIf="game.visibility">
-                                <a [routerLink]="['/create/description', game._id]">
-                                    <button mat-fab extended color="accent" class="large-text">
-                                        {{ game.name }} 
-                                    </button>
-                                </a>
-                            </div>
+    <div class="wrapper">
+        <h1>Liste des Jeux</h1>
+        <div class="select-game-wrapper">
+            <div *ngFor="let game of games" class="games">
+                <div *ngIf="game.visibility">
+                    <div class="game" [routerLink]="['/create/description', game._id]">
+                        <div class="large-text">
+                            {{ game.name }}
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
     </div>
 </app-global-layout>

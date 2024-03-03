@@ -1,23 +1,27 @@
 <app-global-layout>
-    <div *ngIf="game" class="background">
-        <p class="time-description">Temps alloué pour le jeu : {{ game.duration }} secondes</p>
-        <div class="wrapper">
-            <h1>Détails du '{{ game.name }}'</h1>
-            <div class="box-description">
-                <p class="select-game-wrapper">Description du jeu:</p>
-                <p>{{ game.description }}</p>
-            </div>
-            <div class="box-description">
-                <p class="select-game-wrapper">Liste des questions:</p>
-                <div *ngFor="let quest of question; let i = index">
-                    <p>{{ i + 1 }}-{{ quest.label }} ({{ quest.type }})</p>
+    <div *ngIf="game" class="container">
+        <div class="game-information-container">
+            <div class="game-title-container">
+                <div class="title title-text">
+                    {{ game.name }}
+                </div>
+                <div class="game-description-container">
+                    <div class="description">{{ game.description }}</div>
+                    <div class="duration">Temps alloué pour chaque question : {{ game.duration }} secondes</div>
                 </div>
             </div>
-        </div>
-        <div class="button-container">
-            <button routerLink="/create" mat-fab extended class="large-text quit-button">Retour</button>
-            <button (click)="testGame(game._id)" mat-fab extended color="accent" class="large-text middle">Tester le jeu</button>
-            <button mat-fab extended color="accent" (click)="createGame(game._id)" class="large-text">Créer une partie</button>
+            <div class="game-questions-container">
+                <div class="box-description">
+                    <div *ngFor="let quest of question; let i = index">
+                        <p>{{ i + 1 }} - {{ quest.label }} ({{ quest.type }})</p>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons-container">
+                <button routerLink="/create" mat-raised-button class="large-text quit-button" color="primary">Retour</button>
+                <button (click)="testGame(game._id)" mat-raised-button class="large-text test-button" color="primary">Tester le jeu</button>
+                <button mat-raised-button (click)="createGame(game._id)" class="large-text create-button" color="primary">Créer une partie</button>
+            </div>
         </div>
     </div>
 </app-global-layout>

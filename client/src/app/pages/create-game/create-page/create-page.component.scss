@@ -1,10 +1,5 @@
 @import '../../../../colors.scss';
 
-.background {
-    width: 100%;
-    height: 100%;
-}
-
 .quit-button {
     background-color: $pink-600;
     margin-top: 10px;
@@ -18,7 +13,9 @@
     justify-content: center;
     height: 100%;
     padding: 1rem;
+    width: 100%;
     box-sizing: border-box;
+    flex: 1;
     .select-game-wrapper {
         display: flex;
         flex-direction: column;
@@ -27,6 +24,24 @@
         gap: 1rem;
         height: 100%;
         width: 100%;
+
+        .games {
+            width: 50%;
+            .game {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                border: 0.25rem solid black;
+                padding: 0.5rem;
+                background-color: $purple-900;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .game:hover {
+                cursor: pointer;
+                background-color: $purple-800;
+            }
+        }
     }
 }
-
