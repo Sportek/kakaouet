@@ -116,32 +116,32 @@ describe('CreateUpdateQuizComponent', () => {
 
     describe('moveUp', () => {
         it('should move the question up when index is greater than 0', () => {
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
             component.moveUp(1);
-            expect(component.questionsQuiz).toEqual([mockQuestion2, mockQuestion1]);
+            expect(component.quiz.questions).toEqual([mockQuestion2, mockQuestion1]);
         });
 
         it('should not move the question up when index is 0 or negative', () => {
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
             component.moveUp(0);
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             component.moveUp(-1);
-            expect(component.questionsQuiz).toEqual([mockQuestion1, mockQuestion2]);
+            expect(component.quiz.questions).toEqual([mockQuestion1, mockQuestion2]);
         });
     });
 
     describe('MoveDown', () => {
         it('should move the question down when index is less than the last index', () => {
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
             component.moveDown(0);
-            expect(component.questionsQuiz).toEqual([mockQuestion2, mockQuestion1]);
+            expect(component.quiz.questions).toEqual([mockQuestion2, mockQuestion1]);
         });
 
         it('should not move the question down when index is the last index or greater', () => {
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
             component.moveDown(1);
             component.moveDown(3);
-            expect(component.questionsQuiz).toEqual([mockQuestion1, mockQuestion2]);
+            expect(component.quiz.questions).toEqual([mockQuestion1, mockQuestion2]);
         });
     });
 
@@ -155,13 +155,13 @@ describe('CreateUpdateQuizComponent', () => {
     });
 
     describe('handleQuestionsImported', () => {
-        it('should add new questions to questionsQuiz and sort them by ID', () => {
-            component.questionsQuiz = [mockQuestion1];
+        it('should add new questions to quiz.questions and sort them by ID', () => {
+            component.quiz.questions = [mockQuestion1];
 
             component.handleQuestionsImported([mockQuestion2]);
 
             // eslint-disable-next-line no-underscore-dangle
-            expect(component.questionsQuiz).toEqual([mockQuestion1, mockQuestion2].sort((a, b) => a._id.localeCompare(b._id)));
+            expect(component.quiz.questions).toEqual([mockQuestion1, mockQuestion2].sort((a, b) => a._id.localeCompare(b._id)));
 
             expect(component.showImportOverlay).toBeFalse();
         });
@@ -173,11 +173,11 @@ describe('CreateUpdateQuizComponent', () => {
             updatedQuiz.name = 'Updated Quiz Name';
             updatedQuiz.updatedAt = new Date();
 
-            component.titleQuiz = updatedQuiz.name;
-            component.descriptionQuiz = updatedQuiz.description;
-            component.durationQuiz = updatedQuiz.duration;
-            component.quizVisibility = updatedQuiz.visibility;
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+            component.quiz.name = updatedQuiz.name;
+            component.quiz.description = updatedQuiz.description;
+            component.quiz.duration = updatedQuiz.duration;
+            component.quiz.visibility = updatedQuiz.visibility;
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
 
             const validatedQuiz: ValidatedObject<Quiz> = validateService.validateQuiz(updatedQuiz);
 
@@ -193,15 +193,15 @@ describe('CreateUpdateQuizComponent', () => {
     });
 
     describe('removeQuestion', () => {
-        it('should remove the specified question from questionsQuiz', () => {
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+        it('should remove the specified question from quiz.questions', () => {
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
             component.removeQuestion(mockQuestion1);
-            expect(component.questionsQuiz).not.toContain(mockQuestion1);
-            expect(component.questionsQuiz).toContain(mockQuestion2);
+            expect(component.quiz.questions).not.toContain(mockQuestion1);
+            expect(component.quiz.questions).toContain(mockQuestion2);
         });
 
-        it('should not remove the specified question from questionsQuiz', () => {
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+        it('should not remove the specified question from quiz.questions', () => {
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
             const questionToRemove: Question = {
                 _id: '5',
                 label: 'Question 5',
@@ -215,8 +215,8 @@ describe('CreateUpdateQuizComponent', () => {
                 ],
             };
             component.removeQuestion(questionToRemove);
-            expect(component.questionsQuiz).toContain(mockQuestion1);
-            expect(component.questionsQuiz).toContain(mockQuestion2);
+            expect(component.quiz.questions).toContain(mockQuestion1);
+            expect(component.quiz.questions).toContain(mockQuestion2);
         });
     });
 
@@ -233,10 +233,10 @@ describe('CreateUpdateQuizComponent', () => {
                 updatedAt: new Date(),
             };
 
-            component.titleQuiz = newQuiz.name;
-            component.descriptionQuiz = newQuiz.description;
-            component.durationQuiz = newQuiz.duration;
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+            component.quiz.name = newQuiz.name;
+            component.quiz.description = newQuiz.description;
+            component.quiz.duration = newQuiz.duration;
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
 
             const addNewQuizSpy = spyOn(quizService, 'addNewQuiz').and.returnValue(of(newQuiz));
 
@@ -293,7 +293,7 @@ describe('CreateUpdateQuizComponent', () => {
             const quizToUpdate: Quiz = cloneDeep(mockQuiz);
 
             // eslint-disable-next-line no-underscore-dangle
-            component.quizId = mockQuiz._id;
+            component.quiz._id = mockQuiz._id;
             component.quiz = quizToUpdate;
 
             const updateQuizSpy = spyOn(component, 'updateQuiz').and.callThrough();
@@ -309,7 +309,7 @@ describe('CreateUpdateQuizComponent', () => {
             const quizToUpdate: Quiz = cloneDeep(mockQuiz);
 
             // eslint-disable-next-line no-underscore-dangle
-            component.quizId = mockQuiz._id;
+            component.quiz._id = mockQuiz._id;
             component.quiz = quizToUpdate;
 
             const createQuizSpy = spyOn(component, 'createQuiz').and.callThrough();
@@ -328,40 +328,24 @@ describe('CreateUpdateQuizComponent', () => {
         });
     });
 
-    describe('wordLength', () => {
-        it('should return true if all words have length less than or equal to MaxWordLength', () => {
-            component.titleQuiz = 'This is a shooooooooooooooooooooooooooooooooooooort title';
-            const expectedResult = false;
-            const result = component.wordLength();
-            expect(result).toEqual(expectedResult);
-        });
-
-        it('should return false if any word has length greater than MaxWordLength', () => {
-            component.titleQuiz = 'This is a title with a very long word length';
-            const expectedResult = true;
-            const result = component.wordLength();
-            expect(result).toEqual(expectedResult);
-        });
-    });
-
     describe('isError', () => {
         it('should give no error message', () => {
-            component.titleQuiz = 'TestId';
-            component.durationQuiz = 10;
-            component.descriptionQuiz = 'Voici un quiz de test';
-            component.questionsQuiz = [mockQuestion1];
+            component.quiz.name = 'TestId';
+            component.quiz.duration = 10;
+            component.quiz.description = 'Voici un quiz de test';
+            component.quiz.questions = [mockQuestion1];
 
             expect(component.isError()).toBe(null);
         });
 
         it('should trigger empty title error', () => {
-            component.titleQuiz = '';
+            component.quiz.name = '';
 
             expect(component.isError()).toBe(QuizValidation.checkRequiredName.errorMessage);
         });
 
         it('should trigger too long title error', () => {
-            component.titleQuiz =
+            component.quiz.name =
                 // eslint-disable-next-line max-len
                 'Ce titre est très loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong';
 
@@ -369,7 +353,7 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger too long word in title error', () => {
-            component.titleQuiz =
+            component.quiz.name =
                 // eslint-disable-next-line max-len
                 'Ce mot est très looooooooooooooooooooooooooooooooooong';
 
@@ -377,31 +361,31 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger too short answer duration error', () => {
-            component.titleQuiz = 'TestId';
-            component.durationQuiz = 1;
+            component.quiz.name = 'TestId';
+            component.quiz.duration = 1;
 
             expect(component.isError()).toBe(QuizValidation.checkMinResponseTime.errorMessage);
         });
 
         it('should trigger too long answer duration error', () => {
-            component.titleQuiz = 'TestId';
-            component.durationQuiz = 100;
+            component.quiz.name = 'TestId';
+            component.quiz.duration = 100;
 
             expect(component.isError()).toBe(QuizValidation.checkMaxResponseTime.errorMessage);
         });
 
         it('should trigger too short description error', () => {
-            component.titleQuiz = 'TestId';
-            component.durationQuiz = 10;
-            component.descriptionQuiz = '';
+            component.quiz.name = 'TestId';
+            component.quiz.duration = 10;
+            component.quiz.description = '';
 
             expect(component.isError()).toBe(QuizValidation.checkMinDescriptionLength.errorMessage);
         });
 
         it('should trigger too long description error', () => {
-            component.titleQuiz = 'TestId';
-            component.durationQuiz = 10;
-            component.descriptionQuiz =
+            component.quiz.name = 'TestId';
+            component.quiz.duration = 10;
+            component.quiz.description =
                 // eslint-disable-next-line max-len
                 'Cette description est très loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongue';
 
@@ -409,18 +393,18 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger missing questions error message', () => {
-            component.titleQuiz = 'TestId';
-            component.durationQuiz = 10;
-            component.descriptionQuiz = 'Voici un quiz de test';
-            component.questionsQuiz = [];
+            component.quiz.name = 'TestId';
+            component.quiz.duration = 10;
+            component.quiz.description = 'Voici un quiz de test';
+            component.quiz.questions = [];
 
             expect(component.isError()).toBe(QuizValidation.checkRequiredQuestions.errorMessage);
         });
     });
 
     describe('onQuestionListUpdate', () => {
-        it('should add the modified question to questionsQuiz if it does not exist in the list', () => {
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+        it('should add the modified question to quiz.questions if it does not exist in the list', () => {
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
 
             const modifiedQuestion: Question = {
                 _id: '3',
@@ -434,12 +418,12 @@ describe('CreateUpdateQuizComponent', () => {
 
             component.onQuestionListUpdate(modifiedQuestion);
 
-            expect(component.questionsQuiz.length).toEqual([mockQuestion1, mockQuestion2].length + 1);
-            expect(component.questionsQuiz).toContain(modifiedQuestion);
+            expect(component.quiz.questions.length).toEqual([mockQuestion1, mockQuestion2].length + 1);
+            expect(component.quiz.questions).toContain(modifiedQuestion);
         });
 
-        it('should update the existing question in questionsQuiz if it exists in the list', () => {
-            component.questionsQuiz = [mockQuestion1, mockQuestion2];
+        it('should update the existing question in quiz.questions if it exists in the list', () => {
+            component.quiz.questions = [mockQuestion1, mockQuestion2];
 
             const modifiedQuestion: Question = {
                 _id: '1',
@@ -454,10 +438,10 @@ describe('CreateUpdateQuizComponent', () => {
             component.onQuestionListUpdate(modifiedQuestion);
 
             // eslint-disable-next-line no-underscore-dangle
-            const updatedQuestionIndex = component.questionsQuiz.findIndex((q) => q._id === modifiedQuestion._id);
+            const updatedQuestionIndex = component.quiz.questions.findIndex((q) => q._id === modifiedQuestion._id);
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             expect(updatedQuestionIndex).toBeGreaterThan(-1);
-            expect(component.questionsQuiz[updatedQuestionIndex]).toEqual(modifiedQuestion);
+            expect(component.quiz.questions[updatedQuestionIndex]).toEqual(modifiedQuestion);
         });
     });
 
@@ -469,15 +453,15 @@ describe('CreateUpdateQuizComponent', () => {
             // eslint-disable-next-line no-underscore-dangle
             component.getQuiz(mockQuiz._id);
 
-            expect(component.titleQuiz).toEqual(mockQuiz.name);
-            expect(component.durationQuiz).toEqual(mockQuiz.duration);
-            expect(component.descriptionQuiz).toEqual(mockQuiz.description);
+            expect(component.quiz.name).toEqual(mockQuiz.name);
+            expect(component.quiz.duration).toEqual(mockQuiz.duration);
+            expect(component.quiz.description).toEqual(mockQuiz.description);
             // eslint-disable-next-line no-underscore-dangle
-            expect(component.quizId).toEqual(mockQuiz._id);
-            expect(component.questionsQuiz).toEqual(mockQuiz.questions);
-            expect(component.quizVisibility).toEqual(mockQuiz.visibility);
-            expect(component.quizUpdate).toEqual(mockQuiz.updatedAt);
-            expect(component.quizCreated).toEqual(mockQuiz.createdAt);
+            expect(component.quiz._id).toEqual(mockQuiz._id);
+            expect(component.quiz.questions).toEqual(mockQuiz.questions);
+            expect(component.quiz.visibility).toEqual(mockQuiz.visibility);
+            expect(component.quiz.updatedAt).toEqual(mockQuiz.updatedAt);
+            expect(component.quiz.createdAt).toEqual(mockQuiz.createdAt);
 
             expect(specifyAmountOfQuizzesSpy).toHaveBeenCalledWith(mockQuiz.questions.length);
         });
