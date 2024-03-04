@@ -83,7 +83,8 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     }
 
     handleQuestionsImported(importedQuestions: Question[]): void {
-        this.questionService.handleQuestionsImported(importedQuestions, this.quiz, this.showImportOverlay);
+        this.questionService.handleQuestionsImported(importedQuestions, this.quiz);
+        this.showImportOverlay = false;
     }
 
     getQuiz(id: string): void {
@@ -116,14 +117,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     }
 
     createQuiz(): void {
-        const newQuiz: Partial<Quiz> = {
-            name: this.quiz.name,
-            description: this.quiz.description,
-            duration: this.quiz.duration,
-            visibility: false,
-            questions: this.quiz.questions,
-        };
-        this.quizSubscription = this.quizService.addNewQuiz(newQuiz as Quiz).subscribe({});
+        this.quizService.createQuiz(this.quiz);
     }
 
     /* importQuestionToBank(question: Question): void {

@@ -102,4 +102,15 @@ export class QuizService {
         }
         return null;
     }
+
+    createQuiz(quiz: Quiz): void {
+        const newQuiz: Partial<Quiz> = {
+            name: quiz.name,
+            description: quiz.description,
+            duration: quiz.duration,
+            visibility: false,
+            questions: quiz.questions,
+        };
+        this.addNewQuiz(newQuiz as Quiz).subscribe({});
+    }
 }
