@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
+import { BAD_QUIZ, WORKING_QUIZ } from '@app/fake-quizzes';
 import { QuestionType, Quiz } from '@common/types';
-import { BAD_QUIZ, WORKING_QUIZ } from './fake-quizzes';
 import { ValidateService } from './validate.service';
 
 describe('ValidateService', () => {
