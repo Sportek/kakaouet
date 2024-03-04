@@ -4,6 +4,7 @@ import { BASE_URL } from '@app/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { QuizValidation } from '../validate/validate.service';
 
 @Injectable({
     providedIn: 'root',
@@ -64,5 +65,40 @@ export class QuizService {
 
     getAmountOfQuizzes(): Observable<number> {
         return this.amountOfQuestions;
+    }
+
+    isError(quiz: Quiz): string | null {
+        if (!QuizValidation.checkRequiredName.callback({ name: quiz.name })) {
+            return QuizValidation.checkRequiredName.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxTitleLength.callback({ name: quiz.name })) {
+            return QuizValidation.checkMaxTitleLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxWordLength.callback({ name: quiz.name })) {
+            return QuizValidation.checkMaxWordLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkMinResponseTime.callback({ duration: quiz.duration })) {
+            return QuizValidation.checkMinResponseTime.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxResponseTime.callback({ duration: quiz.duration })) {
+            return QuizValidation.checkMaxResponseTime.errorMessage;
+        }
+
+        if (!QuizValidation.checkMinDescriptionLength.callback({ description: quiz.description })) {
+            return QuizValidation.checkMinDescriptionLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxDescriptionLength.callback({ description: quiz.description })) {
+            return QuizValidation.checkMaxDescriptionLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkRequiredQuestions.callback({ questions: quiz.questions })) {
+            return QuizValidation.checkRequiredQuestions.errorMessage;
+        }
+        return null;
     }
 }

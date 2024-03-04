@@ -1,11 +1,10 @@
 /* eslint-disable no-underscore-dangle */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { QuizValidation, ValidateService } from '@app/services/validate/validate.service';
+import { ValidateService } from '@app/services/validate/validate.service';
 import { Question, Quiz } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -37,8 +36,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         private quizService: QuizService,
         private route: ActivatedRoute,
         private questionService: QuestionService,
-        private validateService: ValidateService,
-        private dialog: MatSnackBar,
+        private validateService: ValidateService, // private dialog: MatSnackBar,
     ) {}
 
     ngOnInit() {
@@ -131,27 +129,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     }
 
     importQuestionToBank(question: Question): void {
-        const partialQuestionNoId: Partial<Question> = {
-            label: question.label,
-            points: question.points,
-            createdAt: question.createdAt,
-            updatedAt: question.updatedAt,
-            type: question.type,
-        };
-        if (partialQuestionNoId.type === 'QCM' && question.type === 'QCM') partialQuestionNoId.choices = question.choices;
-        this.questionSubscription = this.questionService.getQuestions().subscribe((questionsFromBank: Question[]) => {
-            const questionExistsInBank = questionsFromBank.some((existingQuestion: Question) => existingQuestion.label === partialQuestionNoId.label);
-            if (!questionExistsInBank) {
-                this.questionService.createQuestion(partialQuestionNoId as Question).subscribe({});
-                this.dialog.open('La question a bien était importé à la banque de question', 'Fermer', {
-                    duration: 3000,
-                });
-            } else {
-                this.dialog.open('La question existe deja dans la banque de question', 'Fermer', {
-                    duration: 3000,
-                });
-            }
-        });
+        this.questionService.importQuestionToBank(question);
     }
 
     onSubmit() {
@@ -170,46 +148,10 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     }
 
     isError(): string | null {
-        if (!QuizValidation.checkRequiredName.callback({ name: this.quiz.name })) {
-            return QuizValidation.checkRequiredName.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxTitleLength.callback({ name: this.quiz.name })) {
-            return QuizValidation.checkMaxTitleLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxWordLength.callback({ name: this.quiz.name })) {
-            return QuizValidation.checkMaxWordLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMinResponseTime.callback({ duration: this.quiz.duration })) {
-            return QuizValidation.checkMinResponseTime.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxResponseTime.callback({ duration: this.quiz.duration })) {
-            return QuizValidation.checkMaxResponseTime.errorMessage;
-        }
-
-        if (!QuizValidation.checkMinDescriptionLength.callback({ description: this.quiz.description })) {
-            return QuizValidation.checkMinDescriptionLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxDescriptionLength.callback({ description: this.quiz.description })) {
-            return QuizValidation.checkMaxDescriptionLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkRequiredQuestions.callback({ questions: this.quiz.questions })) {
-            return QuizValidation.checkRequiredQuestions.errorMessage;
-        }
-        return null;
+        return this.quizService.isError(this.quiz);
     }
 
     onQuestionListUpdate(modifiedQuestion: Question) {
-        const index = this.quiz.questions.findIndex((question) => question._id === modifiedQuestion._id);
-        if (index < 0) {
-            this.quiz.questions.push(modifiedQuestion);
-        } else {
-            this.quiz.questions[index] = modifiedQuestion;
-        }
+        this.questionService.onQuestionListUpdate(modifiedQuestion, this.quiz);
     }
 }
