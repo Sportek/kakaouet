@@ -26,35 +26,14 @@ export class QuizComponent implements OnInit {
     }
 
     changeVisibility(quiz: Quiz): void {
-        quiz.visibility = !quiz.visibility;
-        // eslint-disable-next-line no-underscore-dangle
-        this.quizService.updateQuizById(quiz._id, quiz).subscribe({});
+        this.quizService.changeVisibility(quiz);
     }
 
     removeQuiz(quiz: Quiz): void {
-        const index: number = this.quizList.indexOf(quiz);
-        // eslint-disable-next-line no-underscore-dangle
-        this.quizService.deleteQuizById(this.quizList[index]._id).subscribe({});
-        this.quizList.splice(index, 1);
+        this.quizService.removeQuiz(quiz, this.quizList);
     }
 
     generateQuizAsFile(quiz: Quiz) {
-        const quizNoVisibilityNoId: Partial<Quiz> = {
-            name: quiz.name,
-            description: quiz.description,
-            duration: quiz.duration,
-            questions: quiz.questions,
-            createdAt: quiz.createdAt,
-            updatedAt: quiz.updatedAt,
-        };
-        const fileContent = JSON.stringify(quizNoVisibilityNoId);
-        const blob = new Blob([fileContent], { type: 'application/json' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = quiz.name + '.json';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
+        this.quizService.generateQuizAsFile(quiz);
     }
 }
