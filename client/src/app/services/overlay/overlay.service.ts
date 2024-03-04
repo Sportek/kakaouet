@@ -3,7 +3,7 @@ import { QuestionService } from '@app/services/quiz/question.service';
 import { ValidateService } from '@app/services/validate/validate.service';
 import { Choice, Question, QuestionType } from '@common/types';
 import { cloneDeep } from 'lodash';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -88,24 +88,21 @@ export class OverlayService {
     }
 
     specifyQuestion(id: string): void {
-        const subscriber: Subscription = this.questionService.getQuestionsById(id).subscribe({
+        this.questionService.getQuestionsById(id).subscribe({
             next: (question: Question) => {
                 this.currentQuestion = question;
                 this.sendChangesToComponent();
             },
         });
-        subscriber.unsubscribe();
     }
 
     submitQuestion(isPatch: boolean): void {
         const validatedQuestion = this.validationService.validateQuestion(this.currentQuestion).object;
         if (isPatch) {
             // eslint-disable-next-line no-underscore-dangle
-            const subscriber = this.questionService.updateQuestion(this.currentQuestion._id, validatedQuestion).subscribe({});
-            subscriber.unsubscribe();
+            this.questionService.updateQuestion(this.currentQuestion._id, validatedQuestion).subscribe({});
         } else {
-            const subscriber = this.questionService.createQuestion(validatedQuestion).subscribe({});
-            subscriber.unsubscribe();
+            this.questionService.createQuestion(validatedQuestion).subscribe({});
         }
         this.resetQuestion();
     }
