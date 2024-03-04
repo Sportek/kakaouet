@@ -177,41 +177,6 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         return this.quizService.isError(this.quiz);
     }
 
-    /* isError(): string | null {
-        if (!QuizValidation.checkRequiredName.callback({ name: this.quiz.name })) {
-            return QuizValidation.checkRequiredName.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxTitleLength.callback({ name: this.quiz.name })) {
-            return QuizValidation.checkMaxTitleLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxWordLength.callback({ name: this.quiz.name })) {
-            return QuizValidation.checkMaxWordLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMinResponseTime.callback({ duration: this.quiz.duration })) {
-            return QuizValidation.checkMinResponseTime.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxResponseTime.callback({ duration: this.quiz.duration })) {
-            return QuizValidation.checkMaxResponseTime.errorMessage;
-        }
-
-        if (!QuizValidation.checkMinDescriptionLength.callback({ description: this.quiz.description })) {
-            return QuizValidation.checkMinDescriptionLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxDescriptionLength.callback({ description: this.quiz.description })) {
-            return QuizValidation.checkMaxDescriptionLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkRequiredQuestions.callback({ questions: this.quiz.questions })) {
-            return QuizValidation.checkRequiredQuestions.errorMessage;
-        }
-        return null;
-    }*/
-
     onQuestionListUpdate(modifiedQuestion: Question) {
         this.questionService.onQuestionListUpdate(modifiedQuestion, this.quiz);
     }
