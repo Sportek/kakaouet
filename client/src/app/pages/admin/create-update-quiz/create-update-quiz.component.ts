@@ -1,11 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { ValidateService } from '@app/services/validate/validate.service';
 import { Question, Quiz } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -36,9 +34,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     constructor(
         private quizService: QuizService,
         private route: ActivatedRoute,
-        private questionService: QuestionService,
-        private validateService: ValidateService,
-        private dialog: MatSnackBar,
+        private questionService: QuestionService, // private validateService: ValidateService, // private dialog: MatSnackBar,
     ) {}
 
     ngOnInit() {
@@ -105,47 +101,15 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     }
 
     updateQuiz(updatedQuiz: Quiz): void {
-        updatedQuiz.name = this.quiz.name;
-        updatedQuiz.description = this.quiz.description;
-        updatedQuiz.duration = this.quiz.duration;
-        updatedQuiz.visibility = false;
-        updatedQuiz.questions = this.quiz.questions;
-        updatedQuiz.updatedAt = new Date();
-        updatedQuiz.visibility = this.quiz.visibility;
-        const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
-        this.quizSubscription = this.quizService.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
+        this.quizService.updateQuiz(updatedQuiz, this.quiz);
     }
 
     createQuiz(): void {
         this.quizService.createQuiz(this.quiz);
     }
 
-    /* importQuestionToBank(question: Question): void {
-        this.questionService.importQuestionToBank(question);
-    }*/
-
     importQuestionToBank(question: Question): void {
-        const partialQuestionNoId: Partial<Question> = {
-            label: question.label,
-            points: question.points,
-            createdAt: question.createdAt,
-            updatedAt: question.updatedAt,
-            type: question.type,
-        };
-        if (partialQuestionNoId.type === 'QCM' && question.type === 'QCM') partialQuestionNoId.choices = question.choices;
-        this.questionService.getQuestions().subscribe((questionsFromBank: Question[]) => {
-            const questionExistsInBank = questionsFromBank.some((existingQuestion: Question) => existingQuestion.label === partialQuestionNoId.label);
-            if (!questionExistsInBank) {
-                this.questionService.createQuestion(partialQuestionNoId as Question).subscribe({});
-                this.dialog.open('La question a bien était importé à la banque de question', 'Fermer', {
-                    duration: 3000,
-                });
-            } else {
-                this.dialog.open('La question existe deja dans la banque de question', 'Fermer', {
-                    duration: 3000,
-                });
-            }
-        });
+        this.questionService.importQuestionToBank(question);
     }
 
     onSubmit() {

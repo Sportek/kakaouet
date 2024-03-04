@@ -5,7 +5,7 @@ import { QuestionFeedback, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 // eslint-disable-next-line no-restricted-imports
-import { QuizValidation } from '../validate/validate.service';
+import { QuizValidation, ValidateService } from '../validate/validate.service';
 
 @Injectable({
     providedIn: 'root',
@@ -18,7 +18,10 @@ export class QuizService {
     private amountOfQuestionsSubject = new Subject<number>();
     private amountOfQuestions: Observable<number> = this.amountOfQuestionsSubject.asObservable();
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private validateService: ValidateService,
+    ) {}
 
     getAllQuizzes(): Observable<Quiz[]> {
         return this.http.get<Quiz[]>(BASE_URL + '/quiz');
@@ -112,5 +115,18 @@ export class QuizService {
             questions: quiz.questions,
         };
         this.addNewQuiz(newQuiz as Quiz).subscribe({});
+    }
+
+    updateQuiz(updatedQuiz: Quiz, quiz: Quiz): void {
+        updatedQuiz.name = quiz.name;
+        updatedQuiz.description = quiz.description;
+        updatedQuiz.duration = quiz.duration;
+        updatedQuiz.visibility = false;
+        updatedQuiz.questions = quiz.questions;
+        updatedQuiz.updatedAt = new Date();
+        updatedQuiz.visibility = quiz.visibility;
+        const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
+        // eslint-disable-next-line no-underscore-dangle
+        this.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
     }
 }

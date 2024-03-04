@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BAD_QUIZ, WORKING_QUIZ } from '@app/fake-quizzes';
 import { OverlayService } from '@app/services/overlay/overlay.service';
@@ -25,10 +26,12 @@ describe('QuestionOverlayComponent', () => {
     let questionService: QuestionService;
     let overlayService: OverlayService;
     // let validateService: ValidateService;
+    const snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [QuestionOverlayComponent],
+            providers: [{ provide: MatSnackBar, useValue: snackBarMock }],
             imports: [
                 HttpClientModule,
                 HttpClientTestingModule,
@@ -37,6 +40,7 @@ describe('QuestionOverlayComponent', () => {
                 MatInputModule,
                 MatSelectModule,
                 BrowserAnimationsModule,
+                MatSnackBarModule,
             ],
         }).compileComponents();
     }));

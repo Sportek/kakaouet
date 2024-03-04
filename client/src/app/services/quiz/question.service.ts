@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-// import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { BASE_URL } from '@app/constants';
 import { Question, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
@@ -19,7 +19,8 @@ export class QuestionService {
     private baseURL = BASE_URL + '/question';
 
     constructor(
-        private http: HttpClient, // private dialog: MatSnackBar,
+        private http: HttpClient,
+        private dialog: MatSnackBar,
     ) {}
 
     getQuestions(): Observable<Question[]> {
@@ -93,7 +94,7 @@ export class QuestionService {
         quiz.questions = [...quiz.questions, ...newQuestions].sort((questionA, questionB) => questionA._id.localeCompare(questionB._id));
     }
 
-    /* importQuestionToBank(question: Question): void {
+    importQuestionToBank(question: Question): void {
         const partialQuestionNoId: Partial<Question> = {
             label: question.label,
             points: question.points,
@@ -115,7 +116,7 @@ export class QuestionService {
                 });
             }
         });
-    }*/
+    }
 
     onQuestionListUpdate(modifiedQuestion: Question, quiz: Quiz) {
         // eslint-disable-next-line no-underscore-dangle

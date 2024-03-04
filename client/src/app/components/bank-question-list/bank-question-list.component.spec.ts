@@ -2,6 +2,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question, QuestionType } from '@common/types';
 import { of } from 'rxjs';
@@ -12,12 +13,13 @@ describe('BankQuestionListComponent', () => {
     let fixture: ComponentFixture<BankQuestionListComponent>;
     let questionService: QuestionService;
     let dialog: MatDialog;
+    const snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [BankQuestionListComponent],
-            imports: [HttpClientTestingModule, MatDialogModule, MatIconModule],
-            providers: [QuestionService],
+            imports: [HttpClientTestingModule, MatDialogModule, MatIconModule, MatSnackBarModule],
+            providers: [QuestionService, { provide: MatSnackBar, useValue: snackBarMock }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(BankQuestionListComponent);

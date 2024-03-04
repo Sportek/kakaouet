@@ -1,5 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Question, QuestionType } from '@common/types';
 import { Observable, of } from 'rxjs';
 import { QuestionService } from './question.service';
@@ -7,6 +8,7 @@ import { QuestionService } from './question.service';
 describe('QuestionService', () => {
     let service: QuestionService;
     let httpTestingController: HttpTestingController;
+    const snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     const mockQuestion: Question = {
         _id: '123',
@@ -25,9 +27,9 @@ describe('QuestionService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [QuestionService],
-        });
+            imports: [HttpClientTestingModule, MatSnackBarModule],
+            providers: [QuestionService, { provide: MatSnackBar, useValue: snackBarMock }],
+        }).compileComponents();
 
         service = TestBed.inject(QuestionService);
         httpTestingController = TestBed.inject(HttpTestingController);

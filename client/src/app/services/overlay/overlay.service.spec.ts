@@ -1,6 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { WORKING_QUIZ } from '@app/fake-quizzes';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Choice, Question, QuestionType } from '@common/types';
@@ -43,11 +44,14 @@ let WORKING_CHOICE: Choice;
 describe('OverlayService', () => {
     let service: OverlayService;
     let questionService: QuestionService;
+    const snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule, HttpClientTestingModule],
-        });
+            providers: [{ provide: MatSnackBar, useValue: snackBarMock }],
+            imports: [HttpClientModule, HttpClientTestingModule, MatSnackBarModule],
+        }).compileComponents();
+
         service = TestBed.inject(OverlayService);
         questionService = TestBed.inject(QuestionService);
         WORKING_QUESTION = cloneDeep(WORKING_QUIZ.questions[0] as Question);
