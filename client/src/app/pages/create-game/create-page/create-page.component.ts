@@ -1,22 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-create-page',
     templateUrl: './create-page.component.html',
     styleUrls: ['./create-page.component.scss'],
 })
-export class CreatePageComponent implements OnInit {
+export class CreatePageComponent implements OnInit, OnDestroy {
     games: Quiz[];
+    private quizSubscription: Subscription;
     constructor(private quizService: QuizService) {}
 
     ngOnInit() {
         this.getQuizzes();
     }
 
+    ngOnDestroy() {
+        if (this.quizSubscription) {
+            this.quizSubscription.unsubscribe();
+        }
+    }
+
     getQuizzes(): void {
-        this.quizService.getAllQuizzes().subscribe({
+        this.quizSubscription = this.quizService.getAllQuizzes().subscribe({
             next: (quizzes) => {
                 this.games = quizzes;
             },
