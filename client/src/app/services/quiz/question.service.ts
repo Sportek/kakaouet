@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
-import { Question } from '@common/types';
+import { Question, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -56,5 +56,28 @@ export class QuestionService {
     deleteQuestionById(id: string): Observable<void> {
         const url = `${this.baseURL}/${id}`;
         return this.http.delete<void>(url);
+    }
+
+    removeQuestion(question: Question, quiz: Quiz) {
+        const index: number = quiz.questions.indexOf(question);
+        if (index >= 0) quiz.questions.splice(index, 1);
+    }
+
+    moveUp(index: number, quiz: Quiz): void {
+        if (index > 0) {
+            const temp = quiz.questions[index];
+            quiz.questions[index] = quiz.questions[index - 1];
+            quiz.questions[index - 1] = temp;
+            quiz.questions = [...quiz.questions];
+        }
+    }
+
+    moveDown(index: number, quiz: Quiz): void {
+        if (index < quiz.questions.length - 1) {
+            const temp = quiz.questions[index];
+            quiz.questions[index] = quiz.questions[index + 1];
+            quiz.questions[index + 1] = temp;
+            quiz.questions = [...quiz.questions];
+        }
     }
 }

@@ -3,7 +3,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
-import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { QuizValidation, ValidateService } from '@app/services/validate/validate.service';
@@ -40,7 +39,6 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         private questionService: QuestionService,
         private validateService: ValidateService,
         private dialog: MatSnackBar,
-        private overlayService: OverlayService,
     ) {}
 
     ngOnInit() {
@@ -68,12 +66,12 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         this.showImportOverlay = false;
     }
 
-    moveChoiceUp(index: number): void {
-        this.overlayService.moveChoiceUp(index);
+    moveUp(index: number): void {
+        this.questionService.moveUp(index, this.quiz);
     }
 
-    moveChoiceDown(index: number): void {
-        this.overlayService.moveChoiceDown(index);
+    moveDown(index: number): void {
+        this.questionService.moveDown(index, this.quiz);
     }
 
     modifyQuestion(id: string): void {
@@ -118,8 +116,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     }
 
     removeQuestion(question: Question): void {
-        const index: number = this.quiz.questions.indexOf(question);
-        if (index >= 0) this.quiz.questions.splice(index, 1);
+        this.questionService.removeQuestion(question, this.quiz);
     }
 
     createQuiz(): void {
