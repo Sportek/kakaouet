@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
+import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { QuizValidation, ValidateService } from '@app/services/validate/validate.service';
@@ -20,8 +21,8 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     quiz: Quiz = {
         name: '',
         description: '',
-        duration: 0, // not sure if good idea to directly assign a number
-        visibility: false, // not sure if good idea to assign false directly
+        duration: 0,
+        visibility: false,
         questions: [],
         _id: '',
         createdAt: new Date(),
@@ -39,6 +40,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         private questionService: QuestionService,
         private validateService: ValidateService,
         private dialog: MatSnackBar,
+        private overlayService: OverlayService,
     ) {}
 
     ngOnInit() {
@@ -66,22 +68,12 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         this.showImportOverlay = false;
     }
 
-    moveUp(index: number): void {
-        if (index > 0) {
-            const temp = this.quiz.questions[index];
-            this.quiz.questions[index] = this.quiz.questions[index - 1];
-            this.quiz.questions[index - 1] = temp;
-            this.quiz.questions = [...this.quiz.questions];
-        }
+    moveChoiceUp(index: number): void {
+        this.overlayService.moveChoiceUp(index);
     }
 
-    moveDown(index: number): void {
-        if (index < this.quiz.questions.length - 1) {
-            const temp = this.quiz.questions[index];
-            this.quiz.questions[index] = this.quiz.questions[index + 1];
-            this.quiz.questions[index + 1] = temp;
-            this.quiz.questions = [...this.quiz.questions];
-        }
+    moveChoiceDown(index: number): void {
+        this.overlayService.moveChoiceDown(index);
     }
 
     modifyQuestion(id: string): void {
