@@ -4,6 +4,7 @@ import { BASE_URL } from '@app/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
+// eslint-disable-next-line no-restricted-imports
 import { QuizValidation } from '../validate/validate.service';
 
 @Injectable({

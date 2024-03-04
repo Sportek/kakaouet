@@ -114,33 +114,33 @@ describe('CreateUpdateQuizComponent', () => {
         });
     });
 
-    describe('moveUp', () => {
+    describe('moveQuestionUp', () => {
         it('should move the question up when index is greater than 0', () => {
             component.quiz.questions = [mockQuestion1, mockQuestion2];
-            component.moveUp(1);
+            component.moveQuestionUp(1);
             expect(component.quiz.questions).toEqual([mockQuestion2, mockQuestion1]);
         });
 
         it('should not move the question up when index is 0 or negative', () => {
             component.quiz.questions = [mockQuestion1, mockQuestion2];
-            component.moveUp(0);
+            component.moveQuestionUp(0);
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            component.moveUp(-1);
+            component.moveQuestionUp(-1);
             expect(component.quiz.questions).toEqual([mockQuestion1, mockQuestion2]);
         });
     });
 
-    describe('MoveDown', () => {
+    describe('moveQuestionDown', () => {
         it('should move the question down when index is less than the last index', () => {
             component.quiz.questions = [mockQuestion1, mockQuestion2];
-            component.moveDown(0);
+            component.moveQuestionDown(0);
             expect(component.quiz.questions).toEqual([mockQuestion2, mockQuestion1]);
         });
 
         it('should not move the question down when index is the last index or greater', () => {
             component.quiz.questions = [mockQuestion1, mockQuestion2];
-            component.moveDown(1);
-            component.moveDown(3);
+            component.moveQuestionDown(1);
+            component.moveQuestionDown(3);
             expect(component.quiz.questions).toEqual([mockQuestion1, mockQuestion2]);
         });
     });

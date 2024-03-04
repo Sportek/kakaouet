@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
 import { QuestionService } from '@app/services/quiz/question.service';
@@ -36,7 +37,8 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         private quizService: QuizService,
         private route: ActivatedRoute,
         private questionService: QuestionService,
-        private validateService: ValidateService, // private dialog: MatSnackBar,
+        private validateService: ValidateService,
+        private dialog: MatSnackBar,
     ) {}
 
     ngOnInit() {
@@ -128,8 +130,32 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         this.quizSubscription = this.quizService.addNewQuiz(newQuiz as Quiz).subscribe({});
     }
 
-    importQuestionToBank(question: Question): void {
+    /* importQuestionToBank(question: Question): void {
         this.questionService.importQuestionToBank(question);
+    }*/
+
+    importQuestionToBank(question: Question): void {
+        const partialQuestionNoId: Partial<Question> = {
+            label: question.label,
+            points: question.points,
+            createdAt: question.createdAt,
+            updatedAt: question.updatedAt,
+            type: question.type,
+        };
+        if (partialQuestionNoId.type === 'QCM' && question.type === 'QCM') partialQuestionNoId.choices = question.choices;
+        this.questionService.getQuestions().subscribe((questionsFromBank: Question[]) => {
+            const questionExistsInBank = questionsFromBank.some((existingQuestion: Question) => existingQuestion.label === partialQuestionNoId.label);
+            if (!questionExistsInBank) {
+                this.questionService.createQuestion(partialQuestionNoId as Question).subscribe({});
+                this.dialog.open('La question a bien était importé à la banque de question', 'Fermer', {
+                    duration: 3000,
+                });
+            } else {
+                this.dialog.open('La question existe deja dans la banque de question', 'Fermer', {
+                    duration: 3000,
+                });
+            }
+        });
     }
 
     onSubmit() {
@@ -150,6 +176,41 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     isError(): string | null {
         return this.quizService.isError(this.quiz);
     }
+
+    /* isError(): string | null {
+        if (!QuizValidation.checkRequiredName.callback({ name: this.quiz.name })) {
+            return QuizValidation.checkRequiredName.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxTitleLength.callback({ name: this.quiz.name })) {
+            return QuizValidation.checkMaxTitleLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxWordLength.callback({ name: this.quiz.name })) {
+            return QuizValidation.checkMaxWordLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkMinResponseTime.callback({ duration: this.quiz.duration })) {
+            return QuizValidation.checkMinResponseTime.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxResponseTime.callback({ duration: this.quiz.duration })) {
+            return QuizValidation.checkMaxResponseTime.errorMessage;
+        }
+
+        if (!QuizValidation.checkMinDescriptionLength.callback({ description: this.quiz.description })) {
+            return QuizValidation.checkMinDescriptionLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkMaxDescriptionLength.callback({ description: this.quiz.description })) {
+            return QuizValidation.checkMaxDescriptionLength.errorMessage;
+        }
+
+        if (!QuizValidation.checkRequiredQuestions.callback({ questions: this.quiz.questions })) {
+            return QuizValidation.checkRequiredQuestions.errorMessage;
+        }
+        return null;
+    }*/
 
     onQuestionListUpdate(modifiedQuestion: Question) {
         this.questionService.onQuestionListUpdate(modifiedQuestion, this.quiz);
