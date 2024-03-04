@@ -63,7 +63,7 @@ export class QuestionService {
         if (index >= 0) quiz.questions.splice(index, 1);
     }
 
-    moveUp(index: number, quiz: Quiz): void {
+    moveQuestionUp(index: number, quiz: Quiz): void {
         if (index > 0) {
             const temp = quiz.questions[index];
             quiz.questions[index] = quiz.questions[index - 1];
@@ -72,7 +72,7 @@ export class QuestionService {
         }
     }
 
-    moveDown(index: number, quiz: Quiz): void {
+    moveQuestionDown(index: number, quiz: Quiz): void {
         if (index < quiz.questions.length - 1) {
             const temp = quiz.questions[index];
             quiz.questions[index] = quiz.questions[index + 1];

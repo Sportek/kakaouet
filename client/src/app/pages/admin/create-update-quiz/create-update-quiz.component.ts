@@ -66,12 +66,16 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         this.showImportOverlay = false;
     }
 
-    moveUp(index: number): void {
-        this.questionService.moveUp(index, this.quiz);
+    moveQuestionUp(index: number): void {
+        this.questionService.moveQuestionUp(index, this.quiz);
     }
 
-    moveDown(index: number): void {
-        this.questionService.moveDown(index, this.quiz);
+    moveQuestionDown(index: number): void {
+        this.questionService.moveQuestionDown(index, this.quiz);
+    }
+
+    removeQuestion(question: Question): void {
+        this.questionService.removeQuestion(question, this.quiz);
     }
 
     modifyQuestion(id: string): void {
@@ -113,10 +117,6 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         updatedQuiz.visibility = this.quiz.visibility;
         const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
         this.quizSubscription = this.quizService.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
-    }
-
-    removeQuestion(question: Question): void {
-        this.questionService.removeQuestion(question, this.quiz);
     }
 
     createQuiz(): void {
