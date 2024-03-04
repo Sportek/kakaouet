@@ -66,20 +66,28 @@ describe('QuestionBankImportComponent', () => {
     it('should toggle question selection', () => {
         const question = mockQuestions[0];
         component.toggleQuestionSelection(question);
-        expect(component.selectedQuestions.has(question)).toBeTrue();
+        // eslint-disable-next-line no-underscore-dangle
+        expect(component.selectedQuestions.some((q) => q._id === question._id)).toBeTrue();
 
         component.toggleQuestionSelection(question);
-        expect(component.selectedQuestions.has(question)).toBeFalse();
+        // eslint-disable-next-line no-underscore-dangle
+        expect(component.selectedQuestions.some((q) => q._id === question._id)).toBeFalse();
     });
 
     it('should emit selected questions and clear selection on import', () => {
         const question = mockQuestions[0];
-        component.selectedQuestions.add(question);
+        component.toggleQuestionSelection(question);
 
         spyOn(component.questionsImported, 'emit');
         component.importQuestions();
 
         expect(component.questionsImported.emit).toHaveBeenCalledWith([question]);
-        expect(component.selectedQuestions.size).toBe(0);
+        expect(component.selectedQuestions.length).toBe(0);
+    });
+    it('should call importQuestions when import button is clicked', () => {
+        spyOn(component, 'importQuestions');
+        const button = fixture.debugElement.nativeElement.querySelector('.import-button');
+        button.click();
+        expect(component.importQuestions).toHaveBeenCalled();
     });
 });

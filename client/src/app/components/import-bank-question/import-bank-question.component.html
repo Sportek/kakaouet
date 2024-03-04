@@ -2,7 +2,7 @@
     <div class="title title-text">Importer des questions</div>
     <div class="questions-container">
         <div class="question" *ngFor="let question of questionsFromBank">
-            <input title="question" type="checkbox" (change)="toggleQuestionSelection(question)" [checked]="selectedQuestions.has(question)" />
+            <input title="question" type="checkbox" (change)="toggleQuestionSelection(question)" [checked]="isQuestionSelected(question)" />
             {{ question.label }}
         </div>
     </div>

@@ -1,17 +1,19 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question } from '@common/types';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-bank-question',
     templateUrl: './bank-question-list.component.html',
     styleUrls: ['./bank-question-list.component.scss'],
 })
-export class BankQuestionListComponent implements OnInit {
+export class BankQuestionListComponent implements OnInit, OnDestroy {
     @Input() visibility: string[];
     questionList: Question[] = [];
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         private questionService: QuestionService,
@@ -19,25 +21,22 @@ export class BankQuestionListComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        this.subscriptions.add(this.questionService.getQuestionUpdates().subscribe(() => this.getAllQuestions()));
         this.getAllQuestions();
-        this.questionService.getQuestionUpdates().subscribe(() => this.getAllQuestions());
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     getAllQuestions() {
-        this.questionService.getQuestions().subscribe({
-            next: (questions) => {
-                this.questionList = questions;
-                this.questionList = this.questionList.sort((a: Question, b: Question) => {
-                    const dateA = new Date(a.updatedAt);
-                    const dateB = new Date(b.updatedAt);
-                    if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
-                        return dateB.getTime() - dateA.getTime();
-                    } else {
-                        return 0;
-                    }
-                });
-            },
-        });
+        this.subscriptions.add(
+            this.questionService.getQuestions().subscribe({
+                next: (questions) => {
+                    this.questionList = questions.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+                },
+            }),
+        );
     }
 
     modifyQuestionById(id: string): void {
