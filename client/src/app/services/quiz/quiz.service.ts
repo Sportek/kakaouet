@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 @Injectable({
@@ -36,9 +36,9 @@ export class QuizService {
         return this.http.patch<Quiz>(url, quiz).pipe(tap(() => this.updateQuizzes()));
     }
 
-    deleteQuizById(id: string): Observable<void> {
+    deleteQuizById(id: string): void {
         const url = `${BASE_URL}/quiz/${id}`;
-        return this.http.delete<void>(url);
+        this.http.delete<void>(url).subscribe({});
     }
 
     requestCorrectAnswers(quizId: string, index: number): Observable<number[]> {
@@ -64,5 +64,39 @@ export class QuizService {
 
     getAmountOfQuizzes(): Observable<number> {
         return this.amountOfQuestions;
+    }
+
+    changeVisibility(quiz: Quiz): void {
+        quiz.visibility = !quiz.visibility;
+        // eslint-disable-next-line no-underscore-dangle
+        this.updateQuizById(quiz._id, quiz).subscribe({});
+    }
+
+    removeQuiz(quiz: Quiz, quizList: Quiz[]): Observable<Quiz[]> {
+        const index: number = quizList.indexOf(quiz);
+        // eslint-disable-next-line no-underscore-dangle
+        this.deleteQuizById(quizList[index]._id);
+        quizList.splice(index, 1);
+        return of(quizList);
+    }
+
+    generateQuizAsFile(quiz: Quiz) {
+        const quizNoVisibilityNoId: Partial<Quiz> = {
+            name: quiz.name,
+            description: quiz.description,
+            duration: quiz.duration,
+            questions: quiz.questions,
+            createdAt: quiz.createdAt,
+            updatedAt: quiz.updatedAt,
+        };
+        const fileContent = JSON.stringify(quizNoVisibilityNoId);
+        const blob = new Blob([fileContent], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = quiz.name + '.json';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 }
