@@ -30,8 +30,8 @@ describe('ChatComponent', () => {
 
         const user = component.getGameUser('123') as GameUser;
 
-        expect(user._id).toEqual('123');
-        expect(user.name).toEqual('John Doe');
+        expect(user?._id).toEqual('123');
+        expect(user?.name).toEqual('John Doe');
     });
 
     it('should return empty user if incorrect id', () => {

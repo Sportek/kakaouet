@@ -6,7 +6,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ImportGameComponent } from '@app/components/import-game/import-game.component';
-import { BAD_QUIZ, WORKING_QUIZ } from '@app/services//validate/fake-quizzes';
+import { BAD_QUIZ, WORKING_QUIZ } from '@app/fake-quizzes';
 import { ValidateService } from '@app/services//validate/validate.service';
 import { ValidatedObject } from '@app/services//validate/validated-object';
 import { QuizService } from '@app/services/quiz/quiz.service';
