@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
@@ -71,6 +72,46 @@ export class QuizService {
         return this.amountOfQuestions;
     }
 
+    createQuiz(quiz: Quiz): void {
+        const newQuiz: Partial<Quiz> = {
+            name: quiz.name,
+            description: quiz.description,
+            duration: quiz.duration,
+            visibility: false,
+            questions: quiz.questions,
+        };
+        this.addNewQuiz(newQuiz as Quiz).subscribe({});
+    }
+
+    getQuiz(id: string, quiz: Quiz): void {
+        this.getQuizById(id).subscribe({
+            next: (quizToGet) => {
+                quiz.name = quizToGet.name;
+                quiz.duration = quizToGet.duration;
+                quiz.description = quizToGet.description;
+                quiz._id = quizToGet._id;
+                quiz.questions = quizToGet.questions;
+                quiz.visibility = quizToGet.visibility;
+                quiz.updatedAt = quizToGet.updatedAt;
+                quiz.createdAt = quizToGet.createdAt;
+                quiz = quizToGet;
+                this.specifyAmountOfQuizzes(quiz.questions.length);
+            },
+        });
+    }
+
+    updateQuiz(updatedQuiz: Quiz, quiz: Quiz): void {
+        updatedQuiz.name = quiz.name;
+        updatedQuiz.description = quiz.description;
+        updatedQuiz.duration = quiz.duration;
+        updatedQuiz.visibility = false;
+        updatedQuiz.questions = quiz.questions;
+        updatedQuiz.updatedAt = new Date();
+        updatedQuiz.visibility = quiz.visibility;
+        const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
+        this.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
+    }
+
     isError(quiz: Quiz): string | null {
         if (!QuizValidation.checkRequiredName.callback({ name: quiz.name })) {
             return QuizValidation.checkRequiredName.errorMessage;
@@ -104,29 +145,5 @@ export class QuizService {
             return QuizValidation.checkRequiredQuestions.errorMessage;
         }
         return null;
-    }
-
-    createQuiz(quiz: Quiz): void {
-        const newQuiz: Partial<Quiz> = {
-            name: quiz.name,
-            description: quiz.description,
-            duration: quiz.duration,
-            visibility: false,
-            questions: quiz.questions,
-        };
-        this.addNewQuiz(newQuiz as Quiz).subscribe({});
-    }
-
-    updateQuiz(updatedQuiz: Quiz, quiz: Quiz): void {
-        updatedQuiz.name = quiz.name;
-        updatedQuiz.description = quiz.description;
-        updatedQuiz.duration = quiz.duration;
-        updatedQuiz.visibility = false;
-        updatedQuiz.questions = quiz.questions;
-        updatedQuiz.updatedAt = new Date();
-        updatedQuiz.visibility = quiz.visibility;
-        const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
-        // eslint-disable-next-line no-underscore-dangle
-        this.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
     }
 }

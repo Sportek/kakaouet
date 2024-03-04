@@ -30,11 +30,10 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     private quizSubscription: Subscription | undefined;
     private questionSubscription: Subscription | undefined;
 
-    // eslint-disable-next-line max-params
     constructor(
         private quizService: QuizService,
         private route: ActivatedRoute,
-        private questionService: QuestionService, // private validateService: ValidateService, // private dialog: MatSnackBar,
+        private questionService: QuestionService,
     ) {}
 
     ngOnInit() {
@@ -83,21 +82,8 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         this.showImportOverlay = false;
     }
 
-    getQuiz(id: string): void {
-        this.quizSubscription = this.quizService.getQuizById(id).subscribe({
-            next: (quizToGet) => {
-                this.quiz.name = quizToGet.name;
-                this.quiz.duration = quizToGet.duration;
-                this.quiz.description = quizToGet.description;
-                this.quiz._id = quizToGet._id;
-                this.quiz.questions = quizToGet.questions;
-                this.quiz.visibility = quizToGet.visibility;
-                this.quiz.updatedAt = quizToGet.updatedAt;
-                this.quiz.createdAt = quizToGet.createdAt;
-                this.quiz = quizToGet;
-                this.quizService.specifyAmountOfQuizzes(this.quiz.questions.length);
-            },
-        });
+    getQuiz(id: string) {
+        this.quizService.getQuiz(id, this.quiz);
     }
 
     updateQuiz(updatedQuiz: Quiz): void {
