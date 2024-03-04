@@ -83,11 +83,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     }
 
     handleQuestionsImported(importedQuestions: Question[]): void {
-        const newQuestions = importedQuestions.filter(
-            (importedQuestion) => !this.quiz.questions.some((existingQuestion) => existingQuestion._id === importedQuestion._id),
-        );
-        this.quiz.questions = [...this.quiz.questions, ...newQuestions].sort((questionA, questionB) => questionA._id.localeCompare(questionB._id));
-        this.showImportOverlay = false;
+        this.questionService.handleQuestionsImported(importedQuestions, this.quiz, this.showImportOverlay);
     }
 
     getQuiz(id: string): void {
