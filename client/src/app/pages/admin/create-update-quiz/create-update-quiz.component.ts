@@ -1,18 +1,17 @@
 /* eslint-disable no-underscore-dangle */
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Question, Quiz } from '@common/types';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-create-update-quiz',
     templateUrl: './create-update-quiz.component.html',
     styleUrls: ['./create-update-quiz.component.scss'],
 })
-export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
+export class CreateUpdateQuizComponent implements OnInit {
     @ViewChild(QuizQuestionOverlayComponent) quizQuestionOverlayComponent!: QuizQuestionOverlayComponent;
 
     quiz: Quiz = {
@@ -27,8 +26,6 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     };
 
     showImportOverlay = false;
-    private quizSubscription: Subscription | undefined;
-    private questionSubscription: Subscription | undefined;
 
     constructor(
         private quizService: QuizService,
@@ -41,15 +38,6 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         const gameIdFromRoute = routeParams.get('id');
         if (gameIdFromRoute) {
             this.getQuiz(gameIdFromRoute);
-        }
-    }
-
-    ngOnDestroy() {
-        if (this.quizSubscription) {
-            this.quizSubscription.unsubscribe();
-        }
-        if (this.questionSubscription) {
-            this.questionSubscription.unsubscribe();
         }
     }
 

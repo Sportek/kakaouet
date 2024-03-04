@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -87,10 +88,8 @@ export class QuestionService {
 
     handleQuestionsImported(importedQuestions: Question[], quiz: Quiz): void {
         const newQuestions = importedQuestions.filter(
-            // eslint-disable-next-line no-underscore-dangle
             (importedQuestion) => !quiz.questions.some((existingQuestion) => existingQuestion._id === importedQuestion._id),
         );
-        // eslint-disable-next-line no-underscore-dangle
         quiz.questions = [...quiz.questions, ...newQuestions].sort((questionA, questionB) => questionA._id.localeCompare(questionB._id));
     }
 
@@ -119,7 +118,6 @@ export class QuestionService {
     }
 
     onQuestionListUpdate(modifiedQuestion: Question, quiz: Quiz) {
-        // eslint-disable-next-line no-underscore-dangle
         const index = quiz.questions.findIndex((question) => question._id === modifiedQuestion._id);
         if (index < 0) {
             quiz.questions.push(modifiedQuestion);
