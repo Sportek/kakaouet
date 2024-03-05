@@ -10,7 +10,7 @@
                     <mat-icon class="title-text delete-icon" (click)="deleteQuestion(question)">delete</mat-icon>
                 </div>
                 <div class="date">
-                    <div class="small-text">{{ 'Modifié le: ' + (question.updatedAt | date: 'yyyy/MM/dd HH:mm') }}</div>
+                    <div class="small-text">{{ 'Modifié le: ' + (question.lastModified | date: 'yyyy/MM/dd HH:mm') }}</div>
                 </div>
             </div>
         </div>
