@@ -58,7 +58,7 @@ export interface BaseQuestion {
     label: string;
     points: number;
     createdAt: Date;
-    updatedAt: Date;
+    lastModified: Date;
 }
 
 export type Question =
@@ -95,7 +95,7 @@ export interface Quiz {
     visibility: boolean;
     questions: Question[];
     createdAt: Date;
-    updatedAt: Date;
+    lastModified: Date;
 }
 
 export interface Message {
