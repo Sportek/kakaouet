@@ -65,12 +65,12 @@ describe('ValidateService', () => {
                     points: 20,
                     choices: [],
                     createdAt: new Date(),
-                    updatedAt: new Date(),
+                    lastModified: new Date(),
                 },
             ],
             visibility: false,
             createdAt: new Date(),
-            updatedAt: new Date(),
+            lastModified: new Date(),
         };
 
         const validate = service.validateQuiz(quizWithLongWord);
