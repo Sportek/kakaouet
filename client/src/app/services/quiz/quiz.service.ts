@@ -42,9 +42,9 @@ export class QuizService {
         return this.http.patch<Quiz>(url, quiz).pipe(tap(() => this.updateQuizzes()));
     }
 
-    deleteQuizById(id: string): Observable<void> {
+    deleteQuizById(id: string): void {
         const url = `${BASE_URL}/quiz/${id}`;
-        return this.http.delete<void>(url);
+        this.http.delete<void>(url).subscribe({});
     }
 
     requestCorrectAnswers(quizId: string, index: number): Observable<number[]> {
