@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 // eslint-disable-next-line no-restricted-imports
 import { QuizValidation, ValidateService } from '../validate/validate.service';
@@ -145,5 +145,39 @@ export class QuizService {
             return QuizValidation.checkRequiredQuestions.errorMessage;
         }
         return null;
+    }
+
+    changeVisibility(quiz: Quiz): void {
+        quiz.visibility = !quiz.visibility;
+        // eslint-disable-next-line no-underscore-dangle
+        this.updateQuizById(quiz._id, quiz).subscribe({});
+    }
+
+    removeQuiz(quiz: Quiz, quizList: Quiz[]): Observable<Quiz[]> {
+        const index: number = quizList.indexOf(quiz);
+        // eslint-disable-next-line no-underscore-dangle
+        this.deleteQuizById(quizList[index]._id);
+        quizList.splice(index, 1);
+        return of(quizList);
+    }
+
+    generateQuizAsFile(quiz: Quiz) {
+        const quizNoVisibilityNoId: Partial<Quiz> = {
+            name: quiz.name,
+            description: quiz.description,
+            duration: quiz.duration,
+            questions: quiz.questions,
+            createdAt: quiz.createdAt,
+            updatedAt: quiz.updatedAt,
+        };
+        const fileContent = JSON.stringify(quizNoVisibilityNoId);
+        const blob = new Blob([fileContent], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = quiz.name + '.json';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 }
