@@ -40,7 +40,7 @@ export class QuizQuestionOverlayComponent implements OnInit {
         label: '',
         points: Variables.MinScore,
         createdAt: new Date(),
-        updatedAt: new Date(),
+        lastModified: new Date(),
     };
     currentQuestion: Question = cloneDeep(this.baseQuestion as Question);
     choiceModifier: Map<Choice, boolean> = new Map<Choice, boolean>();

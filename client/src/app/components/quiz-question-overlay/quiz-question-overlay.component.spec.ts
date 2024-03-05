@@ -27,7 +27,7 @@ const mockQuestion: Question = {
         { _id: 2, label: 'Incorrect Answer', isCorrect: false },
     ],
     createdAt: new Date(),
-    updatedAt: new Date(),
+    lastModified: new Date(),
 };
 
 describe('QuizQuestionOverlayComponent', () => {
