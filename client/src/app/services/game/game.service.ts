@@ -1,9 +1,9 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Timer } from '@app/classes/timer';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { TimeService } from '@app/services/timer/time.service';
-import { Timer } from '@app/services/timer/timer';
 import { AnswerState, Game, GameRole, GameState, GameType, GameUser, Question } from '@common/types';
 import { BehaviorSubject, Observable, catchError, firstValueFrom, throwError } from 'rxjs';
 

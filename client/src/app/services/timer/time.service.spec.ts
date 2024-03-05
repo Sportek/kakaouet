@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed, discardPeriodicTasks, fakeAsync, flush, tick } from '@angular/core/testing';
 
+import { Timer } from '@app/classes/timer';
 import { TimeService } from './time.service';
-import { Timer } from './timer';
 
 describe('TimeService', () => {
     let service: TimeService;

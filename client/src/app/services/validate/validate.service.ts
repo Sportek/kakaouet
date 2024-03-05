@@ -1,21 +1,9 @@
 import { Injectable } from '@angular/core';
+import { Validate } from '@app/classes/validate';
+import { ValidatedObject } from '@app/classes/validated-object';
+import { Variables } from '@common/enum-variables';
 import { Choice, Question, QuestionType, Quiz } from '@common/types';
 import { ZodSchema, z } from 'zod';
-import { Validate } from './validate';
-import { ValidatedObject } from './validated-object';
-
-const TITLE_MAX_LENGTH = 150;
-const DESCRIPTION_MAX_LENGTH = 200;
-const DESCRIPTION_MIN_LENGTH = 10;
-const WORD_MAX_LENGTH = 27;
-const MAX_RESPONSE_TIME = 60;
-const MIN_RESPONSE_TIME = 10;
-const RESPONSE_TIME_STEP = 10;
-const MIN_CHOICES_AMOUNT = 2;
-const MAX_CHOICES_AMOUNT = 4;
-const MAX_QUESTION_POINTS = 100;
-const MIN_QUESTION_POINTS = 10;
-const QUESTION_POINTS_STEP = 10;
 
 @Injectable({
     providedIn: 'root',
@@ -132,7 +120,7 @@ export namespace QuizValidation {
     export const checkRequiredName = new Validate((quiz: Quiz) => !!quiz.name.trim(), "Le nom d'un quiz est requis");
 
     export const checkMaxTitleLength = new Validate(
-        (quiz: Quiz) => quiz.name.trim().length < TITLE_MAX_LENGTH,
+        (quiz: Quiz) => quiz.name.trim().length < Variables.MaxTitleCharacters,
         'Le titre doit avoir moins de 150 caractères',
     );
 
@@ -140,7 +128,7 @@ export namespace QuizValidation {
         let isValidated = true;
         const words = quiz.name.split(' ');
         for (const word of words) {
-            if (word.length > WORD_MAX_LENGTH) {
+            if (word.length > Variables.MaxWordLength) {
                 isValidated = false;
             }
         }
@@ -148,13 +136,13 @@ export namespace QuizValidation {
     }, 'Le titre ne doit pas contenir de mots plus grands que 27 caractères');
 
     export const checkMaxDescriptionLength = new Validate(
-        (quiz: Quiz) => quiz.description.trim().length < DESCRIPTION_MAX_LENGTH,
-        `La description doit faire moins de ${DESCRIPTION_MAX_LENGTH} caractères`,
+        (quiz: Quiz) => quiz.description.trim().length < Variables.MaxCharacters,
+        `La description doit faire moins de ${Variables.MaxCharacters} caractères`,
     );
 
     export const checkMinDescriptionLength = new Validate(
-        (quiz: Quiz) => quiz.description.trim().length > DESCRIPTION_MIN_LENGTH,
-        `La description doit faire plus de ${DESCRIPTION_MIN_LENGTH} caractères`,
+        (quiz: Quiz) => quiz.description.trim().length > Variables.MinCharacters,
+        `La description doit faire plus de ${Variables.MinCharacters} caractères`,
     );
 
     export const checkRequiredDescription = new Validate((quiz: Quiz) => !!quiz.description.trim(), "La description d'un quiz est requise");
@@ -162,18 +150,18 @@ export namespace QuizValidation {
     export const checkRequiredQuestions = new Validate((quiz: Quiz) => quiz.questions.length > 0, 'Un quiz doit avoir au moins une question');
 
     export const checkMaxResponseTime = new Validate(
-        (quiz: Quiz) => quiz.duration <= MAX_RESPONSE_TIME,
-        `Le temps de réponse doit être inférieur à ${MAX_RESPONSE_TIME} secondes`,
+        (quiz: Quiz) => quiz.duration <= Variables.MaxTime,
+        `Le temps de réponse doit être inférieur à ${Variables.MaxTime} secondes`,
     );
 
     export const checkMinResponseTime = new Validate(
-        (quiz: Quiz) => quiz.duration >= MIN_RESPONSE_TIME,
-        `Le temps de réponse doit être supérieur à ${MIN_RESPONSE_TIME} secondes`,
+        (quiz: Quiz) => quiz.duration >= Variables.MinTime,
+        `Le temps de réponse doit être supérieur à ${Variables.MinTime} secondes`,
     );
 
     export const checkFormatResponseTime = new Validate(
-        (quiz: Quiz) => quiz.duration % RESPONSE_TIME_STEP === 0,
-        `Le temps de réponse doit être un multiple de ${RESPONSE_TIME_STEP} secondes`,
+        (quiz: Quiz) => quiz.duration % Variables.TimeStep === 0,
+        `Le temps de réponse doit être un multiple de ${Variables.TimeStep} secondes`,
     );
 }
 
@@ -187,22 +175,22 @@ export namespace QuestionValidation {
 
     export const checkEnoughChoices = new Validate((question: Question) => {
         if (question.type !== QuestionType.QCM) return true;
-        return question.choices.length >= MIN_CHOICES_AMOUNT && question.choices.length <= MAX_CHOICES_AMOUNT;
+        return question.choices.length >= Variables.QCMMinChoicesAmount && question.choices.length <= Variables.QCMMaxChoicesAmount;
     }, 'Une question QCM doit avoir de deux à quatre réponses');
 
     export const checkMaxPoints = new Validate(
-        (question: Question) => question.points <= MAX_QUESTION_POINTS,
-        `Le nombre de points doit être inférieur à ${MAX_QUESTION_POINTS}`,
+        (question: Question) => question.points <= Variables.MaxScore,
+        `Le nombre de points doit être inférieur à ${Variables.MaxScore}`,
     );
 
     export const checkMinPoints = new Validate(
-        (question: Question) => question.points >= MIN_QUESTION_POINTS,
-        `Le nombre de points doit être supérieur à ${MIN_QUESTION_POINTS}`,
+        (question: Question) => question.points >= Variables.MinScore,
+        `Le nombre de points doit être supérieur à ${Variables.MinScore}`,
     );
 
     export const checkFormatPoints = new Validate(
-        (question: Question) => question.points % QUESTION_POINTS_STEP === 0,
-        `Le nombre de points doit être un multiple de ${QUESTION_POINTS_STEP}`,
+        (question: Question) => question.points % Variables.ScoreStep === 0,
+        `Le nombre de points doit être un multiple de ${Variables.ScoreStep}`,
     );
 
     export const checkRequiredAnswers = new Validate((question: Question) => {
