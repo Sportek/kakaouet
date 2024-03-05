@@ -22,7 +22,7 @@ describe('QuizComponent', () => {
                 visibility: true,
                 questions: [],
                 createdAt: new Date(),
-                updatedAt: new Date(),
+                lastModified: new Date(),
             },
         ];
         const mockQuiz: Quiz = {
@@ -33,7 +33,7 @@ describe('QuizComponent', () => {
             visibility: true,
             questions: [],
             createdAt: new Date(),
-            updatedAt: new Date(),
+            lastModified: new Date(),
         };
 
         TestBed.configureTestingModule({
