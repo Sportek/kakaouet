@@ -15,6 +15,9 @@ export class ImportGameComponent {
     ) {}
 
     async onFileUpload(event: Event): Promise<boolean> {
-        return this.fileService.onFileUpload(event);
+        const response = await this.fileService.onFileUpload(event);
+        const input = event.target as HTMLInputElement;
+        input.value = '';
+        return response;
     }
 }
