@@ -25,7 +25,7 @@ const mockQuestion1 = {
     label: 'Question 1',
     points: 10,
     createdAt: currentDate,
-    updatedAt: currentDate,
+    lastModified: currentDate,
     type: QuestionType.QCM,
     choices: [
         { _id: 1, label: 'Choice 1', isCorrect: true },
@@ -38,7 +38,7 @@ const mockQuestion2 = {
     label: 'Question 2',
     points: 5,
     createdAt: new Date('2024-02-12T00:00:00'),
-    updatedAt: new Date('2024-02-12T00:00:00'),
+    lastModified: new Date('2024-02-12T00:00:00'),
     type: QuestionType.QRL,
 } as Question;
 
@@ -51,7 +51,7 @@ const mockQuiz: Quiz = {
     visibility: true,
     questions: [mockQuestion1, mockQuestion2],
     createdAt: currentDate,
-    updatedAt: currentDate,
+    lastModified: currentDate,
 };
 
 describe('CreateUpdateQuizComponent', () => {
@@ -171,7 +171,7 @@ describe('CreateUpdateQuizComponent', () => {
         it('should update the quiz and call updateQuizById with the correct parameters', () => {
             const updatedQuiz: Quiz = cloneDeep(mockQuiz);
             updatedQuiz.name = 'Updated Quiz Name';
-            updatedQuiz.updatedAt = new Date();
+            updatedQuiz.lastModified = new Date();
 
             component.quiz.name = updatedQuiz.name;
             component.quiz.description = updatedQuiz.description;
@@ -207,7 +207,7 @@ describe('CreateUpdateQuizComponent', () => {
                 label: 'Question 5',
                 points: 8,
                 createdAt: new Date('2024-02-12T00:00:00'),
-                updatedAt: new Date('2024-02-12T00:00:00'),
+                lastModified: new Date('2024-02-12T00:00:00'),
                 type: QuestionType.QCM,
                 choices: [
                     { _id: 1, label: 'Choice 1', isCorrect: true },
@@ -230,7 +230,7 @@ describe('CreateUpdateQuizComponent', () => {
                 visibility: false,
                 questions: [mockQuestion1, mockQuestion2],
                 createdAt: new Date(),
-                updatedAt: new Date(),
+                lastModified: new Date(),
             };
 
             component.quiz.name = newQuiz.name;
@@ -258,7 +258,7 @@ describe('CreateUpdateQuizComponent', () => {
                 label: 'Question 1',
                 points: 10,
                 createdAt: currentDate,
-                updatedAt: currentDate,
+                lastModified: currentDate,
                 type: QuestionType.QCM,
                 choices: [
                     { _id: 1, label: 'Choice 1', isCorrect: true },
@@ -411,7 +411,7 @@ describe('CreateUpdateQuizComponent', () => {
                 label: 'Question 3',
                 points: 8,
                 createdAt: new Date(),
-                updatedAt: new Date(),
+                lastModified: new Date(),
                 type: QuestionType.QCM,
                 choices: [],
             };
@@ -430,7 +430,7 @@ describe('CreateUpdateQuizComponent', () => {
                 label: 'Modified Question 1',
                 points: 8,
                 createdAt: new Date(),
-                updatedAt: new Date(),
+                lastModified: new Date(),
                 type: QuestionType.QCM,
                 choices: [],
             };
@@ -460,7 +460,7 @@ describe('CreateUpdateQuizComponent', () => {
             expect(component.quiz._id).toEqual(mockQuiz._id);
             expect(component.quiz.questions).toEqual(mockQuiz.questions);
             expect(component.quiz.visibility).toEqual(mockQuiz.visibility);
-            expect(component.quiz.updatedAt).toEqual(mockQuiz.updatedAt);
+            expect(component.quiz.lastModified).toEqual(mockQuiz.lastModified);
             expect(component.quiz.createdAt).toEqual(mockQuiz.createdAt);
 
             expect(specifyAmountOfQuizzesSpy).toHaveBeenCalledWith(mockQuiz.questions.length);
