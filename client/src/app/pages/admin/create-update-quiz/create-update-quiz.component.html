@@ -9,7 +9,7 @@
             <ng-template #createNewGame>
                 <div class="title title-text">Création d'un nouveau jeu</div>
             </ng-template>
-            <div *ngIf="isError()" class="white-text">{{ isError() }}</div>
+            <div *ngIf="hasError()" class="white-text">{{ hasError() }}</div>
             <div class="box">
                 <form #quizForm="ngForm" (ngSubmit)="onSubmit()">
                     <mat-form-field appearance="fill">
@@ -71,10 +71,10 @@
             </div>
             <div class="buttons">
                 <button routerLink="/admin/login" mat-raised-button color="primary" class="red">Annuler</button>
-                <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()" *ngIf="!isError()">
+                <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()" *ngIf="!hasError()">
                     Enregistrer
                 </button>
-                <button mat-raised-button [disabled]="true" class="disabled-button" class="green" *ngIf="isError()">Enregistrer</button>
+                <button mat-raised-button [disabled]="true" class="disabled-button" class="green" *ngIf="hasError()">Enregistrer</button>
             </div>
         </div>
     </div>

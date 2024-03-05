@@ -112,38 +112,25 @@ export class QuizService {
         this.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
     }
 
-    isError(quiz: Quiz): string | null {
-        if (!QuizValidation.checkRequiredName.callback({ name: quiz.name })) {
-            return QuizValidation.checkRequiredName.errorMessage;
+    hasError(quiz: Quiz): string | null {
+        const validations = [
+            { validate: QuizValidation.checkRequiredName, value: { name: quiz.name } },
+            { validate: QuizValidation.checkMaxTitleLength, value: { name: quiz.name } },
+            { validate: QuizValidation.checkMaxWordLength, value: { name: quiz.name } },
+            { validate: QuizValidation.checkMinResponseTime, value: { duration: quiz.duration } },
+            { validate: QuizValidation.checkMaxResponseTime, value: { duration: quiz.duration } },
+            { validate: QuizValidation.checkMinDescriptionLength, value: { description: quiz.description } },
+            { validate: QuizValidation.checkMaxDescriptionLength, value: { description: quiz.description } },
+            { validate: QuizValidation.checkRequiredQuestions, value: { questions: quiz.questions } },
+        ];
+
+        for (const validation of validations) {
+            const { validate, value } = validation;
+            if (!validate.callback(value)) {
+                return validate.errorMessage;
+            }
         }
 
-        if (!QuizValidation.checkMaxTitleLength.callback({ name: quiz.name })) {
-            return QuizValidation.checkMaxTitleLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxWordLength.callback({ name: quiz.name })) {
-            return QuizValidation.checkMaxWordLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMinResponseTime.callback({ duration: quiz.duration })) {
-            return QuizValidation.checkMinResponseTime.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxResponseTime.callback({ duration: quiz.duration })) {
-            return QuizValidation.checkMaxResponseTime.errorMessage;
-        }
-
-        if (!QuizValidation.checkMinDescriptionLength.callback({ description: quiz.description })) {
-            return QuizValidation.checkMinDescriptionLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkMaxDescriptionLength.callback({ description: quiz.description })) {
-            return QuizValidation.checkMaxDescriptionLength.errorMessage;
-        }
-
-        if (!QuizValidation.checkRequiredQuestions.callback({ questions: quiz.questions })) {
-            return QuizValidation.checkRequiredQuestions.errorMessage;
-        }
         return null;
     }
 

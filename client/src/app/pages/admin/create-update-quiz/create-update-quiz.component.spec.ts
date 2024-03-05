@@ -328,20 +328,20 @@ describe('CreateUpdateQuizComponent', () => {
         });
     });
 
-    describe('isError', () => {
+    describe('hasError', () => {
         it('should give no error message', () => {
             component.quiz.name = 'TestId';
             component.quiz.duration = 10;
             component.quiz.description = 'Voici un quiz de test';
             component.quiz.questions = [mockQuestion1];
 
-            expect(component.isError()).toBe(null);
+            expect(component.hasError()).toBe(null);
         });
 
         it('should trigger empty title error', () => {
             component.quiz.name = '';
 
-            expect(component.isError()).toBe(QuizValidation.checkRequiredName.errorMessage);
+            expect(component.hasError()).toBe(QuizValidation.checkRequiredName.errorMessage);
         });
 
         it('should trigger too long title error', () => {
@@ -349,7 +349,7 @@ describe('CreateUpdateQuizComponent', () => {
                 // eslint-disable-next-line max-len
                 'Ce titre est très loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong';
 
-            expect(component.isError()).toBe(QuizValidation.checkMaxTitleLength.errorMessage);
+            expect(component.hasError()).toBe(QuizValidation.checkMaxTitleLength.errorMessage);
         });
 
         it('should trigger too long word in title error', () => {
@@ -357,21 +357,21 @@ describe('CreateUpdateQuizComponent', () => {
                 // eslint-disable-next-line max-len
                 'Ce mot est très looooooooooooooooooooooooooooooooooong';
 
-            expect(component.isError()).toBe(QuizValidation.checkMaxWordLength.errorMessage);
+            expect(component.hasError()).toBe(QuizValidation.checkMaxWordLength.errorMessage);
         });
 
         it('should trigger too short answer duration error', () => {
             component.quiz.name = 'TestId';
             component.quiz.duration = 1;
 
-            expect(component.isError()).toBe(QuizValidation.checkMinResponseTime.errorMessage);
+            expect(component.hasError()).toBe(QuizValidation.checkMinResponseTime.errorMessage);
         });
 
         it('should trigger too long answer duration error', () => {
             component.quiz.name = 'TestId';
             component.quiz.duration = 100;
 
-            expect(component.isError()).toBe(QuizValidation.checkMaxResponseTime.errorMessage);
+            expect(component.hasError()).toBe(QuizValidation.checkMaxResponseTime.errorMessage);
         });
 
         it('should trigger too short description error', () => {
@@ -379,7 +379,7 @@ describe('CreateUpdateQuizComponent', () => {
             component.quiz.duration = 10;
             component.quiz.description = '';
 
-            expect(component.isError()).toBe(QuizValidation.checkMinDescriptionLength.errorMessage);
+            expect(component.hasError()).toBe(QuizValidation.checkMinDescriptionLength.errorMessage);
         });
 
         it('should trigger too long description error', () => {
@@ -389,7 +389,7 @@ describe('CreateUpdateQuizComponent', () => {
                 // eslint-disable-next-line max-len
                 'Cette description est très loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongue';
 
-            expect(component.isError()).toBe(QuizValidation.checkMaxDescriptionLength.errorMessage);
+            expect(component.hasError()).toBe(QuizValidation.checkMaxDescriptionLength.errorMessage);
         });
 
         it('should trigger missing questions error message', () => {
@@ -398,7 +398,7 @@ describe('CreateUpdateQuizComponent', () => {
             component.quiz.description = 'Voici un quiz de test';
             component.quiz.questions = [];
 
-            expect(component.isError()).toBe(QuizValidation.checkRequiredQuestions.errorMessage);
+            expect(component.hasError()).toBe(QuizValidation.checkRequiredQuestions.errorMessage);
         });
     });
 

@@ -101,8 +101,8 @@ export class CreateUpdateQuizComponent implements OnInit {
         }
     }
 
-    isError(): string | null {
-        return this.quizService.isError(this.quiz);
+    hasError(): string | null {
+        return this.quizService.hasError(this.quiz);
     }
 
     onQuestionListUpdate(modifiedQuestion: Question) {
