@@ -149,13 +149,11 @@ export class QuizService {
 
     changeVisibility(quiz: Quiz): void {
         quiz.visibility = !quiz.visibility;
-        // eslint-disable-next-line no-underscore-dangle
         this.updateQuizById(quiz._id, quiz).subscribe({});
     }
 
     removeQuiz(quiz: Quiz, quizList: Quiz[]): Observable<Quiz[]> {
         const index: number = quizList.indexOf(quiz);
-        // eslint-disable-next-line no-underscore-dangle
         this.deleteQuizById(quizList[index]._id);
         quizList.splice(index, 1);
         return of(quizList);
