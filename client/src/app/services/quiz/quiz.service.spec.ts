@@ -2,6 +2,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 import { BASE_URL } from '@app/constants';
 import { QuestionFeedback, QuestionType, Quiz } from '@common/types';
+import { of } from 'rxjs';
 import { QuizService } from './quiz.service';
 
 describe('QuizService', () => {
@@ -99,9 +100,7 @@ describe('QuizService', () => {
     it('should delete a quiz by id', () => {
         const quizId = '1';
 
-        service.deleteQuizById(quizId).subscribe((response) => {
-            expect(response).toBeNull();
-        });
+        service.deleteQuizById(quizId);
 
         const req = httpTestingController.expectOne(`${BASE_URL}/quiz/${quizId}`);
         expect(req.request.method).toEqual('DELETE');
@@ -160,5 +159,41 @@ describe('QuizService', () => {
         service.specifyAmountOfQuizzes(1);
 
         expect(spy).toHaveBeenCalledWith(1);
+    });
+
+    // new tests
+    it('should change visibility of a quiz', () => {
+        const quiz = mockQuiz;
+        const originalVisibility = quiz.visibility;
+        const updateQuizByIdSpy = spyOn(service, 'updateQuizById').and.returnValue(of(quiz));
+        service.changeVisibility(quiz);
+        // eslint-disable-next-line no-underscore-dangle
+        expect(updateQuizByIdSpy).toHaveBeenCalledWith(quiz._id, quiz);
+        expect(quiz.visibility).not.toBe(originalVisibility);
+    });
+
+    it('should remove a quiz', () => {
+        const quiz = mockQuiz;
+        const quizList = [mockQuiz];
+        const deleteQuizByIdSpy = spyOn(service, 'deleteQuizById');
+        service.removeQuiz(quiz, quizList);
+        // eslint-disable-next-line no-underscore-dangle
+        expect(deleteQuizByIdSpy).toHaveBeenCalledWith(quiz._id);
+    });
+
+    it('should generate a quiz as a file', () => {
+        const createObjectURLSpy = spyOn(window.URL, 'createObjectURL');
+        const createElementSpy = spyOn(document, 'createElement').and.callThrough();
+        const appendChildSpy = spyOn(document.body, 'appendChild').and.callThrough();
+        const clickSpy = spyOn(HTMLElement.prototype, 'click').and.callThrough();
+        const revokeObjectURLSpy = spyOn(window.URL, 'revokeObjectURL').and.callThrough();
+
+        service.generateQuizAsFile(mockQuiz);
+
+        expect(createObjectURLSpy).toHaveBeenCalled();
+        expect(createElementSpy).toHaveBeenCalledWith('a');
+        expect(appendChildSpy).toHaveBeenCalled();
+        expect(clickSpy).toHaveBeenCalled();
+        expect(revokeObjectURLSpy).toHaveBeenCalled();
     });
 });
