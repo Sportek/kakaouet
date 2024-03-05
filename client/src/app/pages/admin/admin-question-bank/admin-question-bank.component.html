@@ -5,11 +5,7 @@
                 <app-question-overlay> </app-question-overlay>
                 <div class="title-text">Banque de Questions</div>
                 <div class="selectors">
-                    <app-selector
-                        [label]="'Questions Visibles'"
-                        [choices]="visibilityOptions"
-                        (emitCurrentChoice)="changeVisibility($event)"
-                    ></app-selector>
+                    <app-selector [label]="'Questions Visibles'" [choices]="visibilityOptions"></app-selector>
                 </div>
                 <app-bank-question [visibility]="visibility"></app-bank-question>
                 <div class="button">

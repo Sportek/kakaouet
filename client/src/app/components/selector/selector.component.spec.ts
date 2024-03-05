@@ -1,21 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatMenuModule } from '@angular/material/menu';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { SelectorService } from '@app/services/selector/selector.service';
+import { of } from 'rxjs';
 import { SelectorComponent } from './selector.component';
+
+class MockSelectorService {
+    getCurrentChoice = jasmine.createSpy().and.returnValue(of('Choice 1'));
+    selectChoice = jasmine.createSpy();
+}
 
 describe('SelectorComponent', () => {
     let component: SelectorComponent;
     let fixture: ComponentFixture<SelectorComponent>;
+    let mockSelectorService: MockSelectorService;
 
     beforeEach(async () => {
+        mockSelectorService = new MockSelectorService();
+
         await TestBed.configureTestingModule({
             declarations: [SelectorComponent],
-            imports: [MatMenuModule],
+            providers: [{ provide: SelectorService, useValue: mockSelectorService }],
+            imports: [MatMenuModule, NoopAnimationsModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(SelectorComponent);
         component = fixture.componentInstance;
-        component.label = 'Test Label';
-        component.choices = ['Option 1', 'Option 2', 'Option 3'];
+
+        component.choices = ['Choice 1', 'Choice 2', 'Choice 3'];
         fixture.detectChanges();
     });
 
@@ -23,35 +35,23 @@ describe('SelectorComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should have the first choice selected by default on init', () => {
-        expect(component.currentChoice).toBe(component.choices[0]);
+    it('should set the first choice as currentChoice on init', () => {
+        expect(component.currentChoice).toEqual('Choice 1');
     });
 
-    it('should emit the selected choice when selectChoice is called with a valid choice', () => {
-        spyOn(component.emitCurrentChoice, 'emit');
-        const choiceToSelect = 'Option 2';
-        component.selectChoice(choiceToSelect);
-        expect(component.currentChoice).toBe(choiceToSelect);
-        expect(component.emitCurrentChoice.emit).toHaveBeenCalledWith(choiceToSelect);
+    it('should call selectChoice on the service when selectChoice is called', () => {
+        const choice = 'Choice 2';
+        component.selectChoice(choice);
+        expect(mockSelectorService.selectChoice).toHaveBeenCalledWith(choice, component.choices);
+
+        expect(component.dropdownOpen).toBeTrue();
     });
 
-    it('should not emit when selectChoice is called with an invalid choice', () => {
-        spyOn(component.emitCurrentChoice, 'emit');
-        const invalidChoice = 'Invalid Option';
-        component.selectChoice(invalidChoice);
-        expect(component.emitCurrentChoice.emit).not.toHaveBeenCalled();
-    });
-
-    it('should toggle dropdownOpen when modifyDropdown is called', () => {
-        const initialDropdownState = component.dropdownOpen;
+    it('should toggle dropdown state when modifyDropdown is called', () => {
+        expect(component.dropdownOpen).toBeFalse();
         component.modifyDropdown();
-        expect(component.dropdownOpen).toBe(!initialDropdownState);
-    });
-
-    it('should validate the choice correctly', () => {
-        const validChoice = 'Option 1';
-        const invalidChoice = 'Invalid Option';
-        expect(component.validateChoice(validChoice)).toBeTrue();
-        expect(component.validateChoice(invalidChoice)).toBeFalse();
+        expect(component.dropdownOpen).toBeTrue();
+        component.modifyDropdown();
+        expect(component.dropdownOpen).toBeFalse();
     });
 });
