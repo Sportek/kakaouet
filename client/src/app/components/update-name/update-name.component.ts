@@ -1,18 +1,21 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ImportGameComponent } from '@app/components/import-game/import-game.component';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-update-name',
     templateUrl: './update-name.component.html',
     styleUrls: ['./update-name.component.scss'],
 })
-export class UpdateNameComponent {
+export class UpdateNameComponent implements OnDestroy {
     newName: string = '';
+    subscription: Subscription = new Subscription();
+
     // eslint-disable-next-line max-params
     constructor(
         public dialogRef: MatDialogRef<ImportGameComponent>,
@@ -23,19 +26,25 @@ export class UpdateNameComponent {
 
     sendNewName() {
         this.data.quiz.name = this.newName;
-        this.quizService.addNewQuiz(this.data.quiz).subscribe({
-            next: () => {
-                this.snackbar.open('Quiz importé avec succès', '✅');
-                this.dialogRef.close();
-            },
-            error: (error) => {
-                if (error instanceof HttpErrorResponse && error.status === HttpStatusCode.BadRequest) {
-                    if (error.error.message === 'Quiz name has to be unique: ') {
-                        this.newName = '';
-                        this.snackbar.open('Le nom du quiz doit être unique, vous devez changer le nom.', '❌');
+        this.subscription.add(
+            this.quizService.addNewQuiz(this.data.quiz).subscribe({
+                next: () => {
+                    this.snackbar.open('Quiz importé avec succès', '✅');
+                    this.dialogRef.close();
+                },
+                error: (error) => {
+                    if (error instanceof HttpErrorResponse && error.status === HttpStatusCode.BadRequest) {
+                        if (error.error.message === 'Quiz name has to be unique: ') {
+                            this.newName = '';
+                            this.snackbar.open('Le nom du quiz doit être unique, vous devez changer le nom.', '❌');
+                        }
                     }
-                }
-            },
-        });
+                },
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
     }
 }

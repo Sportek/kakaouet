@@ -91,4 +91,10 @@ describe('UpdateNameComponent', () => {
         component.sendNewName();
         expect(snackBarMock.open).toHaveBeenCalledWith('Le nom du quiz doit être unique, vous devez changer le nom.', '❌');
     });
+
+    it('should unsubscribe on destroy', () => {
+        spyOn(component.subscription, 'unsubscribe');
+        component.ngOnDestroy();
+        expect(component.subscription.unsubscribe).toHaveBeenCalled();
+    });
 });
