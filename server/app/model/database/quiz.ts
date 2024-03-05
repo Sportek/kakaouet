@@ -40,4 +40,4 @@ export class Quiz {
 
 export const quizSchema = SchemaFactory.createForClass(Quiz);
 
-quizSchema.set('timestamps', true);
+quizSchema.set('timestamps', { createdAt: 'createdAt', updatedAt: 'lastModified' });
