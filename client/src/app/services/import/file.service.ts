@@ -6,13 +6,12 @@ import { NotificationService } from '@app/services/notification/notification.ser
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { ValidateService } from '@app/services/validate/validate.service';
 import { Quiz } from '@common/types';
-import { Observable, of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
 export class FileService {
+    // eslint-disable-next-line max-params -- Nécessite absolument tous les paramètres
     constructor(
         private validateService: ValidateService,
         private quizService: QuizService,
@@ -20,57 +19,44 @@ export class FileService {
         private dialog: MatDialog,
     ) {}
 
-    onFileUpload(event: Event): Observable<boolean> {
-        const input = event.target as HTMLInputElement;
-        const file = input.files ? input.files[0] : null;
-        
-        if (!file) {
-            return of(false);
-        }
+    async onFileUpload(event: Event): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+            const input = event.target as HTMLInputElement;
+            const file = input.files ? input.files[0] : null;
+            if (!file) return resolve(false);
 
-        return this.readFileAsText(file).pipe(
-            switchMap((rawText) => {
+            const fileReader = new FileReader();
+            fileReader.onload = async () => {
+                const rawText = fileReader.result as string;
                 const validatedObject = this.validateService.validateJSONQuiz(rawText);
                 if (validatedObject.isValid) {
-                    return this.quizService.addNewQuiz(validatedObject.object).pipe(
-                        switchMap(() => {
+                    this.quizService.addNewQuiz(validatedObject.object).subscribe({
+                        next: () => {
                             this.notificationService.success('Quiz importé avec succès');
-                            return of(true);
-                        }),
-                        catchError((error) => {
+                            return resolve(true);
+                        },
+                        error: (error) => {
                             if (error instanceof HttpErrorResponse && error.status === HttpStatusCode.BadRequest) {
                                 if (error.error.message === 'Quiz name has to be unique: ') {
-                                    this.notificationService.error(
-                                        'Le nom du quiz doit être unique, vous devez changer le nom.'
-                                    );
+                                    this.notificationService.error('Le nom du quiz doit être unique, vous devez changer le nom.');
                                     this.updateName(validatedObject.object);
-                                    return of(false);
+                                    return resolve(false);
                                 }
                             }
                             this.notificationService.error("Erreur lors de l'import du quiz");
-                            return of(false);
-                        })
-                    );
-                } else {
-                    this.notificationService.error(validatedObject.errors.join('\n'));
-                    return of(false);
+                            return resolve(false);
+                        },
+                    });
                 }
-            })
-        );
-    }
-
-    private readFileAsText(file: File): Observable<string> {
-        return new Observable<string>((observer) => {
-            const fileReader = new FileReader();
-            fileReader.onload = () => {
-                observer.next(fileReader.result as string);
-                observer.complete();
+                this.notificationService.error(validatedObject.errors.join('\n'));
+                return resolve(false);
             };
+
             fileReader.readAsText(file);
         });
     }
 
-    private updateName(quiz: Quiz): void {
+    private updateName(quiz: Quiz) {
         this.dialog.open(UpdateNameComponent, {
             data: { quiz },
         });
