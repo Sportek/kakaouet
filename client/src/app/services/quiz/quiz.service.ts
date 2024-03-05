@@ -1,9 +1,12 @@
+/* eslint-disable no-underscore-dangle */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { Observable, Subject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+// eslint-disable-next-line no-restricted-imports
+import { QuizValidation, ValidateService } from '../validate/validate.service';
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +19,10 @@ export class QuizService {
     private amountOfQuestionsSubject = new Subject<number>();
     private amountOfQuestions: Observable<number> = this.amountOfQuestionsSubject.asObservable();
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private validateService: ValidateService,
+    ) {}
 
     getAllQuizzes(): Observable<Quiz[]> {
         return this.http.get<Quiz[]>(BASE_URL + '/quiz');
@@ -66,15 +72,75 @@ export class QuizService {
         return this.amountOfQuestions;
     }
 
+    createQuiz(quiz: Quiz): void {
+        const newQuiz: Partial<Quiz> = {
+            name: quiz.name,
+            description: quiz.description,
+            duration: quiz.duration,
+            visibility: false,
+            questions: quiz.questions,
+        };
+        this.addNewQuiz(newQuiz as Quiz).subscribe({});
+    }
+
+    getQuiz(id: string, quiz: Quiz): void {
+        this.getQuizById(id).subscribe({
+            next: (quizToGet) => {
+                quiz.name = quizToGet.name;
+                quiz.duration = quizToGet.duration;
+                quiz.description = quizToGet.description;
+                quiz._id = quizToGet._id;
+                quiz.questions = quizToGet.questions;
+                quiz.visibility = quizToGet.visibility;
+                quiz.updatedAt = quizToGet.updatedAt;
+                quiz.createdAt = quizToGet.createdAt;
+                quiz = quizToGet;
+                this.specifyAmountOfQuizzes(quiz.questions.length);
+            },
+        });
+    }
+
+    updateQuiz(updatedQuiz: Quiz, quiz: Quiz): void {
+        updatedQuiz.name = quiz.name;
+        updatedQuiz.description = quiz.description;
+        updatedQuiz.duration = quiz.duration;
+        updatedQuiz.visibility = false;
+        updatedQuiz.questions = quiz.questions;
+        updatedQuiz.updatedAt = new Date();
+        updatedQuiz.visibility = quiz.visibility;
+        const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
+        this.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
+    }
+
+    hasError(quiz: Quiz): string | null {
+        const validations = [
+            { validate: QuizValidation.checkRequiredName, value: { name: quiz.name } },
+            { validate: QuizValidation.checkMaxTitleLength, value: { name: quiz.name } },
+            { validate: QuizValidation.checkMaxWordLength, value: { name: quiz.name } },
+            { validate: QuizValidation.checkMinResponseTime, value: { duration: quiz.duration } },
+            { validate: QuizValidation.checkMaxResponseTime, value: { duration: quiz.duration } },
+            { validate: QuizValidation.checkMinDescriptionLength, value: { description: quiz.description } },
+            { validate: QuizValidation.checkMaxDescriptionLength, value: { description: quiz.description } },
+            { validate: QuizValidation.checkRequiredQuestions, value: { questions: quiz.questions } },
+        ];
+
+        for (const validation of validations) {
+            const { validate, value } = validation;
+            if (!validate.callback(value)) {
+                return validate.errorMessage;
+            }
+        }
+
+        return null;
+    }
+
     changeVisibility(quiz: Quiz): void {
         quiz.visibility = !quiz.visibility;
-        // eslint-disable-next-line no-underscore-dangle
         this.updateQuizById(quiz._id, quiz).subscribe({});
     }
 
     removeQuiz(quiz: Quiz, quizList: Quiz[]): Observable<Quiz[]> {
         const index: number = quizList.indexOf(quiz);
-        // eslint-disable-next-line no-underscore-dangle
         this.deleteQuizById(quizList[index]._id);
         quizList.splice(index, 1);
         return of(quizList);

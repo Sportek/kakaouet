@@ -9,7 +9,7 @@
             <ng-template #createNewGame>
                 <div class="title title-text">Création d'un nouveau jeu</div>
             </ng-template>
-            <div *ngIf="isError()" class="white-text">{{ isError() }}</div>
+            <div *ngIf="hasError()" class="white-text">{{ hasError() }}</div>
             <div class="box">
                 <form #quizForm="ngForm" (ngSubmit)="onSubmit()">
                     <mat-form-field appearance="fill">
@@ -50,8 +50,8 @@
                     <div *ngFor="let quest of quiz.questions; let i = index" class="question-bar">
                         <div class="question">{{ i + 1 }}. {{ quest.label }} ({{ quest.type }})</div>
                         <div class="icons">
-                            <mat-icon (click)="moveUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
-                            <mat-icon (click)="moveDown(i)" *ngIf="i < quiz.questions.length - 1">arrow_downward</mat-icon>
+                            <mat-icon (click)="moveQuestionUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
+                            <mat-icon (click)="moveQuestionDown(i)" *ngIf="i < quiz.questions.length - 1">arrow_downward</mat-icon>
                             <mat-icon class="large-text" (click)="quizQuestionOverlayComponent.specifyQuestion(quest)">edit</mat-icon>
                             <mat-icon class="icons large-text" (click)="removeQuestion(quest)">delete</mat-icon>
                             <mat-icon class="icons large-text" (click)="importQuestionToBank(quest)">ios_share</mat-icon>
@@ -71,10 +71,10 @@
             </div>
             <div class="buttons">
                 <button routerLink="/admin/login" mat-raised-button color="primary" class="red">Annuler</button>
-                <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()" *ngIf="!isError()">
+                <button routerLink="/admin/login" mat-raised-button color="primary" class="green" (click)="onSubmit()" *ngIf="!hasError()">
                     Enregistrer
                 </button>
-                <button mat-raised-button [disabled]="true" class="disabled-button" class="green" *ngIf="isError()">Enregistrer</button>
+                <button mat-raised-button [disabled]="true" class="disabled-button" class="green" *ngIf="hasError()">Enregistrer</button>
             </div>
         </div>
     </div>
