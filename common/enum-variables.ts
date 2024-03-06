@@ -1,12 +1,16 @@
 export enum Variables {
     MinTime = 10,
     MaxTime = 60,
+    TimeStep = 10,
     MinScore = 10,
     MaxScore = 100,
+    ScoreStep = 10,
     MinCharacters = 10,
     MaxCharacters = 200,
     MinTitleLength = 1,
     MaxTitleCharacters = 150,
     MaxWordLength = 27,
     NotFound = 404,
+    QCMMinChoicesAmount = 2,
+    QCMMaxChoicesAmount = 4,
 }

@@ -1,7 +1,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Question, QuestionType } from '@common/types';
+import { Question, QuestionType, Quiz } from '@common/types';
 import { Observable, of } from 'rxjs';
 import { QuestionService } from './question.service';
 
@@ -138,5 +138,61 @@ describe('QuestionService', () => {
             expect(req.request.method).toEqual('DELETE');
             req.flush(null);
         }));
+    });
+
+    describe('onQuestionListUpdate', () => {
+        it('should modify question', () => {
+            const quiz = {
+                name: 'Thomas',
+                description: 'Salut, je suis thomas et je pue',
+                duration: 10,
+                questions: [
+                    {
+                        _id: '1',
+                        label: 'Quelle est la capitale de la France ?',
+                        type: 'QCM',
+                        points: 10,
+                        choices: [
+                            {
+                                label: 'Paris',
+                                isCorrect: true,
+                            },
+                            {
+                                label: 'Londres',
+                                isCorrect: false,
+                            },
+                            {
+                                label: 'Berlin',
+                                isCorrect: false,
+                            },
+                        ],
+                    },
+                    {
+                        _id: '2',
+                        label: "Quelle est la capitale de l'Allemagne ?",
+                        type: 'QCM',
+                        points: 10,
+                        choices: [
+                            {
+                                label: 'Paris',
+                                isCorrect: false,
+                            },
+                            {
+                                label: 'Londres',
+                                isCorrect: false,
+                            },
+                            {
+                                label: 'Berlin',
+                                isCorrect: true,
+                            },
+                        ],
+                    },
+                ],
+            };
+            const question = quiz.questions[0] as Question;
+            const testQuiz = quiz as Quiz;
+            service.onQuestionListUpdate(question, testQuiz);
+            expect(quiz.questions[0] as Question).toEqual(question);
+        });
     });
 });

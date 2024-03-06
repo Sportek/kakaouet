@@ -1,18 +1,20 @@
 /* eslint-disable no-underscore-dangle */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { QuizQuestionOverlayComponent } from '@app/components/quiz-question-overlay/quiz-question-overlay.component';
+import { QuestionOverlayComponent } from '@app/components/question-overlay/question-overlay.component';
+import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Question, Quiz } from '@common/types';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-create-update-quiz',
     templateUrl: './create-update-quiz.component.html',
     styleUrls: ['./create-update-quiz.component.scss'],
 })
-export class CreateUpdateQuizComponent implements OnInit {
-    @ViewChild(QuizQuestionOverlayComponent) quizQuestionOverlayComponent!: QuizQuestionOverlayComponent;
+export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
+    @ViewChild(QuestionOverlayComponent) questionOverlayComponent!: QuestionOverlayComponent;
 
     quiz: Quiz = {
         name: '',
@@ -27,10 +29,14 @@ export class CreateUpdateQuizComponent implements OnInit {
 
     showImportOverlay = false;
 
+    private subscriber: Subscription;
+
+    // eslint-disable-next-line max-params
     constructor(
         private quizService: QuizService,
         private route: ActivatedRoute,
         private questionService: QuestionService,
+        private overlayService: OverlayService,
     ) {}
 
     ngOnInit() {
@@ -38,6 +44,13 @@ export class CreateUpdateQuizComponent implements OnInit {
         const gameIdFromRoute = routeParams.get('id');
         if (gameIdFromRoute) {
             this.getQuiz(gameIdFromRoute);
+        }
+        this.overlayService.specifyQuiz(this.quiz);
+    }
+
+    ngOnDestroy(): void {
+        if (this.subscriber) {
+            this.subscriber.unsubscribe();
         }
     }
 
@@ -59,10 +72,6 @@ export class CreateUpdateQuizComponent implements OnInit {
 
     removeQuestion(question: Question): void {
         this.questionService.removeQuestion(question, this.quiz);
-    }
-
-    modifyQuestion(id: string): void {
-        this.questionService.sendId(id);
     }
 
     handleQuestionsImported(importedQuestions: Question[]): void {
@@ -88,7 +97,7 @@ export class CreateUpdateQuizComponent implements OnInit {
 
     onSubmit() {
         if (this.quiz._id) {
-            this.quizService.getQuizById(this.quiz._id).subscribe({
+            this.subscriber = this.quizService.getQuizById(this.quiz._id).subscribe({
                 next: (quiz) => {
                     this.updateQuiz(quiz);
                 },
@@ -101,11 +110,7 @@ export class CreateUpdateQuizComponent implements OnInit {
         }
     }
 
-    hasError(): string | null {
+    hasError(): string | undefined {
         return this.quizService.hasError(this.quiz);
-    }
-
-    onQuestionListUpdate(modifiedQuestion: Question) {
-        this.questionService.onQuestionListUpdate(modifiedQuestion, this.quiz);
     }
 }

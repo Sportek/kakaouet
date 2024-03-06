@@ -1,7 +1,7 @@
 <app-global-layout>
     <div class="wrapper">
         <div class="container">
-            <app-quiz-question-overlay (questionEmitter)="onQuestionListUpdate($event)"></app-quiz-question-overlay>
+            <app-question-overlay></app-question-overlay>
             <div *ngIf="quiz._id; else createNewGame">
                 <div class="title title-text">Modification d'un jeu</div>
             </div>
@@ -52,7 +52,7 @@
                         <div class="icons">
                             <mat-icon (click)="moveQuestionUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
                             <mat-icon (click)="moveQuestionDown(i)" *ngIf="i < quiz.questions.length - 1">arrow_downward</mat-icon>
-                            <mat-icon class="large-text" (click)="quizQuestionOverlayComponent.specifyQuestion(quest)">edit</mat-icon>
+                            <mat-icon class="large-text" (click)="questionOverlayComponent.specifyQuestionObject(quest)">edit</mat-icon>
                             <mat-icon class="icons large-text" (click)="removeQuestion(quest)">delete</mat-icon>
                             <mat-icon class="icons large-text" (click)="importQuestionToBank(quest)">ios_share</mat-icon>
                         </div>
@@ -67,7 +67,7 @@
             </div>
             <div class="questions-buttons">
                 <button (click)="openImportOverlay()" mat-raised-button color="primary">Importer une question de la banque</button>
-                <button mat-raised-button color="primary" (click)="quizQuestionOverlayComponent.createQuestion()">Créer une nouvelle question</button>
+                <button mat-raised-button color="primary" (click)="questionOverlayComponent.newQuestion()">Créer une nouvelle question</button>
             </div>
             <div class="buttons">
                 <button routerLink="/admin/login" mat-raised-button color="primary" class="red">Annuler</button>

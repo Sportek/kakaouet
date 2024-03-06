@@ -84,6 +84,18 @@ describe('QuizService', () => {
         req.flush(mockQuiz);
     });
 
+    it('should return the amount of quizzes', () => {
+        const amountOfQuizesSuscriber = service.getAmountOfQuizzes().subscribe({
+            next: (amount) => {
+                expect(amount).toEqual(2);
+            },
+        });
+
+        // @ts-ignore
+        service.amountOfQuestionsSubject.next(2);
+        amountOfQuizesSuscriber.unsubscribe();
+    });
+
     it('should update a quiz by id', () => {
         const quizId = '1';
 

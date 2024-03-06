@@ -20,7 +20,6 @@ import { QuestionBankImportComponent } from './components/import-bank-question/i
 import { ImportGameComponent } from './components/import-game/import-game.component';
 import { QuestionOverlayComponent } from './components/question-overlay/question-overlay.component';
 import { QuizHistoryComponent } from './components/quiz-history/quiz-history.component';
-import { QuizQuestionOverlayComponent } from './components/quiz-question-overlay/quiz-question-overlay.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { SelectorComponent } from './components/selector/selector.component';
 import { UpdateNameComponent } from './components/update-name/update-name.component';
@@ -68,7 +67,6 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         JoinComponent,
         QuestionOverlayComponent,
         QuestionBankImportComponent,
-        QuizQuestionOverlayComponent,
         ConfirmationDialogComponent,
         WaitingRoomComponent,
         UpdateNameComponent,

@@ -25,10 +25,10 @@ describe('ValidateService', () => {
         const validate = service.validateQuiz(BAD_QUIZ as Quiz);
         const expectedErrors = [
             'Le temps de réponse doit être un multiple de 10 secondes',
-            "Question 0: Le label d'une question est requis",
-            'Question 0: Le nombre de points doit être un multiple de 10',
-            'Question 0: Une question QCM doit avoir au moins une réponse correcte et une réponse incorrecte',
-            "Question 1: Choix 0: Le label d'une réponse est requis",
+            "Question 1: Le label d'une question est requis",
+            'Question 1: Le nombre de points doit être un multiple de 10',
+            'Question 1: Une question QCM doit avoir au moins une réponse correcte et une réponse incorrecte',
+            "Question 2: Choix 1: Le label d'une réponse est requis",
         ];
         expect(validate.errors).toEqual(expectedErrors);
     });

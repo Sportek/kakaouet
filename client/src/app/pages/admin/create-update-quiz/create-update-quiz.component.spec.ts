@@ -9,10 +9,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
+import { ValidatedObject } from '@app/classes/validated-object';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { QuizValidation, ValidateService } from '@app/services/validate/validate.service';
-import { ValidatedObject } from '@app/services/validate/validated-object';
 import { Question, QuestionType, Quiz } from '@common/types';
 import { cloneDeep } from 'lodash';
 import { of, throwError } from 'rxjs';
@@ -142,15 +142,6 @@ describe('CreateUpdateQuizComponent', () => {
             component.moveQuestionDown(1);
             component.moveQuestionDown(3);
             expect(component.quiz.questions).toEqual([mockQuestion1, mockQuestion2]);
-        });
-    });
-
-    describe('modifyQuestion', () => {
-        it('should call sendId method from QuestionService with the provided id', () => {
-            const sendIdSpy = spyOn(questionService, 'sendId');
-            const questionId = 'fakeId';
-            component.modifyQuestion(questionId);
-            expect(sendIdSpy).toHaveBeenCalledWith(questionId);
         });
     });
 
@@ -335,13 +326,13 @@ describe('CreateUpdateQuizComponent', () => {
             component.quiz.description = 'Voici un quiz de test';
             component.quiz.questions = [mockQuestion1];
 
-            expect(component.hasError()).toBe(null);
+            expect(component.hasError()).toEqual(undefined);
         });
 
         it('should trigger empty title error', () => {
             component.quiz.name = '';
 
-            expect(component.hasError()).toBe(QuizValidation.checkRequiredName.errorMessage);
+            expect(component.hasError()).toEqual(QuizValidation.checkRequiredName.errorMessage);
         });
 
         it('should trigger too long title error', () => {
@@ -363,6 +354,8 @@ describe('CreateUpdateQuizComponent', () => {
         it('should trigger too short answer duration error', () => {
             component.quiz.name = 'TestId';
             component.quiz.duration = 1;
+            component.quiz.description = 'Blablablabla';
+            component.quiz.questions = [mockQuestion1];
 
             expect(component.hasError()).toBe(QuizValidation.checkMinResponseTime.errorMessage);
         });
@@ -370,6 +363,8 @@ describe('CreateUpdateQuizComponent', () => {
         it('should trigger too long answer duration error', () => {
             component.quiz.name = 'TestId';
             component.quiz.duration = 100;
+            component.quiz.description = 'Blablablabla';
+            component.quiz.questions = [mockQuestion1];
 
             expect(component.hasError()).toBe(QuizValidation.checkMaxResponseTime.errorMessage);
         });
@@ -399,49 +394,6 @@ describe('CreateUpdateQuizComponent', () => {
             component.quiz.questions = [];
 
             expect(component.hasError()).toBe(QuizValidation.checkRequiredQuestions.errorMessage);
-        });
-    });
-
-    describe('onQuestionListUpdate', () => {
-        it('should add the modified question to quiz.questions if it does not exist in the list', () => {
-            component.quiz.questions = [mockQuestion1, mockQuestion2];
-
-            const modifiedQuestion: Question = {
-                _id: '3',
-                label: 'Question 3',
-                points: 8,
-                createdAt: new Date(),
-                lastModified: new Date(),
-                type: QuestionType.QCM,
-                choices: [],
-            };
-
-            component.onQuestionListUpdate(modifiedQuestion);
-
-            expect(component.quiz.questions.length).toEqual([mockQuestion1, mockQuestion2].length + 1);
-            expect(component.quiz.questions).toContain(modifiedQuestion);
-        });
-
-        it('should update the existing question in quiz.questions if it exists in the list', () => {
-            component.quiz.questions = [mockQuestion1, mockQuestion2];
-
-            const modifiedQuestion: Question = {
-                _id: '1',
-                label: 'Modified Question 1',
-                points: 8,
-                createdAt: new Date(),
-                lastModified: new Date(),
-                type: QuestionType.QCM,
-                choices: [],
-            };
-
-            component.onQuestionListUpdate(modifiedQuestion);
-
-            // eslint-disable-next-line no-underscore-dangle
-            const updatedQuestionIndex = component.quiz.questions.findIndex((q) => q._id === modifiedQuestion._id);
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            expect(updatedQuestionIndex).toBeGreaterThan(-1);
-            expect(component.quiz.questions[updatedQuestionIndex]).toEqual(modifiedQuestion);
         });
     });
 
