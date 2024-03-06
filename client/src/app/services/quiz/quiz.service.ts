@@ -6,7 +6,7 @@ import { QuestionFeedback, Quiz } from '@common/types';
 import { Observable, Subject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 // eslint-disable-next-line no-restricted-imports
-import { QuizValidation, ValidateService } from '../validate/validate.service';
+import { ValidateService } from '../validate/validate.service';
 
 @Injectable({
     providedIn: 'root',
@@ -112,26 +112,8 @@ export class QuizService {
         this.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
     }
 
-    hasError(quiz: Quiz): string | null {
-        const validations = [
-            { validate: QuizValidation.checkRequiredName, value: { name: quiz.name } },
-            { validate: QuizValidation.checkMaxTitleLength, value: { name: quiz.name } },
-            { validate: QuizValidation.checkMaxWordLength, value: { name: quiz.name } },
-            { validate: QuizValidation.checkMinResponseTime, value: { duration: quiz.duration } },
-            { validate: QuizValidation.checkMaxResponseTime, value: { duration: quiz.duration } },
-            { validate: QuizValidation.checkMinDescriptionLength, value: { description: quiz.description } },
-            { validate: QuizValidation.checkMaxDescriptionLength, value: { description: quiz.description } },
-            { validate: QuizValidation.checkRequiredQuestions, value: { questions: quiz.questions } },
-        ];
-
-        for (const validation of validations) {
-            const { validate, value } = validation;
-            if (!validate.callback(value)) {
-                return validate.errorMessage;
-            }
-        }
-
-        return null;
+    hasError(quiz: Quiz): string | undefined {
+        return this.validateService.validateQuiz(quiz).errors[0];
     }
 
     changeVisibility(quiz: Quiz): void {

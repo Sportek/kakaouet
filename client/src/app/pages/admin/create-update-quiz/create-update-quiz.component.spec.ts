@@ -326,13 +326,13 @@ describe('CreateUpdateQuizComponent', () => {
             component.quiz.description = 'Voici un quiz de test';
             component.quiz.questions = [mockQuestion1];
 
-            expect(component.hasError()).toBe(null);
+            expect(component.hasError()).toEqual(undefined);
         });
 
         it('should trigger empty title error', () => {
             component.quiz.name = '';
 
-            expect(component.hasError()).toBe(QuizValidation.checkRequiredName.errorMessage);
+            expect(component.hasError()).toEqual(QuizValidation.checkRequiredName.errorMessage);
         });
 
         it('should trigger too long title error', () => {
@@ -354,6 +354,8 @@ describe('CreateUpdateQuizComponent', () => {
         it('should trigger too short answer duration error', () => {
             component.quiz.name = 'TestId';
             component.quiz.duration = 1;
+            component.quiz.description = 'Blablablabla';
+            component.quiz.questions = [mockQuestion1];
 
             expect(component.hasError()).toBe(QuizValidation.checkMinResponseTime.errorMessage);
         });
@@ -361,6 +363,8 @@ describe('CreateUpdateQuizComponent', () => {
         it('should trigger too long answer duration error', () => {
             component.quiz.name = 'TestId';
             component.quiz.duration = 100;
+            component.quiz.description = 'Blablablabla';
+            component.quiz.questions = [mockQuestion1];
 
             expect(component.hasError()).toBe(QuizValidation.checkMaxResponseTime.errorMessage);
         });

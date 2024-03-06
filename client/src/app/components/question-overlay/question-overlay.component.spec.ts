@@ -102,6 +102,19 @@ describe('QuestionOverlayComponent', () => {
         expect(component.hasQuestionId).toBeTrue();
     });
 
+    it('should execute specifyQuestionObject', () => {
+        component.hasQuestionId = false;
+
+        const overlayServiceSpy = spyOn(overlayService, 'specifyQuestionObject');
+        const changeOverlaySpy = spyOn(component, 'changeOverlay');
+
+        component.specifyQuestionObject(WORKING_QUESTION);
+
+        expect(overlayServiceSpy).toHaveBeenCalled();
+        expect(changeOverlaySpy).toHaveBeenCalled();
+        expect(component.hasQuestionId).toBeTrue();
+    });
+
     it('should change overlay status and reset choices if display is flex', () => {
         component.overlayStatus.display = 'flex';
 

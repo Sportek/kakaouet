@@ -110,7 +110,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         }
     }
 
-    hasError(): string | null {
+    hasError(): string | undefined {
         return this.quizService.hasError(this.quiz);
     }
 }

@@ -25,7 +25,7 @@ export class ValidateService {
             const validatedQuestion = this.validateQuestion(question);
             if (!validatedQuestion.isValid) {
                 quizToValidate.isValid = false;
-                quizToValidate.errors.push(...validatedQuestion.errors.map((error) => `Question ${index}: ${error}`));
+                quizToValidate.errors.push(...validatedQuestion.errors.map((error) => `Question ${index + 1}: ${error}`));
             }
         });
 
@@ -46,7 +46,7 @@ export class ValidateService {
                 const validatedChoice = this.validateChoice(choice);
                 if (!validatedChoice.isValid) {
                     questionToValidate.isValid = false;
-                    questionToValidate.errors.push(...validatedChoice.errors.map((error) => `Choix ${index}: ${error}`));
+                    questionToValidate.errors.push(...validatedChoice.errors.map((error) => `Choix ${index + 1}: ${error}`));
                 }
             });
         }
