@@ -48,7 +48,7 @@ describe('BankQuestionListComponent', () => {
                 type: QuestionType.QRL,
                 points: 10,
                 createdAt: new Date(),
-                updatedAt: new Date(),
+                lastModified: new Date(),
             },
         ];
         component.questionList = questionMock;
@@ -71,7 +71,7 @@ describe('BankQuestionListComponent', () => {
             type: QuestionType.QRL,
             points: 10,
             createdAt: new Date(),
-            updatedAt: new Date(),
+            lastModified: new Date(),
         };
         component.questionList = [questionMock];
 
@@ -97,7 +97,7 @@ describe('BankQuestionListComponent', () => {
             type: QuestionType.QRL,
             points: 10,
             createdAt: new Date(),
-            updatedAt: new Date(),
+            lastModified: new Date(),
         };
         component.questionList = [questionMock];
 
@@ -122,13 +122,13 @@ describe('BankQuestionListComponent', () => {
             type: QuestionType.QRL,
             points: 10,
             createdAt: new Date(),
-            updatedAt: new Date(),
+            lastModified: new Date(),
         };
 
         expect(component.isVisible(questionMock)).toBeFalse();
     });
 
-    it('should sort questions by updatedAt in descending order', fakeAsync(() => {
+    it('should sort questions by lastModified in descending order', fakeAsync(() => {
         const questionMocks: Question[] = [
             {
                 _id: '1',
@@ -136,7 +136,7 @@ describe('BankQuestionListComponent', () => {
                 type: QuestionType.QRL,
                 points: 10,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
-                updatedAt: new Date('2024-02-12T19:05:00.000Z'),
+                lastModified: new Date('2024-02-12T19:05:00.000Z'),
             },
             {
                 _id: '2',
@@ -144,7 +144,7 @@ describe('BankQuestionListComponent', () => {
                 type: QuestionType.QRL,
                 points: 20,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
-                updatedAt: new Date('2024-02-12T19:10:00.000Z'),
+                lastModified: new Date('2024-02-12T19:10:00.000Z'),
             },
         ];
         spyOn(questionService, 'getQuestions').and.returnValue(of(questionMocks));
@@ -166,7 +166,7 @@ describe('BankQuestionListComponent', () => {
                 type: QuestionType.QRL,
                 points: 10,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
-                updatedAt: new Date('2024-02-12T19:05:00.000Z'), // Valid date
+                lastModified: new Date('2024-02-12T19:05:00.000Z'), // Valid date
             },
             {
                 _id: '2',
@@ -174,7 +174,7 @@ describe('BankQuestionListComponent', () => {
                 type: QuestionType.QRL,
                 points: 20,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
-                updatedAt: new Date('invalid-date'), // Invalid date
+                lastModified: new Date('invalid-date'), // Invalid date
             },
         ];
         spyOn(questionService, 'getQuestions').and.returnValue(of(questionMocks));

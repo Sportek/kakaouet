@@ -17,7 +17,7 @@ describe('QuizController', () => {
         visibility: true,
         questions: [],
         createdAt: new Date(),
-        updatedAt: new Date(),
+        lastModified: new Date(),
     };
 
     beforeEach(async () => {

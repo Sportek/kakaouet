@@ -33,7 +33,7 @@ export class QuizDto {
     @IsDate()
     @Type(() => Date)
     @IsOptional()
-    updatedAt?: Date;
+    lastModified?: Date;
 
     _id?: string;
 }

@@ -22,7 +22,7 @@ describe('CreatePageComponent', () => {
                 visibility: true,
                 questions: [],
                 createdAt: new Date(),
-                updatedAt: new Date(),
+                lastModified: new Date(),
             },
             {
                 _id: '456',
@@ -32,7 +32,7 @@ describe('CreatePageComponent', () => {
                 visibility: true,
                 questions: [],
                 createdAt: new Date(),
-                updatedAt: new Date(),
+                lastModified: new Date(),
             },
         ];
 

@@ -14,7 +14,7 @@ describe('QuestionBankImportComponent', () => {
             label: 'Question 1',
             points: 10,
             createdAt: new Date(),
-            updatedAt: new Date(),
+            lastModified: new Date(),
             type: QuestionType.QCM,
             choices: [
                 { _id: 1, label: 'Choice 1', isCorrect: true },
@@ -26,7 +26,7 @@ describe('QuestionBankImportComponent', () => {
             label: 'Question 2',
             points: 5,
             createdAt: new Date(),
-            updatedAt: new Date(),
+            lastModified: new Date(),
             type: QuestionType.QRL,
         },
     ];

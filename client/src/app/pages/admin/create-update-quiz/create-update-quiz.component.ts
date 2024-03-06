@@ -24,7 +24,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
         questions: [],
         _id: '',
         createdAt: new Date(),
-        updatedAt: new Date(),
+        lastModified: new Date(),
     };
 
     showImportOverlay = false;

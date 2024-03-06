@@ -98,7 +98,7 @@ export class QuestionService {
             label: question.label,
             points: question.points,
             createdAt: question.createdAt,
-            updatedAt: question.updatedAt,
+            lastModified: question.lastModified,
             type: question.type,
         };
         if (partialQuestionNoId.type === 'QCM' && question.type === 'QCM') partialQuestionNoId.choices = question.choices;
