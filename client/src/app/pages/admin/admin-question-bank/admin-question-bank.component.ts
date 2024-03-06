@@ -24,7 +24,7 @@ export class AdminQuestionBankComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.currentChoiceSubscriber.unsubscribe();
+        if (this.currentChoiceSubscriber) this.currentChoiceSubscriber.unsubscribe();
     }
 
     changeVisibility(label: string) {
