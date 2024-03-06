@@ -92,7 +92,7 @@ export class QuizService {
                 quiz._id = quizToGet._id;
                 quiz.questions = quizToGet.questions;
                 quiz.visibility = quizToGet.visibility;
-                quiz.lastModified = quizToGet.lastModified;
+                quiz.lastModification = quizToGet.lastModification;
                 quiz.createdAt = quizToGet.createdAt;
                 quiz = quizToGet;
                 this.specifyAmountOfQuizzes(quiz.questions.length);
@@ -106,7 +106,7 @@ export class QuizService {
         updatedQuiz.duration = quiz.duration;
         updatedQuiz.visibility = false;
         updatedQuiz.questions = quiz.questions;
-        updatedQuiz.lastModified = new Date();
+        updatedQuiz.lastModification = new Date();
         updatedQuiz.visibility = quiz.visibility;
         const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
         this.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
@@ -135,7 +135,7 @@ export class QuizService {
             duration: quiz.duration,
             questions: quiz.questions,
             createdAt: quiz.createdAt,
-            lastModified: quiz.lastModified,
+            lastModification: quiz.lastModification,
         };
         const fileContent = JSON.stringify(quizNoVisibilityNoId);
         const blob = new Blob([fileContent], { type: 'application/json' });

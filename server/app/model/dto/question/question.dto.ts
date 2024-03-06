@@ -43,7 +43,7 @@ export class QuestionDto {
     @IsDate()
     @Type(() => Date)
     @IsOptional()
-    lastModified?: Date;
+    lastModification?: Date;
 
     @Type(() => String)
     _id?: string;

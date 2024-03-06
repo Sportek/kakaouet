@@ -30,7 +30,7 @@ describe('QuestionBankService', () => {
                 ],
                 points: 5,
                 createdAt: new Date(),
-                lastModified: new Date(),
+                lastModification: new Date(),
             },
         ];
         questionServiceMock.getQuestions.and.returnValue(of(mockQuestions));
@@ -67,7 +67,7 @@ describe('QuestionBankService', () => {
             ],
             points: 5,
             createdAt: new Date(),
-            lastModified: new Date(),
+            lastModification: new Date(),
         };
 
         service.toggleQuestionSelection(question);
@@ -90,7 +90,7 @@ describe('QuestionBankService', () => {
             ],
             points: 5,
             createdAt: new Date(),
-            lastModified: new Date(),
+            lastModification: new Date(),
         };
         service.toggleQuestionSelection(question);
 

@@ -33,7 +33,7 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
             this.questionService.getQuestions().subscribe({
                 next: (questions) => {
-                    this.questionList = questions.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime());
+                    this.questionList = questions.sort((a, b) => new Date(b.lastModification).getTime() - new Date(a.lastModification).getTime());
                 },
             }),
         );

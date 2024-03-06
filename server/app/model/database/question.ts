@@ -30,8 +30,8 @@ export class Question {
     createdAt?: Date;
 
     @ApiProperty()
-    lastModified?: Date;
+    lastModification?: Date;
 }
 
 export const questionSchema = SchemaFactory.createForClass(Question);
-questionSchema.set('timestamps', { createdAt: 'createdAt', updatedAt: 'lastModified' });
+questionSchema.set('timestamps', { createdAt: 'createdAt', updatedAt: 'lastModification' });

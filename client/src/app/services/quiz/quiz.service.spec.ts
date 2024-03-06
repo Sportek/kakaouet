@@ -29,11 +29,11 @@ describe('QuizService', () => {
                     { _id: 0, label: 'Celebrimbor', isCorrect: false },
                 ],
                 createdAt: new Date(),
-                lastModified: new Date(),
+                lastModification: new Date(),
             },
         ],
         createdAt: new Date(),
-        lastModified: new Date(),
+        lastModification: new Date(),
     };
     beforeEach(() => {
         TestBed.configureTestingModule({

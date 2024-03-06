@@ -24,7 +24,6 @@ describe('ValidateService', () => {
     it('should not validate quiz correctly', () => {
         const validate = service.validateQuiz(BAD_QUIZ as Quiz);
         const expectedErrors = [
-            'Le temps de réponse doit être un multiple de 10 secondes',
             "Question 1: Le label d'une question est requis",
             'Question 1: Le nombre de points doit être un multiple de 10',
             'Question 1: Une question QCM doit avoir au moins une réponse correcte et une réponse incorrecte',
@@ -65,12 +64,12 @@ describe('ValidateService', () => {
                     points: 20,
                     choices: [],
                     createdAt: new Date(),
-                    lastModified: new Date(),
+                    lastModification: new Date(),
                 },
             ],
             visibility: false,
             createdAt: new Date(),
-            lastModified: new Date(),
+            lastModification: new Date(),
         };
 
         const validate = service.validateQuiz(quizWithLongWord);

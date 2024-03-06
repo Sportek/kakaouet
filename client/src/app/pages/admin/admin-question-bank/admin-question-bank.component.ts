@@ -18,7 +18,7 @@ export class AdminQuestionBankComponent implements OnInit, OnDestroy {
     constructor(private selectorService: SelectorService) {}
 
     ngOnInit(): void {
-        this.currentChoiceSubscriber = this.selectorService.getCurrentChoice().subscribe({
+        this.selectorService.getCurrentChoice().subscribe({
             next: (choice) => this.changeVisibility(choice),
         });
     }
