@@ -1,19 +1,18 @@
 /* eslint-disable no-underscore-dangle */
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { QuestionOverlayComponent } from '@app/components/question-overlay/question-overlay.component';
 import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Question, Quiz } from '@common/types';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-create-update-quiz',
     templateUrl: './create-update-quiz.component.html',
     styleUrls: ['./create-update-quiz.component.scss'],
 })
-export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
+export class CreateUpdateQuizComponent implements OnInit {
     @ViewChild(QuestionOverlayComponent) questionOverlayComponent!: QuestionOverlayComponent;
 
     quiz: Quiz = {
@@ -28,8 +27,6 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
     };
 
     showImportOverlay = false;
-
-    private subscriber: Subscription;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -46,12 +43,6 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
             this.getQuiz(gameIdFromRoute);
         }
         this.overlayService.specifyQuiz(this.quiz);
-    }
-
-    ngOnDestroy(): void {
-        if (this.subscriber) {
-            this.subscriber.unsubscribe();
-        }
     }
 
     openImportOverlay(): void {
@@ -97,7 +88,7 @@ export class CreateUpdateQuizComponent implements OnInit, OnDestroy {
 
     onSubmit() {
         if (this.quiz._id) {
-            this.subscriber = this.quizService.getQuizById(this.quiz._id).subscribe({
+            this.quizService.getQuizById(this.quiz._id).subscribe({
                 next: (quiz) => {
                     this.updateQuiz(quiz);
                 },

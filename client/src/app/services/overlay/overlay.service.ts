@@ -113,9 +113,11 @@ export class OverlayService {
     }
 
     submitQuestion(isPatch: boolean): void {
-        // eslint-disable-next-line no-underscore-dangle
-        this.currentQuestion._id = this.idTracker.toString();
-        this.idTracker++;
+        if (this.isPartOfQuiz) {
+            // eslint-disable-next-line no-underscore-dangle
+            this.currentQuestion._id = this.idTracker.toString();
+            this.idTracker++;
+        }
         const validatedQuestion = this.validationService.validateQuestion(this.currentQuestion).object;
         if (this.isPartOfQuiz) {
             this.submitQuestionToQuiz();
