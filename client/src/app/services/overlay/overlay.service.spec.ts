@@ -84,6 +84,12 @@ describe('OverlayService', () => {
         subscriber.unsubscribe();
     });
 
+    it('should return the current question', () => {
+        spyOn(service, 'getCurrentQuestion').and.returnValue(baseQuestion);
+        const questionReturned = service.getCurrentQuestion();
+        expect(questionReturned).toEqual(baseQuestion);
+    });
+
     it('should add a choice', () => {
         const lengthBefore = WORKING_QUIZ.questions[0].choices.length;
         spyOn(questionService, 'getQuestionsById').and.callFake(() => {
@@ -92,6 +98,21 @@ describe('OverlayService', () => {
 
         // eslint-disable-next-line no-underscore-dangle
         service.specifyQuestion(WORKING_QUESTION._id);
+
+        service.addChoice();
+
+        const currentQuestion = service.getCurrentQuestion();
+
+        if (currentQuestion.type === QuestionType.QCM) {
+            expect(currentQuestion.choices.length).toEqual(lengthBefore + 1);
+        }
+    });
+
+    it('should add a choice with specifyQuestionObject', () => {
+        const lengthBefore = WORKING_QUIZ.questions[0].choices.length;
+
+        // eslint-disable-next-line no-underscore-dangle
+        service.specifyQuestionObject(WORKING_QUESTION);
 
         service.addChoice();
 
@@ -141,12 +162,30 @@ describe('OverlayService', () => {
         const updateQuestionServiceSpy = spyOn(questionService, 'updateQuestion').and.callFake((id, question) => {
             return of(question);
         });
+        const submitQuestionToQuizSpy = spyOn(service, 'submitQuestionToQuiz').and.callThrough();
 
         service.submitQuestion(true);
         expect(updateQuestionServiceSpy).toHaveBeenCalled();
 
         service.submitQuestion(false);
         expect(createQuestionServiceSpy).toHaveBeenCalled();
+
+        // @ts-ignore
+        service.isPartOfQuiz = true;
+        // @ts-ignore
+        service.currentQuestion = cloneDeep(WORKING_QUESTION);
+        // @ts-ignore
+        service.currentQuiz = cloneDeep(WORKING_QUIZ);
+        service.submitQuestion(true);
+        expect(submitQuestionToQuizSpy).toHaveBeenCalled();
+    });
+
+    it('should submit a question to quiz', () => {
+        const onQuestionListUpdateSpy = spyOn(questionService, 'onQuestionListUpdate').and.callFake((question, quiz) => {
+            return of(question, quiz);
+        });
+        service.submitQuestionToQuiz();
+        expect(onQuestionListUpdateSpy).toHaveBeenCalled();
     });
 
     it('should delete choice', () => {
