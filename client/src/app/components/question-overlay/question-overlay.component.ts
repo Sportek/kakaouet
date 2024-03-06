@@ -82,7 +82,12 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
 
     isError(): string | null {
         if (this.currentQuestion) {
-            return this.validationService.validateQuestion(this.currentQuestion).errors[0];
+            const isModifyingChoiceArray = Array.from(this.isModifyingChoiceMap.values());
+            if (isModifyingChoiceArray.some((bool) => bool)) {
+                return 'Tous les choix doivent être enregistrés';
+            } else {
+                return this.validationService.validateQuestion(this.currentQuestion).errors[0];
+            }
         }
         return null;
     }
