@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { ValidateService } from '@app/services/validate/validate.service';
-import { Choice, Question, QuestionType } from '@common/types';
+import { Choice, Question, QuestionType, Quiz } from '@common/types';
 import { cloneDeep } from 'lodash';
 import { Observable, Subject } from 'rxjs';
 
@@ -42,6 +42,11 @@ export class OverlayService {
     private currentQuestionSubject: Subject<Question> = new Subject<Question>();
     private currentQuestionObservable: Observable<Question> = this.currentQuestionSubject.asObservable();
 
+    private currentQuiz: Quiz;
+    private idTracker: number = 0;
+
+    private isPartOfQuiz: boolean;
+
     constructor(
         private questionService: QuestionService,
         private validationService: ValidateService,
@@ -63,6 +68,12 @@ export class OverlayService {
 
     getCurrentQuestion(): Question {
         return this.currentQuestion;
+    }
+
+    specifyQuiz(quiz: Quiz): void {
+        this.currentQuiz = quiz;
+        this.isPartOfQuiz = true;
+        this.idTracker = quiz.questions.length;
     }
 
     addChoice(): void {
@@ -96,14 +107,29 @@ export class OverlayService {
         });
     }
 
+    specifyQuestionObject(question: Question): void {
+        this.currentQuestion = question;
+        this.sendChangesToComponent();
+    }
+
     submitQuestion(isPatch: boolean): void {
+        // eslint-disable-next-line no-underscore-dangle
+        this.currentQuestion._id = this.idTracker.toString();
+        this.idTracker++;
         const validatedQuestion = this.validationService.validateQuestion(this.currentQuestion).object;
-        if (isPatch) {
+        if (this.isPartOfQuiz) {
+            this.submitQuestionToQuiz();
+        } else if (isPatch) {
             // eslint-disable-next-line no-underscore-dangle
             this.questionService.updateQuestion(this.currentQuestion._id, validatedQuestion).subscribe({});
         } else {
             this.questionService.createQuestion(validatedQuestion).subscribe({});
         }
+        this.resetQuestion();
+    }
+
+    submitQuestionToQuiz(): void {
+        this.questionService.onQuestionListUpdate(this.currentQuestion, this.currentQuiz);
         this.resetQuestion();
     }
 

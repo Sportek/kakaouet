@@ -145,15 +145,6 @@ describe('CreateUpdateQuizComponent', () => {
         });
     });
 
-    describe('modifyQuestion', () => {
-        it('should call sendId method from QuestionService with the provided id', () => {
-            const sendIdSpy = spyOn(questionService, 'sendId');
-            const questionId = 'fakeId';
-            component.modifyQuestion(questionId);
-            expect(sendIdSpy).toHaveBeenCalledWith(questionId);
-        });
-    });
-
     describe('handleQuestionsImported', () => {
         it('should add new questions to quiz.questions and sort them by ID', () => {
             component.quiz.questions = [mockQuestion1];
@@ -399,49 +390,6 @@ describe('CreateUpdateQuizComponent', () => {
             component.quiz.questions = [];
 
             expect(component.hasError()).toBe(QuizValidation.checkRequiredQuestions.errorMessage);
-        });
-    });
-
-    describe('onQuestionListUpdate', () => {
-        it('should add the modified question to quiz.questions if it does not exist in the list', () => {
-            component.quiz.questions = [mockQuestion1, mockQuestion2];
-
-            const modifiedQuestion: Question = {
-                _id: '3',
-                label: 'Question 3',
-                points: 8,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                type: QuestionType.QCM,
-                choices: [],
-            };
-
-            component.onQuestionListUpdate(modifiedQuestion);
-
-            expect(component.quiz.questions.length).toEqual([mockQuestion1, mockQuestion2].length + 1);
-            expect(component.quiz.questions).toContain(modifiedQuestion);
-        });
-
-        it('should update the existing question in quiz.questions if it exists in the list', () => {
-            component.quiz.questions = [mockQuestion1, mockQuestion2];
-
-            const modifiedQuestion: Question = {
-                _id: '1',
-                label: 'Modified Question 1',
-                points: 8,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                type: QuestionType.QCM,
-                choices: [],
-            };
-
-            component.onQuestionListUpdate(modifiedQuestion);
-
-            // eslint-disable-next-line no-underscore-dangle
-            const updatedQuestionIndex = component.quiz.questions.findIndex((q) => q._id === modifiedQuestion._id);
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            expect(updatedQuestionIndex).toBeGreaterThan(-1);
-            expect(component.quiz.questions[updatedQuestionIndex]).toEqual(modifiedQuestion);
         });
     });
 

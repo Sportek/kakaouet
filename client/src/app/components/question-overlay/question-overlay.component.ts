@@ -17,6 +17,8 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
     isModifyingChoiceMap: Map<Choice, boolean> = new Map<Choice, boolean>();
     index: number;
 
+    isPartOfQuiz: boolean = false;
+
     overlayStatus = {
         display: 'none',
     };
@@ -58,6 +60,12 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
 
     specifyQuestion(id: string): void {
         this.overlayService.specifyQuestion(id);
+        this.hasQuestionId = true;
+        this.changeOverlay();
+    }
+
+    specifyQuestionObject(question: Question): void {
+        this.overlayService.specifyQuestionObject(question);
         this.hasQuestionId = true;
         this.changeOverlay();
     }
