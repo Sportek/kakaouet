@@ -22,7 +22,7 @@ describe('QuestionService', () => {
             { _id: 3, label: 'C.S. Lewis', isCorrect: false },
         ],
         createdAt: new Date(),
-        lastModified: new Date(),
+        lastModification: new Date(),
     };
 
     beforeEach(() => {

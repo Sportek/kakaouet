@@ -15,7 +15,7 @@ export const mockQuestions: QuestionDto[] = [
     {
         type: 'QCM',
         label: "Quel est le nom du hobbit qui hérite de l'Anneau Unique de Bilbon ?",
-        points: 15,
+        points: 20,
         choices: [
             { label: 'Meriadoc Brandebouc', isCorrect: false },
             { label: 'Peregrin Touc', isCorrect: false },
@@ -37,7 +37,7 @@ export const mockQuestions: QuestionDto[] = [
     {
         type: 'QCM',
         label: "Qui est l'intendant du Gondor avant qu'Aragorn ne devienne roi ?",
-        points: 15,
+        points: 20,
         choices: [
             { label: 'Denethor', isCorrect: true },
             { label: 'Boromir', isCorrect: false },
@@ -59,7 +59,7 @@ export const mockQuestions: QuestionDto[] = [
     {
         type: 'QCM',
         label: 'Quel personnage a dit : "Tous ceux qui errent ne sont pas perdus" ?',
-        points: 15,
+        points: 20,
         choices: [
             { label: 'Gandalf', isCorrect: false },
             { label: 'Bilbo', isCorrect: true },
@@ -81,7 +81,7 @@ export const mockQuestions: QuestionDto[] = [
     {
         type: 'QCM',
         label: "Quelle créature était Gollum à l'origine avant d'être corrompu par l'Anneau Unique ?",
-        points: 15,
+        points: 20,
         choices: [
             { label: 'Elfe', isCorrect: false },
             { label: 'Hobbit', isCorrect: true },
@@ -103,7 +103,7 @@ export const mockQuestions: QuestionDto[] = [
     {
         type: 'QCM',
         label: "Quel est le nom de l'araignée que Frodon affronte dans la tanière de Shelob ?",
-        points: 15,
+        points: 20,
         choices: [
             { label: 'Ungoliant', isCorrect: false },
             { label: 'Shelob', isCorrect: true },

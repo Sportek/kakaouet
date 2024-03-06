@@ -47,7 +47,7 @@ describe('GameService', () => {
         const quiz = {
             _id: 'quizId',
             createdAt: new Date(),
-            lastModified: new Date(),
+            lastModification: new Date(),
             visibility: true,
             description: 'quizDescription',
             duration: 10,
@@ -60,7 +60,7 @@ describe('GameService', () => {
                     type: QuestionType.QCM,
                     choices: [{ _id: 0, label: 'choiceLabel', isCorrect: true }],
                     createdAt: new Date(),
-                    lastModified: new Date(),
+                    lastModification: new Date(),
                 },
                 {
                     _id: 'questionId2',
@@ -69,7 +69,7 @@ describe('GameService', () => {
                     type: QuestionType.QCM,
                     choices: [{ _id: 1, label: 'choiceLabel2', isCorrect: true }],
                     createdAt: new Date(),
-                    lastModified: new Date(),
+                    lastModification: new Date(),
                 },
             ],
         };
@@ -153,7 +153,7 @@ describe('GameService', () => {
                 _id: 'fakeQuizId',
                 questions: [],
                 createdAt: new Date(),
-                lastModified: new Date(),
+                lastModification: new Date(),
                 visibility: true,
                 description: 'fakeQuizDescription',
                 duration: 10,

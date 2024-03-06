@@ -23,7 +23,7 @@ export class CreateUpdateQuizComponent implements OnInit {
         questions: [],
         _id: '',
         createdAt: new Date(),
-        lastModified: new Date(),
+        lastModification: new Date(),
     };
 
     showImportOverlay = false;

@@ -20,7 +20,6 @@ export class ValidateService {
         quizToValidate.check(QuizValidation.checkRequiredQuestions);
         quizToValidate.check(QuizValidation.checkMaxResponseTime);
         quizToValidate.check(QuizValidation.checkMinResponseTime);
-        quizToValidate.check(QuizValidation.checkFormatResponseTime);
         quizToValidate.object.questions.forEach((question, index) => {
             const validatedQuestion = this.validateQuestion(question);
             if (!validatedQuestion.isValid) {
@@ -157,11 +156,6 @@ export namespace QuizValidation {
     export const checkMinResponseTime = new Validate(
         (quiz: Quiz) => quiz.duration >= Variables.MinTime,
         `Le temps de réponse doit être supérieur à ${Variables.MinTime} secondes`,
-    );
-
-    export const checkFormatResponseTime = new Validate(
-        (quiz: Quiz) => quiz.duration % Variables.TimeStep === 0,
-        `Le temps de réponse doit être un multiple de ${Variables.TimeStep} secondes`,
     );
 }
 
