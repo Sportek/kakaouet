@@ -1,13 +1,13 @@
 <app-global-layout>
-    <div *ngIf="game" class="container">
+    <div *ngIf="quiz" class="container">
         <div class="game-information-container">
             <div class="game-title-container">
                 <div class="title title-text">
-                    {{ game.name }}
+                    {{ quiz.name }}
                 </div>
                 <div class="game-description-container">
-                    <div class="description">{{ game.description }}</div>
-                    <div class="duration">Temps alloué pour chaque question : {{ game.duration }} secondes</div>
+                    <div class="description">{{ quiz.description }}</div>
+                    <div class="duration">Temps alloué pour chaque question : {{ quiz.duration }} secondes</div>
                 </div>
             </div>
             <div class="game-questions-container">
@@ -19,8 +19,8 @@
             </div>
             <div class="buttons-container">
                 <button routerLink="/create" mat-raised-button class="large-text quit-button" color="primary">Retour</button>
-                <button (click)="testGame(game._id)" mat-raised-button class="large-text test-button" color="primary">Tester le jeu</button>
-                <button mat-raised-button (click)="createGame(game._id)" class="large-text create-button" color="primary">Créer une partie</button>
+                <button (click)="testGame(quiz._id)" mat-raised-button class="large-text test-button" color="primary">Tester le jeu</button>
+                <button mat-raised-button (click)="createGame(quiz._id)" class="large-text create-button" color="primary">Créer une partie</button>
             </div>
         </div>
     </div>

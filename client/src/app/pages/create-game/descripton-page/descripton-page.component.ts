@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Variables } from '@common/enum-variables';
-import { Question, Quiz } from '@common/types';
+import { GameType, Question, Quiz } from '@common/types';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -12,7 +13,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./descripton-page.component.scss'],
 })
 export class DescriptonPageComponent implements OnInit, OnDestroy {
-    game: Quiz;
+    quiz: Quiz;
     question: Question[];
     notFound: number;
     private subscriptions = new Subscription();
@@ -24,6 +25,7 @@ export class DescriptonPageComponent implements OnInit, OnDestroy {
         private router: Router,
         private snackBar: MatSnackBar,
         private cd: ChangeDetectorRef,
+        private gameService: GameService,
     ) {}
 
     ngOnInit() {
@@ -43,7 +45,7 @@ export class DescriptonPageComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
             this.quizService.getQuizById(id).subscribe({
                 next: (quiz) => {
-                    this.game = quiz;
+                    this.quiz = quiz;
                     this.question = quiz.questions;
                     this.cd.detectChanges();
                 },
@@ -54,8 +56,8 @@ export class DescriptonPageComponent implements OnInit, OnDestroy {
         this.checkQuizBeforeNavigation(gameId, '/testing');
     }
 
-    createGame(gameId: string) {
-        this.checkQuizBeforeNavigation(gameId, './waiting-room', false);
+    createGame(quizId: string) {
+        this.gameService.createNewGame(quizId, GameType.Default);
     }
 
     checkQuizBeforeNavigation(gameId: string, path: string, includeId: boolean = true) {

@@ -1,0 +1,93 @@
+<app-global-layout>
+    <div class="container">
+        <div class="wrapper">
+            <div class="question-container">
+                <div class="icon-container">
+                    <mat-icon>
+                        <span class="material-symbols-outlined"> grade </span>
+                    </mat-icon>
+                    <div class="text large-text">{{ question?.points }}</div>
+                </div>
+                <div class="question large-text">
+                    {{ question?.label }}
+                </div>
+                <div class="icon-container">
+                    <mat-icon>
+                        <span class="material-symbols-outlined"> hourglass </span>
+                    </mat-icon>
+                    <div class="text large-text">{{ cooldown }}</div>
+                </div>
+            </div>
+
+            <div class="stats-container">
+                <div class="columns">
+                    <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.label">
+                        <div
+                            class="column"
+                            [style]="'height: ' + calculatePurcentage(column.amount) * 100 + '%'"
+                            [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
+                        ></div>
+                        <div class="column-label">{{ 'Choix ' + (i + 1) }} ({{ column.amount }})</div>
+                    </div>
+                </div>
+                <div class="legend">
+                    <div class="state">
+                        <div class="color isCorrect"></div>
+                        <div class="label">Correct</div>
+                    </div>
+                    <div class="stats">
+                        {{ getAnswerAmount() + '/' + players.length }}
+                    </div>
+                    <div class="state">
+                        <div class="color isIncorrect"></div>
+                        <div class="label">Incorrect</div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-controller-container">
+                <div class="title">Panneau de contrôle</div>
+                <div class="controls">
+                    <button mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
+                    <div class="timer">
+                        <mat-icon>
+                            <span
+                                *ngIf="timerIsRunning"
+                                (click)="toggleTimer()"
+                                class="material-symbols-outlined clickable"
+                                matTooltip="Arrêter le timer"
+                            >
+                                timer_pause
+                            </span>
+                            <span
+                                *ngIf="!timerIsRunning"
+                                (click)="toggleTimer()"
+                                class="material-symbols-outlined clickable"
+                                matTooltip="Recommencer le timer"
+                            >
+                                timer_play
+                            </span>
+                        </mat-icon>
+                        <mat-icon>
+                            <span class="material-symbols-outlined clickable" (click)="speedUpTimer()" matTooltip="Activer le mode panique">
+                                acute
+                            </span>
+                        </mat-icon>
+                    </div>
+                </div>
+            </div>
+
+            <div class="players-container">
+                <div class="players">
+                    <div class="player" *ngFor="let player of players">
+                        <div class="player-name" [ngClass]="{ 'has-giveup': player.hasGiveUp }">{{ player.name }}</div>
+                        <div class="player-score">({{ player.score }})</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat">
+                <app-chat />
+            </div>
+        </div>
+    </div>
+</app-global-layout>

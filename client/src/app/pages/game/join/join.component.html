@@ -2,9 +2,12 @@
     <div class="wrapper">
         <img src="./assets/img/kakaouet.png" alt="" />
         <div class="join-container">
-            <form (submit)="joinGame()" name="codeForm">
+            <form (submit)="confirm()" name="codeForm">
                 <mat-form-field>
                     <input matInput placeholder="Code du jeu" [(ngModel)]="code" name="code" />
+                </mat-form-field>
+                <mat-form-field>
+                    <input matInput placeholder="Pseudonyme" [(ngModel)]="name" name="pseudo" />
                 </mat-form-field>
                 <button type="submit" mat-raised-button color="primary">Rejoindre</button>
             </form>

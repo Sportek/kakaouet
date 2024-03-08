@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { socketConnectionGuard } from '@app/guards/socket-connection/socket-connection.guard';
 import { AdminGameHistoryComponent } from '@app/pages/admin/admin-game-history/admin-game-history.component';
 import { AdminLoginPageComponent } from '@app/pages/admin/admin-login-page/admin-login-page.component';
 import { AdminPageComponent } from '@app/pages/admin/admin-page/admin-page.component';
@@ -10,6 +11,7 @@ import { DescriptonPageComponent } from '@app/pages/create-game/descripton-page/
 import { Error404Component } from '@app/pages/error/error404/error404.component';
 import { GameVueComponent } from '@app/pages/game/game-vue/game-vue.component';
 import { JoinComponent } from '@app/pages/game/join/join.component';
+import { OrganisatorComponent } from '@app/pages/game/organisator/organisator.component';
 import { WaitingRoomComponent } from '@app/pages/game/waiting-room/waiting-room.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 
@@ -28,15 +30,17 @@ const routes: Routes = [
     // Modification d'un Quiz
     { path: 'admin/create/quiz/:id', component: CreateUpdateQuizComponent },
 
-    { path: 'game/:code', component: GameVueComponent },
-    { path: 'waiting-room', component: WaitingRoomComponent },
-    { path: 'join', component: JoinComponent },
+    { path: 'game/:code', component: GameVueComponent, canActivate: [socketConnectionGuard] },
+    { path: 'organisator/:code', component: OrganisatorComponent, canActivate: [socketConnectionGuard] },
+    { path: 'waiting-room/:code', component: WaitingRoomComponent, canActivate: [socketConnectionGuard] },
+    { path: 'join', component: JoinComponent, canActivate: [socketConnectionGuard] },
     { path: 'create/description/:gameId', component: DescriptonPageComponent },
 
     // Tester un jeu via son id
     { path: 'testing/:id', component: GameVueComponent },
 
     { path: 'error-404', component: Error404Component },
+
     { path: '**', redirectTo: '/error-404' },
 ];
 
