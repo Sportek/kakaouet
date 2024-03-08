@@ -1,1 +1,89 @@
-<app-global-layout> waiting room </app-global-layout>
+<app-global-layout>
+    <div class="container">
+        <div class="wrapper">
+            <div class="main-container">
+                <div class="code-container">
+                    <div class="code-box">
+                        <div class="code-title">Code du jeu</div>
+                        <div class="code">{{ game.code }}</div>
+                    </div>
+                </div>
+
+                <div class="game-informations">
+                    <div class="game-data">
+                        <div class="game-title">
+                            {{ game.quizName }}
+                        </div>
+                        <div class="game-type">
+                            <div *ngIf="game.type === 'default'" class="game">
+                                <mat-icon>
+                                    <span class="material-symbols-outlined"> joystick </span>
+                                </mat-icon>
+                            </div>
+                            <div *ngIf="game.type === 'random'" class="game">
+                                <mat-icon>
+                                    <span class="material-symbols-outlined"> shuffle </span>
+                                </mat-icon>
+                            </div>
+                            <div *ngIf="game.type === 'test'" class="game">
+                                <mat-icon>
+                                    <span class="material-symbols-outlined"> labs </span>
+                                </mat-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="isCooldownStarted" class="game-start-container">
+                        <div class="starting-text">Préparez-vous, la partie commence bientôt!</div>
+                    </div>
+                </div>
+
+                <div class="players-container">
+                    <div class="players">
+                        <div *ngFor="let player of filterPlayers()" class="player">
+                            <div class="player-name">{{ player.name }}</div>
+                            <div *ngIf="client.role === 'organisator'" class="ban-player clickable">
+                                <mat-icon>
+                                    <span class="material-symbols-outlined" (click)="banPlayer(player)"> block </span>
+                                </mat-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-container">
+                    <app-chat />
+                </div>
+            </div>
+        </div>
+
+        <div class="player-counter-container">
+            <div class="player-counter-icon">
+                <mat-icon><span class="material-symbols-outlined"> person </span></mat-icon>
+            </div>
+            <div class="player-counter-value">{{ filterPlayers().length }}</div>
+        </div>
+
+        <div class="player-data-container">
+            <div class="player-name">{{ client.name }}</div>
+            <div *ngIf="client.role === 'organisator' && !isCooldownStarted" class="organizer-container">
+                <div class="organisator-button clickable" (click)="start()">
+                    <mat-icon><span class="material-symbols-outlined" matTooltip="Démarrer la partie"> play_arrow </span></mat-icon>
+                </div>
+                <div class="organisator-button clickable" (click)="changeLockState()">
+                    <mat-icon>
+                        <span *ngIf="isLocked" class="material-symbols-outlined" matTooltip="Dévérouiller la partie"> lock </span>
+                        <span *ngIf="!isLocked" class="material-symbols-outlined" matTooltip="Vérouiller la partie"> lock_open </span>
+                    </mat-icon>
+                </div>
+            </div>
+
+            <div *ngIf="isCooldownStarted" class="cooldown-timer">
+                <mat-icon>
+                    <span class="material-symbols-outlined"> hourglass </span>
+                </mat-icon>
+                <div class="text large-text">{{ cooldown }}</div>
+            </div>
+        </div>
+    </div>
+</app-global-layout>

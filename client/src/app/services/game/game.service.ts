@@ -1,249 +1,140 @@
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Timer } from '@app/classes/timer';
-import { QuizService } from '@app/services/quiz/quiz.service';
-import { TimeService } from '@app/services/timer/time.service';
-import { AnswerState, Game, GameRole, GameState, GameType, GameUser, Question } from '@common/types';
-import { BehaviorSubject, Observable, catchError, firstValueFrom, throwError } from 'rxjs';
+import { BASE_URL } from '@app/constants';
+import { NotificationService } from '@app/services/notification/notification.service';
+import { SocketService } from '@app/services/socket/socket.service';
+import { Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
+import { Game, GameRole, GameState, GameType, Question, QuestionType } from '@common/types';
+import { BehaviorSubject, catchError, throwError } from 'rxjs';
 
-const INCREMENTE_SCORE = 1.2;
+const QCM_REQUIRED_TIME_LEFT = 10;
+const QRL_REQUIRED_TIME_LEFT = 20;
+
 @Injectable({
     providedIn: 'root',
 })
 export class GameService {
-    id: string | null = null;
-    game: Game | undefined;
-    gameState: GameState = GameState.WaitingPlayers;
-    actualQuestionIndex: number = 0;
-    actualQuestion: BehaviorSubject<Question> = new BehaviorSubject<Question>({} as Question);
-    timer: Timer | undefined;
-    user: GameUser = {
-        _id: 'player',
-        isActive: true,
-        isExcluded: false,
-        name: 'Player',
-        answerState: AnswerState.Waiting,
-        role: GameRole.Player,
-        score: 0,
-    };
-    answers: BehaviorSubject<number[]> = new BehaviorSubject<number[]>([]);
-    selectedChoices: number[] = [];
-    canChangeChoices: boolean = true;
+    players: BehaviorSubject<PlayerClient[]>;
+    client: BehaviorSubject<Client>;
+    cooldown: BehaviorSubject<number>;
+    game: BehaviorSubject<GameRestricted>;
+    question: BehaviorSubject<Question | null>;
+    gameState: BehaviorSubject<GameState>;
+    isFinalAnswer: BehaviorSubject<boolean>;
+    answer: BehaviorSubject<Answer | null>;
+    isLocked: BehaviorSubject<boolean>;
 
+    // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
         private router: Router,
-        private quizService: QuizService,
-        private timeService: TimeService,
-    ) {}
+        private httpService: HttpClient,
+        private socketService: SocketService,
+        private notificationService: NotificationService,
+    ) {
+        this.initialise();
+        this.registerListeners();
 
-    async init(id: string | null) {
-        this.resetGame();
-        this.id = id;
-        if (this.router.url.includes('testing') && id) {
-            await this.setupFakeGame(id);
-        }
-        this.nextQuestion(0);
-        this.executeState(this.gameState);
-    }
-
-    sendMessage(message: string) {
-        // TODO: Pour l'instant c'est un "faux" message, aucun envoie en backend, en attente pour le sprint 2 ou 3.
-        this.game?.messages.push({
-            content: message,
-            createdAt: new Date(),
-            // eslint-disable-next-line no-underscore-dangle
-            gameUserId: 'organisator',
+        // Évènement de test pour vérifier qu'on est connecté au serveur
+        this.socketService.listen('test', (data) => {
+            // eslint-disable-next-line no-console
+            console.log(data);
         });
     }
 
-    resetGame() {
-        this.id = null;
-        this.game = undefined;
-        this.gameState = GameState.WaitingPlayers;
-        this.actualQuestionIndex = 0;
-        this.actualQuestion.next({} as Question);
-        this.timer = undefined;
-        this.user = {
-            _id: 'player',
-            isActive: true,
-            isExcluded: false,
-            name: 'Player',
-            answerState: AnswerState.Waiting,
-            role: GameRole.Player,
-            score: 0,
-        };
+    initialise() {
+        this.players = new BehaviorSubject<PlayerClient[]>([]);
+        this.client = new BehaviorSubject<Client>({ name: '', role: GameRole.Organisator, score: 0 });
+        this.cooldown = new BehaviorSubject<number>(0);
+        this.game = new BehaviorSubject<GameRestricted>({ code: '', quizName: '', type: GameType.Default });
+        this.question = new BehaviorSubject<Question | null>(null);
+        this.gameState = new BehaviorSubject<GameState>(GameState.WaitingPlayers);
+        this.isFinalAnswer = new BehaviorSubject<boolean>(false);
+        this.answer = new BehaviorSubject<Answer | null>(null);
+        this.isLocked = new BehaviorSubject<boolean>(false);
     }
 
-    /**
-     * Permet de créer une game de test avec un quiz contenue dans l'URL. */
-    async setupFakeGame(id: string) {
-        return new Promise<void>((resolve) => {
-            const organisator = {
-                _id: 'organisator',
-                isActive: true,
-                isExcluded: false,
-                name: 'Organisator',
-                answerState: AnswerState.Waiting,
-                role: GameRole.Player,
-                score: 0,
-            };
-            this.user = organisator;
-
-            this.quizService
-                .getQuizById(id)
-                .pipe(catchError((error) => this.handleError(error)))
-                .subscribe((quiz) => {
-                    this.game = {
-                        _id: 'test',
-                        type: GameType.Test,
-                        code: 'FAKE',
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                        isLocked: true,
-                        messages: [],
-                        quiz,
-                        users: [organisator],
-                    };
-                    resolve();
-                });
-        });
-    }
-    executeState(gameState: GameState) {
-        this.gameState = gameState;
-        switch (gameState) {
-            case GameState.WaitingPlayers:
-                // TODO: Pour le prochain sprint
-                this.executeState(GameState.PlayersAnswerQuestion);
-                break;
-            case GameState.PlayersAnswerQuestion:
-                this.playersAnswerQuestion();
-                break;
-            case GameState.OrganisatorCorrectingAnswers:
-                this.organisatorCorrectingAnswers();
-                break;
-            case GameState.DisplayQuestionResults:
-                this.displayQuestionResults();
-                break;
-            case GameState.DisplayQuizResults:
-                this.displayQuizResults();
-                break;
-            case GameState.End:
-                this.gameEnd();
-                break;
-            default:
-                throw new Error('Invalid game state');
-        }
+    startGame() {
+        if (!this.isLocked.getValue()) return this.notificationService.error('Veuillez verrouiller la partie avant de la démarrer');
+        if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length)
+            return this.notificationService.error('Il doit y avoir au moins un joueur pour démarrer la partie');
+        this.socketService.send(GameEvents.StartGame);
     }
 
-    /*
-     * Permet de set la question actuelle, soit en prenant la prochaine, soit en prenant celle à l'index donné.
-     * @return true si la question a été changée */
-    nextQuestion(index?: number) {
-        if (!this.game) return false;
-        if (index === undefined) {
-            if (!(this.actualQuestionIndex < this.game.quiz.questions.length - 1)) return false;
-            index = ++this.actualQuestionIndex;
-        }
-        this.resetQuestion();
-        this.actualQuestion.next(this.game.quiz.questions[index]);
-        return true;
+    changeLockState() {
+        this.socketService.send(GameEvents.ChangeLockedState);
     }
 
-    resetQuestion() {
-        this.canChangeChoices = true;
-        this.selectedChoices = [];
+    sendAnswer(answer: Answer) {
+        this.socketService.send(GameEvents.SelectAnswer, { answers: answer });
     }
 
-    isSelected(index: number) {
-        return this.selectedChoices.includes(index);
+    confirmAnswer() {
+        this.socketService.send(GameEvents.ConfirmAnswers);
     }
 
-    getCorrectAnswers(): Observable<number[]> {
-        return this.answers;
+    filterPlayers(): PlayerClient[] {
+        return this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded);
     }
 
-    selectChoice(index: number) {
-        if (!this.canChangeChoices) return;
-        if (this.selectedChoices.includes(index)) {
-            this.selectedChoices = this.selectedChoices.filter((choice) => choice !== index);
+    toggleTimer() {
+        this.socketService.send(GameEvents.ToggleTimer);
+    }
+
+    speedUpTimer() {
+        const requiredTime = this.question.getValue()?.type === QuestionType.QCM ? QCM_REQUIRED_TIME_LEFT : QRL_REQUIRED_TIME_LEFT;
+        if (requiredTime < this.cooldown.getValue())
+            return this.notificationService.error('Le temps requis minimum pour accélérer le timer est dépassé');
+        this.socketService.send(GameEvents.SpeedUpTimer);
+    }
+
+    createNewGame(quizId: string, type: GameType): void {
+        this.httpService
+            .post<Game>(BASE_URL + '/game/', { quizId, type })
+            .pipe(catchError((error) => this.handleError(error)))
+            .subscribe((game) => {
+                this.router.navigateByUrl('/waiting-room/' + game.code);
+                this.initialise();
+                this.socketService.send(GameEvents.CreateGame, { code: game.code, quizId });
+                this.socketService.connect();
+                this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
+                this.game.next({ code: game.code, quizName: game.quiz.name, type: game.type });
+            });
+    }
+
+    nextQuestion(): void {
+        this.socketService.send(GameEvents.NextQuestion);
+    }
+
+    selectAnswer(index: number): void {
+        if (this.isFinalAnswer.getValue()) return;
+        const answer = this.answer.getValue() as number[];
+        if (answer.includes(index)) {
+            this.answer.next(answer.filter((i) => i !== index));
         } else {
-            this.selectedChoices.push(index);
+            this.answer.next([...answer, index]);
         }
+
+        const newAnswer = this.answer.getValue();
+        if (newAnswer) this.sendAnswer(newAnswer);
     }
 
-    giveUp() {
-        // TODO: Traiter le cas où le joueur abandonne (sprint 2)
-        if (!this.id) return;
-        this.router.navigateByUrl('/create/description/' + this.id);
-    }
-
-    /*
-     * Phase de réponse aux questions par les joueurs*/
-    private playersAnswerQuestion() {
-        if (!this.game) return;
-        // Démarrer le timer de réponse à la question
-        this.timer = this.timeService.createTimer(
-            'game',
-            new Timer(this.game.quiz.duration, {
-                whenDone: () => this.executeState(GameState.OrganisatorCorrectingAnswers),
-            }),
-        );
-    }
-
-    /*
-     * Phase de correction des réponses par l'organisateur */
-    private organisatorCorrectingAnswers() {
-        this.canChangeChoices = false;
-        this.executeState(GameState.DisplayQuestionResults);
-    }
-
-    private async correctAnswers() {
-        if (this.user && this.game) {
-            const values = await firstValueFrom(
-                // eslint-disable-next-line no-underscore-dangle
-                this.quizService.correctQuizAnswers(this.game.quiz._id, this.actualQuestionIndex, this.selectedChoices),
-            );
-            this.answers.next(values.correctChoicesIndices);
-            this.user.score += values.points * INCREMENTE_SCORE;
+    setResponseAsFinal(): void {
+        if (this.question.getValue()?.type === QuestionType.QCM) {
+            const answer = this.answer.getValue() as number[];
+            if (answer.length === 0) return this.notificationService.error('Veuillez sélectionner au moins une réponse');
         }
+        this.isFinalAnswer.next(true);
+        this.confirmAnswer();
     }
 
-    private async goNextQuestion() {
-        const hasNextQuestion = this.nextQuestion();
-        let nextGameState = GameState.DisplayQuizResults;
-        if (hasNextQuestion) nextGameState = GameState.PlayersAnswerQuestion;
-        this.executeState(nextGameState);
+    banPlayer(player: PlayerClient) {
+        this.socketService.send(GameEvents.BanPlayer, { name: player.name });
     }
 
-    private displayQuestionResults() {
-        if (this.game?.type === GameType.Test) this.correctAnswers();
-        this.answers.next([0]);
-
-        this.timer = this.timeService.createTimer(
-            'cooldown',
-            new Timer(3, {
-                whenDone: () => {
-                    // const hasNextQuestion = this.nextQuestion();
-                    // let nextGameState = GameState.DisplayQuizResults;
-                    // if (hasNextQuestion) nextGameState = GameState.PlayersAnswerQuestion;
-                    // this.executeState(nextGameState);
-                    this.goNextQuestion();
-                },
-            }),
-        );
-    }
-
-    private displayQuizResults() {
-        this.executeState(GameState.End);
-    }
-
-    private gameEnd() {
-        if (!this.game) return;
-        if (this.game.type === GameType.Test) {
-            // eslint-disable-next-line no-underscore-dangle
-            this.router.navigateByUrl('/create/description/' + this.game.quiz._id);
-        }
+    // TODO: Envoyer le message
+    sendMessage(message: string) {
+        return message;
     }
 
     private handleError(error: HttpErrorResponse) {
@@ -252,5 +143,158 @@ export class GameService {
             return throwError(() => new Error('Impossible to find this game'));
         }
         return throwError(() => new Error(error.message));
+    }
+
+    private resetPlayerAnswers() {
+        this.players.next(
+            this.players.getValue().map((player) => {
+                if (player.answers)
+                    player.answers = {
+                        hasInterracted: false,
+                        hasConfirmed: false,
+                        answer: this.question.getValue()?.type === QuestionType.QCM ? [] : '',
+                    };
+                return player;
+            }),
+        );
+    }
+
+    private playerJoinGameListener() {
+        this.socketService.listen(GameEvents.PlayerJoinGame, (data: GameEventsData.PlayerJoinGame) => {
+            this.players.next([
+                ...this.players.getValue(),
+                { name: data.name, role: data.role, isExcluded: data.isExcluded, score: data.score, hasGiveUp: data.hasGiveUp },
+            ]);
+        });
+    }
+
+    private playerQuitGameListener() {
+        this.socketService.listen(GameEvents.PlayerQuitGame, (data: GameEventsData.PlayerQuitGame) => {
+            this.players.next(this.players.getValue().filter((player) => player.name !== data.name));
+        });
+    }
+
+    private gameCooldownListener() {
+        this.socketService.listen(GameEvents.GameCooldown, (data: GameEventsData.GameCooldown) => {
+            this.cooldown.next(data.cooldown);
+        });
+    }
+
+    private gameClosedListener() {
+        this.socketService.listen(GameEvents.GameClosed, () => {
+            this.router.navigateByUrl('/home', { replaceUrl: true });
+            this.notificationService.success('La partie a été fermée');
+        });
+    }
+
+    private gameChangeStateListener() {
+        this.socketService.listen(GameEvents.GameStateChanged, (data: GameEventsData.GameStateChanged) => {
+            this.gameState.next(data.gameState);
+
+            if (data.gameState === GameState.PlayersAnswerQuestion) {
+                this.resetPlayerAnswers();
+                if (this.client.getValue().role === GameRole.Organisator) {
+                    this.router.navigate(['/organisator', this.game.getValue().code], { replaceUrl: true });
+                    return;
+                }
+                this.router.navigate(['/game', this.game.getValue().code], { replaceUrl: true });
+            }
+
+            if (data.gameState === GameState.DisplayQuestionResults) {
+                this.isFinalAnswer.next(true);
+            }
+        });
+    }
+
+    private gameQuestionListener() {
+        this.socketService.listen(GameEvents.GameQuestion, (data: GameEventsData.GameQuestion) => {
+            this.question.next(data.question);
+            this.answer.next(data.question.type === QuestionType.QCM ? [] : '');
+            this.isFinalAnswer.next(false);
+        });
+    }
+
+    private receiveAnswerListener() {
+        this.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
+            const player = this.players.getValue().find((p) => p.name === data.name);
+            if (player) {
+                player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
+                this.players.next([...this.players.getValue()]);
+            }
+        });
+    }
+
+    private receiveConfirmAnswerListener() {
+        this.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmAnswers) => {
+            const player = this.players.getValue().find((p) => p.name === data.name);
+            if (player) {
+                if (player.answers) {
+                    player.answers.hasConfirmed = true;
+                }
+                this.players.next([...this.players.getValue()]);
+            }
+        });
+    }
+
+    private receiveUpdateScoreListener() {
+        this.socketService.listen(GameEvents.UpdateScore, (data: GameEventsData.UpdateScore) => {
+            if (data.hasAnsweredFirst) this.notificationService.info('Vous avez répondu en premier !');
+            this.client.next({ ...this.client.getValue(), score: data.score });
+        });
+    }
+
+    private receiveGameLockedStateChanged() {
+        this.socketService.listen(GameEvents.GameLockedStateChanged, (data: GameEventsData.GameLockedStateChanged) => {
+            this.isLocked.next(data.isLocked);
+        });
+    }
+
+    private receiveBannedPlayers() {
+        this.socketService.listen(GameEvents.PlayerBanned, (data: GameEventsData.PlayerBanned) => {
+            this.players.next(this.players.getValue().map((player) => (player.name === data.name ? { ...player, isExcluded: true } : player)));
+            if (data.name === this.client.getValue().name) {
+                this.router.navigateByUrl('/home', { replaceUrl: true });
+                this.notificationService.error('Vous avez été banni de la partie');
+            }
+        });
+    }
+
+    private receivePlayerScores() {
+        this.socketService.listen(GameEvents.SendPlayersScores, (data: GameEventsData.SendPlayersScores) => {
+            this.players.next(
+                this.players.getValue().map((player) => {
+                    const score = data.scores.find((s) => s.name === player.name);
+                    if (score) player.score = score.score;
+                    return player;
+                }),
+            );
+        });
+    }
+
+    private receiveGiveUpPlayers() {
+        this.socketService.listen(GameEvents.PlayerHasGiveUp, (data: GameEventsData.PlayerHasGiveUp) => {
+            this.players.next(
+                this.players.getValue().map((player) => {
+                    if (player.name === data.name) player.hasGiveUp = true;
+                    return player;
+                }),
+            );
+        });
+    }
+
+    private registerListeners() {
+        this.playerJoinGameListener();
+        this.playerQuitGameListener();
+        this.gameCooldownListener();
+        this.gameClosedListener();
+        this.gameChangeStateListener();
+        this.gameQuestionListener();
+        this.receiveAnswerListener();
+        this.receiveConfirmAnswerListener();
+        this.receiveUpdateScoreListener();
+        this.receiveGameLockedStateChanged();
+        this.receiveBannedPlayers();
+        this.receivePlayerScores();
+        this.receiveGiveUpPlayers();
     }
 }

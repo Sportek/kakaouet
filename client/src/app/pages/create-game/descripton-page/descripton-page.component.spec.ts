@@ -8,6 +8,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { GameType } from '@common/types';
 import { DescriptonPageComponent } from './descripton-page.component';
 
 class MockQuizService {
@@ -69,9 +70,9 @@ describe('DescriptonPageComponent', () => {
 
     it('should set game data on valid quiz fetch', () => {
         fixture.detectChanges();
-        expect(component.game).toBeTruthy();
+        expect(component.quiz).toBeTruthy();
         // eslint-disable-next-line no-underscore-dangle
-        expect(component.game._id).toEqual('valid-id');
+        expect(component.quiz._id).toEqual('valid-id');
     });
 
     it('should navigate to /testing on testGame with valid quiz', () => {
@@ -81,11 +82,12 @@ describe('DescriptonPageComponent', () => {
         expect(spy).toHaveBeenCalledWith(['/testing', 'valid-id']);
     });
 
-    it('should navigate to /waiting-room on createGame with valid quiz', () => {
-        const spy = spyOn(router, 'navigate');
+    it('should call createNewGame on createGame', () => {
+        // @ts-ignore -- Obligé de mocker la méthode car elle est privée
+        const spy = spyOn(component.gameService, 'createNewGame');
         fixture.detectChanges();
         component.createGame('valid-id');
-        expect(spy).toHaveBeenCalledWith(['./waiting-room']);
+        expect(spy).toHaveBeenCalledWith('valid-id', GameType.Default);
     });
 
     it('should handle hidden quiz in checkQuizBeforeNavigation', () => {

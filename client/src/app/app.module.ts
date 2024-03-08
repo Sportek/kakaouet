@@ -34,6 +34,7 @@ import { DescriptonPageComponent } from './pages/create-game/descripton-page/des
 import { Error404Component } from './pages/error/error404/error404.component';
 import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
 import { JoinComponent } from './pages/game/join/join.component';
+import { OrganisatorComponent } from './pages/game/organisator/organisator.component';
 import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.component';
 
 /**
@@ -70,6 +71,7 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         ConfirmationDialogComponent,
         WaitingRoomComponent,
         UpdateNameComponent,
+        OrganisatorComponent,
     ],
     imports: [
         AppMaterialModule,

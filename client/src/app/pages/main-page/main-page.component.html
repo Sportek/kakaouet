@@ -7,7 +7,7 @@
                         <img src="./assets/img/kakaouet.png" alt="Logo" />
                     </div>
                     <div class="buttons">
-                        <button routerLink="/join" mat-fab extended color="accent" class="large-text">Joindre une partie</button>
+                        <button routerLink="/join" mat-fab extended color="accent" (click)="joinGame()" class="large-text">Joindre une partie</button>
                         <button routerLink="/create" mat-fab extended color="primary" class="large-text">Créer une partie</button>
                         <button routerLink="/admin" mat-fab extended color="primary" class="large-text">Administrer les jeux</button>
                     </div>

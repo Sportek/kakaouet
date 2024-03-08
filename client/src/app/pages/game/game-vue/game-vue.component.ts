@@ -1,90 +1,95 @@
-import { Component, HostListener, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
-import { BaseQuestion, Choice, GameState, QuestionType } from '@common/types';
-import { Observable, filter, map, of, switchMap } from 'rxjs';
+import { Answer } from '@common/game-types';
+import { Question, QuestionType } from '@common/types';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-game-vue',
     templateUrl: './game-vue.component.html',
     styleUrls: ['./game-vue.component.scss'],
 })
-export class GameVueComponent implements OnInit {
-    constructor(
-        public gameService: GameService,
-        private snackbar: MatSnackBar,
-        private router: ActivatedRoute,
-    ) {}
+export class GameVueComponent implements OnInit, OnDestroy {
+    question: Question | null;
+    cooldown: number;
+    answer: Answer | null;
+    isFinalAnswer: boolean;
+    score: number;
+
+    private subscriptions: Subscription[];
+
+    constructor(public gameService: GameService) {
+        this.question = null;
+        this.cooldown = 0;
+        this.answer = null;
+        this.isFinalAnswer = false;
+        this.score = 0;
+        this.subscriptions = [];
+    }
 
     @HostListener('document:keydown', ['$event'])
     keyboardChoices(event: KeyboardEvent) {
         const target = event.target as HTMLElement;
-        if (target.tagName === 'INPUT' && target.getAttribute('type') === 'text') {
-            return;
+        if (target.tagName === 'INPUT' && target.getAttribute('type') === 'text') return;
+
+        if (this.question?.type === QuestionType.QCM) {
+            const possibleChoices = this.question.choices.map((choice, index) => (index + 1).toString());
+            if (possibleChoices.includes(event.key)) this.selectAnswer(parseInt(event.key, 10) - 1);
         }
 
-        this.isQCMQuestion().subscribe((isQCM) => {
-            if (isQCM && this.gameService.canChangeChoices) {
-                this.getQCMChoices().subscribe((choices) => {
-                    const possibleChoices = choices.map((choice, index) => (index + 1).toString());
-                    if (possibleChoices.includes(event.key)) {
-                        this.gameService.selectChoice(parseInt(event.key, 10) - 1);
-                    }
-                });
-            }
-        });
-
-        if (event.key === 'Enter' && this.gameService.canChangeChoices) {
-            this.setResponseAsFinal();
-        }
+        if (event.key === 'Enter' && !this.isFinalAnswer) this.setResponseAsFinal();
     }
 
-    async ngOnInit() {
-        await this.gameService.init(this.router.snapshot.paramMap.get('id'));
+    selectAnswer(index: number): void {
+        this.gameService.selectAnswer(index);
     }
 
-    setResponseAsFinal() {
-        if (this.gameService.selectedChoices.length === 0) {
-            this.snackbar.open('Veuillez sélectionner au moins une réponse', '❌', { duration: 2000 });
-            return;
-        }
-        this.gameService.canChangeChoices = false;
+    temporary() {
+        return true;
     }
 
-    isQCMQuestion(): Observable<boolean> {
-        return this.gameService.actualQuestion.pipe(map((question) => question.type === QuestionType.QCM.toUpperCase()));
-    }
-
-    getQCMChoices(): Observable<Choice[]> {
-        return this.gameService.actualQuestion.pipe(
-            filter((question) => question.type === QuestionType.QCM),
-            map((question) => {
-                const qcmQuestion = question as { type: QuestionType.QCM; choices: Choice[] } & BaseQuestion;
-                return qcmQuestion.choices;
+    ngOnInit(): void {
+        this.subscriptions.push(
+            this.gameService.question.subscribe((question) => {
+                this.question = question;
+                this.answer = this.question?.type === QuestionType.QCM ? [] : '';
             }),
-            switchMap((choices) => {
-                return choices ? of(choices) : of([]);
+        );
+
+        this.subscriptions.push(
+            this.gameService.cooldown.subscribe((cooldown) => {
+                this.cooldown = cooldown;
+            }),
+        );
+
+        this.subscriptions.push(
+            this.gameService.isFinalAnswer.subscribe((isFinalAnswer) => {
+                this.isFinalAnswer = isFinalAnswer;
+            }),
+        );
+
+        this.subscriptions.push(
+            this.gameService.client.subscribe((client) => {
+                this.score = client.score;
+            }),
+        );
+
+        this.subscriptions.push(
+            this.gameService.answer.subscribe((answer) => {
+                this.answer = answer;
             }),
         );
     }
 
-    getQuestionLabel(): Observable<string> {
-        return this.gameService.actualQuestion.pipe(map((question) => question.label));
+    ngOnDestroy(): void {
+        this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
 
-    getQuestionPoints(): Observable<number> {
-        return this.gameService.actualQuestion.pipe(map((question) => question.points));
+    isSelected(index: number): boolean {
+        return (this.answer as number[]).includes(index);
     }
 
-    isIncorrectAnswer(index: number): Observable<boolean> {
-        if (this.gameService.gameState !== GameState.DisplayQuestionResults) {
-            return of(false);
-        }
-        return this.gameService.getCorrectAnswers().pipe(
-            map((answers) => {
-                return !answers.includes(index);
-            }),
-        );
+    setResponseAsFinal(): void {
+        this.gameService.setResponseAsFinal();
     }
 }

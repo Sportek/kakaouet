@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { JoinService } from '@app/services/join/join.service';
 
 @Component({
     selector: 'app-join',
@@ -8,8 +8,10 @@ import { Router } from '@angular/router';
 })
 export class JoinComponent {
     code: string = '';
-    constructor(private router: Router) {}
-    joinGame() {
-        this.router.navigate(['/game', this.code]);
+    name: string = '';
+    constructor(private joinService: JoinService) {}
+
+    confirm(): void {
+        this.joinService.join(this.code, this.name);
     }
 }

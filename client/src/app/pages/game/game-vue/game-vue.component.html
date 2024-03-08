@@ -6,32 +6,32 @@
                     <mat-icon>
                         <span class="material-symbols-outlined"> grade </span>
                     </mat-icon>
-                    <div class="text large-text">{{ getQuestionPoints() | async }}</div>
+                    <div class="text large-text">{{ question?.points }}</div>
                 </div>
                 <div class="question large-text">
-                    {{ getQuestionLabel() | async }}
+                    {{ question?.label }}
                 </div>
                 <div class="icon-container">
                     <mat-icon>
                         <span class="material-symbols-outlined"> hourglass </span>
                     </mat-icon>
-                    <div class="text large-text">{{ gameService.timer?.getTimer() || 0 }}</div>
+                    <div class="text large-text">{{ cooldown }}</div>
                 </div>
             </div>
             <div class="responses-container">
-                <div *ngIf="isQCMQuestion() | async">
-                    <ng-container *ngIf="getQCMChoices() | async as choices">
+                <div *ngIf="question">
+                    <ng-container *ngIf="question.type === 'QCM'">
                         <div
-                            *ngFor="let choice of choices; let i = index"
+                            *ngFor="let choice of question.choices; let i = index"
                             [id]="'index-' + i"
                             class="response large-text"
                             [ngClass]="{
-                                selected: gameService.isSelected(i),
-                                clickable: gameService.canChangeChoices,
-                                'not-clickable': !gameService.canChangeChoices,
-                                'is-incorrect': isIncorrectAnswer(i) | async
+                                selected: isSelected(i),
+                                clickable: !isFinalAnswer,
+                                'not-clickable': isFinalAnswer,
+                                'is-incorrect': false
                             }"
-                            (click)="gameService.selectChoice(i)"
+                            (click)="selectAnswer(i)"
                         >
                             {{ i + 1 + '. ' + choice.label }}
                         </div></ng-container
@@ -39,11 +39,11 @@
                 </div>
             </div>
             <div class="buttons-container">
-                <button mat-raised-button color="primary" class="button" (click)="gameService.giveUp()">
+                <button mat-raised-button color="primary" class="button" (click)="temporary()">
                     <span class="button-text">Abandonner</span>
                 </button>
-                <div class="user-data-container">Votre score actuel : {{ gameService.user.score || 0 }}</div>
-                <button mat-raised-button color="primary" class="button" (click)="setResponseAsFinal()">
+                <div class="user-data-container">Votre score actuel : {{ score }}</div>
+                <button mat-raised-button color="primary" class="button" (click)="temporary()">
                     <span class="button-text">Valider</span>
                 </button>
             </div>
