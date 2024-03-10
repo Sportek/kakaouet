@@ -118,11 +118,29 @@ describe('DescriptonPageComponent', () => {
 
     it('should navigate to specified path', fakeAsync(() => {
         const spyRouterNavigate = spyOn(router, 'navigate');
-        const visibilityOffQuiz = cloneDeep(WORKING_QUIZ as Quiz);
-        visibilityOffQuiz.visibility = true;
-        spyOn(quizService, 'getQuizById').and.returnValue(of(visibilityOffQuiz));
-        component.checkQuizBeforeNavigation('invalid-id', '/fakePath', false);
+        const visibilityOnQuiz = cloneDeep(WORKING_QUIZ as Quiz);
+        visibilityOnQuiz.visibility = true;
+        spyOn(quizService, 'getQuizById').and.returnValue(of(visibilityOnQuiz));
+        component.checkQuizBeforeNavigation('fakeId', '/fakePath', false);
         tick();
         expect(spyRouterNavigate).toHaveBeenCalledWith(['/fakePath']);
     }));
+
+    it('should navigate to specified path with gameId', fakeAsync(() => {
+        const spyRouterNavigate = spyOn(router, 'navigate');
+        const visibilityOnQuiz = cloneDeep(WORKING_QUIZ as Quiz);
+        visibilityOnQuiz.visibility = true;
+        spyOn(quizService, 'getQuizById').and.returnValue(of(visibilityOnQuiz));
+        component.checkQuizBeforeNavigation('fakeId', '/fakePath', true);
+        tick();
+        expect(spyRouterNavigate).toHaveBeenCalledWith(['/fakePath', 'fakeId']);
+    }));
+
+    it('should create a new game', () => {
+        // @ts-ignore
+        const gameServiceSpy = spyOn(component.gameService, 'createNewGame');
+        component.testGame('fakeId');
+
+        expect(gameServiceSpy).toHaveBeenCalledWith('fakeId', GameType.Test);
+    });
 });
