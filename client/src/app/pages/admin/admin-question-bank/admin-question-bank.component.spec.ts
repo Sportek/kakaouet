@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SelectorService } from '@app/services/selector/selector.service';
-import { of } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { AdminQuestionBankComponent } from './admin-question-bank.component';
 
 class MockSelectorService {
@@ -71,5 +71,14 @@ describe('AdminQuestionBankComponent', () => {
 
     it('should unsubscribe from currentChoice on destroy', () => {
         expect(() => component.ngOnDestroy()).not.toThrow();
+    });
+
+    it('should remove subscriber if exists', () => {
+        // @ts-ignore
+        component.currentChoiceSubscriber = new Subscription();
+        component.ngOnDestroy();
+
+        // @ts-ignore
+        expect(component.currentChoiceSubscriber.closed).toBe(true);
     });
 });

@@ -7,8 +7,10 @@ import { Observable, of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { WORKING_QUIZ } from '@app/fake-quizzes';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { GameType } from '@common/types';
+import { GameType, Quiz } from '@common/types';
+import { cloneDeep } from 'lodash';
 import { DescriptonPageComponent } from './descripton-page.component';
 
 class MockQuizService {
@@ -98,7 +100,8 @@ describe('DescriptonPageComponent', () => {
         expect(spySnackBar).toHaveBeenCalledWith('Ce jeu est actuellement invisible.', 'Fermer', { duration: 5000 });
         expect(spyRouter).toHaveBeenCalledWith(['/create']);
     });
-    it('should handle other errors in checkQuizBeforeNavigation', fakeAsync(() => {
+
+    it('should handle notFound errors in checkQuizBeforeNavigation', fakeAsync(() => {
         const spySnackBarOpen = spyOn(snackBar, 'open');
         const spyRouterNavigate = spyOn(router, 'navigate');
         spyOn(quizService, 'getQuizById').and.returnValue(throwError(() => new Error()));
@@ -106,5 +109,27 @@ describe('DescriptonPageComponent', () => {
         tick();
         expect(spySnackBarOpen).toHaveBeenCalledWith('Ce jeu a été supprimé, veuillez sélectionner un autre jeu', 'Fermer', { duration: 5000 });
         expect(spyRouterNavigate).toHaveBeenCalled();
+    }));
+
+    it('should handle other errors in checkQuizBeforeNavigation', fakeAsync(() => {
+        const spySnackBarOpen = spyOn(snackBar, 'open');
+        spyOn(quizService, 'getQuizById').and.returnValue(
+            throwError(() => {
+                return { status: 500 };
+            }),
+        );
+        component.checkQuizBeforeNavigation('invalid-id', '/create', true);
+        tick();
+        expect(spySnackBarOpen).toHaveBeenCalledWith('Une erreur est survenue. Veuillez réessayer.', 'Fermer', { duration: 5000 });
+    }));
+
+    it('should navigate to specified path', fakeAsync(() => {
+        const spyRouterNavigate = spyOn(router, 'navigate');
+        const visibilityOffQuiz = cloneDeep(WORKING_QUIZ as Quiz);
+        visibilityOffQuiz.visibility = true;
+        spyOn(quizService, 'getQuizById').and.returnValue(of(visibilityOffQuiz));
+        component.checkQuizBeforeNavigation('invalid-id', '/fakePath', false);
+        tick();
+        expect(spyRouterNavigate).toHaveBeenCalledWith(['/fakePath']);
     }));
 });
