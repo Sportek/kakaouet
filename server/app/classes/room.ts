@@ -1,6 +1,6 @@
 import { GameService } from '@app/services/game/game.service';
 import { GameEvents, PlayerClient } from '@common/game-types';
-import { GameRole, GameType } from '@common/types';
+import { GameRole, GameState, GameType } from '@common/types';
 import { Server } from 'socket.io';
 import { GameSession } from './game/game-session';
 import { Player } from './player';
@@ -30,6 +30,7 @@ export class Room {
         player.hasGiveUp = true;
         player.leaveAllRooms();
         this.broadcast(GameEvents.PlayerHasGiveUp, {}, { name: playerName });
+        this.shouldDeleteGame();
     }
 
     addPlayer(player: Player): void {
@@ -67,14 +68,7 @@ export class Room {
         this.players = this.players.filter((p) => p.name !== playerName);
         player.leaveAllRooms();
         this.broadcast(GameEvents.PlayerQuitGame, { exceptRoom: player.socket.id }, { name: playerName });
-
-        const noPlayers = this.players.length === 0;
-        // TODO: Check game type if it is a normal game.
-        const noOrganizer = !this.players.some((p) => p.role === GameRole.Organisator);
-
-        if (noPlayers || noOrganizer) {
-            this.deleteRoom();
-        }
+        this.shouldDeleteGame();
     }
 
     deleteRoom(): void {
@@ -123,5 +117,15 @@ export class Room {
 
     allPlayerAnswered(): boolean {
         return this.getOnlyGamePlayers().every((player) => player.getAnswer(this.game.gameQuestionIndex) !== undefined);
+    }
+
+    private shouldDeleteGame(): void {
+        const hasPlayers = this.players.some((p) => p.role === GameRole.Player && p.isExcluded === false);
+        const noPlayers = !hasPlayers && this.game.gameState !== GameState.WaitingPlayers;
+        const hasOrganisator = this.players.some((p) => p.role === GameRole.Organisator && p.hasGiveUp === false);
+        const noOrganisator = !hasOrganisator && this.game.type === GameType.Default;
+        if (noPlayers || noOrganisator) {
+            this.deleteRoom();
+        }
     }
 }

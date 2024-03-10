@@ -39,7 +39,7 @@ export class GameService {
 
         // Évènement de test pour vérifier qu'on est connecté au serveur
         this.socketService.listen('test', (data) => {
-            // eslint-disable-next-line no-console
+            // eslint-disable-next-line no-console -- Nécessaire pour le débug message dans la console.
             console.log(data);
         });
     }

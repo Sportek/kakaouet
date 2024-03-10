@@ -1,6 +1,6 @@
 import { Player } from '@app/classes/player';
 import { GameService } from '@app/services/game/game.service';
-import { GameEvents, GameEventsData } from '@common/game-types';
+import { GameEvents, GameEventsData, SocketResponse } from '@common/game-types';
 import { GameRole, GameState, GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -14,7 +14,7 @@ export class GameGateway {
     constructor(private gameService: GameService) {}
 
     @SubscribeMessage(GameEvents.Disconnect)
-    handleDisconnect(@ConnectedSocket() client: Socket): void {
+    handleDisconnect(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (gameSession) {
             const player = gameSession.room.getPlayerWithSocketId(client.id);
@@ -26,10 +26,12 @@ export class GameGateway {
                 }
             }
         }
+
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.SelectAnswer)
-    handleSelectAnswer(@MessageBody() data: GameEventsData.SelectAnswer, @ConnectedSocket() client: Socket): void {
+    handleSelectAnswer(@MessageBody() data: GameEventsData.SelectAnswer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (gameSession) {
             const player = gameSession.room.getPlayerWithSocketId(client.id);
@@ -37,10 +39,11 @@ export class GameGateway {
                 player.setAnswer(data.answers);
             }
         }
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.ConfirmAnswers)
-    handleConfirmAnswers(@ConnectedSocket() client: Socket): void {
+    handleConfirmAnswers(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (gameSession) {
             const player = gameSession.room.getPlayerWithSocketId(client.id);
@@ -52,20 +55,21 @@ export class GameGateway {
                 }
             }
         }
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.JoinGame)
-    handleJoinGame(@MessageBody() data: GameEventsData.JoinGame, @ConnectedSocket() client: Socket): void {
+    handleJoinGame(@MessageBody() data: GameEventsData.JoinGame, @ConnectedSocket() client: Socket): SocketResponse {
         try {
             const gameSession = this.gameService.getGameSessionByCode(data.code);
             if (!gameSession) {
                 client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: "La partie n'existe pas" });
-                return;
+                return { isSuccess: false, message: "La partie n'existe pas" };
             }
 
             if (gameSession.isLocked) {
                 client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: 'La partie est vérouillée' });
-                return;
+                return { isSuccess: false, message: 'La partie est vérouillée' };
             }
 
             const player = gameSession.room.getPlayer(data.name);
@@ -76,83 +80,94 @@ export class GameGateway {
                         isSuccess: false,
                         message: 'Ce pseudonyme est banni de la partie',
                     });
-                    return;
+                    return { isSuccess: false, message: 'Ce pseudonyme est banni de la partie' };
                 } else {
                     client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: 'Ce nom est déjà pris' });
-                    return;
+                    return { isSuccess: false, message: 'Ce nom est déjà pris' };
                 }
             }
             gameSession.room.addPlayer(new Player(data.name, client, GameRole.Player));
         } catch (error) {
             client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: 'Une erreur est survenue' });
+            return { isSuccess: false, message: 'Une erreur est survenue' };
         }
     }
 
     @SubscribeMessage(GameEvents.CreateGame)
-    async handleCreateGame(@MessageBody() data: GameEventsData.CreateGame, @ConnectedSocket() client: Socket): Promise<void> {
+    async handleCreateGame(@MessageBody() data: GameEventsData.CreateGame, @ConnectedSocket() client: Socket): Promise<SocketResponse> {
         const gameSession = await this.gameService.createGameSession(data.code, this.server, data.quizId, data.gameType);
         const playerRole = data.gameType === GameType.Default ? GameRole.Organisator : GameRole.Player;
         gameSession.room.addPlayer(new Player('Organisateur', client, playerRole));
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.StartGame)
-    handleStartGame(@ConnectedSocket() client: Socket): void {
+    handleStartGame(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player) return;
+        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
         gameSession.startGameDelayed();
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.GameClosed)
-    handleGameClosed(@ConnectedSocket() client: Socket): void {
+    handleGameClosed(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        if (!gameSession) return;
+        if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
         this.gameService.removeGameSession(gameSession.code);
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.ChangeLockedState)
-    handleChangeLockState(@ConnectedSocket() client: Socket): void {
+    handleChangeLockState(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player) return;
-
+        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
         gameSession.changeGameLockState();
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.NextQuestion)
-    handleNextQuestion(@ConnectedSocket() client: Socket): void {
+    handleNextQuestion(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator) return;
+        if (!player || player.role !== GameRole.Organisator)
+            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.nextQuestion();
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.BanPlayer)
-    handleBanPlayer(@MessageBody() data: GameEventsData.BanPlayer, @ConnectedSocket() client: Socket): void {
+    handleBanPlayer(@MessageBody() data: GameEventsData.BanPlayer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator) return;
+        if (!player || player.role !== GameRole.Organisator)
+            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.room.banPlayer(data.name);
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.ToggleTimer)
-    handleToggleTimer(@ConnectedSocket() client: Socket): void {
+    handleToggleTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator) return;
+        if (!player || player.role !== GameRole.Organisator)
+            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.toggleTimer();
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.SpeedUpTimer)
-    handleSpeedUpTimer(@ConnectedSocket() client: Socket): void {
+    handleSpeedUpTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
         if (!player || player.role !== GameRole.Organisator) return;
 
         gameSession.speedUpTimer();
+        return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.SendMessage)
@@ -164,6 +179,7 @@ export class GameGateway {
     }
 
     afterInit(server: Server): void {
+        const INTERVAL = 1000;
         server.on('connection', (socket: Socket) => {
             socket.onAny((event) => {
                 Logger.log(`SOCKET ${event} (user: ${socket.id})`);
@@ -172,7 +188,6 @@ export class GameGateway {
 
         setInterval(() => {
             this.gameService.broadcastToGameSessions();
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        }, 1000);
+        }, INTERVAL);
     }
 }

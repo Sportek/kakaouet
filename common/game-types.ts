@@ -40,7 +40,8 @@ export type Answer = string | number[];
 export type ExtendedAnswer = { hasInterracted: boolean; hasConfirmed: boolean; answer: Answer };
 export type PlayerClient = { name: string; role: GameRole; score: number; isExcluded: boolean; hasGiveUp: boolean; answers?: ExtendedAnswer };
 export type Client = { name: string; role: GameRole; score: number };
-export type GameRestricted = { code: string; quizName: string; type: GameType };
+export type GameRestricted = { code: string; quizName: string; type: GameType }
+export type SocketResponse = { isSuccess: boolean, message?: string };
 
 export namespace GameEventsData {
     export interface SelectAnswer {

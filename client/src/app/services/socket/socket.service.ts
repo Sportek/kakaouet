@@ -12,6 +12,8 @@ export class SocketService {
     isConnected = false;
     private socket: Socket;
     private url: string = environment.gateawayUrl;
+    private messageQueue: unknown[] = [];
+    private isSendingMessage = false;
 
     constructor(private router: Router) {
         this.socket = io(this.url);
@@ -30,8 +32,11 @@ export class SocketService {
      * @param eventName Nom de l'événement
      * @param args Arguments à envoyer
      * @returns void */
-    send(eventName: string, ...args: unknown[]): void {
-        this.socket.emit(eventName, ...args);
+    send(eventName: string, ...args: unknown[]) {
+        this.messageQueue.push({ eventName, args });
+        if (!this.isSendingMessage) {
+            this.processQueue();
+        }
     }
 
     /*
@@ -59,5 +64,16 @@ export class SocketService {
     private disconnect(): void {
         this.isConnected = false;
         this.socket.disconnect();
+    }
+
+    private processQueue() {
+        if (this.messageQueue.length > 0) {
+            this.isSendingMessage = true;
+            const { eventName, args } = this.messageQueue.shift() as { eventName: string; args: unknown[] };
+            this.socket.emit(eventName, ...args, () => {
+                this.isSendingMessage = false;
+                this.processQueue();
+            });
+        }
     }
 }
