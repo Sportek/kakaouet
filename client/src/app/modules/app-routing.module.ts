@@ -36,9 +36,6 @@ const routes: Routes = [
     { path: 'join', component: JoinComponent, canActivate: [socketConnectionGuard] },
     { path: 'create/description/:gameId', component: DescriptonPageComponent },
 
-    // Tester un jeu via son id
-    { path: 'testing/:id', component: GameVueComponent },
-
     { path: 'error-404', component: Error404Component },
 
     { path: '**', redirectTo: '/error-404' },

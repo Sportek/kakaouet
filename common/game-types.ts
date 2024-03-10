@@ -60,7 +60,8 @@ export namespace GameEventsData {
 
     export interface CreateGame {
         code: string;
-        quizId: string
+        quizId: string;
+        gameType: GameType;
     }
 
     export interface PlayerConfirmAnswers {

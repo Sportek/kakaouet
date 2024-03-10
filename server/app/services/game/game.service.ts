@@ -1,9 +1,10 @@
 import { GameSession } from '@app/classes/game/game-session';
+import { Player } from '@app/classes/player';
 import { Room } from '@app/classes/room';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
 import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH } from '@common/constants';
-import { GameType } from '@common/types';
+import { GameRole, GameType } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -107,10 +108,11 @@ export class GameService {
         }
     }
 
-    async createGameSession(code: string, server: Server, quizId: string): Promise<GameSession> {
+    // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
+    async createGameSession(code: string, server: Server, quizId: string, gameType: GameType): Promise<GameSession> {
         const room = new Room(code, server, this);
         const quiz = await this.quizModel.findById(quizId);
-        const gameSession = new GameSession(code, room, quiz.toObject());
+        const gameSession = new GameSession(code, room, quiz.toObject(), gameType);
         this.gameSessions.set(code, gameSession);
         return gameSession;
     }
@@ -118,9 +120,11 @@ export class GameService {
     broadcastToGameSessions(): void {
         this.gameSessions.forEach((gameSession) => {
             const playerAmount = gameSession.room.getPlayers().length;
+
+            const role = (player: Player) => (player.role === GameRole.Organisator ? 'O' : 'P');
             const playerNames = gameSession.room
                 .getPlayers()
-                .map((player) => `${player.name}${player.isExcluded ? ' (banned)' : ''}${player.hasGiveUp ? ' (giveup)' : ''}`)
+                .map((player) => `[${role(player)}] ${player.name}${player.isExcluded ? ' (banned)' : ''}${player.hasGiveUp ? ' (giveup)' : ''}`)
                 .join(', ');
 
             gameSession.room.broadcast(

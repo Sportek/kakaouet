@@ -3,7 +3,7 @@ import { Room } from '@app/classes/room';
 import { Timer } from '@app/classes/timer';
 import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';
 import { GameEvents } from '@common/game-types';
-import { GameState, QuestionType, Quiz } from '@common/types';
+import { GameState, GameType, QuestionType, Quiz } from '@common/types';
 
 const START_GAME_DELAY = 5;
 const NEXT_QUESTION_DELAY = 3;
@@ -14,10 +14,12 @@ export class GameSession {
     room: Room;
     timer: Timer;
     gameState: GameState;
+    type: GameType;
     gameQuestionIndex: number;
     isLocked: boolean;
 
-    constructor(code: string, room: Room, quiz: Quiz) {
+    // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
+    constructor(code: string, room: Room, quiz: Quiz, gameType: GameType) {
         this.gameState = GameState.WaitingPlayers;
         this.gameQuestionIndex = 0;
         this.code = code;
@@ -25,37 +27,29 @@ export class GameSession {
         this.quiz = quiz;
         this.isLocked = false;
         this.room.setGame(this);
+        this.type = gameType;
     }
 
-    startGame(): void {
+    startGameDelayed(): void {
         if (this.gameState !== GameState.WaitingPlayers) return;
-        this.timer = new Timer(START_GAME_DELAY, {
-            whenDone: () => {
-                this.changeGameState(GameState.PlayersAnswerQuestion);
-                this.room.broadcast(GameEvents.GameQuestion, {}, { question: this.quiz.questions[this.gameQuestionIndex] });
-                this.startQuestionCooldown();
-            },
-            whenIncrement: (timeLeft) => {
-                this.room.broadcast(GameEvents.GameCooldown, {}, { cooldown: timeLeft });
-            },
-        });
+        if (this.type === GameType.Test) return this.startGame();
 
-        this.timer.start();
+        this.simpleDelay(START_GAME_DELAY, () => {
+            this.startGame();
+        });
+    }
+
+    startGame() {
+        this.changeGameState(GameState.PlayersAnswerQuestion);
+        this.room.broadcast(GameEvents.GameQuestion, {}, { question: this.quiz.questions[this.gameQuestionIndex] });
+        this.startQuestionCooldown();
     }
 
     startQuestionCooldown(): void {
         if (this.gameState !== GameState.PlayersAnswerQuestion) return;
-
-        this.timer = new Timer(this.quiz.duration, {
-            whenDone: () => {
-                this.displayQuestionResults();
-            },
-            whenIncrement: (timeLeft) => {
-                this.room.broadcast(GameEvents.GameCooldown, {}, { cooldown: timeLeft });
-            },
+        this.simpleDelay(this.quiz.duration, () => {
+            this.displayQuestionResults();
         });
-
-        this.timer.start();
     }
 
     displayQuestionResults(): void {
@@ -65,6 +59,7 @@ export class GameSession {
         });
         const scores = this.room.getOnlyGamePlayers().map((player) => ({ name: player.name, score: player.score }));
         this.room.sendToOrganizer(GameEvents.SendPlayersScores, { scores });
+        if (this.type === GameType.Test) this.nextQuestion();
     }
 
     nextQuestion(): void {
@@ -72,23 +67,17 @@ export class GameSession {
 
         this.gameQuestionIndex++;
         if (this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();
-
-        this.timer = new Timer(NEXT_QUESTION_DELAY, {
-            whenDone: () => {
-                this.changeGameState(GameState.PlayersAnswerQuestion);
-                this.room.broadcast(GameEvents.GameQuestion, {}, { question: this.quiz.questions[this.gameQuestionIndex] });
-                this.startQuestionCooldown();
-            },
-            whenIncrement: (timeLeft) => {
-                this.room.broadcast(GameEvents.GameCooldown, {}, { cooldown: timeLeft });
-            },
+        this.simpleDelay(NEXT_QUESTION_DELAY, () => {
+            this.changeGameState(GameState.PlayersAnswerQuestion);
+            this.room.broadcast(GameEvents.GameQuestion, {}, { question: this.quiz.questions[this.gameQuestionIndex] });
+            this.startQuestionCooldown();
         });
-
-        this.timer.start();
     }
 
     displayResults(): void {
-        this.changeGameState(GameState.DisplayQuizResults);
+        this.simpleDelay(NEXT_QUESTION_DELAY, () => {
+            this.changeGameState(GameState.DisplayQuizResults);
+        });
     }
 
     endGame(): void {
@@ -146,6 +135,16 @@ export class GameSession {
             if (hasAnsweredFirst) player.score += question.points * FIRST_PLAYER_SCORE_MULTIPLICATOR;
             return { player, hasAnsweredFirst };
         });
+    }
+
+    private simpleDelay(delay: number, callback: () => void) {
+        this.timer = new Timer(delay, {
+            whenDone: callback,
+            whenIncrement: (timeLeft) => {
+                this.room.broadcast(GameEvents.GameCooldown, {}, { cooldown: timeLeft });
+            },
+        });
+        this.timer.start();
     }
 
     private isCorrectAnswer(answer: number[], correctAnswers: number[]): boolean {
