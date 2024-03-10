@@ -175,6 +175,13 @@ describe('QuestionOverlayComponent', () => {
         expect(typeof returnValue).toBe('string');
     });
 
+    it('should have an error if still modifying one choice', () => {
+        component.currentQuestion = WORKING_QUESTION;
+        component.modifyChoice(WORKING_CHOICE);
+        const returnValue = component.isError();
+        expect(returnValue).toEqual('Tous les choix doivent être enregistrés');
+    });
+
     it('should execute saveChangesToQuestion', () => {
         component.currentQuestion = WORKING_QUESTION;
         const overlayServiceSpy = spyOn(overlayService, 'submitQuestion');
