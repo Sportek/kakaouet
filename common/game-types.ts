@@ -1,4 +1,4 @@
-import { GameRole, GameState, GameType, Question } from "./types";
+import { GameRole, GameState, GameType, Question } from './types';
 
 export enum GameEvents {
     // Events launched by the client
@@ -13,7 +13,7 @@ export enum GameEvents {
     BanPlayer = 'banPlayer', // Event sent to the server when an organizer wants to ban a player
     ToggleTimer = 'toggleTimer', // Event sent to the server when an organizer wants to toggle the timer
     SpeedUpTimer = 'speedUpTimer', // Event sent to the server when an organizer wants to speed up the timer
-
+    SendMessage = 'sendMessage', // Event sent to the server when a user sends a chat message
 
     // Events launched by the server
     PlayerSelectAnswer = 'playerSelectedAnswer', // Event sent to organizer a player has selected an answer
@@ -31,18 +31,18 @@ export enum GameEvents {
     PlayerBanned = 'playerBanned', // Event sent to all players when a player is banned
     SendPlayersScores = 'sendPlayersScores', // Event sent to organizer all players scores
     PlayerHasGiveUp = 'playerHasGiveUp', // Event sent to organizer when a player has give up
+    PlayerSendMessage = 'playerSendMessage', // Event broadcasted to room containing player
 }
 
 // Différents types définis
 
 export type Answer = string | number[];
-export type ExtendedAnswer = { hasInterracted: boolean; hasConfirmed: boolean; answer: Answer }
-export type PlayerClient = { name: string; role: GameRole; score: number; isExcluded: boolean, hasGiveUp: boolean, answers?: ExtendedAnswer; }
+export type ExtendedAnswer = { hasInterracted: boolean; hasConfirmed: boolean; answer: Answer };
+export type PlayerClient = { name: string; role: GameRole; score: number; isExcluded: boolean; hasGiveUp: boolean; answers?: ExtendedAnswer };
 export type Client = { name: string; role: GameRole; score: number };
-export type GameRestricted = { code: string; quizName: string; type: GameType }
+export type GameRestricted = { code: string; quizName: string; type: GameType };
 
 export namespace GameEventsData {
-
     export interface SelectAnswer {
         answers: Answer;
     }
@@ -123,11 +123,20 @@ export namespace GameEventsData {
     }
 
     export interface SendPlayersScores {
-        scores: { name: string, score: number }[];
+        scores: { name: string; score: number }[];
     }
 
     export interface PlayerHasGiveUp {
         name: string;
     }
 
+    export interface SendMessage {
+        content: string;
+    }
+
+    export interface PlayerSendMessage {
+        name: string;
+        content: string;
+        createdAt: Date;
+    }
 }

@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/h
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BASE_URL } from '@app/constants';
+import { ChatService } from '@app/services/chat/chat.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
@@ -31,6 +32,7 @@ export class GameService {
         private httpService: HttpClient,
         private socketService: SocketService,
         private notificationService: NotificationService,
+        private chatService: ChatService,
     ) {
         this.initialise();
         this.registerListeners();
@@ -52,6 +54,7 @@ export class GameService {
         this.isFinalAnswer = new BehaviorSubject<boolean>(false);
         this.answer = new BehaviorSubject<Answer | null>(null);
         this.isLocked = new BehaviorSubject<boolean>(false);
+        this.chatService.initialize();
     }
 
     startGame() {
@@ -143,11 +146,6 @@ export class GameService {
 
     banPlayer(player: PlayerClient) {
         this.socketService.send(GameEvents.BanPlayer, { name: player.name });
-    }
-
-    // TODO: Envoyer le message
-    sendMessage(message: string) {
-        return message;
     }
 
     private handleError(error: HttpErrorResponse) {
