@@ -116,13 +116,13 @@ export class Room {
     }
 
     allPlayerAnswered(): boolean {
-        return this.getOnlyGamePlayers().every((player) => player.getAnswer(this.game.gameQuestionIndex) !== undefined);
+        return this.getOnlyGamePlayers().every((player) => player.getAnswer(this.game.gameQuestionIndex));
     }
 
     private shouldDeleteGame(): void {
-        const hasPlayers = this.players.some((p) => p.role === GameRole.Player && p.isExcluded === false);
+        const hasPlayers = this.players.some((p) => p.role === GameRole.Player && !p.isExcluded);
         const noPlayers = !hasPlayers && this.game.gameState !== GameState.WaitingPlayers;
-        const hasOrganisator = this.players.some((p) => p.role === GameRole.Organisator && p.hasGiveUp === false);
+        const hasOrganisator = this.players.some((p) => p.role === GameRole.Organisator && !p.hasGiveUp);
         const noOrganisator = !hasOrganisator && this.game.type === GameType.Default;
         if (noPlayers || noOrganisator) {
             this.deleteRoom();

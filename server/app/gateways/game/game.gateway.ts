@@ -87,6 +87,7 @@ export class GameGateway {
                 }
             }
             gameSession.room.addPlayer(new Player(data.name, client, GameRole.Player));
+            return { isSuccess: true };
         } catch (error) {
             client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: 'Une erreur est survenue' });
             return { isSuccess: false, message: 'Une erreur est survenue' };
@@ -165,17 +166,17 @@ export class GameGateway {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
         if (!player || player.role !== GameRole.Organisator) return;
-
         gameSession.speedUpTimer();
         return { isSuccess: true };
     }
 
     @SubscribeMessage(GameEvents.SendMessage)
-    handleMessageSent(@MessageBody() data: GameEventsData.SendMessage, @ConnectedSocket() client: Socket): void {
+    handleMessageSent(@MessageBody() data: GameEventsData.SendMessage, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
 
         gameSession.broadcastMessage(player, data.content);
+        return { isSuccess: true };
     }
 
     afterInit(server: Server): void {

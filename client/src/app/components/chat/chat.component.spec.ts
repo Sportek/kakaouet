@@ -3,13 +3,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
-import { GameService } from '@app/services/game/game.service';
+import { ChatService } from '@app/services/chat/chat.service';
+import { of } from 'rxjs';
 import { ChatComponent } from './chat.component';
+
+class ChatServiceMock {
+    getMessageHistory = jasmine.createSpy('getMessageHistory').and.returnValue(of([]));
+    sendMessage = jasmine.createSpy('sendMessage');
+}
 
 describe('ChatComponent', () => {
     let component: ChatComponent;
     let fixture: ComponentFixture<ChatComponent>;
-    let gameServiceMock: jasmine.SpyObj<GameService>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -17,8 +22,8 @@ describe('ChatComponent', () => {
             imports: [HttpClientTestingModule, FormsModule],
             providers: [
                 {
-                    provide: GameService,
-                    useValue: gameServiceMock,
+                    provide: ChatService,
+                    useClass: ChatServiceMock,
                 },
             ],
         });

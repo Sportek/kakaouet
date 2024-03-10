@@ -52,6 +52,10 @@
                         color: $text-100;
                     }
                 }
+
+                .message {
+                    word-wrap: break-word;
+                }
             }
         }
 
