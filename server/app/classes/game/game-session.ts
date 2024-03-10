@@ -103,6 +103,11 @@ export class GameSession {
         if (this.timer) this.timer.speedUp();
     }
 
+    broadcastMessage(player: Player, content: string): void {
+        const newDate: Date = new Date();
+        this.room.broadcast(GameEvents.PlayerSendMessage, {}, { name: player.name, content, createdAt: newDate });
+    }
+
     private calculateScores(): { player: Player; hasAnsweredFirst: boolean }[] {
         const question = this.quiz.questions[this.gameQuestionIndex];
 

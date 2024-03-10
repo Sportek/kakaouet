@@ -155,6 +155,14 @@ export class GameGateway {
         gameSession.speedUpTimer();
     }
 
+    @SubscribeMessage(GameEvents.SendMessage)
+    handleMessageSent(@MessageBody() data: GameEventsData.SendMessage, @ConnectedSocket() client: Socket): void {
+        const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        const player = gameSession.room.getPlayerWithSocketId(client.id);
+
+        gameSession.broadcastMessage(player, data.content);
+    }
+
     afterInit(server: Server): void {
         server.on('connection', (socket: Socket) => {
             socket.onAny((event) => {

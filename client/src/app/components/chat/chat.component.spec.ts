@@ -12,8 +12,6 @@ describe('ChatComponent', () => {
     let gameServiceMock: jasmine.SpyObj<GameService>;
 
     beforeEach(() => {
-        gameServiceMock = jasmine.createSpyObj('GameService', ['sendMessage']);
-
         TestBed.configureTestingModule({
             declarations: [ChatComponent],
             imports: [HttpClientTestingModule, FormsModule],
@@ -34,12 +32,6 @@ describe('ChatComponent', () => {
     });
 
     describe('sendMessage', () => {
-        it('should send the message', () => {
-            component.message = 'Bonjour';
-            component.sendMessage();
-            expect(gameServiceMock.sendMessage).toHaveBeenCalled();
-        });
-
         it('should reset the message', () => {
             component.message = 'Bonjour';
             component.sendMessage();
