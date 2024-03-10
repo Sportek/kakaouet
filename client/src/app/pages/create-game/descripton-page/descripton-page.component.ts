@@ -52,8 +52,8 @@ export class DescriptonPageComponent implements OnInit, OnDestroy {
             }),
         );
     }
-    testGame(gameId: string) {
-        this.checkQuizBeforeNavigation(gameId, '/testing');
+    testGame(quizId: string) {
+        this.gameService.createNewGame(quizId, GameType.Test);
     }
 
     createGame(quizId: string) {

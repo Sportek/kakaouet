@@ -44,8 +44,8 @@ export class GameVueComponent implements OnInit, OnDestroy {
         this.gameService.selectAnswer(index);
     }
 
-    temporary() {
-        return true;
+    giveUp() {
+        this.gameService.giveUp();
     }
 
     ngOnInit(): void {

@@ -88,17 +88,30 @@ export class GameService {
         this.socketService.send(GameEvents.SpeedUpTimer);
     }
 
+    giveUp() {
+        this.router.navigateByUrl('/home', { replaceUrl: true });
+    }
+
     createNewGame(quizId: string, type: GameType): void {
         this.httpService
             .post<Game>(BASE_URL + '/game/', { quizId, type })
             .pipe(catchError((error) => this.handleError(error)))
             .subscribe((game) => {
-                this.router.navigateByUrl('/waiting-room/' + game.code);
                 this.initialise();
-                this.socketService.send(GameEvents.CreateGame, { code: game.code, quizId });
                 this.socketService.connect();
-                this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
+                this.socketService.send(GameEvents.CreateGame, { code: game.code, quizId, gameType: game.type });
                 this.game.next({ code: game.code, quizName: game.quiz.name, type: game.type });
+                if (type === GameType.Default) {
+                    this.router.navigateByUrl('/waiting-room/' + game.code);
+                    this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
+                } else {
+                    this.router.navigateByUrl('/game/' + game.code);
+                    this.client.next({ name: 'Organisateur', role: GameRole.Player, score: 0 });
+                    this.changeLockState();
+                    this.isLocked.next(true);
+                    this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false }]);
+                    this.startGame();
+                }
             });
     }
 
@@ -187,7 +200,7 @@ export class GameService {
         });
     }
 
-    private gameChangeStateListener() {
+    private gameChangeStateListener(): void {
         this.socketService.listen(GameEvents.GameStateChanged, (data: GameEventsData.GameStateChanged) => {
             this.gameState.next(data.gameState);
 
@@ -202,6 +215,15 @@ export class GameService {
 
             if (data.gameState === GameState.DisplayQuestionResults) {
                 this.isFinalAnswer.next(true);
+            }
+
+            if (data.gameState === GameState.DisplayQuizResults) {
+                if (this.game.getValue().type === GameType.Test) {
+                    this.router.navigate(['/create/'], { replaceUrl: true });
+                    return;
+                }
+
+                this.router.navigate(['/results', this.game.getValue().code], { replaceUrl: true });
             }
         });
     }

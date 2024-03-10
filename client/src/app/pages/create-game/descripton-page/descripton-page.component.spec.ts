@@ -77,13 +77,6 @@ describe('DescriptonPageComponent', () => {
         expect(component.quiz._id).toEqual('valid-id');
     });
 
-    it('should navigate to /testing on testGame with valid quiz', () => {
-        const spy = spyOn(router, 'navigate');
-        fixture.detectChanges();
-        component.testGame('valid-id');
-        expect(spy).toHaveBeenCalledWith(['/testing', 'valid-id']);
-    });
-
     it('should call createNewGame on createGame', () => {
         // @ts-ignore -- Obligé de mocker la méthode car elle est privée
         const spy = spyOn(component.gameService, 'createNewGame');

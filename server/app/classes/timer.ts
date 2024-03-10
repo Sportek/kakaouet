@@ -31,23 +31,22 @@ export class Timer {
     }
 
     start() {
+        this.whenIncrement(this.timer);
         this.interval = setInterval(
             () => {
-                if (this.timer <= 0) {
-                    this.stop();
-                }
-                this.whenIncrement(this.timer);
                 this.timer -= 1;
+                if (this.timer < 0) return this.stop();
+                this.whenIncrement(this.timer);
             },
-            this.tick * (this.isAccelerated ? 1 / this.multiplicator : 1),
+            (this.tick - 1) * (this.isAccelerated ? 1 / this.multiplicator : 1),
         );
     }
 
     stop() {
         this.timer = 0;
-        this.whenDone();
         clearInterval(this.interval);
         this.interval = undefined;
+        this.whenDone();
     }
 
     togglePlayPause() {

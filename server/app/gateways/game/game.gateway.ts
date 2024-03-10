@@ -1,7 +1,7 @@
 import { Player } from '@app/classes/player';
 import { GameService } from '@app/services/game/game.service';
 import { GameEvents, GameEventsData } from '@common/game-types';
-import { GameRole, GameState } from '@common/types';
+import { GameRole, GameState, GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -48,7 +48,7 @@ export class GameGateway {
                 player.confirmAnswer();
                 gameSession.room.sendToOrganizer(GameEvents.PlayerConfirmAnswers, { name: player.name });
                 if (gameSession.room.allPlayerAnswered()) {
-                    gameSession.room.sendToOrganizer(GameEvents.AllPlayersAnswered);
+                    gameSession.timer.stop();
                 }
             }
         }
@@ -90,19 +90,17 @@ export class GameGateway {
 
     @SubscribeMessage(GameEvents.CreateGame)
     async handleCreateGame(@MessageBody() data: GameEventsData.CreateGame, @ConnectedSocket() client: Socket): Promise<void> {
-        const gameSession = await this.gameService.createGameSession(data.code, this.server, data.quizId);
-        gameSession.room.addPlayer(new Player('Organisateur', client, GameRole.Organisator));
+        const gameSession = await this.gameService.createGameSession(data.code, this.server, data.quizId, data.gameType);
+        const playerRole = data.gameType === GameType.Default ? GameRole.Organisator : GameRole.Player;
+        gameSession.room.addPlayer(new Player('Organisateur', client, playerRole));
     }
 
     @SubscribeMessage(GameEvents.StartGame)
     handleStartGame(@ConnectedSocket() client: Socket): void {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator) {
-            return;
-        }
-
-        gameSession.startGame();
+        if (!player) return;
+        gameSession.startGameDelayed();
     }
 
     @SubscribeMessage(GameEvents.GameClosed)
@@ -116,7 +114,7 @@ export class GameGateway {
     handleChangeLockState(@ConnectedSocket() client: Socket): void {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator) return;
+        if (!player) return;
 
         gameSession.changeGameLockState();
     }
