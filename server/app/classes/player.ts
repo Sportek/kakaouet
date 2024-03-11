@@ -7,6 +7,7 @@ export class Player {
     name: string;
     role: GameRole;
     socket: Socket;
+    bonus: number;
     score: number;
     isExcluded: boolean;
     hasGiveUp: boolean;
@@ -20,6 +21,7 @@ export class Player {
         this.socket = socket;
         this.answers = [];
         this.score = 0;
+        this.bonus = 0;
         this.hasGiveUp = false;
     }
 

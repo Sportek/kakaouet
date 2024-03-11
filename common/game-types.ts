@@ -32,16 +32,26 @@ export enum GameEvents {
     SendPlayersScores = 'sendPlayersScores', // Event sent to organizer all players scores
     PlayerHasGiveUp = 'playerHasGiveUp', // Event sent to organizer when a player has give up
     PlayerSendMessage = 'playerSendMessage', // Event broadcasted to room containing player
+    PlayerSendResults = 'playerSendResults', // Event sent to all players when the results are sent
 }
 
 // Différents types définis
 
 export type Answer = string | number[];
 export type ExtendedAnswer = { hasInterracted: boolean; hasConfirmed: boolean; answer: Answer };
-export type PlayerClient = { name: string; role: GameRole; score: number; isExcluded: boolean; hasGiveUp: boolean; answers?: ExtendedAnswer };
+export type PlayerClient = {
+    name: string;
+    role: GameRole;
+    score: number;
+    isExcluded: boolean;
+    hasGiveUp: boolean;
+    answers?: ExtendedAnswer;
+};
 export type Client = { name: string; role: GameRole; score: number };
-export type GameRestricted = { code: string; quizName: string; type: GameType }
+export type GameRestricted = { code: string; quizName: string; type: GameType };
 export type SocketResponse = { isSuccess: boolean, message?: string };
+export type ActualQuestion = { question: Question; totalQuestion: number; actualIndex: number };
+export type ChoiceData = { label: string; amount: number; isCorrect: boolean };
 
 export namespace GameEventsData {
     export interface SelectAnswer {
@@ -90,7 +100,7 @@ export namespace GameEventsData {
     }
 
     export interface GameQuestion {
-        question: Question;
+        actualQuestion: ActualQuestion
     }
 
     export interface PlayerSelectAnswer {
@@ -139,5 +149,11 @@ export namespace GameEventsData {
         name: string;
         content: string;
         createdAt: Date;
+    }
+
+    export interface PlayerSendResults {
+        scores: { name: string; score: number; bonus: number }[];
+        choices: ChoiceData[][];
+        questions: Question[];
     }
 }

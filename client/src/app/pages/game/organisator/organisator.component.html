@@ -6,10 +6,10 @@
                     <mat-icon>
                         <span class="material-symbols-outlined"> grade </span>
                     </mat-icon>
-                    <div class="text large-text">{{ question?.points }}</div>
+                    <div class="text large-text">{{ actualQuestion?.question?.points }}</div>
                 </div>
                 <div class="question large-text">
-                    {{ question?.label }}
+                    {{ actualQuestion?.question?.label }}
                 </div>
                 <div class="icon-container">
                     <mat-icon>
@@ -24,7 +24,7 @@
                     <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.label">
                         <div
                             class="column"
-                            [style]="'height: ' + calculatePurcentage(column.amount) * 100 + '%'"
+                            [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
                             [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
                         ></div>
                         <div class="column-label">{{ 'Choix ' + (i + 1) }} ({{ column.amount }})</div>
@@ -46,8 +46,9 @@
             </div>
             <div class="game-controller-container">
                 <div class="title">Panneau de contrôle</div>
-                <div class="controls">
-                    <button mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
+                <div class="controls" *ngIf="true">
+                    <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
+                    <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button>
                     <div class="timer">
                         <mat-icon>
                             <span
@@ -80,7 +81,7 @@
                 <div class="players">
                     <div class="player" *ngFor="let player of players">
                         <div class="player-name" [ngClass]="{ 'has-giveup': player.hasGiveUp }">{{ player.name }}</div>
-                        <div class="player-score">({{ player.score }})</div>
+                        <div class="player-score">(score: {{ player.score }})</div>
                     </div>
                 </div>
             </div>

@@ -1,10 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+// import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
-import { PlayerClient } from '@common/game-types';
-import { Question, QuestionType } from '@common/types';
+import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
+import { QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
-
-type ChoiceData = { label: string; amount: number; isCorrect: boolean };
 
 @Component({
     selector: 'app-organisator',
@@ -12,24 +11,28 @@ type ChoiceData = { label: string; amount: number; isCorrect: boolean };
     styleUrls: ['./organisator.component.scss'],
 })
 export class OrganisatorComponent implements OnInit, OnDestroy {
-    question: Question | null;
+    actualQuestion: ActualQuestion | null;
     cooldown: number;
     players: PlayerClient[];
     choices: ChoiceData[];
     timerIsRunning;
 
+    currentQuestion: number;
     private subscriptions: Subscription[];
 
-    constructor(private gameService: GameService) {
-        this.question = null;
+    constructor(
+        private gameService: GameService, // private router: Router,
+    ) {
+        this.actualQuestion = null;
         this.cooldown = 0;
         this.players = [];
         this.choices = [];
         this.timerIsRunning = true;
         this.subscriptions = [];
+        this.currentQuestion = 0;
     }
 
-    calculatePurcentage(amount: number): number {
+    calculatePercentage(amount: number): number {
         return amount / this.choices.map((data) => data.amount).reduce((a, b) => a + b, 0);
     }
 
@@ -38,8 +41,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     calculateChoices(): void {
-        if (this.question?.type === QuestionType.QCM) {
-            this.choices = this.question.choices.map((choice, index) => {
+        if (this.actualQuestion?.question?.type === QuestionType.QCM) {
+            this.choices = this.actualQuestion.question.choices.map((choice, index) => {
                 const amount = this.gameService.filterPlayers().filter((player) => {
                     if (!player.answers) return false;
                     return (player.answers.answer as number[]).includes(index);
@@ -64,8 +67,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.subscriptions.push(
-            this.gameService.question.subscribe((question) => {
-                this.question = question;
+            this.gameService.actualQuestion.subscribe((actualQuestion) => {
+                this.actualQuestion = actualQuestion;
             }),
         );
 
@@ -85,5 +88,9 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+    }
+
+    isLastQuestion(): boolean {
+        return this.gameService.isLastQuestion();
     }
 }

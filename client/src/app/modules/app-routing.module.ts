@@ -12,6 +12,7 @@ import { Error404Component } from '@app/pages/error/error404/error404.component'
 import { GameVueComponent } from '@app/pages/game/game-vue/game-vue.component';
 import { JoinComponent } from '@app/pages/game/join/join.component';
 import { OrganisatorComponent } from '@app/pages/game/organisator/organisator.component';
+import { ResultsComponent } from '@app/pages/game/result-statistics/result-statistics.component';
 import { WaitingRoomComponent } from '@app/pages/game/waiting-room/waiting-room.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 
@@ -32,9 +33,11 @@ const routes: Routes = [
 
     { path: 'game/:code', component: GameVueComponent, canActivate: [socketConnectionGuard] },
     { path: 'organisator/:code', component: OrganisatorComponent, canActivate: [socketConnectionGuard] },
+    { path: 'results/:code', component: ResultsComponent, canActivate: [socketConnectionGuard] },
     { path: 'waiting-room/:code', component: WaitingRoomComponent, canActivate: [socketConnectionGuard] },
     { path: 'join', component: JoinComponent, canActivate: [socketConnectionGuard] },
     { path: 'create/description/:gameId', component: DescriptonPageComponent },
+    // { path: 'results', component: ResultsComponent },
 
     { path: 'error-404', component: Error404Component },
 

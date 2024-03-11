@@ -3,7 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
-const SOCKET_WHITELIST_PAGES = ['game', 'join', 'waiting-room', 'organisator'];
+const SOCKET_WHITELIST_PAGES = ['game', 'join', 'waiting-room', 'organisator', 'results'];
 
 @Injectable({
     providedIn: 'root',

@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
-import { Answer } from '@common/game-types';
-import { Question, QuestionType } from '@common/types';
+import { ActualQuestion, Answer } from '@common/game-types';
+import { QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./game-vue.component.scss'],
 })
 export class GameVueComponent implements OnInit, OnDestroy {
-    question: Question | null;
+    actualQuestion: ActualQuestion | null;
     cooldown: number;
     answer: Answer | null;
     isFinalAnswer: boolean;
@@ -19,7 +19,7 @@ export class GameVueComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
 
     constructor(public gameService: GameService) {
-        this.question = null;
+        this.actualQuestion = null;
         this.cooldown = 0;
         this.answer = null;
         this.isFinalAnswer = false;
@@ -32,8 +32,8 @@ export class GameVueComponent implements OnInit, OnDestroy {
         const target = event.target as HTMLElement;
         if (target.tagName === 'INPUT' && target.getAttribute('type') === 'text') return;
 
-        if (this.question?.type === QuestionType.QCM) {
-            const possibleChoices = this.question.choices.map((choice, index) => (index + 1).toString());
+        if (this.actualQuestion?.question?.type === QuestionType.QCM) {
+            const possibleChoices = this.actualQuestion?.question.choices.map((choice, index) => (index + 1).toString());
             if (possibleChoices.includes(event.key)) this.selectAnswer(parseInt(event.key, 10) - 1);
         }
 
@@ -50,9 +50,9 @@ export class GameVueComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.subscriptions.push(
-            this.gameService.question.subscribe((question) => {
-                this.question = question;
-                this.answer = this.question?.type === QuestionType.QCM ? [] : '';
+            this.gameService?.actualQuestion.subscribe((actualQuestion) => {
+                this.actualQuestion = actualQuestion;
+                this.answer = this.actualQuestion?.question?.type === QuestionType.QCM ? [] : '';
             }),
         );
 

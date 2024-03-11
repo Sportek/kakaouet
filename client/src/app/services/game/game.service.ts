@@ -5,8 +5,8 @@ import { BASE_URL } from '@app/constants';
 import { ChatService } from '@app/services/chat/chat.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
-import { Game, GameRole, GameState, GameType, Question, QuestionType } from '@common/types';
+import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
+import { Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, catchError, throwError } from 'rxjs';
 
 const QCM_REQUIRED_TIME_LEFT = 10;
@@ -20,11 +20,12 @@ export class GameService {
     client: BehaviorSubject<Client>;
     cooldown: BehaviorSubject<number>;
     game: BehaviorSubject<GameRestricted>;
-    question: BehaviorSubject<Question | null>;
+    actualQuestion: BehaviorSubject<ActualQuestion | null>;
     gameState: BehaviorSubject<GameState>;
     isFinalAnswer: BehaviorSubject<boolean>;
     answer: BehaviorSubject<Answer | null>;
     isLocked: BehaviorSubject<boolean>;
+    answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
@@ -49,11 +50,12 @@ export class GameService {
         this.client = new BehaviorSubject<Client>({ name: '', role: GameRole.Organisator, score: 0 });
         this.cooldown = new BehaviorSubject<number>(0);
         this.game = new BehaviorSubject<GameRestricted>({ code: '', quizName: '', type: GameType.Default });
-        this.question = new BehaviorSubject<Question | null>(null);
+        this.actualQuestion = new BehaviorSubject<ActualQuestion | null>(null);
         this.gameState = new BehaviorSubject<GameState>(GameState.WaitingPlayers);
         this.isFinalAnswer = new BehaviorSubject<boolean>(false);
         this.answer = new BehaviorSubject<Answer | null>(null);
         this.isLocked = new BehaviorSubject<boolean>(false);
+        this.answers = new BehaviorSubject<GameEventsData.PlayerSendResults>({ choices: [], scores: [], questions: [] });
         this.chatService.initialize();
     }
 
@@ -72,6 +74,12 @@ export class GameService {
         this.socketService.send(GameEvents.SelectAnswer, { answers: answer });
     }
 
+    isLastQuestion(): boolean {
+        const actualQuestion = this.actualQuestion.getValue();
+        if (!actualQuestion) return false;
+        return actualQuestion.actualIndex === actualQuestion.totalQuestion - 1;
+    }
+
     confirmAnswer() {
         this.socketService.send(GameEvents.ConfirmAnswers);
     }
@@ -85,7 +93,7 @@ export class GameService {
     }
 
     speedUpTimer() {
-        const requiredTime = this.question.getValue()?.type === QuestionType.QCM ? QCM_REQUIRED_TIME_LEFT : QRL_REQUIRED_TIME_LEFT;
+        const requiredTime = this.actualQuestion.getValue()?.question?.type === QuestionType.QCM ? QCM_REQUIRED_TIME_LEFT : QRL_REQUIRED_TIME_LEFT;
         if (requiredTime < this.cooldown.getValue())
             return this.notificationService.error('Le temps requis minimum pour accélérer le timer est dépassé');
         this.socketService.send(GameEvents.SpeedUpTimer);
@@ -136,7 +144,7 @@ export class GameService {
     }
 
     setResponseAsFinal(): void {
-        if (this.question.getValue()?.type === QuestionType.QCM) {
+        if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) {
             const answer = this.answer.getValue() as number[];
             if (answer.length === 0) return this.notificationService.error('Veuillez sélectionner au moins une réponse');
         }
@@ -163,7 +171,7 @@ export class GameService {
                     player.answers = {
                         hasInterracted: false,
                         hasConfirmed: false,
-                        answer: this.question.getValue()?.type === QuestionType.QCM ? [] : '',
+                        answer: this.actualQuestion.getValue()?.question?.type === QuestionType.QCM ? [] : '',
                     };
                 return player;
             }),
@@ -228,8 +236,8 @@ export class GameService {
 
     private gameQuestionListener() {
         this.socketService.listen(GameEvents.GameQuestion, (data: GameEventsData.GameQuestion) => {
-            this.question.next(data.question);
-            this.answer.next(data.question.type === QuestionType.QCM ? [] : '');
+            this.actualQuestion.next(data.actualQuestion);
+            this.answer.next(data.actualQuestion.question.type === QuestionType.QCM ? [] : '');
             this.isFinalAnswer.next(false);
         });
     }
@@ -302,6 +310,12 @@ export class GameService {
         });
     }
 
+    private receiveGameResults() {
+        this.socketService.listen(GameEvents.PlayerSendResults, (data: GameEventsData.PlayerSendResults) => {
+            this.answers.next(data);
+        });
+    }
+
     private registerListeners() {
         this.playerJoinGameListener();
         this.playerQuitGameListener();
@@ -316,5 +330,6 @@ export class GameService {
         this.receiveBannedPlayers();
         this.receivePlayerScores();
         this.receiveGiveUpPlayers();
+        this.receiveGameResults();
     }
 }

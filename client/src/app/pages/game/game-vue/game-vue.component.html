@@ -6,10 +6,10 @@
                     <mat-icon>
                         <span class="material-symbols-outlined"> grade </span>
                     </mat-icon>
-                    <div class="text large-text">{{ question?.points }}</div>
+                    <div class="text large-text">{{ actualQuestion?.question?.points }}</div>
                 </div>
                 <div class="question large-text">
-                    {{ question?.label }}
+                    {{ actualQuestion?.question?.label }}
                 </div>
                 <div class="icon-container">
                     <mat-icon>
@@ -19,10 +19,10 @@
                 </div>
             </div>
             <div class="responses-container">
-                <div *ngIf="question">
-                    <ng-container *ngIf="question.type === 'QCM'">
+                <div *ngIf="actualQuestion">
+                    <ng-container *ngIf="actualQuestion.question.type === 'QCM'">
                         <div
-                            *ngFor="let choice of question.choices; let i = index"
+                            *ngFor="let choice of actualQuestion.question.choices; let i = index"
                             [id]="'index-' + i"
                             class="response large-text"
                             [ngClass]="{
