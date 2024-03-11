@@ -37,7 +37,7 @@ export class GameVueComponent implements OnInit, OnDestroy {
             if (possibleChoices.includes(event.key)) this.selectAnswer(parseInt(event.key, 10) - 1);
         }
 
-        if (event.key === 'Enter' && !this.isFinalAnswer) this.setResponseAsFinal();
+        if (event.key === 'Enter') this.setResponseAsFinal();
     }
 
     selectAnswer(index: number): void {

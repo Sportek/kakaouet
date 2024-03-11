@@ -27,6 +27,7 @@ export class ChatService {
     sendMessage(content: string): void {
         if (content.length > Variables.MaxCharacters)
             return this.notificationService.error(`Vous ne pouvez pas envoyer plus de ${Variables.MaxCharacters} caractères.`);
+        if (!content.length) return this.notificationService.error('Vous ne pouvez pas envoyer un message vide.');
         this.socketService.send(GameEvents.SendMessage, { content });
     }
 

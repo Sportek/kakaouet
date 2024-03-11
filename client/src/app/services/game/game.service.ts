@@ -5,6 +5,7 @@ import { BASE_URL } from '@app/constants';
 import { ChatService } from '@app/services/chat/chat.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { NEGATIVE_SCORE } from '@common/constants';
 import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
 import { Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, catchError, throwError } from 'rxjs';
@@ -48,7 +49,7 @@ export class GameService {
     initialise() {
         this.players = new BehaviorSubject<PlayerClient[]>([]);
         this.client = new BehaviorSubject<Client>({ name: '', role: GameRole.Organisator, score: 0 });
-        this.cooldown = new BehaviorSubject<number>(0);
+        this.cooldown = new BehaviorSubject<number>(NEGATIVE_SCORE);
         this.game = new BehaviorSubject<GameRestricted>({ code: '', quizName: '', type: GameType.Default });
         this.actualQuestion = new BehaviorSubject<ActualQuestion | null>(null);
         this.gameState = new BehaviorSubject<GameState>(GameState.WaitingPlayers);
@@ -144,6 +145,7 @@ export class GameService {
     }
 
     setResponseAsFinal(): void {
+        if (this.isFinalAnswer.getValue()) return;
         if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) {
             const answer = this.answer.getValue() as number[];
             if (answer.length === 0) return this.notificationService.error('Veuillez sélectionner au moins une réponse');
