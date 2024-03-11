@@ -35,6 +35,7 @@ import { Error404Component } from './pages/error/error404/error404.component';
 import { GameVueComponent } from './pages/game/game-vue/game-vue.component';
 import { JoinComponent } from './pages/game/join/join.component';
 import { OrganisatorComponent } from './pages/game/organisator/organisator.component';
+import { ResultsComponent } from './pages/game/result-statistics/result-statistics.component';
 import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.component';
 
 /**
@@ -72,6 +73,7 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         WaitingRoomComponent,
         UpdateNameComponent,
         OrganisatorComponent,
+        ResultsComponent,
     ],
     imports: [
         AppMaterialModule,

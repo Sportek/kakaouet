@@ -2,7 +2,7 @@ import { Player } from '@app/classes/player';
 import { Room } from '@app/classes/room';
 import { Timer } from '@app/classes/timer';
 import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';
-import { GameEvents } from '@common/game-types';
+import { ActualQuestion, ChoiceData, GameEvents, GameEventsData } from '@common/game-types';
 import { GameState, GameType, QuestionType, Quiz } from '@common/types';
 
 const START_GAME_DELAY = 5;
@@ -41,7 +41,17 @@ export class GameSession {
 
     startGame() {
         this.changeGameState(GameState.PlayersAnswerQuestion);
-        this.room.broadcast(GameEvents.GameQuestion, {}, { question: this.quiz.questions[this.gameQuestionIndex] });
+        this.room.broadcast(
+            GameEvents.GameQuestion,
+            {},
+            {
+                actualQuestion: {
+                    question: this.quiz.questions[this.gameQuestionIndex],
+                    totalQuestion: this.quiz.questions.length,
+                    actualIndex: this.gameQuestionIndex,
+                } as ActualQuestion,
+            },
+        );
         this.startQuestionCooldown();
     }
 
@@ -69,7 +79,17 @@ export class GameSession {
         if (this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();
         this.simpleDelay(NEXT_QUESTION_DELAY, () => {
             this.changeGameState(GameState.PlayersAnswerQuestion);
-            this.room.broadcast(GameEvents.GameQuestion, {}, { question: this.quiz.questions[this.gameQuestionIndex] });
+            this.room.broadcast(
+                GameEvents.GameQuestion,
+                {},
+                {
+                    actualQuestion: {
+                        question: this.quiz.questions[this.gameQuestionIndex],
+                        actualIndex: this.gameQuestionIndex,
+                        totalQuestion: this.quiz.questions.length,
+                    } as ActualQuestion,
+                },
+            );
             this.startQuestionCooldown();
         });
     }
@@ -77,9 +97,42 @@ export class GameSession {
     displayResults(): void {
         this.simpleDelay(NEXT_QUESTION_DELAY, () => {
             this.changeGameState(GameState.DisplayQuizResults);
+            this.sendResultsToPlayers();
         });
     }
 
+    sendResultsToPlayers(): void {
+        if (this.gameState !== GameState.DisplayQuizResults) return;
+
+        const scores = this.room.getOnlyGamePlayers().map((player) => ({
+            name: player.name,
+            score: player.score,
+            bonus: player.bonus,
+        }));
+
+        const choices: ChoiceData[][] = [];
+
+        this.quiz.questions.forEach((question, index) => {
+            if (question.type !== QuestionType.QCM) return;
+
+            const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
+
+            const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
+                const amount = globalPlayerAnswers[i];
+                const name = choice.label;
+                const isCorrect = choice.isCorrect;
+                return { label: name, amount, isCorrect };
+            });
+
+            choices.push(choiceData);
+        });
+
+        this.room.broadcast(GameEvents.PlayerSendResults, {}, {
+            scores,
+            choices,
+            questions: this.quiz.questions,
+        } as GameEventsData.PlayerSendResults);
+    }
     endGame(): void {
         this.changeGameState(GameState.End);
         // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc.
@@ -137,7 +190,10 @@ export class GameSession {
 
         return this.room.players.map((player) => {
             const hasAnsweredFirst = firstPlayersToAnswer.has(player);
-            if (hasAnsweredFirst) player.score += question.points * FIRST_PLAYER_SCORE_MULTIPLICATOR;
+            if (hasAnsweredFirst) {
+                player.score += question.points * FIRST_PLAYER_SCORE_MULTIPLICATOR;
+                player.bonus++;
+            }
             return { player, hasAnsweredFirst };
         });
     }
@@ -154,5 +210,20 @@ export class GameSession {
 
     private isCorrectAnswer(answer: number[], correctAnswers: number[]): boolean {
         return answer.every((index) => correctAnswers.includes(index));
+    }
+
+    private getAmountOfPlayersWhoAnswered(index: number): number[] {
+        return this.room.getOnlyGamePlayers().reduce(
+            (acc, player) => {
+                const answer = player.getAnswer(index);
+                if (!answer) return acc;
+                const answers = answer.answer as number[];
+                answers.forEach((i) => {
+                    acc[i]++;
+                });
+                return acc;
+            },
+            [0, 0, 0, 0],
+        );
     }
 }

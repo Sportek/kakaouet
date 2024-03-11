@@ -5,13 +5,14 @@ import { of } from 'rxjs';
 import { OrganisatorComponent } from './organisator.component';
 
 class MockGameService {
-    question = of(null);
+    actualQuestion = of(null);
     cooldown = of(0);
     players = of([]);
     filterPlayers = jasmine.createSpy('filterPlayers').and.returnValue([]);
     toggleTimer = jasmine.createSpy('toggleTimer');
     speedUpTimer = jasmine.createSpy('speedUpTimer');
     nextQuestion = jasmine.createSpy('nextQuestion');
+    isLastQuestion = jasmine.createSpy('isLastQuestion').and.returnValue(false);
 }
 
 describe('OrganisatorComponent', () => {
