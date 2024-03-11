@@ -1,4 +1,4 @@
-import { GameRole, GameState, GameType, Question } from './types';
+import { Choice, GameRole, GameState, GameType, Question } from './types';
 
 export enum GameEvents {
     // Events launched by the client
@@ -33,6 +33,7 @@ export enum GameEvents {
     PlayerHasGiveUp = 'playerHasGiveUp', // Event sent to organizer when a player has give up
     PlayerSendMessage = 'playerSendMessage', // Event broadcasted to room containing player
     PlayerSendResults = 'playerSendResults', // Event sent to all players when the results are sent
+    SendCorrectAnswers = 'playerSendCorrectAnswers', // Event sent to all players containing the correct answers
 }
 
 // Différents types définis
@@ -49,7 +50,7 @@ export type PlayerClient = {
 };
 export type Client = { name: string; role: GameRole; score: number };
 export type GameRestricted = { code: string; quizName: string; type: GameType };
-export type SocketResponse = { isSuccess: boolean, message?: string };
+export type SocketResponse = { isSuccess: boolean; message?: string };
 export type ActualQuestion = { question: Question; totalQuestion: number; actualIndex: number };
 export type ChoiceData = { label: string; amount: number; isCorrect: boolean };
 
@@ -100,7 +101,7 @@ export namespace GameEventsData {
     }
 
     export interface GameQuestion {
-        actualQuestion: ActualQuestion
+        actualQuestion: ActualQuestion;
     }
 
     export interface PlayerSelectAnswer {
@@ -155,5 +156,9 @@ export namespace GameEventsData {
         scores: { name: string; score: number; bonus: number }[];
         choices: ChoiceData[][];
         questions: Question[];
+    }
+
+    export interface SendCorrectAnswers {
+        choices: Choice[];
     }
 }

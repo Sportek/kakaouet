@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
 import { ActualQuestion, Answer } from '@common/game-types';
-import { QuestionType } from '@common/types';
+import { Choice, GameState, QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -15,6 +15,7 @@ export class GameVueComponent implements OnInit, OnDestroy {
     answer: Answer | null;
     isFinalAnswer: boolean;
     score: number;
+    correctAnswers: Choice[];
 
     private subscriptions: Subscription[];
 
@@ -25,6 +26,7 @@ export class GameVueComponent implements OnInit, OnDestroy {
         this.isFinalAnswer = false;
         this.score = 0;
         this.subscriptions = [];
+        this.correctAnswers = [];
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -79,6 +81,12 @@ export class GameVueComponent implements OnInit, OnDestroy {
                 this.answer = answer;
             }),
         );
+
+        this.subscriptions.push(
+            this.gameService.getCorrectAnswers().subscribe((choices) => {
+                this.correctAnswers = choices;
+            }),
+        );
     }
 
     ngOnDestroy(): void {
@@ -91,5 +99,14 @@ export class GameVueComponent implements OnInit, OnDestroy {
 
     setResponseAsFinal(): void {
         this.gameService.setResponseAsFinal();
+    }
+
+    isIncorrectAnswer(choice: Choice): boolean {
+        if (this.gameService.gameState.getValue() !== GameState.DisplayQuestionResults) return false;
+        let isIncorrect = true;
+        this.correctAnswers.forEach((correctChoice) => {
+            if (choice.label === correctChoice.label) isIncorrect = false;
+        });
+        return isIncorrect;
     }
 }
