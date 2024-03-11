@@ -1,3 +1,4 @@
 export const GAME_CODE_LENGTH = 4;
 export const GAME_CODE_CHARACTERS = '0123456789';
 export const FIRST_PLAYER_SCORE_MULTIPLICATOR = 0.20;
+export const NEGATIVE_SCORE = -1;

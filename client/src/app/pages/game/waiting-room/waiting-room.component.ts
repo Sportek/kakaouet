@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
+import { NEGATIVE_SCORE } from '@common/constants';
 import { Client, GameRestricted, PlayerClient } from '@common/game-types';
 import { GameRole, GameType } from '@common/types';
 import { Subscription } from 'rxjs';
@@ -25,7 +26,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         this.client = { name: '', role: GameRole.Player, score: 0 };
         this.game = { code: '', quizName: '', type: GameType.Default };
         this.isCooldownStarted = false;
-        this.cooldown = 0;
+        this.cooldown = NEGATIVE_SCORE;
         this.subscriptions = [];
     }
 
@@ -62,7 +63,7 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.cooldown.subscribe((cooldown) => {
                 this.cooldown = cooldown;
-                this.isCooldownStarted = cooldown > 0;
+                this.isCooldownStarted = cooldown >= 0;
             }),
         );
 

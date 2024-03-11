@@ -46,6 +46,7 @@ export class Timer {
         this.timer = 0;
         clearInterval(this.interval);
         this.interval = undefined;
+        this.whenIncrement(this.timer);
         this.whenDone();
     }
 

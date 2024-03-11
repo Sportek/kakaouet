@@ -1,28 +1,30 @@
 <app-global-layout>
     <div class="container-global">
-        <div class="sidebar-container">
-            <div class="sidebar-wrapper">
-                <div class="stats-sidebar">
-                    <div class="stats-header">Statistiques</div>
-                    <div class="stats-table">
-                        <div class="table-row">
-                            <div class="table-cell">Joueur</div>
-                            <div class="table-cell">Points</div>
-                            <div class="table-cell">Bonus</div>
-                        </div>
-                        <!-- You can loop through players using *ngFor here -->
-                        <div class="table-row" *ngFor="let player of answers.scores">
-                            <div class="table-cell">{{ player.name }}</div>
-                            <div class="table-cell">{{ player.score }}</div>
-                            <div class="table-cell">{{ player.bonus }}</div>
-                        </div>
+        <div class="sidebar">
+            <!-- Stats -->
+            <div class="stats-sidebar">
+                <div class="stats-header">Statistiques</div>
+                <div class="stats-table">
+                    <div class="table-row">
+                        <div class="table-cell">Joueur</div>
+                        <div class="table-cell">Points</div>
+                        <div class="table-cell">Bonus</div>
+                    </div>
+                    <!-- You can loop through players using *ngFor here -->
+                    <div class="table-row" *ngFor="let player of answers.scores">
+                        <div class="table-cell">{{ player.name }}</div>
+                        <div class="table-cell">{{ player.score }}</div>
+                        <div class="table-cell">{{ player.bonus }}</div>
                     </div>
                 </div>
-                <div class="chat">
-                    <app-chat />
-                </div>
+            </div>
+
+            <!-- Chat -->
+            <div class="chat">
+                <app-chat />
             </div>
         </div>
+
         <div class="container">
             <div class="wrapper">
                 <div class="question-container">
