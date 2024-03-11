@@ -40,4 +40,30 @@ describe('JoinComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('should have default code and name as empty strings', () => {
+        expect(component.code).toBe('');
+        expect(component.name).toBe('');
+    });
+
+    it('confirm method should call join service with correct parameters', () => {
+        const testCode = 'TESTCODE';
+        const testName = 'TESTNAME';
+        component.code = testCode;
+        component.name = testName;
+
+        component.confirm();
+
+        expect(joinServiceMock.join).toHaveBeenCalledWith(testCode, testName);
+    });
+
+    it('should update code and name based on input fields', () => {
+        component.code = 'NEWCODE';
+        component.name = 'NEWNAME';
+
+        fixture.detectChanges();
+
+        expect(component.code).toBe('NEWCODE');
+        expect(component.name).toBe('NEWNAME');
+    });
 });
