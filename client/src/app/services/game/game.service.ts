@@ -6,8 +6,8 @@ import { ChatService } from '@app/services/chat/chat.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
-import { Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
-import { BehaviorSubject, catchError, throwError } from 'rxjs';
+import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
+import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 
 const QCM_REQUIRED_TIME_LEFT = 10;
 const QRL_REQUIRED_TIME_LEFT = 20;
@@ -26,6 +26,7 @@ export class GameService {
     answer: BehaviorSubject<Answer | null>;
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
+    correctAnswers: BehaviorSubject<Choice[]>;
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
@@ -56,6 +57,7 @@ export class GameService {
         this.answer = new BehaviorSubject<Answer | null>(null);
         this.isLocked = new BehaviorSubject<boolean>(false);
         this.answers = new BehaviorSubject<GameEventsData.PlayerSendResults>({ choices: [], scores: [], questions: [] });
+        this.correctAnswers = new BehaviorSubject<Choice[]>([]);
         this.chatService.initialize();
     }
 
@@ -156,6 +158,10 @@ export class GameService {
         this.socketService.send(GameEvents.BanPlayer, { name: player.name });
     }
 
+    getCorrectAnswers(): Observable<Choice[]> {
+        return this.correctAnswers.asObservable();
+    }
+
     private handleError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
             this.router.navigateByUrl('/error-404', { replaceUrl: true });
@@ -252,6 +258,12 @@ export class GameService {
         });
     }
 
+    private receiveCorrectAnswersListener() {
+        this.socketService.listen(GameEvents.SendCorrectAnswers, (data: GameEventsData.SendCorrectAnswers) => {
+            this.correctAnswers.next(data.choices);
+        });
+    }
+
     private receiveConfirmAnswerListener() {
         this.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmAnswers) => {
             const player = this.players.getValue().find((p) => p.name === data.name);
@@ -331,5 +343,6 @@ export class GameService {
         this.receivePlayerScores();
         this.receiveGiveUpPlayers();
         this.receiveGameResults();
+        this.receiveCorrectAnswersListener();
     }
 }

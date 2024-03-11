@@ -29,7 +29,7 @@
                                 selected: isSelected(i),
                                 clickable: !isFinalAnswer,
                                 'not-clickable': isFinalAnswer,
-                                'is-incorrect': false
+                                'is-incorrect': isIncorrectAnswer(choice)
                             }"
                             (click)="selectAnswer(i)"
                         >

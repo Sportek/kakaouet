@@ -167,13 +167,15 @@ export class GameSession {
         // TODO: Je ne gère pas les autres types de questions pour l'instant
         if (question.type !== QuestionType.QCM) return this.room.players.map((player) => ({ player, hasAnsweredFirst: false }));
 
-        const correctAnswers = question.choices.flatMap((choice, index) => (choice.isCorrect ? index : []));
+        const correctAnswersIndex = question.choices.flatMap((choice, index) => (choice.isCorrect ? index : []));
+        const correctAnswers = question.choices.flatMap((choice) => (choice.isCorrect ? choice : []));
+        this.room.broadcast(GameEvents.SendCorrectAnswers, {}, { choices: correctAnswers });
         let firstPlayerToAnswerTime: Date | null = null;
         const firstPlayersToAnswer = new Set<Player>();
 
         this.room.getOnlyGamePlayers().forEach((player) => {
             const answer = player.getAnswer(this.gameQuestionIndex);
-            if (answer && this.isCorrectAnswer(answer.answer as number[], correctAnswers)) {
+            if (answer && this.isCorrectAnswer(answer.answer as number[], correctAnswersIndex)) {
                 player.score += question.points;
                 if (!firstPlayerToAnswerTime || answer.hasConfirmedAt < firstPlayerToAnswerTime) {
                     firstPlayersToAnswer.clear();
