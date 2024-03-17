@@ -31,6 +31,7 @@ export class Timer {
     }
 
     start() {
+        if (this.interval) clearInterval(this.interval);
         this.whenIncrement(this.timer);
         this.interval = setInterval(
             () => {
@@ -51,6 +52,7 @@ export class Timer {
     }
 
     togglePlayPause() {
+        if (this.timer === 0) return;
         this.isPaused = !this.isPaused;
         if (this.isPaused) {
             clearInterval(this.interval);
@@ -64,6 +66,7 @@ export class Timer {
     }
 
     speedUp() {
+        if (this.timer === 0) return;
         this.isAccelerated = true;
         this.start();
     }
