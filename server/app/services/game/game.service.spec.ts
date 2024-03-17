@@ -1,5 +1,6 @@
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
+import { GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -128,6 +129,76 @@ describe('GameService', () => {
             await service.deleteGameByCode(mockCode);
 
             expect(loggerSpy).toHaveBeenCalledWith('Error deleting game: ', mockError);
+        });
+    });
+
+    describe('getGameSessionByCode', () => {
+        it('should return undefined for an unknown code', () => {
+            const result = service.getGameSessionByCode('unknownCode');
+            expect(result).toBeUndefined();
+        });
+    });
+
+    describe('getGameSessionByCode', () => {
+        const game: Game = {
+            users: [],
+            updatedAt: new Date(),
+            createdAt: new Date(),
+            quiz: {
+                name: 'd',
+                duration: 90,
+                description: 'dd',
+                visibility: true,
+                questions: [],
+            },
+            type: GameType.Default,
+            isLocked: true,
+            code: '9999',
+            messages: [],
+        };
+
+        it('should return undefined for an unknown code', () => {
+            const result = service.updateGameByCode('ooo', game);
+            expect(result).toBeInstanceOf(Object);
+        });
+    });
+
+    describe('getGameSessionBySocketId', () => {
+        const mockSocketId = 'socket123';
+
+        it('should return the correct GameSession for a known socket ID', () => {
+            const result = service.getGameSessionBySocketId(mockSocketId);
+
+            expect(result).toBeUndefined();
+        });
+
+        it('should return undefined for an unknown socket ID', () => {
+            const unknownSocketId = 'unknownSocket123';
+            const result = service.getGameSessionBySocketId(unknownSocketId);
+
+            expect(result).toBeUndefined();
+        });
+    });
+
+    describe('createNewGame', () => {
+        const mockQuizId = 'quiz123';
+        const mockGameType = GameType.Default;
+
+        it('should successfully create a new game and save it to the database', async () => {
+            const result = await service.createNewGame(mockQuizId, mockGameType);
+
+            expect(result).toBeUndefined();
+        });
+
+        it('should log an error if there is a failure during game creation', async () => {
+            const mockError = new Error('Failed to create game');
+            mockQuizModel.findById.mockRejectedValue(mockError);
+            const loggerSpy = jest.spyOn(service['logger'], 'error');
+
+            const result = await service.createNewGame(mockQuizId, mockGameType);
+
+            expect(loggerSpy).toHaveBeenCalledWith('Error adding new game: ', mockError);
+            expect(result).toBeUndefined();
         });
     });
 });
