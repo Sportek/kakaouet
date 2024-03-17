@@ -177,12 +177,12 @@ export class GameSession {
             const answer = player.getAnswer(this.gameQuestionIndex);
             if (answer && this.isCorrectAnswer(answer.answer as number[], correctAnswersIndex)) {
                 player.score += question.points;
-                if (!firstPlayerToAnswerTime || answer.hasConfirmedAt < firstPlayerToAnswerTime) {
+                if (!firstPlayerToAnswerTime || (answer.hasConfirmed && answer.hasConfirmedAt < firstPlayerToAnswerTime)) {
                     firstPlayersToAnswer.clear();
                     firstPlayerToAnswerTime = answer.hasConfirmedAt;
                     firstPlayersToAnswer.add(player);
                 }
-                if (firstPlayerToAnswerTime && answer.hasConfirmedAt.getTime() === firstPlayerToAnswerTime.getTime()) {
+                if (firstPlayerToAnswerTime && answer.hasConfirmed && answer.hasConfirmedAt.getTime() === firstPlayerToAnswerTime.getTime()) {
                     firstPlayersToAnswer.add(player);
                 }
             }
