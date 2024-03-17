@@ -7,7 +7,10 @@ import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { WORKING_QUIZ } from '@app/fake-quizzes';
 import { GameService } from '@app/services/game/game.service';
+import { GameState, Question } from '@common/types';
+import { cloneDeep } from 'lodash';
 import { GameVueComponent } from './game-vue.component';
 
 describe('GameVueComponent', () => {
@@ -49,35 +52,43 @@ describe('GameVueComponent', () => {
             expect(selectAnswerComponent).not.toHaveBeenCalled();
         });
 
-        // it('should select answer if correct KeyboardEvent submitted', () => {
-        //     const inputElement = document.createElement('div');
-        //     document.body.appendChild(inputElement);
-        //     const event = new KeyboardEvent('keydown', { key: '1' });
-        //     inputElement.dispatchEvent(event);
+        it('should select answer if correct KeyboardEvent submitted', () => {
+            const inputElement = document.createElement('div');
+            document.body.appendChild(inputElement);
+            const event = new KeyboardEvent('keydown', { key: '1' });
+            inputElement.dispatchEvent(event);
 
-        //     const selectAnswerSpy = spyOn(component, 'selectAnswer');
+            const selectAnswerSpy = spyOn(component, 'selectAnswer');
 
-        //     component.question = cloneDeep(WORKING_QUIZ.questions[0] as Question);
+            component.actualQuestion = {
+                question: cloneDeep(WORKING_QUIZ.questions[0] as Question),
+                totalQuestion: 1,
+                actualIndex: 1,
+            };
 
-        //     component.keyboardChoices(event);
+            component.keyboardChoices(event);
 
-        //     expect(selectAnswerSpy).toHaveBeenCalledWith(0);
-        // });
+            expect(selectAnswerSpy).toHaveBeenCalledWith(0);
+        });
 
-        // it('should set current answer as final', () => {
-        //     const inputElement = document.createElement('div');
-        //     document.body.appendChild(inputElement);
-        //     const event = new KeyboardEvent('keydown', { key: 'Enter' });
-        //     inputElement.dispatchEvent(event);
+        it('should set current answer as final', () => {
+            const inputElement = document.createElement('div');
+            document.body.appendChild(inputElement);
+            const event = new KeyboardEvent('keydown', { key: 'Enter' });
+            inputElement.dispatchEvent(event);
 
-        //     const setResponseAsFinalSpy = spyOn(component, 'setResponseAsFinal');
+            const setResponseAsFinalSpy = spyOn(component, 'setResponseAsFinal');
 
-        //     component.question = cloneDeep(WORKING_QUIZ.questions[0] as Question);
+            component.actualQuestion = {
+                question: cloneDeep(WORKING_QUIZ.questions[0] as Question),
+                totalQuestion: 1,
+                actualIndex: 1,
+            };
 
-        //     component.keyboardChoices(event);
+            component.keyboardChoices(event);
 
-        //     expect(setResponseAsFinalSpy).toHaveBeenCalled();
-        // });
+            expect(setResponseAsFinalSpy).toHaveBeenCalled();
+        });
     });
 
     it('should select answer', () => {
@@ -102,5 +113,27 @@ describe('GameVueComponent', () => {
         const gameServiceSpy = spyOn(gameService, 'setResponseAsFinal');
         component.setResponseAsFinal();
         expect(gameServiceSpy).toHaveBeenCalled();
+    });
+
+    describe('isIncorrectAnswer', () => {
+        it('should return false if not displaying results', () => {
+            gameService.gameState.next(GameState.WaitingPlayers);
+            const result = component.isIncorrectAnswer({ _id: 1, label: 'Choix 1', isCorrect: true });
+            expect(result).toBeFalse();
+        });
+
+        it('should return true if choice is incorrect', () => {
+            gameService.gameState.next(GameState.DisplayQuestionResults);
+            gameService.correctAnswers.next([{ _id: 2, label: 'Choix 2', isCorrect: true }]);
+            const result = component.isIncorrectAnswer({ _id: 1, label: 'Choix 1', isCorrect: true });
+            expect(result).toBeTrue();
+        });
+
+        it('should return false if choice is correct', () => {
+            gameService.gameState.next(GameState.DisplayQuestionResults);
+            gameService.correctAnswers.next([{ _id: 1, label: 'Choix 1', isCorrect: true }]);
+            const result = component.isIncorrectAnswer({ _id: 1, label: 'Choix 1', isCorrect: true });
+            expect(result).toBeFalse();
+        });
     });
 });
