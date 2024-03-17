@@ -1,7 +1,7 @@
 import { mockQuizTable } from '@app/services/quiz/mock-quiz';
 import { AnswerState, Game, GameRole, GameType, Quiz } from '@common/types';
 
-export const mockGame: Partial<Game> = {
+export const mockGame: Game = {
     users: [
         {
             _id: '1',
@@ -22,4 +22,5 @@ export const mockGame: Partial<Game> = {
     createdAt: new Date(),
     updatedAt: new Date(),
     messages: [],
+    _id: ''
 };
