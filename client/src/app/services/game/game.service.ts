@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -29,6 +30,8 @@ export class GameService {
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
 
+    canGoNextQuestion: boolean;
+
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
         private router: Router,
@@ -59,6 +62,7 @@ export class GameService {
         this.isLocked = new BehaviorSubject<boolean>(false);
         this.answers = new BehaviorSubject<GameEventsData.PlayerSendResults>({ choices: [], scores: [], questions: [] });
         this.correctAnswers = new BehaviorSubject<Choice[]>([]);
+        this.canGoNextQuestion = true;
         this.chatService.initialize();
     }
 
@@ -130,7 +134,10 @@ export class GameService {
     }
 
     nextQuestion(): void {
-        this.socketService.send(GameEvents.NextQuestion);
+        if (this.canGoNextQuestion) {
+            this.canGoNextQuestion = false;
+            this.socketService.send(GameEvents.NextQuestion);
+        }
     }
 
     selectAnswer(index: number): void {
@@ -219,6 +226,7 @@ export class GameService {
             this.gameState.next(data.gameState);
 
             if (data.gameState === GameState.PlayersAnswerQuestion) {
+                this.canGoNextQuestion = true;
                 this.resetPlayerAnswers();
                 if (this.client.getValue().role === GameRole.Organisator) {
                     this.router.navigate(['/organisator', this.game.getValue().code], { replaceUrl: true });
