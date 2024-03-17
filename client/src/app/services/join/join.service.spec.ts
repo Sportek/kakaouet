@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { GAME_CODE_CHARACTERS } from '@common/constants';
+import { GAME_CODE_CHARACTERS, GAME_USERNAME_MAX_LENGTH } from '@common/constants';
 import { GameEvents } from '@common/game-types';
 import { GameRole } from '@common/types';
 import { JoinService } from './join.service';
@@ -92,6 +92,30 @@ describe('JoinService', () => {
         expect(notificationService.error).toHaveBeenCalledWith(
             'Le code ne peut contenir que les caractères suivants: ' + GAME_CODE_CHARACTERS.split('').join(', ') + '.',
         );
+        expect(gameService.initialise).not.toHaveBeenCalled();
+        expect(socketService.send).not.toHaveBeenCalled();
+    });
+
+    it('should not proceed and show error if name contains more than 11 characters', () => {
+        const validCoe = '1234';
+        const veryLongName = 'Test player alfa';
+
+        service.join(validCoe, veryLongName);
+
+        expect(notificationService.error).toHaveBeenCalledWith(
+            `Le nom d'utilisateur doit être plus petit ou égal à ${GAME_USERNAME_MAX_LENGTH} caractères.`,
+        );
+        expect(gameService.initialise).not.toHaveBeenCalled();
+        expect(socketService.send).not.toHaveBeenCalled();
+    });
+
+    it('should not proceed and show error if name is empty', () => {
+        const validCoe = '1234';
+        const notValidUsername = '  ';
+
+        service.join(validCoe, notValidUsername);
+
+        expect(notificationService.error).toHaveBeenCalledWith("Le nom d'utilisateur ne peut pas être vide.");
         expect(gameService.initialise).not.toHaveBeenCalled();
         expect(socketService.send).not.toHaveBeenCalled();
     });

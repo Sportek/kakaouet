@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
-import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH } from '@common/constants';
+import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH, GAME_USERNAME_MAX_LENGTH } from '@common/constants';
 import { GameEvents, GameEventsData } from '@common/game-types';
 import { GameRole } from '@common/types';
 
@@ -23,6 +23,7 @@ export class JoinService {
 
     join(code: string, name: string): void {
         if (!this.confirmCodeValidity(code)) return;
+        if (!this.confirmUsernameValidity(name)) return;
         this.gameService.initialise();
         this.socketService.send(GameEvents.JoinGame, { code, name });
         this.gameService.client.next({ name, role: GameRole.Player, score: 0 });
@@ -53,5 +54,21 @@ export class JoinService {
         } else if (!code.split('').every((char) => GAME_CODE_CHARACTERS.includes(char))) {
             return 'Le code ne peut contenir que les caractères suivants: ' + GAME_CODE_CHARACTERS.split('').join(', ') + '.';
         } else return '';
+    }
+
+    private confirmUsernameValidity(name: string): boolean {
+        const error = this.confirmUsernameSyntax(name);
+        if (error) this.notificationService.error(error);
+        return !error;
+    }
+
+    private confirmUsernameSyntax(name: string): string {
+        if (name.length > GAME_USERNAME_MAX_LENGTH) {
+            return `Le nom d'utilisateur doit être plus petit ou égal à ${GAME_USERNAME_MAX_LENGTH} caractères.`;
+        }
+        if (name.length === 0 || name.trim().length === 0) {
+            return "Le nom d'utilisateur ne peut pas être vide.";
+        }
+        return '';
     }
 }
