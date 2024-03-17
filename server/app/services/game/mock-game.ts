@@ -22,5 +22,5 @@ export const mockGame: Game = {
     createdAt: new Date(),
     updatedAt: new Date(),
     messages: [],
-    _id: ''
+    _id: '',
 };
