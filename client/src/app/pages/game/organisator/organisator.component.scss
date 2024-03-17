@@ -154,7 +154,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-
+            
             .players {
                 height: 8rem;
                 display: grid;
@@ -177,6 +177,9 @@
 
                 .has-giveup {
                     text-decoration: line-through;
+                }
+                .isExcluded{
+                    visibility: hidden;
                 }
             }
         }

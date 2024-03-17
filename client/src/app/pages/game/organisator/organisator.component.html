@@ -79,9 +79,9 @@
 
             <div class="players-container">
                 <div class="players">
-                    <div class="player" *ngFor="let player of players">
-                        <div class="player-name" [ngClass]="{ 'has-giveup': player.hasGiveUp }">{{ player.name }}</div>
-                        <div class="player-score">(score: {{ player.score }})</div>
+                    <div *ngFor="let player of filterPlayers()" class="player">
+                        <div class="player-name">{{ player.name }}</div>
+                        
                     </div>
                 </div>
             </div>
