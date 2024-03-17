@@ -1,4 +1,4 @@
-import { Timer } from './Timer'; // Adjust the import path as necessary
+import { Timer } from './Timer';
 
 describe('Timer class', () => {
     jest.useFakeTimers();
@@ -26,14 +26,14 @@ describe('Timer class', () => {
         });
 
         timer.start();
-        jest.advanceTimersByTime(3000); // Advance 3 seconds, timer should be at 7
-        timer.togglePlayPause(); // Pause
-        jest.advanceTimersByTime(3000); // Advance 3 more seconds, timer should still be at 7
-        timer.togglePlayPause(); // Resume
-        jest.advanceTimersByTime(7000); // Finish the countdown
+        jest.advanceTimersByTime(3000); 
+        timer.togglePlayPause(); 
+        jest.advanceTimersByTime(3000); 
+        timer.togglePlayPause(); 
+        jest.advanceTimersByTime(7000); 
 
-        expect(mockIncrement).toHaveBeenLastCalledWith(0); // Checks if the timer ended correctly
-        expect(mockIncrement).toHaveBeenCalledTimes(12); // Checks if whenIncrement was called 10 times
+        expect(mockIncrement).toHaveBeenLastCalledWith(0); 
+        expect(mockIncrement).toHaveBeenCalledTimes(12); 
     });
 
     it('should stop and reset the timer', () => {
@@ -41,11 +41,11 @@ describe('Timer class', () => {
         const timer = new Timer(10, { whenIncrement: mockIncrement });
 
         timer.start();
-        jest.advanceTimersByTime(3000); // Advance 3 seconds
+        jest.advanceTimersByTime(3000); 
         timer.stop();
 
-        expect(mockIncrement).toHaveBeenLastCalledWith(0); // Checks if the timer was reset
-        expect(timer.getTimer()).toBe(0); // Ensure timer value is reset to 0
+        expect(mockIncrement).toHaveBeenLastCalledWith(0);
+        expect(timer.getTimer()).toBe(0); 
     });
 
     it('should accelerate the countdown', () => {
@@ -53,38 +53,36 @@ describe('Timer class', () => {
 
         const timer = new Timer(10, {
             isAccelerated: true,
-            accelerationMultiplicator: 2, // Speeding up by factor of 2
+            accelerationMultiplicator: 2, 
             whenIncrement: mockIncrement,
         });
 
         timer.start();
-        jest.advanceTimersByTime(2500); // Should count down twice as fast
+        jest.advanceTimersByTime(2500); 
 
-        expect(mockIncrement).toHaveBeenCalledTimes(6); // Checks if whenIncrement was called 5 times (half the time due to acceleration)
+        expect(mockIncrement).toHaveBeenCalledTimes(6); 
     });
 
     
         it('should accelerate the timer countdown', () => {
             const mockIncrement = jest.fn();
     
-            const initialTick = 1000; // Assuming the default tick is 1000ms
-            const accelerationMultiplicator = 4; // Assuming the default acceleration multiplier is 4
-            const acceleratedTick = initialTick / accelerationMultiplicator; // Expected accelerated tick interval
+            const initialTick = 1000; 
+            const accelerationMultiplicator = 4; 
+            const acceleratedTick = initialTick / accelerationMultiplicator;
     
             const timer = new Timer(10, {
                 whenIncrement: mockIncrement,
             });
     
             timer.start();
-            jest.advanceTimersByTime(3000); // Advance 3 seconds to simulate initial countdown
-            expect(mockIncrement).toHaveBeenCalledTimes(4); // Initial pace, 1 tick per second
+            jest.advanceTimersByTime(3000); 
+            expect(mockIncrement).toHaveBeenCalledTimes(4); 
     
             timer.speedUp();
-            jest.advanceTimersByTime(acceleratedTick * 2); // Advance time by twice the accelerated tick interval
+            jest.advanceTimersByTime(acceleratedTick * 2); 
     
-            // Now, after acceleration, the whenIncrement should be called more frequently.
-            // Since we've advanced the timer by 2 accelerated ticks, expect 2 additional calls.
-            expect(mockIncrement).toHaveBeenCalledTimes(7); // Checks if whenIncrement was called 2 more times at the accelerated pace
+            expect(mockIncrement).toHaveBeenCalledTimes(7); 
         });
 
             it('should use provided options', () => {
