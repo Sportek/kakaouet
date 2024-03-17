@@ -171,6 +171,33 @@ export class GameService {
         return this.correctAnswers.asObservable();
     }
 
+    private receiveGameResults() {
+        this.socketService.listen(GameEvents.PlayerSendResults, (data: GameEventsData.PlayerSendResults) => {
+            this.answers.next(data);
+        });
+    }
+
+    private receivePlayerScores() {
+        this.socketService.listen(GameEvents.SendPlayersScores, (data: GameEventsData.SendPlayersScores) => {
+            this.players.next(
+                this.players.getValue().map((player) => {
+                    const score = data.scores.find((s) => s.name === player.name);
+                    if (score) player.score = score.score;
+                    return player;
+                }),
+            );
+        });
+    }
+
+    private playerJoinGameListener() {
+        this.socketService.listen(GameEvents.PlayerJoinGame, (data: GameEventsData.PlayerJoinGame) => {
+            this.players.next([
+                ...this.players.getValue(),
+                { name: data.name, role: data.role, isExcluded: data.isExcluded, score: data.score, hasGiveUp: data.hasGiveUp },
+            ]);
+        });
+    }
+
     private handleError(error: HttpErrorResponse) {
         if (error.status === HttpStatusCode.NotFound) {
             this.router.navigateByUrl('/error-404', { replaceUrl: true });
@@ -191,15 +218,6 @@ export class GameService {
                 return player;
             }),
         );
-    }
-
-    private playerJoinGameListener() {
-        this.socketService.listen(GameEvents.PlayerJoinGame, (data: GameEventsData.PlayerJoinGame) => {
-            this.players.next([
-                ...this.players.getValue(),
-                { name: data.name, role: data.role, isExcluded: data.isExcluded, score: data.score, hasGiveUp: data.hasGiveUp },
-            ]);
-        });
     }
 
     private playerQuitGameListener() {
@@ -309,18 +327,6 @@ export class GameService {
         });
     }
 
-    private receivePlayerScores() {
-        this.socketService.listen(GameEvents.SendPlayersScores, (data: GameEventsData.SendPlayersScores) => {
-            this.players.next(
-                this.players.getValue().map((player) => {
-                    const score = data.scores.find((s) => s.name === player.name);
-                    if (score) player.score = score.score;
-                    return player;
-                }),
-            );
-        });
-    }
-
     private receiveGiveUpPlayers() {
         this.socketService.listen(GameEvents.PlayerHasGiveUp, (data: GameEventsData.PlayerHasGiveUp) => {
             this.players.next(
@@ -329,12 +335,6 @@ export class GameService {
                     return player;
                 }),
             );
-        });
-    }
-
-    private receiveGameResults() {
-        this.socketService.listen(GameEvents.PlayerSendResults, (data: GameEventsData.PlayerSendResults) => {
-            this.answers.next(data);
         });
     }
 
