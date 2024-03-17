@@ -104,7 +104,16 @@ export class GameSession {
     sendResultsToPlayers(): void {
         if (this.gameState !== GameState.DisplayQuizResults) return;
 
-        const scores = this.room.getOnlyGamePlayers().map((player) => ({
+        const players = this.room.getOnlyGamePlayers();
+
+        const sortedPlayers = players.sort((playerA, playerB) => {
+            if (playerB.score !== playerA.score) {
+                return playerB.score - playerA.score;
+            }
+            return playerA.name.localeCompare(playerB.name);
+        });
+
+        const scores = sortedPlayers.map((player) => ({
             name: player.name,
             score: player.score,
             bonus: player.bonus,
@@ -133,6 +142,7 @@ export class GameSession {
             questions: this.quiz.questions,
         } as GameEventsData.PlayerSendResults);
     }
+
     endGame(): void {
         this.changeGameState(GameState.End);
         // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc.
