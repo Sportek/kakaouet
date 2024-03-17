@@ -21,6 +21,7 @@
         gap: 1rem;
         .stats-sidebar {
             flex: 1;
+            overflow-y: auto;
             grid-area: stats-sidebar;
             border-radius: 5px;
             width: 100%;
