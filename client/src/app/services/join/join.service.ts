@@ -25,7 +25,7 @@ export class JoinService {
         if (!this.confirmCodeValidity(code)) return;
         if (!this.confirmUsernameValidity(name)) return;
         this.gameService.initialise();
-        this.socketService.send(GameEvents.JoinGame, { code, name });
+        this.socketService.send(GameEvents.JoinGame, { code, name: name.trim() });
         this.gameService.client.next({ name, role: GameRole.Player, score: 0 });
     }
 
