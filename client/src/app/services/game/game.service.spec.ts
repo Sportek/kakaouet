@@ -181,6 +181,21 @@ describe('GameService', () => {
             expect(mockNotificationService.error).toHaveBeenCalledWith('Le temps requis minimum pour accélérer le timer est dépassé');
         });
 
+        it('should return QCM time limit', () => {
+            service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
+            // @ts-ignore
+            const result = service.getRequiredTime();
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(result).toEqual(10);
+        });
+
+        it('should return QCM time limit', () => {
+            // @ts-ignore
+            const result = service.getRequiredTime();
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(result).toEqual(20);
+        });
+
         it('should speed up timer', () => {
             service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -235,6 +250,18 @@ describe('GameService', () => {
                 { name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false },
             ]);
             expect(startGameSpy).toHaveBeenCalled();
+        });
+
+        it('should do nothing', () => {
+            mockHttpService.post.and.returnValue(of(mockTestGame));
+            // @ts-ignore
+            const createDefaultGameSpy = spyOn(service, 'createDefaultGame');
+            // @ts-ignore
+            const createTestGameSpy = spyOn(service, 'createTestGame');
+
+            service.createNewGame('fakeId', GameType.Random);
+            expect(createDefaultGameSpy).not.toHaveBeenCalled();
+            expect(createTestGameSpy).not.toHaveBeenCalled();
         });
     });
 
@@ -548,7 +575,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveGameResults();
+        service.playerSendResultsListener();
         expect(service.answers.getValue()).toEqual({
             scores: [{ name: 'Sportek', score: 12, bonus: 1 }],
             choices: [[{ label: 'choice1', amount: 1, isCorrect: true }]],
@@ -564,7 +591,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receivePlayerScores();
+        service.sendPlayerScoresListener();
 
         expect(service.players.getValue()).toEqual([
             {
