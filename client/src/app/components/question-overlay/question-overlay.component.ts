@@ -19,9 +19,7 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
 
     isPartOfQuiz: boolean = false;
 
-    overlayStatus = {
-        display: 'none',
-    };
+    isActiveOverlay: boolean = false;
 
     private subscribers: Subscription[] = [];
 
@@ -51,11 +49,7 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
     }
 
     changeOverlay(): void {
-        if (this.overlayStatus.display === 'flex') {
-            this.overlayStatus.display = 'none';
-        } else if (this.overlayStatus.display === 'none') {
-            this.overlayStatus.display = 'flex';
-        }
+        this.isActiveOverlay = !this.isActiveOverlay;
     }
 
     specifyQuestion(id: string): void {
@@ -80,14 +74,16 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
         this.changeOverlay();
     }
 
+    isModifyingChoices(): boolean {
+        return Array.from(this.isModifyingChoiceMap.values()).some((bool) => bool);
+    }
+
     isError(): string | null {
         if (this.currentQuestion) {
-            const isModifyingChoiceArray = Array.from(this.isModifyingChoiceMap.values());
-            if (isModifyingChoiceArray.some((bool) => bool)) {
+            if (this.isModifyingChoices()) {
                 return 'Tous les choix doivent être enregistrés';
-            } else {
-                return this.validationService.validateQuestion(this.currentQuestion).errors[0];
             }
+            return this.validationService.validateQuestion(this.currentQuestion).errors[0];
         }
         return null;
     }
@@ -99,9 +95,12 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
         this.changeOverlay();
     }
 
+    isModifyingChoice(choice: Choice): boolean | undefined {
+        return this.isModifyingChoiceMap.get(choice);
+    }
+
     modifyChoice(choice: Choice): void {
-        const currentValue = this.isModifyingChoiceMap.get(choice);
-        this.isModifyingChoiceMap.set(choice, !currentValue);
+        this.isModifyingChoiceMap.set(choice, !this.isModifyingChoice(choice));
     }
 
     deleteChoice(choice: Choice): void {
