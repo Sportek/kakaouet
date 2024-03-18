@@ -1,6 +1,3 @@
-// Ce service s'occupe de gérer le jeu, incluant le traitement de l'envoi et la réception de SocketEvents
-// Donc il est long
-/* eslint-disable max-lines */
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -9,12 +6,11 @@ import { ChatService } from '@app/services/chat/chat.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { NEGATIVE_SCORE } from '@common/constants';
+import { Variables } from '@common/enum-variables';
 import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
-
-const QCM_REQUIRED_TIME_LEFT = 10;
-const QRL_REQUIRED_TIME_LEFT = 20;
+import { SocketEventHandlerService } from './socket-event-handler.service';
 
 @Injectable({
     providedIn: 'root',
@@ -31,7 +27,6 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
-
     canGoNextQuestion: boolean;
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
@@ -41,6 +36,7 @@ export class GameService {
         private socketService: SocketService,
         private notificationService: NotificationService,
         private chatService: ChatService,
+        private socketEventHandlerService: SocketEventHandlerService,
     ) {
         this.initialise();
         this.registerListeners();
@@ -96,8 +92,7 @@ export class GameService {
     }
 
     speedUpTimer() {
-        const requiredTime = this.actualQuestion.getValue()?.question?.type === QuestionType.QCM ? QCM_REQUIRED_TIME_LEFT : QRL_REQUIRED_TIME_LEFT;
-        if (requiredTime < this.cooldown.getValue())
+        if (this.getRequiredTime() < this.cooldown.getValue())
             return this.notificationService.error('Le temps requis minimum pour accélérer le timer est dépassé');
         this.socketService.send(GameEvents.SpeedUpTimer);
     }
@@ -111,20 +106,16 @@ export class GameService {
             .post<Game>(BASE_URL + '/game/', { quizId, type })
             .pipe(catchError((error) => this.handleError(error)))
             .subscribe((game) => {
-                this.initialise();
-                this.socketService.connect();
-                this.socketService.send(GameEvents.CreateGame, { code: game.code, quizId, gameType: game.type });
-                this.game.next({ code: game.code, quizName: game.quiz.name, type: game.type });
-                if (type === GameType.Default) {
-                    this.router.navigateByUrl('/waiting-room/' + game.code);
-                    this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
-                } else {
-                    this.router.navigateByUrl('/game/' + game.code);
-                    this.client.next({ name: 'Organisateur', role: GameRole.Player, score: 0 });
-                    this.changeLockState();
-                    this.isLocked.next(true);
-                    this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false }]);
-                    this.startGame();
+                this.reinitialise(quizId, game);
+                switch (type) {
+                    case GameType.Default:
+                        this.createDefaultGame(game);
+                        break;
+                    case GameType.Test:
+                        this.createTestGame(game);
+                        break;
+                    default:
+                        break;
                 }
             });
     }
@@ -144,7 +135,6 @@ export class GameService {
         } else {
             this.answer.next([...answer, index]);
         }
-
         const newAnswer = this.answer.getValue();
         if (newAnswer) this.sendAnswer(newAnswer);
     }
@@ -167,31 +157,30 @@ export class GameService {
         return this.correctAnswers.asObservable();
     }
 
-    private receiveGameResults() {
-        this.socketService.listen(GameEvents.PlayerSendResults, (data: GameEventsData.PlayerSendResults) => {
-            this.answers.next(data);
-        });
+    private reinitialise(id: string, game: Game) {
+        this.initialise();
+        this.socketService.connect();
+        this.socketService.send(GameEvents.CreateGame, { code: game.code, quizId: id, gameType: game.type });
+        this.game.next({ code: game.code, quizName: game.quiz.name, type: game.type });
     }
 
-    private receivePlayerScores() {
-        this.socketService.listen(GameEvents.SendPlayersScores, (data: GameEventsData.SendPlayersScores) => {
-            this.players.next(
-                this.players.getValue().map((player) => {
-                    const score = data.scores.find((s) => s.name === player.name);
-                    if (score) player.score = score.score;
-                    return player;
-                }),
-            );
-        });
+    private createDefaultGame(game: Game) {
+        this.router.navigateByUrl('/waiting-room/' + game.code);
+        this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
     }
 
-    private playerJoinGameListener() {
-        this.socketService.listen(GameEvents.PlayerJoinGame, (data: GameEventsData.PlayerJoinGame) => {
-            this.players.next([
-                ...this.players.getValue(),
-                { name: data.name, role: data.role, isExcluded: data.isExcluded, score: data.score, hasGiveUp: data.hasGiveUp },
-            ]);
-        });
+    private createTestGame(game: Game) {
+        this.router.navigateByUrl('/game/' + game.code);
+        this.client.next({ name: 'Organisateur', role: GameRole.Player, score: 0 });
+        this.changeLockState();
+        this.isLocked.next(true);
+        this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false }]);
+        this.startGame();
+    }
+
+    private getRequiredTime(): number {
+        if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) return Variables.QCMRequiredTimeLeft;
+        return Variables.QRLRequiredTimeLeft;
     }
 
     private handleError(error: HttpErrorResponse) {
@@ -216,6 +205,42 @@ export class GameService {
         );
     }
 
+    private handlePlayersAnswerQuestion() {
+        this.canGoNextQuestion = true;
+        this.resetPlayerAnswers();
+        if (this.client.getValue().role === GameRole.Organisator) {
+            this.router.navigate(['/organisator', this.game.getValue().code], { replaceUrl: true });
+            return;
+        }
+        this.router.navigate(['/game', this.game.getValue().code], { replaceUrl: true });
+    }
+
+    private handleDisplayQuizResults() {
+        if (this.game.getValue().type === GameType.Test) {
+            this.router.navigate(['/create/'], { replaceUrl: true });
+            return;
+        }
+        this.router.navigate(['/results', this.game.getValue().code], { replaceUrl: true });
+    }
+
+    private playerSendResultsListener() {
+        this.socketService.listen(GameEvents.PlayerSendResults, (data: GameEventsData.PlayerSendResults) => {
+            this.answers.next(data);
+        });
+    }
+
+    private sendPlayerScoresListener() {
+        this.socketService.listen(GameEvents.SendPlayersScores, (data: GameEventsData.SendPlayersScores) => {
+            this.socketEventHandlerService.handleSendPlayerScores(data, this.players);
+        });
+    }
+
+    private playerJoinGameListener() {
+        this.socketService.listen(GameEvents.PlayerJoinGame, (data: GameEventsData.PlayerJoinGame) => {
+            this.socketEventHandlerService.handlePlayerJoinGame(data, this.players);
+        });
+    }
+
     private playerQuitGameListener() {
         this.socketService.listen(GameEvents.PlayerQuitGame, (data: GameEventsData.PlayerQuitGame) => {
             this.players.next(this.players.getValue().filter((player) => player.name !== data.name));
@@ -230,55 +255,38 @@ export class GameService {
 
     private gameClosedListener() {
         this.socketService.listen(GameEvents.GameClosed, () => {
-            this.router.navigateByUrl('/home', { replaceUrl: true });
-            this.notificationService.success('La partie a été fermée');
+            this.socketEventHandlerService.handleGameClosed();
         });
     }
 
     private gameChangeStateListener(): void {
         this.socketService.listen(GameEvents.GameStateChanged, (data: GameEventsData.GameStateChanged) => {
             this.gameState.next(data.gameState);
-
-            if (data.gameState === GameState.PlayersAnswerQuestion) {
-                this.canGoNextQuestion = true;
-                this.resetPlayerAnswers();
-                if (this.client.getValue().role === GameRole.Organisator) {
-                    this.router.navigate(['/organisator', this.game.getValue().code], { replaceUrl: true });
-                    return;
-                }
-                this.router.navigate(['/game', this.game.getValue().code], { replaceUrl: true });
-            }
-
-            if (data.gameState === GameState.DisplayQuestionResults) {
-                this.isFinalAnswer.next(true);
-            }
-
-            if (data.gameState === GameState.DisplayQuizResults) {
-                if (this.game.getValue().type === GameType.Test) {
-                    this.router.navigate(['/create/'], { replaceUrl: true });
-                    return;
-                }
-
-                this.router.navigate(['/results', this.game.getValue().code], { replaceUrl: true });
+            switch (data.gameState) {
+                case GameState.PlayersAnswerQuestion:
+                    this.handlePlayersAnswerQuestion();
+                    break;
+                case GameState.DisplayQuestionResults:
+                    this.isFinalAnswer.next(true);
+                    break;
+                case GameState.DisplayQuizResults:
+                    this.handleDisplayQuizResults();
+                    break;
+                default:
+                    break;
             }
         });
     }
 
     private gameQuestionListener() {
         this.socketService.listen(GameEvents.GameQuestion, (data: GameEventsData.GameQuestion) => {
-            this.actualQuestion.next(data.actualQuestion);
-            this.answer.next(data.actualQuestion.question.type === QuestionType.QCM ? [] : '');
-            this.isFinalAnswer.next(false);
+            this.socketEventHandlerService.handleGameQuestion(data, this.actualQuestion, this.answer, this.isFinalAnswer);
         });
     }
 
     private receiveAnswerListener() {
         this.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
-            const player = this.players.getValue().find((p) => p.name === data.name);
-            if (player) {
-                player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
-                this.players.next([...this.players.getValue()]);
-            }
+            this.socketEventHandlerService.handlePlayerSelectAnswer(data, this.players);
         });
     }
 
@@ -290,20 +298,13 @@ export class GameService {
 
     private receiveConfirmAnswerListener() {
         this.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmAnswers) => {
-            const player = this.players.getValue().find((p) => p.name === data.name);
-            if (player) {
-                if (player.answers) {
-                    player.answers.hasConfirmed = true;
-                }
-                this.players.next([...this.players.getValue()]);
-            }
+            this.socketEventHandlerService.handlePlayerConfirmAnswers(data, this.players);
         });
     }
 
     private receiveUpdateScoreListener() {
         this.socketService.listen(GameEvents.UpdateScore, (data: GameEventsData.UpdateScore) => {
-            if (data.hasAnsweredFirst) this.notificationService.info('Vous avez répondu en premier !');
-            this.client.next({ ...this.client.getValue(), score: data.score });
+            this.socketEventHandlerService.handleUpdateScore(data, this.client);
         });
     }
 
@@ -315,22 +316,13 @@ export class GameService {
 
     private receiveBannedPlayers() {
         this.socketService.listen(GameEvents.PlayerBanned, (data: GameEventsData.PlayerBanned) => {
-            this.players.next(this.players.getValue().map((player) => (player.name === data.name ? { ...player, isExcluded: true } : player)));
-            if (data.name === this.client.getValue().name) {
-                this.router.navigateByUrl('/home', { replaceUrl: true });
-                this.notificationService.error('Vous avez été banni de la partie');
-            }
+            this.socketEventHandlerService.handlePlayerBanned(data, this.players, this.client);
         });
     }
 
     private receiveGiveUpPlayers() {
         this.socketService.listen(GameEvents.PlayerHasGiveUp, (data: GameEventsData.PlayerHasGiveUp) => {
-            this.players.next(
-                this.players.getValue().map((player) => {
-                    if (player.name === data.name) player.hasGiveUp = true;
-                    return player;
-                }),
-            );
+            this.socketEventHandlerService.handlePlayerGivesUp(data, this.players);
         });
     }
 
@@ -346,9 +338,9 @@ export class GameService {
         this.receiveUpdateScoreListener();
         this.receiveGameLockedStateChanged();
         this.receiveBannedPlayers();
-        this.receivePlayerScores();
+        this.sendPlayerScoresListener();
         this.receiveGiveUpPlayers();
-        this.receiveGameResults();
+        this.playerSendResultsListener();
         this.receiveCorrectAnswersListener();
     }
 }

@@ -13,4 +13,6 @@ export enum Variables {
     NotFound = 404,
     QCMMinChoicesAmount = 2,
     QCMMaxChoicesAmount = 4,
+    QCMRequiredTimeLeft = 10,
+    QRLRequiredTimeLeft = 20,
 }
