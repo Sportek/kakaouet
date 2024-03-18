@@ -9,7 +9,7 @@ export class QuestionController {
 
     @Get('/')
     async getAllQuestions() {
-        return await this.questionService.getAllQuestions();
+        return this.questionService.getAllQuestions();
     }
 
     @Get('/:id')
@@ -25,13 +25,13 @@ export class QuestionController {
     @Post('/')
     @HttpCode(HttpStatus.CREATED)
     async createQuestion(@Body() question: QuestionDto) {
-        return await this.questionService.addNewQuestion(question);
+        return this.questionService.addNewQuestion(question);
     }
 
     @Patch('/:id')
     @HttpCode(HttpStatus.OK)
     async updateQuestion(@Param('id') id: string, @Body() question: QuestionDto) {
-        return await this.questionService.updateQuestionById(id, question);
+        return this.questionService.updateQuestionById(id, question);
     }
 
     @Delete('/:id')
