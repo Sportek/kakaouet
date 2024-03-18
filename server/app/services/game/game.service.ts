@@ -1,6 +1,6 @@
 import { GameSession } from '@app/classes/game/game-session';
 import { Player } from '@app/classes/player';
-import { Room } from '@app/classes/room';
+import { Room } from '@app/classes/room/room';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
 import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH } from '@common/constants';

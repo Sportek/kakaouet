@@ -2,7 +2,7 @@ import { CompletePlayerAnswer, GameEvents, PlayerAnswers } from '@common/game-ty
 import { GameRole } from '@common/types';
 import { Socket } from 'socket.io';
 import { GameSession } from './game/game-session';
-import { Room } from './room';
+import { Room } from './room/room';
 export class Player {
     name: string;
     role: GameRole;
