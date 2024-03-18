@@ -9,7 +9,7 @@ export class GameController {
 
     @Get('/')
     async getAllGames() {
-        return await this.gameService.getAllGames();
+        return this.gameService.getAllGames();
     }
 
     @Get('/:code')
@@ -25,13 +25,13 @@ export class GameController {
     @Post('/')
     @HttpCode(HttpStatus.CREATED)
     async createGame(@Body() data: { quizId: string; type: GameType }) {
-        return await this.gameService.createNewGame(data.quizId, data.type);
+        return this.gameService.createNewGame(data.quizId, data.type);
     }
 
     @Patch('/:code')
     @HttpCode(HttpStatus.OK)
     async updateGame(@Param('code') code: string, @Body() game: Game) {
-        return await this.gameService.updateGameByCode(code, game);
+        return this.gameService.updateGameByCode(code, game);
     }
 
     @Delete('/:code')

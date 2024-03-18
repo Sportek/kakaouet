@@ -51,7 +51,7 @@ export class QuestionService {
             await this.questionModel.replaceOne(filter, question);
             // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
-            return await this.questionModel.findOne({ _id: question._id });
+            return this.questionModel.findOne({ _id: question._id });
         } catch (error) {
             this.logger.error('Error updating question: ', error);
         }
@@ -77,7 +77,7 @@ export class QuestionService {
         try {
             question.lastModification = new Date();
             question.createdAt = new Date();
-            return await this.questionModel.create(question);
+            return this.questionModel.create(question);
         } catch (error) {
             this.logger.error('Error adding new question: ', error);
         }
