@@ -39,8 +39,8 @@ export enum GameEvents {
 // Différents types définis
 
 export type Answer = string | number[];
-export type ExtendedAnswer = { hasInterracted: boolean; hasConfirmed: boolean; answer: Answer };
-export type PlayerClient = {
+export interface ExtendedAnswer { hasInterracted: boolean; hasConfirmed: boolean; answer: Answer };
+export interface PlayerClient {
     name: string;
     role: GameRole;
     score: number;
@@ -48,11 +48,18 @@ export type PlayerClient = {
     hasGiveUp: boolean;
     answers?: ExtendedAnswer;
 };
-export type Client = { name: string; role: GameRole; score: number };
-export type GameRestricted = { code: string; quizName: string; type: GameType };
-export type SocketResponse = { isSuccess: boolean; message?: string };
-export type ActualQuestion = { question: Question; totalQuestion: number; actualIndex: number };
-export type ChoiceData = { label: string; amount: number; isCorrect: boolean };
+export interface Client { name: string; role: GameRole; score: number };
+export interface GameRestricted { code: string; quizName: string; type: GameType };
+export interface SocketResponse { isSuccess: boolean; message?: string };
+export interface ActualQuestion { question: Question; totalQuestion: number; actualIndex: number };
+export interface ChoiceData { label: string; amount: number; isCorrect: boolean };
+export interface PlayerAnswers { [questionId: number]: CompletePlayerAnswer }
+export interface CompletePlayerAnswer { hasInterracted: boolean; hasConfirmed: boolean; hasConfirmedAt?: Date; answer: string | number[] }
+export interface Score {
+    name: string;
+    score: number;
+    bonus: number;
+};
 
 export namespace GameEventsData {
     export interface SelectAnswer {

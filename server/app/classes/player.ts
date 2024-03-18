@@ -1,4 +1,4 @@
-import { GameEvents } from '@common/game-types';
+import { CompletePlayerAnswer, GameEvents, PlayerAnswers } from '@common/game-types';
 import { GameRole } from '@common/types';
 import { Socket } from 'socket.io';
 import { GameSession } from './game/game-session';
@@ -13,7 +13,7 @@ export class Player {
     hasGiveUp: boolean;
     private room: Room;
     private game: GameSession;
-    private answers: { [questionId: number]: { hasInterracted: boolean; hasConfirmed: boolean; hasConfirmedAt?: Date; answer: string | number[] } };
+    private answers: PlayerAnswers;
 
     constructor(name: string, socket: Socket, role: GameRole = GameRole.Player) {
         this.name = name;
@@ -43,7 +43,7 @@ export class Player {
         this.room.sendToOrganizer(GameEvents.PlayerSelectAnswer, { name: this.name, answer: answerData.answer });
     }
 
-    getAnswer(index: number): { hasInterracted: boolean; hasConfirmed: boolean; hasConfirmedAt?: Date; answer: string | number[] } {
+    getAnswer(index: number): CompletePlayerAnswer {
         return this.answers[index];
     }
 

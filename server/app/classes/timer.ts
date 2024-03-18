@@ -1,5 +1,12 @@
 const DEFAULT_TICK = 1000;
 const DEFAULT_MULTIPLICATOR = 4;
+interface TimerOptions {
+    tick?: number;
+    isAccelerated?: boolean;
+    accelerationMultiplicator?: number;
+    whenDone?: () => void;
+    whenIncrement?: (timer: number) => void;
+}
 
 export class Timer {
     private timer: number;
@@ -10,16 +17,7 @@ export class Timer {
     private isPaused: boolean = false;
     private whenDone: () => void;
     private whenIncrement: (timer: number) => void;
-    constructor(
-        countDown: number,
-        options?: {
-            tick?: number;
-            isAccelerated?: boolean;
-            accelerationMultiplicator?: number;
-            whenDone?: () => void;
-            whenIncrement?: (timer: number) => void;
-        },
-    ) {
+    constructor(countDown: number, options?: TimerOptions) {
         this.timer = countDown;
         this.isAccelerated = options?.isAccelerated || false;
         this.tick = options?.tick || DEFAULT_TICK;

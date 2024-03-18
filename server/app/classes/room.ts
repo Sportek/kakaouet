@@ -4,6 +4,10 @@ import { GameRole, GameState, GameType } from '@common/types';
 import { Server } from 'socket.io';
 import { GameSession } from './game/game-session';
 import { Player } from './player';
+
+interface BroadcastOptions {
+    exceptRoom?: string;
+}
 export class Room {
     code: string;
     players: Player[];
@@ -77,7 +81,7 @@ export class Room {
         this.gameService.removeGameSession(this.code);
     }
 
-    broadcast(event: string, options: { exceptRoom?: string }, ...args: unknown[]): void {
+    broadcast(event: string, options: BroadcastOptions, ...args: unknown[]): void {
         this.server
             .to(this.code)
             .except(options.exceptRoom)
@@ -119,13 +123,17 @@ export class Room {
         return this.getOnlyGamePlayers().every((player) => player.getAnswer(this.game.gameQuestionIndex));
     }
 
+    getPlayingPlayers(): Player[] {
+        return this.getOnlyGamePlayers().filter((player) => !player.hasGiveUp);
+    }
+
+    getOrganisator(): Player {
+        return this.players.find((p) => p.role === GameRole.Organisator && !p.hasGiveUp);
+    }
+
     private shouldDeleteGame(): void {
-        const hasPlayers = this.players.some((p) => p.role === GameRole.Player && !p.isExcluded && !p.hasGiveUp);
-        const noPlayers = !hasPlayers && this.game.gameState !== GameState.WaitingPlayers;
-        const hasOrganisator = this.players.some((p) => p.role === GameRole.Organisator && !p.hasGiveUp);
-        const noOrganisator = !hasOrganisator && this.game.type === GameType.Default;
-        if (noPlayers || noOrganisator) {
-            this.deleteRoom();
-        }
+        const noPlayers = !(this.getPlayingPlayers().length > 0) && this.game.gameState !== GameState.WaitingPlayers;
+        const noOrganisator = !this.getOrganisator() && this.game.type === GameType.Default;
+        if (noPlayers || noOrganisator) this.deleteRoom();
     }
 }

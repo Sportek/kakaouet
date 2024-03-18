@@ -36,6 +36,7 @@ export class SocketService {
                 this.connect();
             }
         });
+        this.debugHeartbeat();
     }
 
     /*
@@ -87,5 +88,14 @@ export class SocketService {
                 this.processQueue();
             });
         }
+    }
+
+    private debugHeartbeat() {
+        if (environment.production) return;
+        // Évènement de test pour vérifier qu'on est connecté au serveur
+        this.listen('test', (data) => {
+            // eslint-disable-next-line no-console -- Nécessaire pour le débug message dans la console.
+            console.log(data);
+        });
     }
 }
