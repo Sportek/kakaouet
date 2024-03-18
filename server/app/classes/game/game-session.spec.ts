@@ -65,15 +65,90 @@ describe('GameSession', () => {
     describe('startQuestionCooldown', () => {
         it('does nothing if gameState is not PlayersAnswerQuestion', () => {
             gameSession.gameState = GameState.WaitingPlayers; // Set to a different state
-            // Assuming simpleDelay is not recognized by TypeScript in the context of GameSession
+            const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
+            gameSession.startQuestionCooldown();
+            expect(simpleDelaySpy).not.toHaveBeenCalled();
+        });
+
+        /*it('calls simpleDelay with quiz duration and eventually calls displayQuestionResults', () => {
+            gameSession.gameState = GameState.PlayersAnswerQuestion; // Ensure correct state
+
             const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
 
+            simpleDelaySpy.mockImplementation((duration, callback: () => void) => {
+                callback(); 
+            });
+
+            const displayQuestionResultsSpy = jest.spyOn(gameSession, 'displayQuestionResults');
         
             gameSession.startQuestionCooldown();
         
-            expect(simpleDelaySpy).not.toHaveBeenCalled();
-        });
+            expect(simpleDelaySpy).toHaveBeenCalledWith(gameSession.quiz.duration, expect.any(Function));
+            expect(displayQuestionResultsSpy).toHaveBeenCalled();
+        });*/
     });
 
+    
+    describe('displayQuestionResults', () => {
+        /*it('changes the game state to DisplayQuestionResults', () => {
+            const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
+            gameSession.displayQuestionResults();
+            expect(changeGameStateSpy).toHaveBeenCalledWith(GameState.DisplayQuestionResults);
+        });
 
+        it('calls sendScores', () => {
+            const sendScoresSpy = jest.spyOn(gameSession as any, 'sendScores');
+
+            gameSession.displayQuestionResults();
+            expect(sendScoresSpy).toHaveBeenCalled();
+        });
+
+        it('calls sendScores', () => {
+            const sendScoresSpy = jest.spyOn(gameSession as any, 'sendScores');
+
+            gameSession.displayQuestionResults();
+            expect(sendScoresSpy).toHaveBeenCalled();
+        });
+        
+        it('calls nextQuestion if the game type is Test', () => {
+            gameSession.type = GameType.Test; 
+            const nextQuestionSpy = jest.spyOn(gameSession, 'nextQuestion');
+            gameSession.displayQuestionResults();
+            expect(nextQuestionSpy).toHaveBeenCalled();
+        });
+        
+        it('does not call nextQuestion if the game type is not Test', () => {
+            gameSession.type = GameType.Default; 
+            const nextQuestionSpy = jest.spyOn(gameSession, 'nextQuestion');
+            gameSession.displayQuestionResults();
+            expect(nextQuestionSpy).not.toHaveBeenCalled();
+        });*/
+    
+    });
+
+    it('does nothing if gameState is not DisplayQuestionResults', () => {
+        gameSession.gameState = GameState.WaitingPlayers; // Set to a different state
+        gameSession.nextQuestion();
+        expect(gameSession.changeGameState).not.toHaveBeenCalled();
+    });
+    
+    it('calls displayResults if on the last question', () => {
+        gameSession.gameQuestionIndex = gameSession.quiz.questions.length - 1; // Set to last question
+        gameSession.nextQuestion();
+        expect(gameSession.displayResults).toHaveBeenCalled();
+    });
+    
+
+    /*it('processes the next question correctly', () => {
+        gameSession.gameQuestionIndex = 0; // Ensure not the last question
+        gameSession.nextQuestion();
+        
+        jest.advanceTimersByTime(NEXT_QUESTION_DELAY);
+    
+        expect(gameSession.simpleDelay).toHaveBeenCalledWith(NEXT_QUESTION_DELAY, expect.any(Function));
+        expect(gameSession.changeGameState).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
+        expect(gameSession.broadcastGameNextQuestion).toHaveBeenCalled();
+        expect(gameSession.startQuestionCooldown).toHaveBeenCalled();
+    });*/
+    
 });
