@@ -59,32 +59,14 @@ export class GameGateway {
 
     @SubscribeMessage(GameEvents.JoinGame)
     handleJoinGame(@MessageBody() data: GameEventsData.JoinGame, @ConnectedSocket() client: Socket): SocketResponse {
-        const gameSession = this.gameService.getGameSessionByCode(data.code);
-        if (!gameSession) {
-            client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: "La partie n'existe pas" });
-            return { isSuccess: false };
-        }
-
-        if (gameSession.isLocked) {
-            client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: 'La partie est vérouillée' });
-            return { isSuccess: false };
-        }
-
-        const player = gameSession.room.getPlayer(data.name);
-        if (!player) {
+        const response = this.verifyJoinGame(data);
+        if (!response.isSuccess) {
+            client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, ...response });
+        } else {
+            const gameSession = this.gameService.getGameSessionByCode(data.code);
             gameSession.room.addPlayer(new Player(data.name, client, GameRole.Player));
-            return { isSuccess: true };
         }
-        if (player.isExcluded) {
-            client.emit(GameEvents.PlayerConfirmJoinGame, {
-                code: data.code,
-                isSuccess: false,
-                message: 'Ce pseudonyme est banni de la partie',
-            });
-            return { isSuccess: false };
-        }
-        client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: 'Ce nom est déjà pris' });
-        return { isSuccess: false };
+        return { isSuccess: response.isSuccess };
     }
 
     @SubscribeMessage(GameEvents.CreateGame)
@@ -125,7 +107,8 @@ export class GameGateway {
     handleNextQuestion(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (!this.hasAutorisation(client, GameRole.Organisator))
-            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+            if (!this.hasAutorisation(client, GameRole.Organisator))
+                return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.nextQuestion();
         return { isSuccess: true, message: 'Question suivante' };
@@ -135,7 +118,8 @@ export class GameGateway {
     handleBanPlayer(@MessageBody() data: GameEventsData.BanPlayer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (!this.hasAutorisation(client, GameRole.Organisator))
-            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+            if (!this.hasAutorisation(client, GameRole.Organisator))
+                return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.room.banPlayer(data.name);
         return { isSuccess: true, message: 'Joueur banni' };
@@ -145,7 +129,8 @@ export class GameGateway {
     handleToggleTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (!this.hasAutorisation(client, GameRole.Organisator))
-            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+            if (!this.hasAutorisation(client, GameRole.Organisator))
+                return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.toggleTimer();
         return { isSuccess: true, message: 'Timer modifié' };
@@ -154,6 +139,8 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.SpeedUpTimer)
     handleSpeedUpTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        if (!this.hasAutorisation(client, GameRole.Organisator))
+            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
         if (!this.hasAutorisation(client, GameRole.Organisator))
             return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
         gameSession.speedUpTimer();
@@ -182,10 +169,27 @@ export class GameGateway {
         }, INTERVAL);
     }
 
+    private verifyJoinGame(data: GameEventsData.JoinGame): SocketResponse {
+        const gameSession = this.gameService.getGameSessionByCode(data.code);
+        if (!gameSession) {
+            return { isSuccess: false, message: "La partie n'existe pas" };
+        }
+        if (gameSession.isLocked) {
+            return { isSuccess: false, message: 'La partie est vérouillée' };
+        }
+        const player = gameSession.room.getPlayer(data.name);
+        if (player && player.isExcluded) {
+            return { isSuccess: false, message: 'Ce pseudonyme est banni de la partie' };
+        }
+        if (player) {
+            return { isSuccess: false, message: 'Ce nom est déjà pris' };
+        }
+        return { isSuccess: true };
+    }
+
     private hasAutorisation(client: Socket, role: GameRole): boolean {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-
         return player && player.role === role;
     }
 }
