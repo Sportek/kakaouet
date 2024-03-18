@@ -16,6 +16,8 @@ export class UpdateNameComponent implements OnDestroy {
     newName: string = '';
     subscription: Subscription = new Subscription();
 
+    // le constructeur n'a qu'une réelle dépendance
+    // dialogRef, data et snackbar sont liés à l'utilisation de Material
     // eslint-disable-next-line max-params
     constructor(
         public dialogRef: MatDialogRef<ImportGameComponent>,

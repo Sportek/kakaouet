@@ -54,9 +54,11 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe((confirm) => {
             if (confirm) {
+                // _id est forcé par MongoDB, accepté par le prof
                 // eslint-disable-next-line no-underscore-dangle
                 this.questionService.deleteQuestionById(question._id).subscribe({
                     next: () => {
+                        // _id est forcé par MongoDB, accepté par le prof
                         // eslint-disable-next-line no-underscore-dangle
                         this.questionList = this.questionList.filter((quest) => question._id !== quest._id);
                     },

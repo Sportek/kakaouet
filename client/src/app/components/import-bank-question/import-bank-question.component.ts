@@ -48,6 +48,7 @@ export class QuestionBankImportComponent implements OnInit, OnDestroy {
         this.questionBankService.clearSelectedQuestions();
     }
     isQuestionSelected(question: Question): boolean {
+        // _id est forcé par MongoDB, accepté par le prof
         // eslint-disable-next-line no-underscore-dangle
         return this.selectedQuestions.some((selectedQuestion) => selectedQuestion._id === question._id);
     }

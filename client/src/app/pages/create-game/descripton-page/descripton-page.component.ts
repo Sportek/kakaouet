@@ -18,6 +18,7 @@ export class DescriptonPageComponent implements OnInit, OnDestroy {
     notFound: number;
     private subscriptions = new Subscription();
 
+    // Toutes ces dépendances sont nécessaires
     // eslint-disable-next-line max-params
     constructor(
         private quizService: QuizService,
