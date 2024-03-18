@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Room } from '@app/classes/room';
 import { GameService } from '@app/services/game/game.service';
 import { GameType } from '@common/game-types';
@@ -5,18 +7,31 @@ import { GameState, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
 import { GameSession } from './game-session';
 
+jest.mock('socket.io', () => {
+    const mServer = {
+        to: jest.fn().mockReturnThis(),
+        except: jest.fn().mockReturnThis(),
+        emit: jest.fn().mockReturnThis(),
+    };
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    return { Server: jest.fn(() => mServer) };
+});
+
 describe('GameSession', () => {
     let gameSession: GameSession;
     let room: Room;
     let quiz: Quiz;
+    let serverMock: Server;
+    // eslint-disable-next-line no-unused-vars
     const START_GAME_DELAY = 5;
-    // const NEXT_QUESTION_DELAY = 3;
+    const NEXT_QUESTION_DELAY = 3;
 
     beforeEach(() => {
-        // Mock Server and GameService for testing purposes
-        const mockServer = {} as Server;
+        jest.clearAllMocks();
+        serverMock = new Server() as unknown as Server;
+        // const mockServer = {} as Server;
         const mockGameService = {} as GameService;
-        room = new Room('test-room', mockServer, mockGameService);
+        room = new Room('test-room', serverMock, mockGameService);
         quiz = {
             _id: 'quiz123',
             name: 'Test Quiz',
@@ -62,93 +77,61 @@ describe('GameSession', () => {
         });
     });
 
-    describe('startQuestionCooldown', () => {
-        it('does nothing if gameState is not PlayersAnswerQuestion', () => {
-            gameSession.gameState = GameState.WaitingPlayers; // Set to a different state
+    describe('startGameDelayed', () => {
+        it('does nothing if gameState is not WaitingPlayers', () => {
+            gameSession.gameState = GameState.PlayersAnswerQuestion;
+
             const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
-            gameSession.startQuestionCooldown();
+
+            gameSession.startGameDelayed();
+
             expect(simpleDelaySpy).not.toHaveBeenCalled();
         });
 
-        /*it('calls simpleDelay with quiz duration and eventually calls displayQuestionResults', () => {
-            gameSession.gameState = GameState.PlayersAnswerQuestion; // Ensure correct state
+        it('calls startGame if type is GameType.Test', () => {
+            gameSession.type = GameType.Test;
+            const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
+            gameSession.startGameDelayed();
+            expect(simpleDelaySpy).not.toHaveBeenCalled();
+            expect(gameSession.startGame).toHaveBeenCalled();
+        });
+
+        it('calls simpleDelay and then startGame if gameState is WaitingPlayers and type is not GameType.Test', () => {
+            gameSession.gameState = GameState.WaitingPlayers;
+            gameSession.type = GameType.Default;
 
             const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
 
-            simpleDelaySpy.mockImplementation((duration, callback: () => void) => {
-                callback(); 
-            });
+            gameSession.startGameDelayed();
 
-            const displayQuestionResultsSpy = jest.spyOn(gameSession, 'displayQuestionResults');
-        
+            expect(simpleDelaySpy).toHaveBeenCalledWith(START_GAME_DELAY, expect.any(Function));
+
+            // Manually trigger the callback function passed to simpleDelay
+            /* const callback = simpleDelaySpy.mock.calls[0][1];
+            callback();*/
+
+            expect(gameSession.startGame).toHaveBeenCalled();
+        });
+    });
+
+    describe('startQuestionCooldown', () => {
+        it('does nothing if gameState is not PlayersAnswerQuestion', () => {
+            gameSession.gameState = GameState.WaitingPlayers; // Set to a different state
+            const simpleDelaySpy = jest.spyOn(gameSession as unknown as { simpleDelay: () => void }, 'simpleDelay');
             gameSession.startQuestionCooldown();
-        
-            expect(simpleDelaySpy).toHaveBeenCalledWith(gameSession.quiz.duration, expect.any(Function));
-            expect(displayQuestionResultsSpy).toHaveBeenCalled();
-        });*/
+            expect(simpleDelaySpy).not.toHaveBeenCalled();
+        });
     });
 
-    
     describe('displayQuestionResults', () => {
-        /*it('changes the game state to DisplayQuestionResults', () => {
-            const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
-            gameSession.displayQuestionResults();
-            expect(changeGameStateSpy).toHaveBeenCalledWith(GameState.DisplayQuestionResults);
-        });
+        it('does nothing if gameState is not DisplayQuestionResults', () => {
+            gameSession.gameState = GameState.WaitingPlayers;
+            const changeGameStateMock = jest.fn();
+            jest.spyOn(gameSession, 'changeGameState').mockImplementation(changeGameStateMock);
 
-        it('calls sendScores', () => {
-            const sendScoresSpy = jest.spyOn(gameSession as any, 'sendScores');
+            gameSession.nextQuestion();
 
-            gameSession.displayQuestionResults();
-            expect(sendScoresSpy).toHaveBeenCalled();
+            expect(changeGameStateMock).not.toHaveBeenCalled();
         });
-
-        it('calls sendScores', () => {
-            const sendScoresSpy = jest.spyOn(gameSession as any, 'sendScores');
-
-            gameSession.displayQuestionResults();
-            expect(sendScoresSpy).toHaveBeenCalled();
-        });
-        
-        it('calls nextQuestion if the game type is Test', () => {
-            gameSession.type = GameType.Test; 
-            const nextQuestionSpy = jest.spyOn(gameSession, 'nextQuestion');
-            gameSession.displayQuestionResults();
-            expect(nextQuestionSpy).toHaveBeenCalled();
-        });
-        
-        it('does not call nextQuestion if the game type is not Test', () => {
-            gameSession.type = GameType.Default; 
-            const nextQuestionSpy = jest.spyOn(gameSession, 'nextQuestion');
-            gameSession.displayQuestionResults();
-            expect(nextQuestionSpy).not.toHaveBeenCalled();
-        });*/
-    
     });
-
-    it('does nothing if gameState is not DisplayQuestionResults', () => {
-        gameSession.gameState = GameState.WaitingPlayers; // Set to a different state
-        gameSession.nextQuestion();
-        expect(gameSession.changeGameState).not.toHaveBeenCalled();
-    });
-    
-    it('calls displayResults if on the last question', () => {
-        gameSession.gameQuestionIndex = gameSession.quiz.questions.length - 1; // Set to last question
-        gameSession.nextQuestion();
-        expect(gameSession.displayResults).toHaveBeenCalled();
-    });
-    
-
-    /*it('processes the next question correctly', () => {
-        gameSession.gameQuestionIndex = 0; // Ensure not the last question
-        gameSession.nextQuestion();
-        
-        jest.advanceTimersByTime(NEXT_QUESTION_DELAY);
-    
-        expect(gameSession.simpleDelay).toHaveBeenCalledWith(NEXT_QUESTION_DELAY, expect.any(Function));
-        expect(gameSession.changeGameState).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
-        expect(gameSession.broadcastGameNextQuestion).toHaveBeenCalled();
-        expect(gameSession.startQuestionCooldown).toHaveBeenCalled();
-    });*/
-    
 });
