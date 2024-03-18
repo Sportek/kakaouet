@@ -165,6 +165,7 @@ export class GameSession {
         const firstPlayerToAnswer = goodAnswerPlayers[0] || null;
         if (!this.hasMultiplePlayersAnsweredCorrectly(goodAnswerPlayers) && firstPlayerToAnswer) {
             firstPlayerToAnswer.score += question.points * FIRST_PLAYER_SCORE_MULTIPLICATOR;
+            firstPlayerToAnswer.bonus++;
         }
 
         return goodAnswerPlayers.map((player) => ({ player, hasAnsweredFirst: firstPlayerToAnswer === player }));

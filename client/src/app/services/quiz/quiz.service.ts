@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
 import { ValidateService } from '@app/services/validate/validate.service';
 import { QuestionFeedback, Quiz } from '@common/types';
+import { saveAs } from 'file-saver';
 import { Observable, Subject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -143,14 +144,9 @@ export class QuizService {
             createdAt: quiz.createdAt,
             lastModification: quiz.lastModification,
         };
-        const fileContent = JSON.stringify(quizNoVisibilityNoId);
+        const space = 2;
+        const fileContent = JSON.stringify(quizNoVisibilityNoId, null, space);
         const blob = new Blob([fileContent], { type: 'application/json' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = quiz.name + '.json';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
+        saveAs(blob, quiz.name + '.json');
     }
 }
