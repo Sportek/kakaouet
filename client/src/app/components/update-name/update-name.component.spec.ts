@@ -9,10 +9,10 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ImportGameComponent } from '@app/components/import-game/import-game.component';
 import { WORKING_QUIZ } from '@app/fake-quizzes';
+import { NotificationService } from '@app/services/notification/notification.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { ValidateService } from '@app/services/validate/validate.service';
 import { Quiz } from '@common/types';
@@ -23,12 +23,12 @@ describe('UpdateNameComponent', () => {
     let component: UpdateNameComponent;
     let fixture: ComponentFixture<UpdateNameComponent>;
     let quizServiceMock: jasmine.SpyObj<QuizService>;
-    let snackBarMock: jasmine.SpyObj<MatSnackBar>;
+    let notificationService: jasmine.SpyObj<NotificationService>;
     let dialogRefMock: jasmine.SpyObj<MatDialogRef<ImportGameComponent>>;
 
     beforeEach(() => {
         quizServiceMock = jasmine.createSpyObj('QuizService', ['addNewQuiz']);
-        snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
+        notificationService = jasmine.createSpyObj('MatSnackBar', ['success', 'error']);
         dialogRefMock = jasmine.createSpyObj('MatDialogRef', ['close']);
         TestBed.configureTestingModule({
             declarations: [UpdateNameComponent],
@@ -42,12 +42,11 @@ describe('UpdateNameComponent', () => {
                 FormsModule,
                 CommonModule,
             ],
-            // Sans ça, un fois sur 2 y'a des erreurs bizarre, pourtant les imports sont là... me no comprendo porke it no worko???
             schemas: [NO_ERRORS_SCHEMA],
             providers: [
                 { provide: MAT_DIALOG_DATA, useValue: { quiz: JSON.parse(JSON.stringify(WORKING_QUIZ)) } },
                 { provide: MatDialogRef, useValue: dialogRefMock },
-                { provide: MatSnackBar, useValue: snackBarMock },
+                { provide: NotificationService, useValue: notificationService },
                 { provide: QuizService, useValue: quizServiceMock },
                 { provide: ValidateService, useValue: {} },
             ],
@@ -59,7 +58,8 @@ describe('UpdateNameComponent', () => {
 
     afterEach(() => {
         quizServiceMock.addNewQuiz.calls.reset();
-        snackBarMock.open.calls.reset();
+        notificationService.success.calls.reset();
+        notificationService.error.calls.reset();
         dialogRefMock.close.calls.reset();
     });
 
@@ -75,21 +75,21 @@ describe('UpdateNameComponent', () => {
         component.sendNewName();
         fixture.detectChanges();
         expect(quizServiceMock.addNewQuiz).toHaveBeenCalledWith(jasmine.objectContaining({ name: newName }));
-        expect(snackBarMock.open).toHaveBeenCalledWith('Quiz importé avec succès', '✅');
+        expect(notificationService.success).toHaveBeenCalledWith('Le quiz a été importé avec succès');
         expect(dialogRefMock.close).toHaveBeenCalled();
     }));
 
     it('should handle unique name violation error', () => {
         const errorResponse = new HttpErrorResponse({
             error: { message: 'Quiz name has to be unique: ' },
-            status: 400, // Utilisez 400 pour BadRequest
+            status: 400,
             statusText: 'Bad Request',
         });
 
         quizServiceMock.addNewQuiz.and.returnValue(throwError(() => errorResponse));
 
         component.sendNewName();
-        expect(snackBarMock.open).toHaveBeenCalledWith('Le nom du quiz doit être unique, vous devez changer le nom.', '❌');
+        expect(notificationService.error).toHaveBeenCalledWith('Le nom du quiz doit être unique, vous devez changer le nom.');
     });
 
     it('should unsubscribe on destroy', () => {
