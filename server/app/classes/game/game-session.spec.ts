@@ -1,7 +1,7 @@
 import { Room } from '@app/classes/room';
 import { GameService } from '@app/services/game/game.service';
 import { GameType } from '@common/game-types';
-import { QuestionType, Quiz } from '@common/types';
+import { GameState, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
 import { GameSession } from './game-session';
 
@@ -53,45 +53,27 @@ describe('GameSession', () => {
         jest.clearAllMocks();
     });
 
-    /* describe('startGameDelayed', () => {
-        it('should start the game immediately for a Test game type', () => {
-            gameSession.type = GameType.Test;
-            const startGameSpy = jest.spyOn(gameSession, 'startGame');
-            gameSession.startGameDelayed();
-            expect(startGameSpy).toHaveBeenCalledTimes(1);
+    describe('GameSession.constructor', () => {
+        it('initializes correctly', () => {
+            expect(gameSession.gameState).toBe(GameState.WaitingPlayers);
+            expect(gameSession.room).toBe(room);
+            expect(gameSession.quiz).toBe(quiz);
+            // Verify room.setGame was called with 'gameSession'
         });
+    });
 
-        it('should delay the game start for non-Test game types', () => {
-            gameSession.type = GameType.Default;
-            const startGameSpy = jest.spyOn(gameSession, 'startGame');
-            jest.useFakeTimers();
-            gameSession.startGameDelayed();
-            // eslint-disable-next-line no-undef, @typescript-eslint/no-magic-numbers
-            jest.advanceTimersByTime(START_GAME_DELAY * 1000);
-            expect(startGameSpy).toHaveBeenCalledTimes(1);
-            jest.useRealTimers();
+    describe('startQuestionCooldown', () => {
+        it('does nothing if gameState is not PlayersAnswerQuestion', () => {
+            gameSession.gameState = GameState.WaitingPlayers; // Set to a different state
+            // Assuming simpleDelay is not recognized by TypeScript in the context of GameSession
+            const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
+
+        
+            gameSession.startQuestionCooldown();
+        
+            expect(simpleDelaySpy).not.toHaveBeenCalled();
         });
+    });
 
-        it('should not start the game if the game state is not WaitingPlayers', () => {
-            gameSession.gameState = GameState.End;
-            const startGameSpy = jest.spyOn(gameSession, 'startGame');
-            gameSession.startGameDelayed();
-            expect(startGameSpy).not.toHaveBeenCalled();
-        });
-    });*/
 
-    /* describe('startGame', () => {
-        it('should change game state to PlayersAnswerQuestion and broadcast the first question', () => {
-            const broadcastSpy = jest.spyOn(room, 'broadcast');
-            gameSession.startGame();
-            expect(gameSession.gameState).toBe(GameState.PlayersAnswerQuestion);
-            expect(broadcastSpy).toHaveBeenCalledWith(
-                GameEvents.GameQuestion,
-                {},
-                { actualQuestion: { question: quiz.questions[0], totalQuestion: quiz.questions.length, actualIndex: 0 } },
-            );
-        });
-    });*/
-
-    // Add tests for other methods as needed
 });
