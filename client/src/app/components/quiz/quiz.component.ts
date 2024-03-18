@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Component, OnInit } from '@angular/core';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';

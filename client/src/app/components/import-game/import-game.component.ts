@@ -1,4 +1,3 @@
-/* eslint-disable max-params */
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { FileService } from '@app/services/import/file.service';

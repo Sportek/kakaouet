@@ -51,6 +51,7 @@ export class QuizService {
             const filter = { _id: id };
             quiz.lastModification = new Date();
             await this.quizModel.updateOne(filter, quiz);
+            // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
             return await this.quizModel.findOne({ _id: quiz._id });
         } catch (error) {

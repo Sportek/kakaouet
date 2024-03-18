@@ -49,6 +49,7 @@ export class QuestionService {
             const filter = { _id: id };
             question.lastModification = new Date();
             await this.questionModel.replaceOne(filter, question);
+            // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
             return await this.questionModel.findOne({ _id: question._id });
         } catch (error) {

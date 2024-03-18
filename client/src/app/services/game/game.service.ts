@@ -1,3 +1,5 @@
+// Ce service s'occupe de gérer le jeu, incluant le traitement de l'envoi et la réception de SocketEvents
+// Donc il est long
 /* eslint-disable max-lines */
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';

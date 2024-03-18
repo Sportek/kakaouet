@@ -1,12 +1,10 @@
-/* eslint-disable no-underscore-dangle */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
+import { ValidateService } from '@app/services/validate/validate.service';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { Observable, Subject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
-// eslint-disable-next-line no-restricted-imports
-import { ValidateService } from '../validate/validate.service';
 
 @Injectable({
     providedIn: 'root',
@@ -89,6 +87,8 @@ export class QuizService {
                 quiz.name = quizToGet.name;
                 quiz.duration = quizToGet.duration;
                 quiz.description = quizToGet.description;
+                // _id est forcé par MongoDB, accepté par le prof
+                // eslint-disable-next-line no-underscore-dangle
                 quiz._id = quizToGet._id;
                 quiz.questions = quizToGet.questions;
                 quiz.visibility = quizToGet.visibility;
@@ -109,6 +109,8 @@ export class QuizService {
         updatedQuiz.lastModification = new Date();
         updatedQuiz.visibility = quiz.visibility;
         const validatedQuiz = this.validateService.validateQuiz(updatedQuiz).object;
+        // _id est forcé par MongoDB, accepté par le prof
+        // eslint-disable-next-line no-underscore-dangle
         this.updateQuizById(validatedQuiz._id, validatedQuiz).subscribe({});
     }
 
@@ -118,11 +120,15 @@ export class QuizService {
 
     changeVisibility(quiz: Quiz): void {
         quiz.visibility = !quiz.visibility;
+        // _id est forcé par MongoDB, accepté par le prof
+        // eslint-disable-next-line no-underscore-dangle
         this.updateQuizById(quiz._id, quiz).subscribe({});
     }
 
     removeQuiz(quiz: Quiz, quizList: Quiz[]): Observable<Quiz[]> {
         const index: number = quizList.indexOf(quiz);
+        // _id est forcé par MongoDB, accepté par le prof
+        // eslint-disable-next-line no-underscore-dangle
         this.deleteQuizById(quizList[index]._id);
         quizList.splice(index, 1);
         return of(quizList);
