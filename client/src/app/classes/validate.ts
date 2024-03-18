@@ -20,15 +20,13 @@ export namespace QuizValidation {
         'Le titre doit avoir moins de 150 caractères',
     );
 
-    export const checkMaxWordLength = new Validate((quiz: Quiz) => {
-        let isValidated = true;
-        const words = quiz.name.split(' ');
-        for (const word of words) {
+    export const checkMaxWordLength = new Validate(({ name }: Quiz) => {
+        for (const word of name.split(' ')) {
             if (word.length > Variables.MaxWordLength) {
-                isValidated = false;
+                return false;
             }
         }
-        return isValidated;
+        return true;
     }, 'Le titre ne doit pas contenir de mots plus grands que 27 caractères');
 
     export const checkMaxDescriptionLength = new Validate(

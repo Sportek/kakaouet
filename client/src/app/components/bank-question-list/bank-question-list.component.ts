@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { sortQuestionByDate } from '@app/classes/utils';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question } from '@common/types';
@@ -33,7 +34,7 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
             this.questionService.getQuestions().subscribe({
                 next: (questions) => {
-                    this.questionList = questions.sort((a, b) => new Date(b.lastModification).getTime() - new Date(a.lastModification).getTime());
+                    this.questionList = sortQuestionByDate(questions);
                 },
             }),
         );

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { QuestionBankService } from '@app/services/questionBanque/questionbank.service';
+import { QuestionBankService } from '@app/services/question-bank/questionbank.service';
 import { Question } from '@common/types';
 import { Subscription } from 'rxjs';
 
