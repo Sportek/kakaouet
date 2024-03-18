@@ -120,7 +120,7 @@ export class Room {
     }
 
     private shouldDeleteGame(): void {
-        const hasPlayers = this.players.some((p) => p.role === GameRole.Player && !p.isExcluded);
+        const hasPlayers = this.players.some((p) => p.role === GameRole.Player && !p.isExcluded && !p.hasGiveUp);
         const noPlayers = !hasPlayers && this.game.gameState !== GameState.WaitingPlayers;
         const hasOrganisator = this.players.some((p) => p.role === GameRole.Organisator && !p.hasGiveUp);
         const noOrganisator = !hasOrganisator && this.game.type === GameType.Default;
