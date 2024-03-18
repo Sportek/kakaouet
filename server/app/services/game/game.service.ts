@@ -63,8 +63,9 @@ export class GameService {
             const filter = { _id: code };
             game.updatedAt = new Date();
             await this.gameModel.replaceOne(filter, game);
+            // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
-            return await this.gameModel.findOne({ _id: game._id });
+            return this.gameModel.findOne({ _id: game._id });
         } catch (error) {
             this.logger.error('Error updating game: ', error);
         }
@@ -102,7 +103,7 @@ export class GameService {
                 quiz,
                 type,
             });
-            return await newGame.save();
+            return newGame.save();
         } catch (error) {
             this.logger.error('Error adding new game: ', error);
         }

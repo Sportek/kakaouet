@@ -10,7 +10,7 @@ export class QuizController {
 
     @Get('/')
     async getAllQuizzes() {
-        return await this.quizService.getAllQuizzes();
+        return this.quizService.getAllQuizzes();
     }
 
     @Get('/:id')
@@ -43,7 +43,7 @@ export class QuizController {
     @HttpCode(HttpStatus.CREATED)
     async createQuiz(@Body() quiz: QuizDto) {
         if (!(await this.quizService.doesQuizExist(quiz.name))) {
-            return await this.quizService.addNewQuiz(quiz);
+            return this.quizService.addNewQuiz(quiz);
         } else {
             throw new HttpException('Quiz name has to be unique: ', HttpStatus.BAD_REQUEST);
         }
@@ -52,13 +52,13 @@ export class QuizController {
     @Patch('/:id')
     @HttpCode(HttpStatus.OK)
     async updateQuiz(@Param('id') id: string, @Body() quiz: QuizDto) {
-        return await this.quizService.updateQuizById(id, quiz);
+        return this.quizService.updateQuizById(id, quiz);
     }
 
     @Delete('/:id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteQuiz(@Param('id') id: string) {
-        return await this.quizService.deleteQuizById(id);
+        return this.quizService.deleteQuizById(id);
     }
 
     @Post('/validate/:quizId/:questionId')

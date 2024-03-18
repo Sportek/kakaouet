@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { QuestionOverlayComponent } from '@app/components/question-overlay/question-overlay.component';
@@ -28,6 +27,7 @@ export class CreateUpdateQuizComponent implements OnInit {
 
     showImportOverlay = false;
 
+    // Tous ces services sont nécessaires
     // eslint-disable-next-line max-params
     constructor(
         private quizService: QuizService,
@@ -87,7 +87,11 @@ export class CreateUpdateQuizComponent implements OnInit {
     }
 
     onSubmit() {
+        // _id est forcé par MongoDB, accepté par le prof
+        // eslint-disable-next-line no-underscore-dangle
         if (this.quiz._id) {
+            // _id est forcé par MongoDB, accepté par le prof
+            // eslint-disable-next-line no-underscore-dangle
             this.quizService.getQuizById(this.quiz._id).subscribe({
                 next: (quiz) => {
                     this.updateQuiz(quiz);

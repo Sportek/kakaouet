@@ -114,6 +114,7 @@ export class OverlayService {
 
     submitQuestion(isPatch: boolean): void {
         if (this.isPartOfQuiz) {
+            // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
             this.currentQuestion._id = this.idTracker.toString();
             this.idTracker++;
@@ -122,6 +123,7 @@ export class OverlayService {
         if (this.isPartOfQuiz) {
             this.submitQuestionToQuiz();
         } else if (isPatch) {
+            // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
             this.questionService.updateQuestion(this.currentQuestion._id, validatedQuestion).subscribe({});
         } else {

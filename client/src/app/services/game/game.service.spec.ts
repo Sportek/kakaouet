@@ -1,347 +1,754 @@
-// /* eslint-disable max-lines */
-// /* eslint-disable @typescript-eslint/no-magic-numbers */
-// import { TestBed } from '@angular/core/testing';
+/* eslint-disable max-lines */
+import { HttpClient } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { WORKING_QUIZ } from '@app/fake-quizzes';
+import { ChatService } from '@app/services/chat/chat.service';
+import { NotificationService } from '@app/services/notification/notification.service';
+import { SocketService } from '@app/services/socket/socket.service';
+import { GameEvents, PlayerClient } from '@common/game-types';
+import { Choice, Game, GameRole, GameState, GameType, Question, Quiz } from '@common/types';
+import { cloneDeep } from 'lodash';
+import { of } from 'rxjs';
+import { GameService } from './game.service';
 
-// import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-// import { HttpClientTestingModule } from '@angular/common/http/testing';
-// import { Router } from '@angular/router';
-// import { QuizService } from '@app/services/quiz/quiz.service';
-// import { TimeService } from '@app/services/timer/time.service';
-// import { Game, GameState, GameType, Question, QuestionFeedback, QuestionType, Quiz } from '@common/types';
-// import { of } from 'rxjs';
-// import { GameService } from './game.service';
+const mockGame: Game = {
+    _id: 'Mock Game',
+    users: [],
+    quiz: WORKING_QUIZ as Quiz,
+    type: GameType.Default,
+    isLocked: false,
+    code: '8824',
+    messages: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+};
 
-// const INCREMENTE_SCORE = 1.2;
+const mockTestGame: Game = {
+    _id: 'Mock Game',
+    users: [],
+    quiz: WORKING_QUIZ as Quiz,
+    type: GameType.Test,
+    isLocked: false,
+    code: '8824',
+    messages: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+};
 
-// describe('GameService', () => {
-//     let service: GameService;
-//     let quizService: jasmine.SpyObj<QuizService>;
-//     let timeService: jasmine.SpyObj<TimeService>;
+const mockPlayer: PlayerClient = {
+    name: 'Sportek',
+    role: GameRole.Player,
+    score: 0,
+    isExcluded: false,
+    hasGiveUp: false,
+};
 
-//     let routerSpy: jasmine.SpyObj<Router>;
+const mockOrganisator = {
+    name: 'Sportek',
+    role: GameRole.Organisator,
+    score: 0,
+    isExcluded: false,
+    hasGiveUp: false,
+};
 
-//     beforeEach(() => {
-//         const quizServiceSpy = jasmine.createSpyObj('QuizService', ['getQuizById', 'correctQuizAnswers']);
+describe('GameService', () => {
+    let service: GameService;
+    let mockSnackbar: jasmine.SpyObj<MatSnackBar>;
+    let mockSocketService: jasmine.SpyObj<SocketService>;
+    let mockNotificationService: jasmine.SpyObj<NotificationService>;
+    let mockChatService: jasmine.SpyObj<ChatService>;
+    let mockRouter: jasmine.SpyObj<Router>;
+    let mockHttpService: jasmine.SpyObj<HttpClient>;
 
-//         const timeServiceSpy = jasmine.createSpyObj('TimeService', ['createTimer']);
-//         routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
-//         TestBed.configureTestingModule({
-//             imports: [HttpClientTestingModule],
-//             providers: [
-//                 GameService,
-//                 { provide: QuizService, useValue: quizServiceSpy },
-//                 { provide: TimeService, useValue: timeServiceSpy },
-//                 {
-//                     provide: Router,
-//                     useValue: {
-//                         url: '/testing',
-//                         navigateByUrl: routerSpy.navigateByUrl,
-//                     },
-//                 },
-//             ],
-//         });
-//         service = TestBed.inject(GameService);
-//         quizService = TestBed.inject(QuizService) as jasmine.SpyObj<QuizService>;
-//         timeService = TestBed.inject(TimeService) as jasmine.SpyObj<TimeService>;
+    beforeEach(() => {
+        mockChatService = jasmine.createSpyObj(ChatService, ['initialize']);
+        mockSocketService = jasmine.createSpyObj(SocketService, ['listen', 'send', 'connect']);
+        mockNotificationService = jasmine.createSpyObj(NotificationService, ['error', 'success', 'info']);
+        mockRouter = jasmine.createSpyObj(Router, ['navigateByUrl', 'navigate']);
+        mockHttpService = jasmine.createSpyObj(HttpClient, ['post']);
 
-//         const quiz = {
-//             _id: 'quizId',
-//             createdAt: new Date(),
-//             updatedAt: new Date(),
-//             visibility: true,
-//             description: 'quizDescription',
-//             duration: 10,
-//             name: 'quizName',
-//             questions: [
-//                 {
-//                     _id: 'questionId',
-//                     label: 'questionLabel',
-//                     points: 1,
-//                     type: QuestionType.QCM,
-//                     choices: [{ _id: 0, label: 'choiceLabel', isCorrect: true }],
-//                     createdAt: new Date(),
-//                     updatedAt: new Date(),
-//                 },
-//                 {
-//                     _id: 'questionId2',
-//                     label: 'questionLabel2',
-//                     points: 1,
-//                     type: QuestionType.QCM,
-//                     choices: [{ _id: 1, label: 'choiceLabel2', isCorrect: true }],
-//                     createdAt: new Date(),
-//                     updatedAt: new Date(),
-//                 },
-//             ],
-//         };
+        TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule],
+            providers: [
+                { provide: MatSnackBar, useValue: mockSnackbar },
+                { provide: SocketService, useValue: mockSocketService },
+                { provide: NotificationService, useValue: mockNotificationService },
+                { provide: ChatService, useValue: mockChatService },
+                { provide: Router, useValue: mockRouter },
+                { provide: HttpClient, useValue: mockHttpService },
+            ],
+        });
+        service = TestBed.inject(GameService);
+    });
 
-//         service.game = {
-//             _id: 'gameId',
-//             code: 'gameCode',
-//             createdAt: new Date(),
-//             isLocked: false,
-//             messages: [],
-//             quiz,
-//             updatedAt: new Date(),
-//             type: GameType.Test,
-//             users: [],
-//         };
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 
-//         quizServiceSpy.getQuizById.and.returnValue(of(quiz));
-//     });
+    describe('startGame', () => {
+        it('should return if game is locked', () => {
+            service.isLocked.next(false);
+            service.startGame();
+            expect(mockNotificationService.error).toHaveBeenCalledWith('Veuillez verrouiller la partie avant de la démarrer');
+            expect(mockSocketService.send).not.toHaveBeenCalled();
+        });
 
-//     it('should be created', () => {
-//         expect(service).toBeTruthy();
-//     });
+        it("should return if there aren't enough players", () => {
+            service.isLocked.next(true);
+            service.players.next([]);
+            service.startGame();
+            expect(mockNotificationService.error).toHaveBeenCalledWith('Il doit y avoir au moins un joueur pour démarrer la partie');
+            expect(mockSocketService.send).not.toHaveBeenCalled();
+        });
 
-//     it('should correctly initialize the game with given id', async () => {
-//         await service.init('someId');
-//         expect(service.id).toBe('someId');
-//     });
+        it('should start game', () => {
+            service.isLocked.next(true);
+            service.players.next([cloneDeep(mockPlayer)]);
+            service.startGame();
+            expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.StartGame);
+        });
+    });
 
-//     it('should set the next question correctly', () => {
-//         const result = service.nextQuestion(1);
-//         expect(result).toBeTrue();
+    it('should lock game', () => {
+        service.changeLockState();
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.ChangeLockedState);
+    });
 
-//         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//         expect(service.actualQuestion.value).toEqual(service.game!.quiz.questions[1]);
-//     });
+    it('should send answers', () => {
+        service.sendAnswer('Fake Answer');
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.SelectAnswer, { answers: 'Fake Answer' });
+    });
 
-//     it('should reset the game state correctly', () => {
-//         service.resetGame();
-//         expect(service.game).toBeUndefined();
-//         expect(service.id).toBeNull();
-//         expect(service.gameState).toEqual(GameState.WaitingPlayers);
-//         expect(service.actualQuestion.value).toEqual({} as Question);
-//         expect(service.timer).toBeUndefined();
-//         expect(service.user.score).toEqual(0);
-//     });
+    describe('isLastQuestion', () => {
+        it('should return false if no question', () => {
+            service.actualQuestion.next(null);
+            const result = service.isLastQuestion();
+            expect(result).toBeFalse();
+        });
 
-//     it('should select a choice correctly when canChangeChoices is true', () => {
-//         service.canChangeChoices = true;
-//         service.selectChoice(1);
-//         expect(service.selectedChoices.includes(1)).toBeTrue();
+        it('should return true if last question', () => {
+            service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 2, actualIndex: 1 });
+            const result = service.isLastQuestion();
+            expect(result).toBeTrue();
+        });
 
-//         // Test pour la déselection d'un choix déjà sélectionné
-//         service.selectChoice(1);
-//         expect(service.selectedChoices.includes(1)).toBeFalse();
-//     });
+        it('should return false if not last question', () => {
+            service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
+            const result = service.isLastQuestion();
+            expect(result).toBeFalse();
+        });
+    });
 
-//     it('should navigate to the description page on give up', () => {
-//         service.id = 'testId';
-//         service.giveUp();
-//         expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/create/description/testId');
-//     });
+    it('should confirm answers', () => {
+        service.confirmAnswer();
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.ConfirmAnswers);
+    });
 
-//     it('should set gameState correctly and call respective methods', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         const playersAnswerQuestionSpy = spyOn<any>(service, 'playersAnswerQuestion');
-//         service.executeState(GameState.PlayersAnswerQuestion);
-//         expect(service.gameState).toEqual(GameState.PlayersAnswerQuestion);
-//         expect(playersAnswerQuestionSpy).toHaveBeenCalled();
-//     });
+    describe('filterPlayers', () => {
+        it('should return empty array if no players', () => {
+            service.players.next([]);
+            const filteredPlayers = service.filterPlayers();
+            expect(filteredPlayers).toEqual([]);
+        });
 
-//     it('should add a message to the game', () => {
-//         const initialMessagesLength = service.game?.messages.length || 0;
-//         service.sendMessage('Test message');
-//         expect(service.game?.messages.length).toBe(initialMessagesLength + 1);
-//         expect(service.game?.messages[initialMessagesLength]?.content).toEqual('Test message');
-//     });
+        it('should return empty array if no player players', () => {
+            service.players.next([mockOrganisator]);
+            const filteredPlayers = service.filterPlayers();
+            expect(filteredPlayers).toEqual([]);
+        });
 
-//     it('should setup a fake game correctly', async () => {
-//         quizService.getQuizById.and.returnValue(
-//             of({
-//                 _id: 'fakeQuizId',
-//                 questions: [],
-//                 createdAt: new Date(),
-//                 updatedAt: new Date(),
-//                 visibility: true,
-//                 description: 'fakeQuizDescription',
-//                 duration: 10,
-//                 name: 'fakeQuizName',
-//             } as Quiz),
-//         );
-//         await service.setupFakeGame('fakeQuizId');
-//         expect(service.game).toBeDefined();
-//         // eslint-disable-next-line no-underscore-dangle
-//         expect(service.game?.quiz._id).toEqual('fakeQuizId');
-//         expect(quizService.getQuizById).toHaveBeenCalledWith('fakeQuizId');
-//     });
+        it('should return player array if players', () => {
+            service.players.next([cloneDeep(mockPlayer)]);
+            const filteredPlayers = service.filterPlayers();
+            expect(filteredPlayers).toEqual([cloneDeep(mockPlayer)]);
+        });
+    });
 
-//     it('should correctly update correct answers and user score', async () => {
-//         const correctAnswersIndices = [0, 2];
-//         const points = 5;
-//         quizService.correctQuizAnswers.and.returnValue(
-//             of({
-//                 correctChoicesIndices: correctAnswersIndices,
-//                 points,
-//             } as QuestionFeedback),
-//         );
+    it('should toggle timer', () => {
+        service.toggleTimer();
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.ToggleTimer);
+    });
 
-//         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//         service.game = { ...service.game, quiz: { ...service!.game!.quiz, _id: 'quizId' } } as Game;
-//         service.actualQuestionIndex = 0;
-//         service.selectedChoices = [0];
+    describe('speedUpTimer', () => {
+        it('should send cooldown exceeded error', () => {
+            service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            service.cooldown.next(15);
+            service.speedUpTimer();
+            expect(mockNotificationService.error).toHaveBeenCalledWith('Le temps requis minimum pour accélérer le timer est dépassé');
+        });
 
-//         // @ts-ignore -- Accéder à une méthode privée
-//         await service.correctAnswers();
+        it('should return QCM time limit', () => {
+            service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
+            // @ts-ignore
+            const result = service.getRequiredTime();
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(result).toEqual(10);
+        });
 
-//         expect(service.answers.value).toEqual(correctAnswersIndices);
-//         expect(service.user.score).toEqual(points * INCREMENTE_SCORE);
-//     });
+        it('should return QCM time limit', () => {
+            // @ts-ignore
+            const result = service.getRequiredTime();
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(result).toEqual(20);
+        });
 
-//     it('should call correctAnswers for a Test game type and start a cooldown timer', async () => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         const correctAnswersSpy = spyOn<any>(service, 'correctAnswers').and.resolveTo();
-//         // const createTimerSpy = spyOn(timeService, 'createTimer').and.callThrough();
+        it('should speed up timer', () => {
+            service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            service.cooldown.next(5);
+            service.speedUpTimer();
+            expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.SpeedUpTimer);
+        });
+    });
 
-//         service.game = { ...service.game, type: GameType.Test } as Game; // S'assurer que le type de jeu est Test
-//         // @ts-ignore -- Accéder à une méthode privée
-//         service.displayQuestionResults();
+    it('should navigate home', () => {
+        service.giveUp();
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home', { replaceUrl: true });
+    });
 
-//         expect(correctAnswersSpy).toHaveBeenCalled();
-//         expect(timeService.createTimer).toHaveBeenCalled();
-//     });
+    describe('createNewGame', () => {
+        it('should create the game', () => {
+            mockHttpService.post.and.returnValue(of(mockGame));
+            const initialiseSpy = spyOn(service, 'initialise');
+            service.createNewGame('FakeId', GameType.Default);
 
-//     it('should call setupFakeGame if URL contains "testing" and id is provided', async () => {
-//         const testId = '123'; // ID de test valide
-//         const setupFakeGameSpy = spyOn(service, 'setupFakeGame').and.resolveTo();
-//         await service.init(testId);
+            expect(initialiseSpy).toHaveBeenCalled();
+            expect(mockSocketService.connect).toHaveBeenCalled();
+            expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.CreateGame, {
+                code: mockGame.code,
+                quizId: 'FakeId',
+                gameType: mockGame.type,
+            });
 
-//         expect(setupFakeGameSpy).toHaveBeenCalledWith(testId);
-//     });
+            const game = service.game.getValue();
+            expect(game).toEqual({ code: mockGame.code, quizName: mockGame.quiz.name, type: mockGame.type });
+        });
 
-//     it('should return true if the choice is selected', () => {
-//         // Simuler une sélection de choix
-//         service.selectedChoices = [1, 2, 3];
+        it('should send to waiting room', () => {
+            mockHttpService.post.and.returnValue(of(mockGame));
+            service.createNewGame('FakeId', GameType.Default);
+            expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/waiting-room/' + mockGame.code);
+            expect(service.client.getValue()).toEqual({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
+        });
 
-//         expect(service.isSelected(1)).toBeTrue();
-//         expect(service.isSelected(2)).toBeTrue();
-//     });
+        it('should test game', () => {
+            mockHttpService.post.and.returnValue(of(mockTestGame));
+            const changeLockStateSpy = spyOn(service, 'changeLockState');
+            const startGameSpy = spyOn(service, 'startGame');
 
-//     it('should return false if the choice is not selected', () => {
-//         // Simuler une sélection de choix
-//         service.selectedChoices = [1, 2, 3];
+            service.createNewGame('FakeId', GameType.Test);
 
-//         expect(service.isSelected(4)).toBeFalse();
-//     });
+            expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/game/' + mockTestGame.code);
+            expect(service.client.getValue()).toEqual({ name: 'Organisateur', role: GameRole.Player, score: 0 });
+            expect(changeLockStateSpy).toHaveBeenCalled();
+            expect(service.isLocked.getValue()).toBeTrue();
+            expect(service.players.getValue()).toEqual([
+                { name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false },
+            ]);
+            expect(startGameSpy).toHaveBeenCalled();
+        });
 
-//     it('should return an Observable of correct answers indices', (done) => {
-//         // Simuler les réponses correctes
-//         service.answers.next([0, 2]);
+        it('should do nothing', () => {
+            mockHttpService.post.and.returnValue(of(mockTestGame));
+            // @ts-ignore
+            const createDefaultGameSpy = spyOn(service, 'createDefaultGame');
+            // @ts-ignore
+            const createTestGameSpy = spyOn(service, 'createTestGame');
 
-//         service.getCorrectAnswers().subscribe((answers) => {
-//             expect(answers).toEqual([0, 2]);
-//             done();
-//         });
-//     });
+            service.createNewGame('fakeId', GameType.Random);
+            expect(createDefaultGameSpy).not.toHaveBeenCalled();
+            expect(createTestGameSpy).not.toHaveBeenCalled();
+        });
+    });
 
-//     it('organisatorCorrectingAnswers should set canChangeChoices to false and execute displayQuestionResults state', () => {
-//         spyOn(service, 'executeState');
+    describe('nextQuestion', () => {
+        it('should return if cannot go next question', () => {
+            service.canGoNextQuestion = false;
+            service.nextQuestion();
+            expect(mockSocketService.send).not.toHaveBeenCalled();
+        });
 
-//         // @ts-ignore -- Accéder à une méthode privée
-//         service.organisatorCorrectingAnswers();
+        it('should return if timer is not done', () => {
+            service.canGoNextQuestion = true;
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            service.cooldown.next(5);
+            service.nextQuestion();
+            expect(mockSocketService.send).not.toHaveBeenCalled();
+        });
 
-//         expect(service.canChangeChoices).toBeFalse();
-//         expect(service.executeState).toHaveBeenCalledWith(GameState.DisplayQuestionResults);
-//     });
+        it('go next question if possible', () => {
+            service.cooldown.next(0);
+            service.canGoNextQuestion = true;
+            service.nextQuestion();
+            expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.NextQuestion);
+        });
+    });
 
-//     it('correctAnswers should update correct answers and user score', async () => {
-//         const correctChoicesIndices = [1];
-//         const points = 5;
-//         quizService.correctQuizAnswers.and.returnValue(of({ correctChoicesIndices, points } as QuestionFeedback));
+    describe('selectAnswer', () => {
+        it('should return if is final answer', () => {
+            const sendAnswerSpy = spyOn(service, 'sendAnswer');
+            service.isFinalAnswer.next(true);
+            service.selectAnswer(0);
+            expect(sendAnswerSpy).not.toHaveBeenCalled();
+        });
 
-//         service.game = { quiz: { _id: 'quizId' }, type: GameType.Test } as unknown as Game;
-//         service.actualQuestionIndex = 0;
-//         service.selectedChoices = [1];
+        it('should remove answer if already in list', () => {
+            const sendAnswerSpy = spyOn(service, 'sendAnswer');
+            service.answer.next([0, 1, 2]);
+            service.selectAnswer(0);
+            expect(sendAnswerSpy).toHaveBeenCalledWith([1, 2]);
+        });
 
-//         // @ts-ignore -- Accéder à une méthode privée
-//         await service.correctAnswers();
+        it('should add answer if not in list', () => {
+            const sendAnswerSpy = spyOn(service, 'sendAnswer');
+            service.answer.next([1, 2]);
+            service.selectAnswer(0);
+            expect(sendAnswerSpy).toHaveBeenCalledWith([1, 2, 0]);
+        });
+    });
 
-//         expect(service.answers.value).toEqual(correctChoicesIndices);
-//         expect(service.user.score).toEqual(points * INCREMENTE_SCORE);
-//     });
+    describe('setResponseAsFinal', () => {
+        it('should return if is final answer', () => {
+            const confirmAnswerSpy = spyOn(service, 'confirmAnswer');
+            service.isFinalAnswer.next(true);
+            service.setResponseAsFinal();
+            expect(confirmAnswerSpy).not.toHaveBeenCalled();
+        });
 
-//     it('displayQuizResults should execute End state', () => {
-//         spyOn(service, 'executeState');
-//         // @ts-ignore -- Accéder à une méthode privée
-//         service.displayQuizResults();
-//         expect(service.executeState).toHaveBeenCalledWith(GameState.End);
-//     });
+        it('should give error if no answer selected', () => {
+            service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
+            service.isFinalAnswer.next(false);
+            service.answer.next([]);
+            service.setResponseAsFinal();
+            expect(mockNotificationService.error).toHaveBeenCalled();
+        });
 
-//     it('gameEnd should navigate to quiz description for Test game', () => {
-//         service.game = { type: GameType.Test, quiz: { _id: 'quizId' } } as unknown as Game;
-//         // @ts-ignore -- Accéder à une méthode privée
-//         service.gameEnd();
-//         expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/create/description/quizId');
-//     });
+        it('should set answer as final', () => {
+            const confirmAnswerSpy = spyOn(service, 'confirmAnswer');
+            service.isFinalAnswer.next(false);
+            service.answer.next([0]);
+            service.setResponseAsFinal();
+            expect(service.isFinalAnswer.getValue()).toBeTrue();
+            expect(confirmAnswerSpy).toHaveBeenCalled();
+        });
+    });
 
-//     it('handleError should navigate to /error-404 for NotFound errors', () => {
-//         const errorResponse = new HttpErrorResponse({
-//             status: HttpStatusCode.NotFound,
-//             error: 'Not found',
-//         });
+    it('should ban player', () => {
+        service.banPlayer(cloneDeep(mockPlayer));
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.BanPlayer, { name: 'Sportek' });
+    });
 
-//         // @ts-ignore -- Accéder à une méthode privée
-//         service.handleError(errorResponse).subscribe({
-//             error: (error) => {
-//                 expect(error.message).toEqual('Impossible to find this game');
-//                 expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/error-404', { replaceUrl: true });
-//             },
-//         });
-//     });
+    it('should return correct answers', () => {
+        spyOn(service['correctAnswers'], 'asObservable').and.returnValue(of(WORKING_QUIZ.questions[0].choices as Choice[]));
 
-//     it('handle next question without index', () => {
-//         const result = service.nextQuestion();
-//         expect(result).toBeTrue();
-//         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//         expect(service.actualQuestion.value).toEqual(service.game!.quiz.questions[1]);
-//     });
+        let result: Choice[] = [];
+        service.getCorrectAnswers().subscribe((answers) => {
+            result = answers;
+        });
 
-//     it('should call executeState with PlayersAnswerQuestion if there is no next question', () => {
-//         spyOn(service, 'executeState');
-//         spyOn(service, 'nextQuestion').and.returnValue(false);
-//         // @ts-ignore: Accès à une méthode privée pour le test
-//         service.goNextQuestion();
-//         expect(service.executeState).toHaveBeenCalledWith(GameState.DisplayQuizResults);
-//     });
+        expect(result).toEqual(WORKING_QUIZ.questions[0].choices as Choice[]);
+    });
 
-//     it('should call executeState with OrganisatorCorrectingAnswers if there is a next question', () => {
-//         spyOn(service, 'executeState');
-//         spyOn(service, 'nextQuestion').and.returnValue(true);
-//         // @ts-ignore: Accès à une méthode privée pour le test
-//         service.goNextQuestion();
-//         expect(service.executeState).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
-//     });
+    describe('handleError', () => {
+        it('should catch 404 error', () => {
+            let thrownError = new Error();
+            // @ts-ignore
+            service.handleError({ status: 404 }).subscribe({
+                error: (caughtError) => {
+                    thrownError = caughtError;
+                },
+            });
+            expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/error-404', { replaceUrl: true });
+            expect(thrownError.message).toEqual('Impossible to find this game');
+        });
 
-//     it('should call executeState with correct function', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         spyOn<any>(service, 'playersAnswerQuestion');
-//         service.executeState(GameState.PlayersAnswerQuestion);
-//         // @ts-ignore: Accès à une méthode privée pour le test
-//         expect(service.playersAnswerQuestion).toHaveBeenCalled();
+        it('should catch other errors', () => {
+            let thrownError = new Error();
+            // @ts-ignore
+            service.handleError({ status: 500, message: 'allo' }).subscribe({
+                error: (caughtError) => {
+                    thrownError = caughtError;
+                },
+            });
+            expect(thrownError.message).toEqual('allo');
+        });
+    });
 
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         spyOn<any>(service, 'organisatorCorrectingAnswers');
-//         service.executeState(GameState.OrganisatorCorrectingAnswers);
-//         // @ts-ignore: Accès à une méthode privée pour le test
-//         expect(service.organisatorCorrectingAnswers).toHaveBeenCalled();
+    it('should reset player answers', () => {
+        service.players.next([
+            {
+                name: 'Sportek',
+                role: GameRole.Player,
+                score: 0,
+                isExcluded: false,
+                hasGiveUp: false,
+                answers: { hasInterracted: true, hasConfirmed: true, answer: [0] },
+            },
+        ]);
+        service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, actualIndex: 1, totalQuestion: 2 });
+        // @ts-ignore
+        service.resetPlayerAnswers();
+        expect(service.players.getValue()).toEqual([
+            {
+                name: 'Sportek',
+                role: GameRole.Player,
+                score: 0,
+                isExcluded: false,
+                hasGiveUp: false,
+                answers: { hasInterracted: false, hasConfirmed: false, answer: [] },
+            },
+        ]);
+    });
 
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         spyOn<any>(service, 'displayQuestionResults');
-//         service.executeState(GameState.DisplayQuestionResults);
-//         // @ts-ignore: Accès à une méthode privée pour le test
-//         expect(service.displayQuestionResults).toHaveBeenCalled();
+    it('should add player to game', () => {
+        service.players.next([]);
 
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         spyOn<any>(service, 'displayQuizResults');
-//         service.executeState(GameState.DisplayQuizResults);
-//         // @ts-ignore: Accès à une méthode privée pour le test
-//         expect(service.displayQuizResults).toHaveBeenCalled();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback(cloneDeep(mockPlayer));
+        });
 
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         spyOn<any>(service, 'gameEnd');
-//         service.executeState(GameState.End);
-//         // @ts-ignore: Accès à une méthode privée pour le test
-//         expect(service.gameEnd).toHaveBeenCalled();
-//     });
-// });
+        // @ts-ignore
+        service.playerJoinGameListener();
+
+        expect(service.players.getValue()).toEqual([cloneDeep(mockPlayer)]);
+    });
+
+    it('should remove player from game', () => {
+        service.players.next([cloneDeep(mockPlayer)]);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ name: 'Sportek' });
+        });
+
+        // @ts-ignore
+        service.playerQuitGameListener();
+
+        expect(service.players.getValue()).toEqual([]);
+    });
+
+    it('should update cooldown', () => {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        service.cooldown.next(10);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ cooldown: 5 });
+        });
+
+        // @ts-ignore
+        service.gameCooldownListener();
+
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(service.cooldown.getValue()).toEqual(5);
+    });
+
+    it('should close game', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback(null);
+        });
+
+        // @ts-ignore
+        service.gameClosedListener();
+
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home', { replaceUrl: true });
+        expect(mockNotificationService.success).toHaveBeenCalledWith('La partie a été fermée');
+    });
+
+    describe('changeGameStateListener', () => {
+        it('should change game state', () => {
+            service.gameState.next(GameState.DisplayQuizResults);
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+                callback({ gameState: GameState.WaitingPlayers });
+            });
+
+            // @ts-ignore
+            service.gameChangeStateListener();
+
+            expect(service.gameState.getValue()).toEqual(GameState.WaitingPlayers);
+        });
+
+        it('should allow players to answer questions and navigate to organiser view', () => {
+            service.gameState.next(GameState.WaitingPlayers);
+            service.client.next(mockOrganisator);
+            service.game.next({ code: mockGame.code, quizName: 'Quiz Test', type: mockGame.type });
+
+            // @ts-ignore
+            const resetPlayerAnswersSpy = spyOn(service, 'resetPlayerAnswers');
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+                callback({ gameState: GameState.PlayersAnswerQuestion });
+            });
+
+            // @ts-ignore
+            service.gameChangeStateListener();
+
+            expect(service.gameState.getValue()).toEqual(GameState.PlayersAnswerQuestion);
+            expect(service.canGoNextQuestion).toBeTrue();
+            expect(resetPlayerAnswersSpy).toHaveBeenCalled();
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/organisator', mockGame.code], { replaceUrl: true });
+        });
+
+        it('should allow players to answer questions and navigate to player view', () => {
+            service.gameState.next(GameState.WaitingPlayers);
+            service.client.next(cloneDeep(mockPlayer));
+            service.game.next({ code: mockGame.code, quizName: 'Quiz Test', type: mockGame.type });
+
+            // @ts-ignore
+            const resetPlayerAnswersSpy = spyOn(service, 'resetPlayerAnswers');
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+                callback({ gameState: GameState.PlayersAnswerQuestion });
+            });
+
+            // @ts-ignore
+            service.gameChangeStateListener();
+
+            expect(service.gameState.getValue()).toEqual(GameState.PlayersAnswerQuestion);
+            expect(service.canGoNextQuestion).toBeTrue();
+            expect(resetPlayerAnswersSpy).toHaveBeenCalled();
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/game', mockGame.code], { replaceUrl: true });
+        });
+
+        it('should set final answer to true', () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+                callback({ gameState: GameState.DisplayQuestionResults });
+            });
+
+            // @ts-ignore
+            service.gameChangeStateListener();
+
+            expect(service.gameState.getValue()).toEqual(GameState.DisplayQuestionResults);
+            expect(service.isFinalAnswer.getValue()).toBeTrue();
+        });
+
+        it('should not show results if game type was test', () => {
+            service.game.next({ code: mockTestGame.code, quizName: 'Quiz Test', type: mockTestGame.type });
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+                callback({ gameState: GameState.DisplayQuizResults });
+            });
+
+            // @ts-ignore
+            service.gameChangeStateListener();
+
+            expect(service.gameState.getValue()).toEqual(GameState.DisplayQuizResults);
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/create/'], { replaceUrl: true });
+        });
+
+        it('should show results if game type is default', () => {
+            service.game.next({ code: mockGame.code, quizName: 'Quiz Test', type: mockGame.type });
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+                callback({ gameState: GameState.DisplayQuizResults });
+            });
+
+            // @ts-ignore
+            service.gameChangeStateListener();
+
+            expect(service.gameState.getValue()).toEqual(GameState.DisplayQuizResults);
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/results', mockGame.code], { replaceUrl: true });
+        });
+    });
+
+    it('should receive game results', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({
+                scores: [{ name: 'Sportek', score: 12, bonus: 1 }],
+                choices: [[{ label: 'choice1', amount: 1, isCorrect: true }]],
+                questions: [WORKING_QUIZ.questions[0] as Question],
+            });
+        });
+
+        // @ts-ignore
+        service.playerSendResultsListener();
+        expect(service.answers.getValue()).toEqual({
+            scores: [{ name: 'Sportek', score: 12, bonus: 1 }],
+            choices: [[{ label: 'choice1', amount: 1, isCorrect: true }]],
+            questions: [WORKING_QUIZ.questions[0] as Question],
+        });
+    });
+
+    it('should assign scores to players', () => {
+        service.players.next([cloneDeep(mockPlayer)]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ scores: [{ name: 'Sportek', score: 12 }] });
+        });
+
+        // @ts-ignore
+        service.sendPlayerScoresListener();
+
+        expect(service.players.getValue()).toEqual([
+            {
+                name: 'Sportek',
+                role: GameRole.Player,
+                score: 12,
+                isExcluded: false,
+                hasGiveUp: false,
+            },
+        ]);
+    });
+
+    it('should update game question', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ actualQuestion: { question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 2, actualIndex: 1 } });
+        });
+
+        // @ts-ignore
+        service.gameQuestionListener();
+
+        expect(service.actualQuestion.getValue()).toEqual({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 2, actualIndex: 1 });
+        expect(service.answer.getValue()).toEqual([]);
+        expect(service.isFinalAnswer.getValue()).toBeFalse();
+    });
+
+    it('should receive answers', () => {
+        service.players.next([cloneDeep(mockPlayer)]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ name: 'Sportek', answer: [0] });
+        });
+
+        // @ts-ignore
+        service.receiveAnswerListener();
+
+        expect(service.players.getValue()[0].answers).toEqual({ hasInterracted: true, hasConfirmed: false, answer: [0] });
+    });
+
+    it('should receive correct choices', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ choices: WORKING_QUIZ.questions[0].choices as Choice[] });
+        });
+
+        // @ts-ignore
+        service.receiveCorrectAnswersListener();
+
+        expect(service.correctAnswers.getValue()).toEqual(WORKING_QUIZ.questions[0].choices as Choice[]);
+    });
+
+    it("should confirm player's answers", () => {
+        service.players.next([
+            {
+                name: 'Sportek',
+                role: GameRole.Player,
+                score: 0,
+                isExcluded: false,
+                hasGiveUp: false,
+                answers: { hasInterracted: false, hasConfirmed: false, answer: [0] },
+            },
+        ]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ name: 'Sportek' });
+        });
+
+        // @ts-ignore
+        service.receiveConfirmAnswerListener();
+
+        expect(service.players.getValue()[0].answers).toEqual({ hasInterracted: false, hasConfirmed: true, answer: [0] });
+    });
+
+    it("shouldn't confirm answers for no players", () => {
+        service.players.next([cloneDeep(mockPlayer)]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ name: 'Sportek' });
+        });
+
+        // @ts-ignore
+        service.receiveConfirmAnswerListener();
+
+        expect(service.players.getValue()[0].answers).toBeUndefined();
+    });
+
+    it('should give bonus to first correct answer', () => {
+        service.client.next(cloneDeep(mockPlayer));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ score: 12, hasAnsweredFirst: true });
+        });
+
+        // @ts-ignore
+        service.receiveUpdateScoreListener();
+
+        expect(mockNotificationService.info).toHaveBeenCalledWith('Vous avez répondu en premier !');
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(service.client.getValue().score).toEqual(12);
+    });
+
+    it('should change locked state', () => {
+        service.isLocked.next(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ isLocked: true });
+        });
+
+        // @ts-ignore
+        service.receiveGameLockedStateChanged();
+
+        expect(service.isLocked.getValue()).toBeTrue();
+    });
+
+    it('should receive banned players', () => {
+        service.client.next(cloneDeep(mockPlayer));
+        service.players.next([cloneDeep(mockPlayer)]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ name: 'Sportek' });
+        });
+
+        // @ts-ignore
+        service.receiveBannedPlayers();
+
+        expect(service.players.getValue()).toEqual([
+            {
+                name: 'Sportek',
+                role: GameRole.Player,
+                score: 0,
+                isExcluded: true,
+                hasGiveUp: false,
+            },
+        ]);
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home', { replaceUrl: true });
+        expect(mockNotificationService.error).toHaveBeenCalledWith('Vous avez été banni de la partie');
+    });
+
+    it('should receive players that have given up', () => {
+        service.client.next(cloneDeep(mockPlayer));
+        service.players.next([cloneDeep(mockPlayer)]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ name: 'Sportek' });
+        });
+
+        // @ts-ignore
+        service.receiveGiveUpPlayers();
+
+        expect(service.players.getValue()).toEqual([
+            {
+                name: 'Sportek',
+                role: GameRole.Player,
+                score: 0,
+                isExcluded: false,
+                hasGiveUp: true,
+            },
+        ]);
+    });
+});

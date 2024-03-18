@@ -1,6 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Observable, of, throwError } from 'rxjs';
 
@@ -8,6 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WORKING_QUIZ } from '@app/fake-quizzes';
+import { NotificationService } from '@app/services/notification/notification.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameType, Quiz } from '@common/types';
 import { cloneDeep } from 'lodash';
@@ -28,18 +28,19 @@ class MockQuizService {
 describe('DescriptonPageComponent', () => {
     let component: DescriptonPageComponent;
     let fixture: ComponentFixture<DescriptonPageComponent>;
-    let snackBar: MatSnackBar;
+    let notificationService: jasmine.SpyObj<NotificationService>;
     let router: Router;
     let quizService: QuizService;
 
     beforeEach(async () => {
+        notificationService = jasmine.createSpyObj('NotificationService', ['error']);
         await TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
             declarations: [DescriptonPageComponent],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
             providers: [
                 { provide: QuizService, useClass: MockQuizService },
-                MatSnackBar,
+                { provide: NotificationService, useValue: notificationService },
                 {
                     provide: ActivatedRoute,
                     useValue: {
@@ -55,7 +56,6 @@ describe('DescriptonPageComponent', () => {
 
         fixture = TestBed.createComponent(DescriptonPageComponent);
         component = fixture.componentInstance;
-        snackBar = TestBed.inject(MatSnackBar);
         router = TestBed.inject(Router);
         quizService = TestBed.inject(QuizService);
     });
@@ -68,6 +68,19 @@ describe('DescriptonPageComponent', () => {
         const spyGetQuiz = spyOn(component, 'getQuiz').and.callThrough();
         fixture.detectChanges();
         expect(spyGetQuiz).toHaveBeenCalledWith('valid-id');
+    });
+
+    it('should redirect if quiz not found', () => {
+        const routerNavigationSpy = spyOn(router, 'navigateByUrl');
+        spyOn(quizService, 'getQuizById').and.returnValue(
+            throwError(() => {
+                return { status: 404 };
+            }),
+        );
+
+        component.getQuiz('fakeId');
+
+        expect(routerNavigationSpy).toHaveBeenCalledWith('/error-404', { replaceUrl: true });
     });
 
     it('should set game data on valid quiz fetch', () => {
@@ -86,26 +99,22 @@ describe('DescriptonPageComponent', () => {
     });
 
     it('should handle hidden quiz in checkQuizBeforeNavigation', () => {
-        const spySnackBar = spyOn(snackBar, 'open');
-
         const spyRouter = spyOn(router, 'navigate');
         component.checkQuizBeforeNavigation('hidden-id', '/create', false);
-        expect(spySnackBar).toHaveBeenCalledWith('Ce jeu est actuellement invisible.', 'Fermer', { duration: 5000 });
+        expect(notificationService.error).toHaveBeenCalledWith('Ce jeu est actuellement invisible.');
         expect(spyRouter).toHaveBeenCalledWith(['/create']);
     });
 
     it('should handle notFound errors in checkQuizBeforeNavigation', fakeAsync(() => {
-        const spySnackBarOpen = spyOn(snackBar, 'open');
         const spyRouterNavigate = spyOn(router, 'navigate');
         spyOn(quizService, 'getQuizById').and.returnValue(throwError(() => new Error()));
         component.checkQuizBeforeNavigation('invalid-id', '/create', true);
         tick();
-        expect(spySnackBarOpen).toHaveBeenCalledWith('Ce jeu a été supprimé, veuillez sélectionner un autre jeu', 'Fermer', { duration: 5000 });
+        expect(notificationService.error).toHaveBeenCalledWith('Ce jeu a été supprimé, veuillez sélectionner un autre jeu');
         expect(spyRouterNavigate).toHaveBeenCalled();
     }));
 
     it('should handle other errors in checkQuizBeforeNavigation', fakeAsync(() => {
-        const spySnackBarOpen = spyOn(snackBar, 'open');
         spyOn(quizService, 'getQuizById').and.returnValue(
             throwError(() => {
                 return { status: 500 };
@@ -113,7 +122,7 @@ describe('DescriptonPageComponent', () => {
         );
         component.checkQuizBeforeNavigation('invalid-id', '/create', true);
         tick();
-        expect(spySnackBarOpen).toHaveBeenCalledWith('Une erreur est survenue. Veuillez réessayer.', 'Fermer', { duration: 5000 });
+        expect(notificationService.error).toHaveBeenCalledWith('Une erreur est survenue. Veuillez réessayer.');
     }));
 
     it('should navigate to specified path', fakeAsync(() => {

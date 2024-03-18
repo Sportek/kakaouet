@@ -116,19 +116,19 @@ describe('QuestionOverlayComponent', () => {
     });
 
     it('should change overlay status and reset choices if display is flex', () => {
-        component.overlayStatus.display = 'flex';
+        component.isActiveOverlay = true;
 
         component.changeOverlay();
 
-        expect(component.overlayStatus.display).toBe('none');
+        expect(component.isActiveOverlay).toBeFalse();
     });
 
     it('should change overlay status to flex if display is none', () => {
-        component.overlayStatus.display = 'none';
+        component.isActiveOverlay = false;
 
         component.changeOverlay();
 
-        expect(component.overlayStatus.display).toBe('flex');
+        expect(component.isActiveOverlay).toBeTrue();
     });
 
     it('should call changeChoiceCorrect in OverlayService', () => {

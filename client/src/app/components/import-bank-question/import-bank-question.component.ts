@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { QuestionBankService } from '@app/services/questionBanque/questionbank.service';
+import { QuestionBankService } from '@app/services/question-bank/questionbank.service';
 import { Question } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -48,6 +48,7 @@ export class QuestionBankImportComponent implements OnInit, OnDestroy {
         this.questionBankService.clearSelectedQuestions();
     }
     isQuestionSelected(question: Question): boolean {
+        // _id est forcé par MongoDB, accepté par le prof
         // eslint-disable-next-line no-underscore-dangle
         return this.selectedQuestions.some((selectedQuestion) => selectedQuestion._id === question._id);
     }

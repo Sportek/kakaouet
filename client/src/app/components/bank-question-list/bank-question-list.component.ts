@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { sortQuestionByDate } from '@app/classes/utils';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question } from '@common/types';
@@ -33,7 +34,7 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
         this.subscriptions.add(
             this.questionService.getQuestions().subscribe({
                 next: (questions) => {
-                    this.questionList = questions.sort((a, b) => new Date(b.lastModification).getTime() - new Date(a.lastModification).getTime());
+                    this.questionList = sortQuestionByDate(questions);
                 },
             }),
         );
@@ -54,9 +55,11 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe((confirm) => {
             if (confirm) {
+                // _id est forcé par MongoDB, accepté par le prof
                 // eslint-disable-next-line no-underscore-dangle
                 this.questionService.deleteQuestionById(question._id).subscribe({
                     next: () => {
+                        // _id est forcé par MongoDB, accepté par le prof
                         // eslint-disable-next-line no-underscore-dangle
                         this.questionList = this.questionList.filter((quest) => question._id !== quest._id);
                     },

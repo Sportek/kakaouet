@@ -1,4 +1,3 @@
-/* eslint-disable max-params */
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { FileService } from '@app/services/import/file.service';
@@ -15,9 +14,7 @@ export class ImportGameComponent {
     ) {}
 
     async onFileUpload(event: Event): Promise<boolean> {
-        const response = await this.fileService.onFileUpload(event);
-        const input = event.target as HTMLInputElement;
-        input.value = '';
-        return response;
+        (event.target as HTMLInputElement).value = '';
+        return this.fileService.onFileUpload(event);
     }
 }

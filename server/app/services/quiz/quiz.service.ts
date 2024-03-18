@@ -51,8 +51,9 @@ export class QuizService {
             const filter = { _id: id };
             quiz.lastModification = new Date();
             await this.quizModel.updateOne(filter, quiz);
+            // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
-            return await this.quizModel.findOne({ _id: quiz._id });
+            return this.quizModel.findOne({ _id: quiz._id });
         } catch (error) {
             this.logger.error('Error updating quiz: ', error);
         }
@@ -70,7 +71,7 @@ export class QuizService {
         try {
             quiz.createdAt = new Date();
             quiz.lastModification = new Date();
-            return await this.quizModel.create(quiz);
+            return this.quizModel.create(quiz);
         } catch (error) {
             this.logger.error('Error adding new quiz: ', error);
         }
