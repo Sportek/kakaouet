@@ -23,7 +23,6 @@ export class Room {
         this.broadcast(GameEvents.PlayerBanned, {}, { name: playerName });
         player.isExcluded = true;
         player.leaveAllRooms();
-        // player.isExcluded = true;
     }
 
     giveUpPlayer(playerName: string) {

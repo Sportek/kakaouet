@@ -134,7 +134,7 @@ export class GameService {
     }
 
     nextQuestion(): void {
-        if (this.canGoNextQuestion) {
+        if (this.canGoNextQuestion && this.cooldown.getValue() === 0) {
             this.canGoNextQuestion = false;
             this.socketService.send(GameEvents.NextQuestion);
         }

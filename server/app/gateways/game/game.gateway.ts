@@ -84,6 +84,7 @@ export class GameGateway {
             return { isSuccess: false };
         }
         client.emit(GameEvents.PlayerConfirmJoinGame, { code: data.code, isSuccess: false, message: 'Ce nom est déjà pris' });
+        return { isSuccess: false };
     }
 
     @SubscribeMessage(GameEvents.CreateGame)

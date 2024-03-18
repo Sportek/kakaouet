@@ -49,6 +49,11 @@ export class DescriptonPageComponent implements OnInit, OnDestroy {
                     this.question = quiz.questions;
                     this.cd.detectChanges();
                 },
+                error: (caughtError) => {
+                    if (caughtError.status === Variables.NotFound) {
+                        this.router.navigateByUrl('/error-404', { replaceUrl: true });
+                    }
+                },
             }),
         );
     }
