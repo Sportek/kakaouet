@@ -1,5 +1,5 @@
 import { Player } from '@app/classes/player';
-import { Room } from '@app/classes/room';
+import { Room } from '@app/classes/room/room';
 import { Timer } from '@app/classes/timer';
 import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';
 import { ActualQuestion, ChoiceData, GameEvents, GameEventsData, Score } from '@common/game-types';
