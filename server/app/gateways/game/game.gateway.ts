@@ -1,4 +1,4 @@
-import { Player } from '@app/classes/player';
+import { Player } from '@app/classes/player/player';
 import { GameService } from '@app/services/game/game.service';
 import { GameEvents, GameEventsData, SocketResponse } from '@common/game-types';
 import { GameRole, GameState, GameType } from '@common/types';

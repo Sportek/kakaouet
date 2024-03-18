@@ -1,4 +1,4 @@
-import { Player } from '@app/classes/player';
+import { Player } from '@app/classes/player/player';
 import { Room } from '@app/classes/room/room';
 import { Timer } from '@app/classes/timer';
 import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';

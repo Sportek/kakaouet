@@ -1,5 +1,5 @@
 import { GameSession } from '@app/classes/game/game-session';
-import { Player } from '@app/classes/player';
+import { Player } from '@app/classes/player/player';
 import { Room } from '@app/classes/room/room';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
