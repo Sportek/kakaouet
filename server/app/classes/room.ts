@@ -21,8 +21,9 @@ export class Room {
     banPlayer(playerName: string) {
         const player = this.getPlayer(playerName);
         this.broadcast(GameEvents.PlayerBanned, {}, { name: playerName });
-        player.leaveAllRooms();
         player.isExcluded = true;
+        player.leaveAllRooms();
+        // player.isExcluded = true;
     }
 
     giveUpPlayer(playerName: string) {

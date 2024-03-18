@@ -85,9 +85,11 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
             }),
         );
     }
+
     filterPlayers(): PlayerClient[] {
         return this.gameService.filterPlayers();
     }
+
     ngOnDestroy(): void {
         this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
