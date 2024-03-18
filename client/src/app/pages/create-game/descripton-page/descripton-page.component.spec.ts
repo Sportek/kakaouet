@@ -70,6 +70,19 @@ describe('DescriptonPageComponent', () => {
         expect(spyGetQuiz).toHaveBeenCalledWith('valid-id');
     });
 
+    it('should redirect if quiz not found', () => {
+        const routerNavigationSpy = spyOn(router, 'navigateByUrl');
+        spyOn(quizService, 'getQuizById').and.returnValue(
+            throwError(() => {
+                return { status: 404 };
+            }),
+        );
+
+        component.getQuiz('fakeId');
+
+        expect(routerNavigationSpy).toHaveBeenCalledWith('/error-404', { replaceUrl: true });
+    });
+
     it('should set game data on valid quiz fetch', () => {
         fixture.detectChanges();
         expect(component.quiz).toBeTruthy();
