@@ -124,8 +124,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.NextQuestion)
     handleNextQuestion(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator)
+        if (!this.hasAutorisation(client, GameRole.Organisator))
             return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.nextQuestion();
@@ -135,8 +134,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.BanPlayer)
     handleBanPlayer(@MessageBody() data: GameEventsData.BanPlayer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator)
+        if (!this.hasAutorisation(client, GameRole.Organisator))
             return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.room.banPlayer(data.name);
@@ -146,8 +144,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.ToggleTimer)
     handleToggleTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator)
+        if (!this.hasAutorisation(client, GameRole.Organisator))
             return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         gameSession.toggleTimer();
@@ -157,8 +154,8 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.SpeedUpTimer)
     handleSpeedUpTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player || player.role !== GameRole.Organisator) return;
+        if (!this.hasAutorisation(client, GameRole.Organisator))
+            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
         gameSession.speedUpTimer();
         return { isSuccess: true, message: 'Timer accéléré' };
     }
@@ -183,5 +180,12 @@ export class GameGateway {
         setInterval(() => {
             this.gameService.broadcastToGameSessions();
         }, INTERVAL);
+    }
+
+    private hasAutorisation(client: Socket, role: GameRole): boolean {
+        const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        const player = gameSession.room.getPlayerWithSocketId(client.id);
+
+        return player && player.role === role;
     }
 }

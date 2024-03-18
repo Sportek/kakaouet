@@ -2,8 +2,8 @@ import { Player } from '@app/classes/player';
 import { Room } from '@app/classes/room';
 import { Timer } from '@app/classes/timer';
 import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';
-import { ActualQuestion, ChoiceData, GameEvents, GameEventsData } from '@common/game-types';
-import { GameState, GameType, QuestionType, Quiz } from '@common/types';
+import { ActualQuestion, ChoiceData, GameEvents, GameEventsData, Score } from '@common/game-types';
+import { GameState, GameType, Question, QuestionType, Quiz } from '@common/types';
 
 const START_GAME_DELAY = 5;
 const NEXT_QUESTION_DELAY = 3;
@@ -41,17 +41,7 @@ export class GameSession {
 
     startGame() {
         this.changeGameState(GameState.PlayersAnswerQuestion);
-        this.room.broadcast(
-            GameEvents.GameQuestion,
-            {},
-            {
-                actualQuestion: {
-                    question: this.quiz.questions[this.gameQuestionIndex],
-                    totalQuestion: this.quiz.questions.length,
-                    actualIndex: this.gameQuestionIndex,
-                } as ActualQuestion,
-            },
-        );
+        this.broadcastGameNextQuestion();
         this.startQuestionCooldown();
     }
 
@@ -64,32 +54,16 @@ export class GameSession {
 
     displayQuestionResults(): void {
         this.changeGameState(GameState.DisplayQuestionResults);
-        this.calculateScores().forEach(({ player, hasAnsweredFirst }) => {
-            player.send(GameEvents.UpdateScore, { score: player.score, hasAnsweredFirst });
-        });
-        const scores = this.room.getOnlyGamePlayers().map((player) => ({ name: player.name, score: player.score }));
-        this.room.sendToOrganizer(GameEvents.SendPlayersScores, { scores });
+        this.sendScores();
         if (this.type === GameType.Test) this.nextQuestion();
     }
 
     nextQuestion(): void {
         if (this.gameState !== GameState.DisplayQuestionResults) return;
-
-        this.gameQuestionIndex++;
-        if (this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();
+        if (++this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();
         this.simpleDelay(NEXT_QUESTION_DELAY, () => {
             this.changeGameState(GameState.PlayersAnswerQuestion);
-            this.room.broadcast(
-                GameEvents.GameQuestion,
-                {},
-                {
-                    actualQuestion: {
-                        question: this.quiz.questions[this.gameQuestionIndex],
-                        actualIndex: this.gameQuestionIndex,
-                        totalQuestion: this.quiz.questions.length,
-                    } as ActualQuestion,
-                },
-            );
+            this.broadcastGameNextQuestion();
             this.startQuestionCooldown();
         });
     }
@@ -103,49 +77,18 @@ export class GameSession {
 
     sendResultsToPlayers(): void {
         if (this.gameState !== GameState.DisplayQuizResults) return;
-
-        const players = this.room.getOnlyGamePlayers();
-
-        const sortedPlayers = players.sort((playerA, playerB) => {
-            if (playerB.score !== playerA.score) {
-                return playerB.score - playerA.score;
-            }
-            return playerA.name.localeCompare(playerB.name);
-        });
-
-        const scores = sortedPlayers.map((player) => ({
-            name: player.name,
-            score: player.score,
-            bonus: player.bonus,
+        const sortedPlayers = this.sortPlayersByScore(this.room.getOnlyGamePlayers());
+        const scores = sortedPlayers.map(({ name, score, bonus }) => ({
+            name,
+            score,
+            bonus,
         }));
-
-        const choices: ChoiceData[][] = [];
-
-        this.quiz.questions.forEach((question, index) => {
-            if (question.type !== QuestionType.QCM) return;
-
-            const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
-
-            const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
-                const amount = globalPlayerAnswers[i];
-                const name = choice.label;
-                const isCorrect = choice.isCorrect;
-                return { label: name, amount, isCorrect };
-            });
-
-            choices.push(choiceData);
-        });
-
-        this.room.broadcast(GameEvents.PlayerSendResults, {}, {
-            scores,
-            choices,
-            questions: this.quiz.questions,
-        } as GameEventsData.PlayerSendResults);
+        this.broadcastPlayerResults(scores, this.calculateCorrectChoices());
     }
 
     endGame(): void {
         this.changeGameState(GameState.End);
-        // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc.
+        // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc : sprint 3.
     }
 
     changeGameState(gameState: GameState): void {
@@ -171,42 +114,115 @@ export class GameSession {
         this.room.broadcast(GameEvents.PlayerSendMessage, {}, { name: player.name, content, createdAt: newDate });
     }
 
-    private calculateScores(): { player: Player; hasAnsweredFirst: boolean }[] {
-        const question = this.quiz.questions[this.gameQuestionIndex];
-
-        // TODO: Je ne gère pas les autres types de questions pour l'instant
-        if (question.type !== QuestionType.QCM) return this.room.players.map((player) => ({ player, hasAnsweredFirst: false }));
-
-        const correctAnswersIndex = question.choices.flatMap((choice, index) => (choice.isCorrect ? index : []));
+    private broadcastCorrectAnswers(question: Question): void {
+        if (question.type !== QuestionType.QCM) return;
         const correctAnswers = question.choices.flatMap((choice) => (choice.isCorrect ? choice : []));
         this.room.broadcast(GameEvents.SendCorrectAnswers, {}, { choices: correctAnswers });
-        let firstPlayerToAnswerTime: Date | null = null;
-        const firstPlayersToAnswer = new Set<Player>();
+    }
 
-        this.room.getOnlyGamePlayers().forEach((player) => {
+    private sortPlayersAnswersByTime(players: Player[]): Player[] {
+        return players.sort((playerA, playerB) => {
+            const answerA = playerA.getAnswer(this.gameQuestionIndex);
+            const answerB = playerB.getAnswer(this.gameQuestionIndex);
+            if (!answerA || !answerB) return 0;
+            if (answerA.hasConfirmedAt && answerB.hasConfirmedAt) {
+                return answerA.hasConfirmedAt.getTime() - answerB.hasConfirmedAt.getTime();
+            }
+            return 0;
+        });
+    }
+
+    private filterCorrectAnswerPlayers(players: Player[], correctAnswersIndex: number[], question: Question): Player[] {
+        const correctAnswerPlayers: Player[] = players.flatMap((player) => {
             const answer = player.getAnswer(this.gameQuestionIndex);
             if (answer && this.isCorrectAnswer(answer.answer as number[], correctAnswersIndex)) {
                 player.score += question.points;
-                if (!firstPlayerToAnswerTime || (answer.hasConfirmed && answer.hasConfirmedAt < firstPlayerToAnswerTime)) {
-                    firstPlayersToAnswer.clear();
-                    firstPlayerToAnswerTime = answer.hasConfirmedAt;
-                    firstPlayersToAnswer.add(player);
-                }
-                if (firstPlayerToAnswerTime && answer.hasConfirmed && answer.hasConfirmedAt.getTime() === firstPlayerToAnswerTime.getTime()) {
-                    firstPlayersToAnswer.add(player);
-                }
+                return player;
             }
+            return [];
+        });
+        return this.sortPlayersAnswersByTime(correctAnswerPlayers);
+    }
+
+    private hasMultiplePlayersAnsweredCorrectly(players: Player[]): boolean {
+        if (players.length < 2) return false;
+        const firstAnswer = players[0].getAnswer(this.gameQuestionIndex);
+        const secondAnswer = players[1].getAnswer(this.gameQuestionIndex);
+        if (firstAnswer.hasConfirmedAt && secondAnswer.hasConfirmedAt) {
+            return firstAnswer.hasConfirmedAt.getTime() === secondAnswer.hasConfirmedAt.getTime();
+        }
+    }
+
+    private calculateScores(): { player: Player; hasAnsweredFirst: boolean }[] {
+        const question = this.quiz.questions[this.gameQuestionIndex];
+
+        // TODO: Je ne gère pas les autres types de questions pour l'instant : Sprint 3
+        if (question.type !== QuestionType.QCM) return this.room.players.map((player) => ({ player, hasAnsweredFirst: false }));
+        const correctAnswersIndex = question.choices.flatMap((choice, index) => (choice.isCorrect ? index : []));
+        this.broadcastCorrectAnswers(question);
+
+        const goodAnswerPlayers = this.filterCorrectAnswerPlayers(this.room.getOnlyGamePlayers(), correctAnswersIndex, question);
+        const firstPlayerToAnswer = goodAnswerPlayers[0] || null;
+        if (!this.hasMultiplePlayersAnsweredCorrectly(goodAnswerPlayers) && firstPlayerToAnswer) {
+            firstPlayerToAnswer.score += question.points * FIRST_PLAYER_SCORE_MULTIPLICATOR;
+        }
+
+        return goodAnswerPlayers.map((player) => ({ player, hasAnsweredFirst: firstPlayerToAnswer === player }));
+    }
+
+    private sendScores(): void {
+        this.calculateScores().forEach(({ player, hasAnsweredFirst }) => {
+            player.send(GameEvents.UpdateScore, { score: player.score, hasAnsweredFirst });
+        });
+        const scores = this.room.getOnlyGamePlayers().map((player) => ({ name: player.name, score: player.score }));
+        this.room.sendToOrganizer(GameEvents.SendPlayersScores, { scores });
+    }
+
+    private broadcastGameNextQuestion(): void {
+        this.room.broadcast(
+            GameEvents.GameQuestion,
+            {},
+            {
+                actualQuestion: {
+                    question: this.quiz.questions[this.gameQuestionIndex],
+                    totalQuestion: this.quiz.questions.length,
+                    actualIndex: this.gameQuestionIndex,
+                } as ActualQuestion,
+            },
+        );
+    }
+
+    private calculateCorrectChoices() {
+        const choices: ChoiceData[][] = [];
+        this.quiz.questions.forEach((question, index) => {
+            if (question.type !== QuestionType.QCM) return;
+            const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
+            const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
+                const amount = globalPlayerAnswers[i];
+                const name = choice.label;
+                const isCorrect = choice.isCorrect;
+                return { label: name, amount, isCorrect };
+            });
+            choices.push(choiceData);
         });
 
-        if (firstPlayersToAnswer.size !== 1) firstPlayersToAnswer.clear();
+        return choices;
+    }
 
-        return this.room.players.map((player) => {
-            const hasAnsweredFirst = firstPlayersToAnswer.has(player);
-            if (hasAnsweredFirst) {
-                player.score += question.points * FIRST_PLAYER_SCORE_MULTIPLICATOR;
-                player.bonus++;
+    private broadcastPlayerResults(scores: Score[], choices: ChoiceData[][]): void {
+        this.room.broadcast(GameEvents.PlayerSendResults, {}, {
+            scores,
+            choices,
+            questions: this.quiz.questions,
+        } as GameEventsData.PlayerSendResults);
+    }
+
+    private sortPlayersByScore(players: Player[]): Player[] {
+        return players.sort((playerA, playerB) => {
+            if (playerB.score !== playerA.score) {
+                return playerB.score - playerA.score;
             }
-            return { player, hasAnsweredFirst };
+            return playerA.name.localeCompare(playerB.name);
         });
     }
 
