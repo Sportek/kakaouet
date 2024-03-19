@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { GameService } from '@app/services/game/game.service';
 import { PlayerClient } from '@common/game-types';
 import { GameRole, GameType } from '@common/types';
@@ -27,8 +34,9 @@ describe('WaitingRoomComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [WaitingRoomComponent],
+            declarations: [WaitingRoomComponent, ChatComponent, GlobalLayoutComponent, HeaderComponent],
             providers: [{ provide: GameService, useClass: MockGameService }],
+            imports: [HttpClientTestingModule, MatIconModule, MatSnackBarModule, FormsModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(WaitingRoomComponent);

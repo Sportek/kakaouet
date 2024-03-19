@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { GameService } from '@app/services/game/game.service';
 import { QuestionType } from '@common/types';
 import { of } from 'rxjs';
@@ -36,7 +44,8 @@ describe('OrganisatorComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [OrganisatorComponent],
+            declarations: [OrganisatorComponent, ChatComponent, GlobalLayoutComponent, HeaderComponent],
+            imports: [HttpClientTestingModule, MatTooltipModule, MatIconModule, MatSnackBarModule, FormsModule],
             providers: [
                 {
                     provide: GameService,
