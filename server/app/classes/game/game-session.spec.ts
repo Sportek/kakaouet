@@ -6,7 +6,7 @@
 import { Room } from '@app/classes/room';
 import { GameService } from '@app/services/game/game.service';
 import { GameEvents, GameType } from '@common/game-types';
-import { GameState, QuestionType, Quiz } from '@common/types';
+import { GameRole, GameState, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
 import { Player } from '../player';
 import { Timer } from '../timer';
@@ -211,29 +211,6 @@ describe('GameSession', () => {
 
             expect(displayResultsSpy).toHaveBeenCalled();
         });
-
-        /* it('should call methods and change game state correctly if gameState is DisplayQuestionResults', () => {
-            gameSession.gameState = GameState.DisplayQuestionResults;
-
-            // eslint-disable-next-line @typescript-eslint/no-shadow
-            const serverMock = {
-                to: jest.fn().mockReturnThis(),
-                except: jest.fn().mockReturnThis(),
-                emit: jest.fn().mockReturnThis(),
-            };
-
-            gameSession.room.server = serverMock as any;
-
-            const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
-            const broadcastGameNextQuestionSpy = jest.spyOn(gameSession as any, 'broadcastGameNextQuestion');
-            const startQuestionCooldownSpy = jest.spyOn(gameSession, 'startQuestionCooldown');
-
-            gameSession.nextQuestion();
-
-            expect(changeGameStateSpy).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
-            expect(broadcastGameNextQuestionSpy).toHaveBeenCalled();
-            expect(startQuestionCooldownSpy).toHaveBeenCalled();
-        });*/
     });
 
     describe('displayResults', () => {
@@ -360,6 +337,58 @@ describe('GameSession', () => {
         });
     });
 
+    describe('broadcastMessage', () => {
+        it('should broadcast a message to players', () => {
+            // Mock de la classe Room
+            const mockRoom = {
+                code: 'test-room',
+                players: [],
+                game: {},
+                gameService: {},
+                broadcast: jest.fn(), // Mock de la méthode broadcast
+                setGame: jest.fn(),
+            };
+
+            const mockPlayer: Partial<Player> = {
+                name: 'Player 1',
+                role: GameRole.Player,
+                socket: {} as any,
+                bonus: 0,
+                score: 0,
+                isExcluded: false,
+                hasGiveUp: false,
+                setRoom: jest.fn(),
+                confirmAnswer: jest.fn(),
+                setAnswer: jest.fn(),
+                getAnswer: jest.fn(),
+                send: jest.fn(),
+                on: jest.fn(),
+                off: jest.fn(),
+                joinRoom: jest.fn(),
+                leaveRoom: jest.fn(),
+                leaveAllRooms: jest.fn(),
+            };
+
+            const messageContent = 'Hello players!';
+            const expectedDate = new Date();
+
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+
+            gameSession.broadcastMessage(mockPlayer as Player, messageContent);
+
+            expect(mockRoom.broadcast).toHaveBeenCalledWith(
+                GameEvents.PlayerSendMessage,
+                {},
+                expect.objectContaining({
+                    name: mockPlayer.name,
+                    content: messageContent,
+                    createdAt: expect.any(Date),
+                }),
+            );
+        });
+    });
+
     describe('toggleTimer', () => {
         it('should toggle the timer play/pause if timer exists', () => {
             gameSession.toggleTimer();
@@ -385,9 +414,6 @@ describe('GameSession', () => {
             expect(timerMock.speedUp).not.toHaveBeenCalled();
         });
     });
-
-    describe('broadcastMessage', () => {});
-
     describe('broadcastCorrectAnswers', () => {});
     describe('sortPlayersAnswersByTime', () => {});
     describe('filterCorrectAnswerPlayers', () => {});
