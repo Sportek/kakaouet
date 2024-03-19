@@ -17,6 +17,7 @@ export class GameSession {
     type: GameType;
     gameQuestionIndex: number;
     isLocked: boolean;
+    private isAlreadyChangingQuestion: boolean;
 
     // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
     constructor(code: string, room: Room, quiz: Quiz, gameType: GameType) {
@@ -28,6 +29,7 @@ export class GameSession {
         this.isLocked = false;
         this.room.setGame(this);
         this.type = gameType;
+        this.isAlreadyChangingQuestion = false;
     }
 
     startGameDelayed(): void {
@@ -60,6 +62,8 @@ export class GameSession {
 
     nextQuestion(): void {
         if (this.gameState !== GameState.DisplayQuestionResults) return;
+        if (this.isAlreadyChangingQuestion) return;
+        this.isAlreadyChangingQuestion = true;
         if (++this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();
         this.simpleDelay(NEXT_QUESTION_DELAY, () => {
             this.changeGameState(GameState.PlayersAnswerQuestion);
@@ -94,6 +98,7 @@ export class GameSession {
     changeGameState(gameState: GameState): void {
         this.gameState = gameState;
         this.room.broadcast(GameEvents.GameStateChanged, {}, { gameState: this.gameState });
+        this.isAlreadyChangingQuestion = false;
     }
 
     changeGameLockState(): void {
