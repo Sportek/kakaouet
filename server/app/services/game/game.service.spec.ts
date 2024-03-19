@@ -1,6 +1,7 @@
+import { GameSession } from '@app/classes/game/game-session';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
-import { GameType } from '@common/types';
+import { GameState, GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -200,5 +201,48 @@ describe('GameService', () => {
             expect(loggerSpy).toHaveBeenCalledWith('Error adding new game: ', mockError);
             expect(result).toBeUndefined();
         });
+    });
+
+    describe('getGameSessionBySocketId', () => {
+        it('should return the correct GameSession for a known socket ID', () => {
+            const gameSessionMap = new Map<string, GameSession>();
+            const gameSession = {
+                code: '1234',
+                room: {
+                    getPlayers: jest.fn().mockReturnValue([{ socket: { id: 'socket123' } }]),
+                },
+                timer: undefined,
+                gameState: GameState.DisplayQuestionResults,
+                type: GameType.Default,
+                gameQuestionIndex: 1,
+                isLocked: true,
+            };
+            gameSessionMap.set('1234', gameSession as unknown as GameSession);
+            // @ts-ignore
+            service.gameSessions = gameSessionMap;
+            const result = service.getGameSessionBySocketId('socket123');
+            expect(result).toEqual(gameSession);
+        });
+    });
+
+    it('should remove gameSession', () => {
+        const gameSessionMap = new Map<string, GameSession>();
+        const gameSession = {
+            code: '1234',
+            room: {
+                getPlayers: jest.fn().mockReturnValue([{ socket: { id: 'socket123' } }]),
+            },
+            timer: undefined,
+            gameState: GameState.DisplayQuestionResults,
+            type: GameType.Default,
+            gameQuestionIndex: 1,
+            isLocked: true,
+        };
+        gameSessionMap.set('1234', gameSession as unknown as GameSession);
+        // @ts-ignore
+        service.gameSessions = gameSessionMap;
+        service.removeGameSession('1234');
+        // @ts-ignore
+        expect(service.gameSessions.size).toEqual(0);
     });
 });
