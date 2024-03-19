@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
-import { NotificationService } from '@app/services/notification/notification.service';
 import { Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { SocketService } from './socket.service';
@@ -9,7 +8,6 @@ describe('SocketService', () => {
     let service: SocketService;
     let mockRouter: unknown;
     let routerEvents: Subject<unknown>;
-    let mockNotificationService: jasmine.SpyObj<NotificationService>;
     let mockSocket: jasmine.SpyObj<Socket>;
 
     beforeEach(() => {
@@ -19,16 +17,10 @@ describe('SocketService', () => {
             events: routerEvents.asObservable(),
         };
 
-        mockNotificationService = jasmine.createSpyObj('NotificationService', ['info']);
         mockSocket = jasmine.createSpyObj('Socket', ['connect', 'disconnect', 'on', 'off', 'emit']);
 
         TestBed.configureTestingModule({
-            providers: [
-                SocketService,
-                { provide: Router, useValue: mockRouter },
-                { provide: NotificationService, useValue: mockNotificationService },
-                { provide: Socket, useValue: mockSocket },
-            ],
+            providers: [SocketService, { provide: Router, useValue: mockRouter }, { provide: Socket, useValue: mockSocket }],
         });
 
         service = TestBed.inject(SocketService);
@@ -48,7 +40,6 @@ describe('SocketService', () => {
         routerEvents.next(new NavigationEnd(1, '/non-whitelist-page', '/non-whitelist-page'));
 
         expect(mockSocket.disconnect).toHaveBeenCalledTimes(1);
-        expect(mockNotificationService.info).toHaveBeenCalledWith('Vous avez été déconnecté du serveur : page non autorisée (non-whitelist-page)');
     });
 
     it('should disconnect and connect when navigating to join page', () => {
@@ -92,7 +83,6 @@ describe('SocketService', () => {
 
         expect(service['isConnected']).toBeFalse();
         expect(mockSocket.disconnect).toHaveBeenCalledTimes(1);
-        expect(mockNotificationService.info).toHaveBeenCalledWith('Vous avez été déconnecté du serveur');
     });
     it('should process the message queue', (done) => {
         service['messageQueue'].push({ eventName: 'test-event-1', args: ['data1'] });

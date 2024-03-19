@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { NotificationService } from '@app/services/notification/notification.service';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -16,23 +15,20 @@ export class SocketService {
     private messageQueue: unknown[] = [];
     private isSendingMessage = false;
 
-    constructor(
-        private router: Router,
-        private notificationService: NotificationService,
-    ) {
+    constructor(private router: Router) {
         this.socket = io(this.url);
         this.router.events.subscribe((event) => {
             if (!(event instanceof NavigationEnd)) return;
             const url = event.url.split('/');
             if (!this.isConnected) return;
             if (!SOCKET_WHITELIST_PAGES.includes(url[1])) {
-                this.disconnect(`page non autorisée (${url[1]})`);
+                this.disconnect();
             }
 
             // Nécessaire pour éviter de pouvoir back sur la page de jeu
             // et être encore considéré comme connecté.
             if (url[1] === 'join') {
-                this.disconnect(`page non autorisée (${url[1]})`);
+                this.disconnect();
                 this.connect();
             }
         });
@@ -73,11 +69,9 @@ export class SocketService {
         this.socket.connect();
     }
 
-    private disconnect(info?: string): void {
+    private disconnect(): void {
         this.isConnected = false;
         this.socket.disconnect();
-        const message = info ? `Vous avez été déconnecté du serveur : ${info}` : 'Vous avez été déconnecté du serveur';
-        this.notificationService.info(message);
     }
 
     private processQueue() {
