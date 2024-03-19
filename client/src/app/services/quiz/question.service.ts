@@ -89,11 +89,11 @@ export class QuestionService {
         const newQuestions = importedQuestions.filter(
             // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
-            (importedQuestion) => !quiz.questions.some((existingQuestion) => existingQuestion._id === importedQuestion._id),
+            (importedQuestion) => !quiz.questions.some((existingQuestion) => existingQuestion.label === importedQuestion.label),
         );
         // _id est forcé par MongoDB, accepté par le prof
         // eslint-disable-next-line no-underscore-dangle
-        quiz.questions = [...quiz.questions, ...newQuestions].sort((questionA, questionB) => questionA._id.localeCompare(questionB._id));
+        quiz.questions = [...quiz.questions, ...newQuestions];
     }
 
     importQuestionToBank(question: Question): void {
