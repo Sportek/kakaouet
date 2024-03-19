@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Room } from '@app/classes/room';
@@ -6,6 +7,7 @@ import { GameType } from '@common/game-types';
 import { GameState, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
 import { Player } from '../player';
+import { Timer } from '../timer';
 import { GameSession } from './game-session';
 
 jest.mock('socket.io', () => {
@@ -24,12 +26,17 @@ describe('GameSession', () => {
     let quiz: Quiz;
     let serverMock: Server;
     let duration: number;
+    let timerMock: Timer;
     // eslint-disable-next-line no-unused-vars
     const START_GAME_DELAY = 5;
     const NEXT_QUESTION_DELAY = 3;
 
     beforeEach(() => {
         jest.clearAllMocks();
+        timerMock = {
+            togglePlayPause: jest.fn(),
+            speedUp: jest.fn(),
+        } as any;
         serverMock = new Server() as unknown as Server;
         // const mockServer = {} as Server;
         const mockGameService = {} as GameService;
@@ -65,6 +72,7 @@ describe('GameSession', () => {
         };
         gameSession = new GameSession('game123', room, quiz, GameType.Default);
         duration = 1;
+        gameSession.timer = timerMock;
     });
 
     afterEach(() => {
@@ -298,6 +306,44 @@ describe('GameSession', () => {
                 [],
             );
             expect(calculateCorrectChoicesMock).toHaveBeenCalled();
+        });
+    });
+
+    describe('endGame', () => {
+        it('should change game state to End', () => {
+            gameSession.gameState = GameState.PlayersAnswerQuestion;
+            const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
+            gameSession.endGame();
+            expect(changeGameStateSpy).toHaveBeenCalledWith(GameState.End);
+        });
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    describe('changeGameState', () => {});
+
+    describe('toggleTimer', () => {
+        it('should toggle the timer play/pause if timer exists', () => {
+            gameSession.toggleTimer();
+            expect(timerMock.togglePlayPause).toHaveBeenCalled();
+        });
+
+        it('should not do anything if timer does not exist', () => {
+            gameSession.timer = null;
+            gameSession.toggleTimer();
+            expect(timerMock.togglePlayPause).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('speedUpTimer', () => {
+        it('should speed up the timer if timer exists', () => {
+            gameSession.speedUpTimer();
+            expect(timerMock.speedUp).toHaveBeenCalled();
+        });
+
+        it('should not do anything if timer does not exist', () => {
+            gameSession.timer = null;
+            gameSession.speedUpTimer();
+            expect(timerMock.speedUp).not.toHaveBeenCalled();
         });
     });
 });
