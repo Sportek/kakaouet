@@ -472,7 +472,7 @@ describe('GameSession', () => {
                 game: {},
                 gameService: {},
                 broadcast: jest.fn(),
-                setGame: jest.fn(), // Mock the setGame method
+                setGame: jest.fn(),
             };
 
             // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -672,6 +672,8 @@ describe('GameSession', () => {
         });
     });
 
+    describe('simpleDelay', () => {});
+
     describe('isCorrectAnswer', () => {
         it('should return true for correct answers', () => {
             const correctAnswers = [1, 3];
@@ -693,8 +695,59 @@ describe('GameSession', () => {
             expect(result).toBe(false);
         });
     });
+    describe('getAmountOfPlayersWhoAnswered', () => {
+        const mockPlayer1: Partial<Player> = {
+            name: 'Player1',
+            role: GameRole.Player,
+            socket: {} as any,
+            bonus: 0,
+            score: 0,
+            isExcluded: false,
+            hasGiveUp: false,
+            getAnswer: jest.fn(() => ({
+                hasInterracted: true,
+                hasConfirmed: true,
+                hasConfirmedAt: new Date(),
+                answer: [0, 1],
+            })),
+        };
 
-    describe('simpleDelay', () => {});
+        const mockPlayer2: Partial<Player> = {
+            name: 'Player2',
+            role: GameRole.Player,
+            socket: {} as any,
+            bonus: 0,
+            score: 0,
+            isExcluded: false,
+            hasGiveUp: false,
+            getAnswer: jest.fn(() => ({
+                hasInterracted: true,
+                hasConfirmed: true,
+                hasConfirmedAt: new Date(),
+                answer: [0, 1],
+            })),
+        };
 
-    describe('getAmountOfPlayersWhoAnswered', () => {});
+        const mockSetGame = jest.fn();
+
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        const mockRoom: Partial<Room> = {
+            getOnlyGamePlayers: jest.fn(() => [mockPlayer1 as Player, mockPlayer2 as Player]),
+            setGame: mockSetGame,
+        };
+
+        it('should correctly count players who answered each choice', () => {
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const gameSession = new GameSession('test-code', mockRoom as unknown as Room, quiz, GameType.Default);
+            // @ts-ignore
+            const result = gameSession.getAmountOfPlayersWhoAnswered(2);
+            expect(result).toEqual([2, 2, 0, 0]);
+        });
+
+        it('should not change the array, if no players are choosed for answers', () => {
+            // @ts-ignore
+            const result = gameSession.getAmountOfPlayersWhoAnswered(0);
+            expect(result).toEqual([0, 0, 0, 0]);
+        });
+    });
 });
