@@ -266,20 +266,6 @@ describe('GameService', () => {
     });
 
     describe('nextQuestion', () => {
-        it('should return if cannot go next question', () => {
-            service.gameState.next(GameState.WaitingPlayers);
-            service.nextQuestion();
-            expect(mockSocketService.send).not.toHaveBeenCalled();
-        });
-
-        it('should return if timer is not done', () => {
-            service.gameState.next(GameState.DisplayQuestionResults);
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            service.cooldown.next(5);
-            service.nextQuestion();
-            expect(mockSocketService.send).not.toHaveBeenCalled();
-        });
-
         it('go next question if possible', () => {
             service.cooldown.next(0);
             service.gameState.next(GameState.DisplayQuestionResults);

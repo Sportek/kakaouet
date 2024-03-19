@@ -119,9 +119,9 @@ export class GameService {
     }
 
     nextQuestion(): void {
-        if (this.gameState.getValue() === GameState.DisplayQuestionResults && this.cooldown.getValue() === 0) {
-            this.socketService.send(GameEvents.NextQuestion);
-        }
+        // if (this.gameState.getValue() === GameState.DisplayQuestionResults && this.cooldown.getValue() === 0) {
+        this.socketService.send(GameEvents.NextQuestion);
+        // }
     }
 
     selectAnswer(index: number): void {
