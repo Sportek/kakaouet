@@ -672,6 +672,28 @@ describe('GameSession', () => {
         });
     });
 
+    describe('isCorrectAnswer', () => {
+        it('should return true for correct answers', () => {
+            const correctAnswers = [1, 3];
+            const playerAnswer = [1, 3];
+
+            // @ts-ignore
+            const result = gameSession.isCorrectAnswer(playerAnswer, correctAnswers);
+
+            expect(result).toBe(true);
+        });
+
+        it('should return false for incorrect answers', () => {
+            const correctAnswers = [1, 3];
+            const playerAnswer = [2, 2];
+
+            // @ts-ignore
+            const result = gameSession.isCorrectAnswer(playerAnswer, correctAnswers);
+
+            expect(result).toBe(false);
+        });
+    });
+
     describe('simpleDelay', () => {});
 
     describe('getAmountOfPlayersWhoAnswered', () => {});
