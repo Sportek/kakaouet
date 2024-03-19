@@ -147,7 +147,7 @@ describe('GameSession', () => {
             gameSession.type = GameType.Default;
 
             const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
-            const sendScoresAny = gameSession as any;
+            const sendScoresAny = gameSession as any; // because sendScores is private
             const sendScoresSpy = jest.spyOn(sendScoresAny, 'sendScores');
             const nextQuestionSpy = jest.spyOn(gameSession, 'nextQuestion');
 
@@ -155,7 +155,7 @@ describe('GameSession', () => {
 
             expect(changeGameStateSpy).toHaveBeenCalledWith(GameState.DisplayQuestionResults);
             expect(sendScoresSpy).toHaveBeenCalled();
-            expect(nextQuestionSpy).not.toHaveBeenCalled(); // Should not call nextQuestion for GameType.Default
+            expect(nextQuestionSpy).not.toHaveBeenCalled();
         });
 
         it('should call sendScores, changeGameState, and nextQuestion for GameType.Test', () => {
@@ -171,6 +171,79 @@ describe('GameSession', () => {
             expect(changeGameStateSpy).toHaveBeenCalledWith(GameState.DisplayQuestionResults);
             expect(sendScoresSpy).toHaveBeenCalled();
             expect(nextQuestionSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('nextQuestion', () => {
+        it('should do nothing if gameState is not DisplayQuestionResults', () => {
+            gameSession.gameState = GameState.WaitingPlayers;
+
+            const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
+
+            const broadcastGameNextQuestionAny = gameSession as any;
+            const broadcastGameNextQuestionSpy = jest.spyOn(broadcastGameNextQuestionAny, 'broadcastGameNextQuestion');
+            const startQuestionCooldownSpy = jest.spyOn(gameSession, 'startQuestionCooldown');
+
+            gameSession.nextQuestion();
+
+            expect(changeGameStateSpy).not.toHaveBeenCalled();
+            expect(broadcastGameNextQuestionSpy).not.toHaveBeenCalled();
+            expect(startQuestionCooldownSpy).not.toHaveBeenCalled();
+        });
+
+        it('should call displayResults if gameQuestionIndex is equal to the number of questions', () => {
+            gameSession.gameState = GameState.DisplayQuestionResults;
+            gameSession.gameQuestionIndex = quiz.questions.length;
+            const displayResultsSpy = jest.spyOn(gameSession, 'displayResults');
+
+            gameSession.nextQuestion();
+
+            expect(displayResultsSpy).toHaveBeenCalled();
+        });
+
+        /* it('should call methods and change game state correctly if gameState is DisplayQuestionResults', () => {
+            gameSession.gameState = GameState.DisplayQuestionResults;
+
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const serverMock = {
+                to: jest.fn().mockReturnThis(),
+                except: jest.fn().mockReturnThis(),
+                emit: jest.fn().mockReturnThis(),
+            };
+
+            gameSession.room.server = serverMock as any;
+
+            const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
+            const broadcastGameNextQuestionSpy = jest.spyOn(gameSession as any, 'broadcastGameNextQuestion');
+            const startQuestionCooldownSpy = jest.spyOn(gameSession, 'startQuestionCooldown');
+
+            gameSession.nextQuestion();
+
+            expect(changeGameStateSpy).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
+            expect(broadcastGameNextQuestionSpy).toHaveBeenCalled();
+            expect(startQuestionCooldownSpy).toHaveBeenCalled();
+        });*/
+    });
+
+    describe('displayResults', () => {
+        it('should call sendResultsToPlayers and changeGameState after delay', () => {
+            const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
+            const sendResultsToPlayersSpy = jest.spyOn(gameSession, 'sendResultsToPlayers');
+
+            jest.spyOn(gameSession as any, 'simpleDelay').mockImplementation((delay: number, callback: () => void) => {
+                callback();
+            });
+
+            gameSession.displayResults();
+
+            expect(changeGameStateSpy).toHaveBeenCalledWith(GameState.DisplayQuizResults);
+            expect(sendResultsToPlayersSpy).toHaveBeenCalled();
+        });
+
+        it('should call simpleDelay with correct parameters', () => {
+            const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
+            gameSession.displayResults();
+            expect(simpleDelaySpy).toHaveBeenCalledWith(NEXT_QUESTION_DELAY, expect.any(Function));
         });
     });
 });
