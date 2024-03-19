@@ -157,16 +157,11 @@ export class GameGateway {
     }
 
     afterInit(server: Server): void {
-        const INTERVAL = 1000;
         server.on('connection', (socket: Socket) => {
             socket.onAny((event) => {
                 Logger.log(`SOCKET ${event} (user: ${socket.id})`);
             });
         });
-
-        setInterval(() => {
-            this.gameService.broadcastToGameSessions();
-        }, INTERVAL);
     }
 
     private verifyJoinGame(data: GameEventsData.JoinGame): SocketResponse {
