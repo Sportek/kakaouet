@@ -6,7 +6,7 @@
 import { Room } from '@app/classes/room';
 import { GameService } from '@app/services/game/game.service';
 import { GameEvents, GameType } from '@common/game-types';
-import { GameRole, GameState, QuestionType, Quiz } from '@common/types';
+import { GameRole, GameState, Question, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
 import { Player } from '../player';
 import { Timer } from '../timer';
@@ -345,7 +345,7 @@ describe('GameSession', () => {
                 players: [],
                 game: {},
                 gameService: {},
-                broadcast: jest.fn(), // Mock de la méthode broadcast
+                broadcast: jest.fn(),
                 setGame: jest.fn(),
             };
 
@@ -414,7 +414,76 @@ describe('GameSession', () => {
             expect(timerMock.speedUp).not.toHaveBeenCalled();
         });
     });
-    describe('broadcastCorrectAnswers', () => {});
+
+    describe('broadcastCorrectAnswers', () => {
+        it('should not broadcast correct answers for a non-QCM question', () => {
+            const mockQuestion: Question = {
+                _id: '123',
+                label: 'What is the capital of France?',
+                points: 10,
+                createdAt: new Date(),
+                lastModification: new Date(),
+                type: QuestionType.QRL,
+            };
+
+            const mockRoom = {
+                code: 'test-room',
+                players: [],
+                game: {},
+                gameService: {},
+                broadcast: jest.fn(),
+                setGame: jest.fn(), // Mock the setGame method
+            };
+
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+            gameSession['broadcastCorrectAnswers'](mockQuestion);
+
+            expect(mockRoom.broadcast).not.toHaveBeenCalled();
+        });
+
+        it('should broadcast correct answers for a QCM question', () => {
+            const mockQuestion: Question = {
+                _id: '123',
+                label: 'What is the capital of France?',
+                points: 10,
+                createdAt: new Date(),
+                lastModification: new Date(),
+                type: QuestionType.QCM,
+                choices: [
+                    { _id: 1, label: 'Paris', isCorrect: true },
+                    { _id: 2, label: 'London', isCorrect: false },
+                    { _id: 3, label: 'Berlin', isCorrect: false },
+                    { _id: 4, label: 'Rome', isCorrect: true },
+                ],
+            };
+
+            const mockRoom = {
+                code: 'test-room',
+                players: [],
+                game: {},
+                gameService: {},
+                broadcast: jest.fn(),
+                setGame: jest.fn(), // Mock the setGame method
+            };
+
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+
+            gameSession['broadcastCorrectAnswers'](mockQuestion);
+
+            expect(mockRoom.broadcast).toHaveBeenCalledWith(
+                GameEvents.SendCorrectAnswers,
+                {},
+                {
+                    choices: [
+                        { _id: 1, label: 'Paris', isCorrect: true },
+                        { _id: 4, label: 'Rome', isCorrect: true },
+                    ],
+                },
+            );
+        });
+    });
     describe('sortPlayersAnswersByTime', () => {});
     describe('filterCorrectAnswerPlayers', () => {});
     describe('hasMultiplePlayersAnsweredCorrectly', () => {});
