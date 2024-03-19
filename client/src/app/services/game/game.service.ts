@@ -27,7 +27,6 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
-    canGoNextQuestion: boolean;
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
@@ -54,7 +53,6 @@ export class GameService {
         this.isLocked = new BehaviorSubject<boolean>(false);
         this.answers = new BehaviorSubject<GameEventsData.PlayerSendResults>({ choices: [], scores: [], questions: [] });
         this.correctAnswers = new BehaviorSubject<Choice[]>([]);
-        this.canGoNextQuestion = true;
         this.chatService.initialize();
     }
 
@@ -121,8 +119,7 @@ export class GameService {
     }
 
     nextQuestion(): void {
-        if (this.canGoNextQuestion && this.cooldown.getValue() === 0) {
-            this.canGoNextQuestion = false;
+        if (this.gameState.getValue() === GameState.DisplayQuestionResults && this.cooldown.getValue() === 0) {
             this.socketService.send(GameEvents.NextQuestion);
         }
     }
@@ -206,7 +203,6 @@ export class GameService {
     }
 
     private handlePlayersAnswerQuestion() {
-        this.canGoNextQuestion = true;
         this.resetPlayerAnswers();
         if (this.client.getValue().role === GameRole.Organisator) {
             this.router.navigate(['/organisator', this.game.getValue().code], { replaceUrl: true });

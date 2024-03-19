@@ -1,5 +1,5 @@
-import { Player } from '@app/classes/player';
-import { Room } from '@app/classes/room';
+import { Player } from '@app/classes/player/player';
+import { Room } from '@app/classes/room/room';
 import { Timer } from '@app/classes/timer';
 import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';
 import { ActualQuestion, ChoiceData, GameEvents, GameEventsData, Score } from '@common/game-types';
@@ -165,6 +165,7 @@ export class GameSession {
         const firstPlayerToAnswer = goodAnswerPlayers[0] || null;
         if (!this.hasMultiplePlayersAnsweredCorrectly(goodAnswerPlayers) && firstPlayerToAnswer) {
             firstPlayerToAnswer.score += question.points * FIRST_PLAYER_SCORE_MULTIPLICATOR;
+            firstPlayerToAnswer.bonus++;
         }
 
         return goodAnswerPlayers.map((player) => ({ player, hasAnsweredFirst: firstPlayerToAnswer === player }));

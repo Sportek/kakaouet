@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { BAD_QUIZ, WORKING_QUIZ } from '@app/fake-quizzes';
-import { QuestionType, Quiz } from '@common/types';
+import { Question, QuestionType, Quiz } from '@common/types';
 import { ValidateService } from './validate.service';
 
 describe('ValidateService', () => {
@@ -76,5 +76,86 @@ describe('ValidateService', () => {
 
         expect(validate.isValid).toBe(false);
         expect(validate.errors).toContain('Le titre ne doit pas contenir de mots plus grands que 27 caractères');
+    });
+
+    it('should not validate question with unsupported type', () => {
+        const invalidQuestion: Question = {
+            _id: '1',
+            label: 'Question 1',
+            type: 'INVALID_TYPE' as QuestionType,
+            points: 20,
+            choices: [],
+            createdAt: new Date(),
+            lastModification: new Date(),
+        };
+
+        const validate = service.validateQuestion(invalidQuestion);
+
+        expect(validate.isValid).toBe(false);
+    });
+
+    it('should not validate question without choices for QCM type', () => {
+        const invalidQuestion: Question = {
+            _id: '1',
+            label: 'Question 1',
+            type: QuestionType.QCM,
+            points: 20,
+            choices: [],
+            createdAt: new Date(),
+            lastModification: new Date(),
+        };
+
+        const validate = service.validateQuestion(invalidQuestion);
+
+        expect(validate.isValid).toBe(false);
+        expect(validate.errors).toContain('Une question QCM doit avoir au moins une réponse correcte et une réponse incorrecte');
+    });
+
+    it('should not validate question with negative points', () => {
+        const invalidQuestion: Question = {
+            _id: '1',
+            label: 'Question 1',
+            type: QuestionType.QCM,
+            points: -20,
+            choices: [],
+            createdAt: new Date(),
+            lastModification: new Date(),
+        };
+
+        const validate = service.validateQuestion(invalidQuestion);
+
+        expect(validate.isValid).toBe(false);
+    });
+
+    it('should not validate question with non-integer points', () => {
+        const invalidQuestion: Question = {
+            _id: '1',
+            label: 'Question 1',
+            type: QuestionType.QCM,
+            points: 20.5,
+            choices: [],
+            createdAt: new Date(),
+            lastModification: new Date(),
+        };
+
+        const validate = service.validateQuestion(invalidQuestion);
+
+        expect(validate.isValid).toBe(false);
+    });
+
+    it('should not validate question with too long label', () => {
+        const invalidQuestion: Question = {
+            _id: '1',
+            label: 'ThisIsAVeryLongLabelThatExceedsTheLimitThisIsAVeryLongLabelThatExceedsTheLimit',
+            type: QuestionType.QCM,
+            points: 20,
+            choices: [],
+            createdAt: new Date(),
+            lastModification: new Date(),
+        };
+
+        const validate = service.validateQuestion(invalidQuestion);
+
+        expect(validate.isValid).toBe(false);
     });
 });

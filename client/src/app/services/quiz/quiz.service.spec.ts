@@ -192,20 +192,4 @@ describe('QuizService', () => {
         // eslint-disable-next-line no-underscore-dangle
         expect(deleteQuizByIdSpy).toHaveBeenCalledWith(quiz._id);
     });
-
-    it('should generate a quiz as a file', () => {
-        const createObjectURLSpy = spyOn(window.URL, 'createObjectURL');
-        const createElementSpy = spyOn(document, 'createElement').and.callThrough();
-        const appendChildSpy = spyOn(document.body, 'appendChild').and.callThrough();
-        const clickSpy = spyOn(HTMLElement.prototype, 'click').and.callThrough();
-        const revokeObjectURLSpy = spyOn(window.URL, 'revokeObjectURL').and.callThrough();
-
-        service.generateQuizAsFile(mockQuiz);
-
-        expect(createObjectURLSpy).toHaveBeenCalled();
-        expect(createElementSpy).toHaveBeenCalledWith('a');
-        expect(appendChildSpy).toHaveBeenCalled();
-        expect(clickSpy).toHaveBeenCalled();
-        expect(revokeObjectURLSpy).toHaveBeenCalled();
-    });
 });

@@ -76,7 +76,8 @@ export class SocketService {
     private disconnect(info?: string): void {
         this.isConnected = false;
         this.socket.disconnect();
-        this.notificationService.info(`Vous avez été déconnecté du serveur ${': ' + info || ''}`);
+        const message = info ? `Vous avez été déconnecté du serveur : ${info}` : 'Vous avez été déconnecté du serveur';
+        this.notificationService.info(message);
     }
 
     private processQueue() {

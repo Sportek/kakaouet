@@ -1,8 +1,8 @@
+import { GameSession } from '@app/classes/game/game-session';
+import { Room } from '@app/classes/room/room';
 import { CompletePlayerAnswer, GameEvents, PlayerAnswers } from '@common/game-types';
 import { GameRole } from '@common/types';
 import { Socket } from 'socket.io';
-import { GameSession } from './game/game-session';
-import { Room } from './room';
 export class Player {
     name: string;
     role: GameRole;

@@ -267,13 +267,13 @@ describe('GameService', () => {
 
     describe('nextQuestion', () => {
         it('should return if cannot go next question', () => {
-            service.canGoNextQuestion = false;
+            service.gameState.next(GameState.WaitingPlayers);
             service.nextQuestion();
             expect(mockSocketService.send).not.toHaveBeenCalled();
         });
 
         it('should return if timer is not done', () => {
-            service.canGoNextQuestion = true;
+            service.gameState.next(GameState.DisplayQuestionResults);
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             service.cooldown.next(5);
             service.nextQuestion();
@@ -282,7 +282,7 @@ describe('GameService', () => {
 
         it('go next question if possible', () => {
             service.cooldown.next(0);
-            service.canGoNextQuestion = true;
+            service.gameState.next(GameState.DisplayQuestionResults);
             service.nextQuestion();
             expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.NextQuestion);
         });
@@ -493,7 +493,6 @@ describe('GameService', () => {
             service.gameChangeStateListener();
 
             expect(service.gameState.getValue()).toEqual(GameState.PlayersAnswerQuestion);
-            expect(service.canGoNextQuestion).toBeTrue();
             expect(resetPlayerAnswersSpy).toHaveBeenCalled();
             expect(mockRouter.navigate).toHaveBeenCalledWith(['/organisator', mockGame.code], { replaceUrl: true });
         });
@@ -515,7 +514,6 @@ describe('GameService', () => {
             service.gameChangeStateListener();
 
             expect(service.gameState.getValue()).toEqual(GameState.PlayersAnswerQuestion);
-            expect(service.canGoNextQuestion).toBeTrue();
             expect(resetPlayerAnswersSpy).toHaveBeenCalled();
             expect(mockRouter.navigate).toHaveBeenCalledWith(['/game', mockGame.code], { replaceUrl: true });
         });
