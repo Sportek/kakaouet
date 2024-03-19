@@ -22,6 +22,7 @@ describe('GameSession', () => {
     let room: Room;
     let quiz: Quiz;
     let serverMock: Server;
+    let duration: number;
     // eslint-disable-next-line no-unused-vars
     const START_GAME_DELAY = 5;
     const NEXT_QUESTION_DELAY = 3;
@@ -62,6 +63,7 @@ describe('GameSession', () => {
             lastModification: new Date(),
         };
         gameSession = new GameSession('game123', room, quiz, GameType.Default);
+        duration = 1;
     });
 
     afterEach(() => {
@@ -73,7 +75,6 @@ describe('GameSession', () => {
             expect(gameSession.gameState).toBe(GameState.WaitingPlayers);
             expect(gameSession.room).toBe(room);
             expect(gameSession.quiz).toBe(quiz);
-            // Verify room.setGame was called with 'gameSession'
         });
     });
 
@@ -121,6 +122,23 @@ describe('GameSession', () => {
             const simpleDelaySpy = jest.spyOn(gameSession as unknown as { simpleDelay: () => void }, 'simpleDelay');
             gameSession.startQuestionCooldown();
             expect(simpleDelaySpy).not.toHaveBeenCalled();
+        });
+
+        it('should start cooldown and call displayQuestionResults if gameState is PlayersAnswerQuestion', () => {
+            gameSession.gameState = GameState.PlayersAnswerQuestion;
+
+            const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
+            const displayQuestionResultsSpy = jest.spyOn(gameSession, 'displayQuestionResults');
+
+            gameSession.quiz = quiz;
+            gameSession.startQuestionCooldown();
+
+            expect(simpleDelaySpy).toHaveBeenCalledWith(quiz.duration, expect.any(Function));
+
+            const callback = simpleDelaySpy.mock.calls[0][1] as () => void;
+            callback();
+
+            expect(displayQuestionResultsSpy).toHaveBeenCalled();
         });
     });
 
