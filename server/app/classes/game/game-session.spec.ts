@@ -6,21 +6,11 @@
 import { Player } from '@app/classes/player/player';
 import { Room } from '@app/classes/room/room';
 import { GameService } from '@app/services/game/game.service';
-import { GameType } from '@common/game-types';
-import { GameRole, GameState, QuestionType, Quiz } from '@common/types';
+import { CompletePlayerAnswer, GameEvents, GameType } from '@common/game-types';
+import { GameRole, GameState, Question, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
 import { Timer } from '../timer';
 import { GameSession } from './game-session';
-
-jest.mock('socket.io', () => {
-    const mServer = {
-        to: jest.fn().mockReturnThis(),
-        except: jest.fn().mockReturnThis(),
-        emit: jest.fn().mockReturnThis(),
-    };
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    return { Server: jest.fn(() => mServer) };
-});
 
 describe('GameSession', () => {
     let gameSession: GameSession;
@@ -163,7 +153,7 @@ describe('GameSession', () => {
             expect(simpleDelaySpy).not.toHaveBeenCalled();
         });
 
-        /* it('should start cooldown and call displayQuestionResults if gameState is PlayersAnswerQuestion', () => {
+        it('should start cooldown and call displayQuestionResults if gameState is PlayersAnswerQuestion', () => {
             gameSession.gameState = GameState.PlayersAnswerQuestion;
 
             const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
@@ -178,7 +168,7 @@ describe('GameSession', () => {
             callback();
 
             expect(displayQuestionResultsSpy).toHaveBeenCalled();
-        });*/
+        });
     });
 
     describe('displayQuestionResults', () => {
@@ -239,6 +229,8 @@ describe('GameSession', () => {
 
             expect(displayResultsSpy).toHaveBeenCalled();
         });
+
+        it('should change game state and callchangeGameState, broadcastGameNextQuestion and startQuestionCooldown', () => {});
     });
 
     describe('displayResults', () => {
@@ -316,7 +308,7 @@ describe('GameSession', () => {
         });
     });
 
-    /* describe('endGame', () => {
+    describe('endGame', () => {
         it('should change game state to End', () => {
             gameSession.gameState = GameState.PlayersAnswerQuestion;
             const changeGameStateSpy = jest.spyOn(gameSession, 'changeGameState');
@@ -696,5 +688,5 @@ describe('GameSession', () => {
             const result = gameSession.getAmountOfPlayersWhoAnswered(0);
             expect(result).toEqual([0, 0, 0, 0]);
         });
-    });*/
+    });
 });
