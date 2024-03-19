@@ -240,6 +240,8 @@ describe('GameSession', () => {
 
             expect(displayResultsSpy).toHaveBeenCalled();
         });
+
+        it('should change game state and callchangeGameState, broadcastGameNextQuestion and startQuestionCooldown', () => {});
     });
 
     describe('displayResults', () => {
@@ -329,14 +331,6 @@ describe('GameSession', () => {
     describe('changeGameState', () => {
         it('should change the game state and broadcast the event', () => {
             const newState = GameState.PlayersAnswerQuestion;
-            const mockRoom = {
-                code: 'test-room',
-                players: [],
-                game: {},
-                gameService: {},
-                broadcast: jest.fn(),
-                setGame: jest.fn(),
-            };
             // eslint-disable-next-line @typescript-eslint/no-shadow
             const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
 
@@ -349,14 +343,6 @@ describe('GameSession', () => {
 
     describe('changeGameLockState', () => {
         it('should change the game lock state and broadcast the event', () => {
-            const mockRoom = {
-                code: 'test-room',
-                players: [],
-                game: {},
-                gameService: {},
-                broadcast: jest.fn(),
-                setGame: jest.fn(),
-            };
             // eslint-disable-next-line @typescript-eslint/no-shadow
             const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
             gameSession.changeGameLockState();
@@ -368,17 +354,7 @@ describe('GameSession', () => {
 
     describe('broadcastMessage', () => {
         it('should broadcast a message to players', () => {
-            // Mock de la classe Room
-            const mockRoom = {
-                code: 'test-room',
-                players: [],
-                game: {},
-                gameService: {},
-                broadcast: jest.fn(),
-                setGame: jest.fn(),
-            };
             const messageContent = 'Hello players!';
-            const expectedDate = new Date();
 
             // eslint-disable-next-line @typescript-eslint/no-shadow
             const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
@@ -434,15 +410,6 @@ describe('GameSession', () => {
                 type: QuestionType.QRL,
             };
 
-            const mockRoom = {
-                code: 'test-room',
-                players: [],
-                game: {},
-                gameService: {},
-                broadcast: jest.fn(),
-                setGame: jest.fn(), // Mock the setGame method
-            };
-
             // eslint-disable-next-line @typescript-eslint/no-shadow
             const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
             gameSession['broadcastCorrectAnswers'](mockQuestion);
@@ -464,15 +431,6 @@ describe('GameSession', () => {
                     { _id: 3, label: 'Berlin', isCorrect: false },
                     { _id: 4, label: 'Rome', isCorrect: true },
                 ],
-            };
-
-            const mockRoom = {
-                code: 'test-room',
-                players: [],
-                game: {},
-                gameService: {},
-                broadcast: jest.fn(),
-                setGame: jest.fn(),
             };
 
             // eslint-disable-next-line @typescript-eslint/no-shadow
