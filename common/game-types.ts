@@ -169,3 +169,5 @@ export namespace GameEventsData {
         choices: Choice[];
     }
 }
+export { GameState, GameType };
+
