@@ -92,27 +92,32 @@ describe('GameSession', () => {
             expect(startGameSpy).toHaveBeenCalled();
         });
 
-        /* it('calls simpleDelay and then startGame if gameState is WaitingPlayers and type is not GameType.Test', () => {
-            gameSession.gameState = GameState.WaitingPlayers;
-            gameSession.type = GameType.Default;
-
-            const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
-
+        it('does not call startGame if type is not GameType.Test', () => {
+            gameSession.type = GameType.Random;
+            const startGameSpy = jest.spyOn(gameSession, 'startGame');
             gameSession.startGameDelayed();
+            expect(startGameSpy).not.toHaveBeenCalled();
+        });
+    });
 
-            expect(simpleDelaySpy).toHaveBeenCalledWith(START_GAME_DELAY, expect.any(Function));
+    describe('startGame', () => {
+        it('starGame should call changeGameState, broadcastGameNextQuestion, startQuestionCooldown', () => {
+            const changeGameStateMock = jest.spyOn(gameSession, 'changeGameState');
+            const startQuestionCooldownMock = jest.spyOn(gameSession, 'startQuestionCooldown');
+            const gameSessionAny = gameSession as any;
+            const broadcastGameNextQuestionMock = jest.spyOn(gameSessionAny, 'broadcastGameNextQuestion');
 
-            // Manually trigger the callback function passed to simpleDelay
-            const callback = simpleDelaySpy.mock.calls[0][1];
-            callback();
+            gameSession.startGame();
 
-            expect(gameSession.startGame).toHaveBeenCalled();
-        });*/
+            expect(changeGameStateMock).toHaveBeenCalledWith(GameState.PlayersAnswerQuestion);
+            expect(broadcastGameNextQuestionMock).toHaveBeenCalled();
+            expect(startQuestionCooldownMock).toHaveBeenCalled();
+        });
     });
 
     describe('startQuestionCooldown', () => {
         it('does nothing if gameState is not PlayersAnswerQuestion', () => {
-            gameSession.gameState = GameState.WaitingPlayers; // Set to a different state
+            gameSession.gameState = GameState.WaitingPlayers;
             const simpleDelaySpy = jest.spyOn(gameSession as unknown as { simpleDelay: () => void }, 'simpleDelay');
             gameSession.startQuestionCooldown();
             expect(simpleDelaySpy).not.toHaveBeenCalled();
@@ -131,10 +136,3 @@ describe('GameSession', () => {
         });
     });
 });
-
-/*            gameSession.type = GameType.Test;
-            // const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
-            const startGameSpy = jest.spyOn(gameSession, 'startGame');
-            gameSession.startGameDelayed();
-            // expect(simpleDelaySpy).not.toHaveBeenCalled();
-            expect(startGameSpy).toHaveBeenCalled();*/
