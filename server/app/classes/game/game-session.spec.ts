@@ -340,8 +340,25 @@ describe('GameSession', () => {
             expect(mockRoom.broadcast).toHaveBeenCalledWith(GameEvents.GameStateChanged, {}, { gameState: newState });
         });
     });
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    describe('changeGameLockState', () => {});
+
+    describe('changeGameLockState', () => {
+        it('should change the game lock state and broadcast the event', () => {
+            const mockRoom = {
+                code: 'test-room',
+                players: [],
+                game: {},
+                gameService: {},
+                broadcast: jest.fn(),
+                setGame: jest.fn(),
+            };
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+            gameSession.changeGameLockState();
+
+            expect(gameSession.isLocked).toBe(true);
+            expect(mockRoom.broadcast).toHaveBeenCalledWith(GameEvents.GameLockedStateChanged, {}, { isLocked: true });
+        });
+    });
 
     describe('toggleTimer', () => {
         it('should toggle the timer play/pause if timer exists', () => {
