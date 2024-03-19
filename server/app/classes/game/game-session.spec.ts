@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable max-lines */
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Room } from '@app/classes/room';
 import { GameService } from '@app/services/game/game.service';
-import { GameType } from '@common/game-types';
+import { GameEvents, GameType } from '@common/game-types';
 import { GameState, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
 import { Player } from '../player';
@@ -318,8 +320,28 @@ describe('GameSession', () => {
         });
     });
 
+    describe('changeGameState', () => {
+        it('should change the game state and broadcast the event', () => {
+            const newState = GameState.PlayersAnswerQuestion;
+            const mockRoom = {
+                code: 'test-room',
+                players: [],
+                game: {},
+                gameService: {},
+                broadcast: jest.fn(),
+                setGame: jest.fn(),
+            };
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+
+            gameSession.changeGameState(newState);
+
+            expect(gameSession.gameState).toBe(newState);
+            expect(mockRoom.broadcast).toHaveBeenCalledWith(GameEvents.GameStateChanged, {}, { gameState: newState });
+        });
+    });
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    describe('changeGameState', () => {});
+    describe('changeGameLockState', () => {});
 
     describe('toggleTimer', () => {
         it('should toggle the timer play/pause if timer exists', () => {
@@ -346,4 +368,21 @@ describe('GameSession', () => {
             expect(timerMock.speedUp).not.toHaveBeenCalled();
         });
     });
+
+    describe('broadcastMessage', () => {});
+
+    describe('broadcastCorrectAnswers', () => {});
+    describe('sortPlayersAnswersByTime', () => {});
+    describe('filterCorrectAnswerPlayers', () => {});
+    describe('hasMultiplePlayersAnsweredCorrectly', () => {});
+    describe('calculateScores', () => {});
+    describe('sendScores', () => {});
+    describe('broadcastGameNextQuestion', () => {});
+    describe('calculateCorrectChoices', () => {});
+    describe('broadcastPlayerResults', () => {});
+    describe('sortPlayersByScore', () => {});
+
+    describe('simpleDelay', () => {});
+
+    describe('getAmountOfPlayersWhoAnswered', () => {});
 });
