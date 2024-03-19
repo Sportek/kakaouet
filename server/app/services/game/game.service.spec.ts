@@ -5,6 +5,7 @@ import { GameState, GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { mockGame } from './mock-game';
 
@@ -25,7 +26,6 @@ const mockQuizModel = {
 
 describe('GameService', () => {
     let service: GameService;
-
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -244,5 +244,32 @@ describe('GameService', () => {
         service.removeGameSession('1234');
         // @ts-ignore
         expect(service.gameSessions.size).toEqual(0);
+    });
+
+    it('should create a game session', async () => {
+        const code = 'testCode';
+        const quizId = 'quiz123';
+        const gameType = GameType.Default;
+
+        const mockServer = {} as unknown as Server;
+        const mockQuiz = {
+            id: quizId,
+            toObject: jest.fn().mockReturnValue({}),
+        };
+        mockQuizModel.findById.mockReturnValue(mockQuiz);
+
+        const result = await service.createGameSession(code, mockServer, quizId, gameType);
+
+        expect(result).toBeInstanceOf(GameSession);
+        expect(result.code).toEqual(code);
+        expect(mockQuizModel.findById).toHaveBeenCalledWith(quizId);
+    });
+
+    it("shouldn't update game", async () => {
+        const testCode = 'testCode';
+        const testGame = { _id: testCode, name: 'Test Game', updatedAt: new Date() };
+        mockGameModel.replaceOne.mockRejectedValue(new Error('Test error'));
+        service.updateGameByCode(testCode, testGame as unknown as Game);
+        expect(mockGameModel.findOne).toHaveBeenCalled();
     });
 });
