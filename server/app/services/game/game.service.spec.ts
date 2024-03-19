@@ -1,9 +1,11 @@
+import { GameSession } from '@app/classes/game/game-session';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
-import { GameType } from '@common/types';
+import { GameState, GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { mockGame } from './mock-game';
 
@@ -24,7 +26,6 @@ const mockQuizModel = {
 
 describe('GameService', () => {
     let service: GameService;
-
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -200,5 +201,75 @@ describe('GameService', () => {
             expect(loggerSpy).toHaveBeenCalledWith('Error adding new game: ', mockError);
             expect(result).toBeUndefined();
         });
+    });
+
+    describe('getGameSessionBySocketId', () => {
+        it('should return the correct GameSession for a known socket ID', () => {
+            const gameSessionMap = new Map<string, GameSession>();
+            const gameSession = {
+                code: '1234',
+                room: {
+                    getPlayers: jest.fn().mockReturnValue([{ socket: { id: 'socket123' } }]),
+                },
+                timer: undefined,
+                gameState: GameState.DisplayQuestionResults,
+                type: GameType.Default,
+                gameQuestionIndex: 1,
+                isLocked: true,
+            };
+            gameSessionMap.set('1234', gameSession as unknown as GameSession);
+            // @ts-ignore
+            service.gameSessions = gameSessionMap;
+            const result = service.getGameSessionBySocketId('socket123');
+            expect(result).toEqual(gameSession);
+        });
+    });
+
+    it('should remove gameSession', () => {
+        const gameSessionMap = new Map<string, GameSession>();
+        const gameSession = {
+            code: '1234',
+            room: {
+                getPlayers: jest.fn().mockReturnValue([{ socket: { id: 'socket123' } }]),
+            },
+            timer: undefined,
+            gameState: GameState.DisplayQuestionResults,
+            type: GameType.Default,
+            gameQuestionIndex: 1,
+            isLocked: true,
+        };
+        gameSessionMap.set('1234', gameSession as unknown as GameSession);
+        // @ts-ignore
+        service.gameSessions = gameSessionMap;
+        service.removeGameSession('1234');
+        // @ts-ignore
+        expect(service.gameSessions.size).toEqual(0);
+    });
+
+    it('should create a game session', async () => {
+        const code = 'testCode';
+        const quizId = 'quiz123';
+        const gameType = GameType.Default;
+
+        const mockServer = {} as unknown as Server;
+        const mockQuiz = {
+            id: quizId,
+            toObject: jest.fn().mockReturnValue({}),
+        };
+        mockQuizModel.findById.mockReturnValue(mockQuiz);
+
+        const result = await service.createGameSession(code, mockServer, quizId, gameType);
+
+        expect(result).toBeInstanceOf(GameSession);
+        expect(result.code).toEqual(code);
+        expect(mockQuizModel.findById).toHaveBeenCalledWith(quizId);
+    });
+
+    it("shouldn't update game", async () => {
+        const testCode = 'testCode';
+        const testGame = { _id: testCode, name: 'Test Game', updatedAt: new Date() };
+        mockGameModel.replaceOne.mockRejectedValue(new Error('Test error'));
+        service.updateGameByCode(testCode, testGame as unknown as Game);
+        expect(mockGameModel.findOne).toHaveBeenCalled();
     });
 });

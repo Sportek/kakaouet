@@ -2,6 +2,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 import { BASE_URL } from '@app/constants';
 import { QuestionFeedback, QuestionType, Quiz } from '@common/types';
+import * as FileSaver from 'file-saver';
 import { of } from 'rxjs';
 import { QuizService } from './quiz.service';
 
@@ -173,7 +174,6 @@ describe('QuizService', () => {
         expect(spy).toHaveBeenCalledWith(1);
     });
 
-    // new tests
     it('should change visibility of a quiz', () => {
         const quiz = mockQuiz;
         const originalVisibility = quiz.visibility;
@@ -191,5 +191,28 @@ describe('QuizService', () => {
         service.removeQuiz(quiz, quizList);
         // eslint-disable-next-line no-underscore-dangle
         expect(deleteQuizByIdSpy).toHaveBeenCalledWith(quiz._id);
+    });
+
+    it('should generate and save a quiz as a JSON file', () => {
+        const quiz: Quiz = {
+            _id: 'exampleId',
+            name: 'Example Quiz',
+            description: 'A sample quiz for testing.',
+            duration: 30,
+            visibility: true,
+            questions: [],
+            createdAt: new Date(),
+            lastModification: new Date(),
+        };
+        const expectedFileName = `${quiz.name}.json`;
+
+        // eslint-disable-next-line deprecation/deprecation
+        const saveAsSpy = spyOn(FileSaver, 'saveAs');
+
+        service.generateQuizAsFile(quiz);
+
+        expect(saveAsSpy).toHaveBeenCalled();
+        const args = saveAsSpy.calls.first().args;
+        expect(args[1]).toEqual(expectedFileName);
     });
 });

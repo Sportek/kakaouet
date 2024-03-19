@@ -1,10 +1,9 @@
 import { GameSession } from '@app/classes/game/game-session';
-import { Player } from '@app/classes/player/player';
 import { Room } from '@app/classes/room/room';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
 import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH } from '@common/constants';
-import { GameRole, GameType } from '@common/types';
+import { GameType } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -116,24 +115,6 @@ export class GameService {
         const gameSession = new GameSession(code, room, quiz.toObject(), gameType);
         this.gameSessions.set(code, gameSession);
         return gameSession;
-    }
-
-    broadcastToGameSessions(): void {
-        this.gameSessions.forEach((gameSession) => {
-            const playerAmount = gameSession.room.getPlayers().length;
-
-            const role = (player: Player) => (player.role === GameRole.Organisator ? 'O' : 'P');
-            const playerNames = gameSession.room
-                .getPlayers()
-                .map((player) => `[${role(player)}] ${player.name}${player.isExcluded ? ' (banned)' : ''}${player.hasGiveUp ? ' (giveup)' : ''}`)
-                .join(', ');
-
-            gameSession.room.broadcast(
-                'test',
-                {},
-                `Code: ${gameSession.code} - isLocked: ${gameSession.isLocked} - players (${playerAmount}): ${playerNames}`,
-            );
-        });
     }
 
     removeGameSession(code: string): void {

@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -11,6 +12,7 @@ import { GameGateway } from './game.gateway';
 
 class MockGameService {
     getGameSessionBySocketId() {}
+
     getGameSessionByCode() {}
 
     createGameSession() {}
@@ -89,6 +91,23 @@ describe('GameGateway', () => {
 
             expect(response).toEqual({ isSuccess: true, message: 'Vous avez quitté la partie' });
             expect(mockSession.room.removePlayer).toHaveBeenCalledWith('JohnDoe');
+        });
+
+        it('should abandon player', () => {
+            const mockSession = {
+                gameState: GameState.DisplayQuestionResults,
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue({ name: 'JohnDoe', isExcluded: false }),
+                    giveUpPlayer: jest.fn(),
+                },
+            } as unknown as GameSession;
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleDisconnect(client);
+
+            expect(response).toEqual({ isSuccess: true, message: 'Vous avez abandonné la partie' });
+            expect(mockSession.room.giveUpPlayer).toHaveBeenCalledWith('JohnDoe');
         });
 
         it('should return failure if game session does not exist', () => {
@@ -530,5 +549,92 @@ describe('GameGateway', () => {
             expect(response).toEqual({ isSuccess: true, message: 'Joueur banni' });
             expect(banPlayerSpy).toHaveBeenCalledWith(data.name);
         });
+    });
+
+    describe('GameGateway - handleToggleTimer', () => {
+        it('should prevent toggleTimer', () => {
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue({ role: GameRole.Organisator }),
+                },
+                toggleTimer: jest.fn(),
+            } as unknown as GameSession;
+
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+            // @ts-ignore
+            jest.spyOn(gateway, 'hasAutorisation').mockReturnValue(false);
+
+            const result = gateway.handleToggleTimer(mockClient as Socket);
+            expect(result).toEqual({ isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" });
+        });
+
+        it('should toggle timer', () => {
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue({ role: GameRole.Organisator }),
+                },
+                toggleTimer: jest.fn(),
+            } as unknown as GameSession;
+
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+            // @ts-ignore
+            jest.spyOn(gateway, 'hasAutorisation').mockReturnValue(true);
+
+            const result = gateway.handleToggleTimer(mockClient as Socket);
+
+            expect(mockSession.toggleTimer).toHaveBeenCalled();
+            expect(result).toEqual({ isSuccess: true, message: 'Timer modifié' });
+        });
+    });
+
+    describe('GameGateway - handleSpeedUpTimer', () => {
+        it('should prevent speedUpTimer', () => {
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue({ role: GameRole.Organisator }),
+                },
+                speedUpTimer: jest.fn(),
+            } as unknown as GameSession;
+
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+            // @ts-ignore
+            jest.spyOn(gateway, 'hasAutorisation').mockReturnValue(false);
+
+            const result = gateway.handleSpeedUpTimer(mockClient as Socket);
+            expect(result).toEqual({ isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" });
+        });
+
+        it('should toggle timer', () => {
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue({ role: GameRole.Organisator }),
+                },
+                speedUpTimer: jest.fn(),
+            } as unknown as GameSession;
+
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+            // @ts-ignore
+            jest.spyOn(gateway, 'hasAutorisation').mockReturnValue(true);
+
+            const result = gateway.handleSpeedUpTimer(mockClient as Socket);
+
+            expect(mockSession.speedUpTimer).toHaveBeenCalled();
+            expect(result).toEqual({ isSuccess: true, message: 'Timer accéléré' });
+        });
+    });
+
+    it('should broadcast message to room', () => {
+        const mockSession = {
+            room: {
+                getPlayerWithSocketId: jest.fn().mockReturnValue({ role: GameRole.Organisator }),
+            },
+            broadcastMessage: jest.fn(),
+        } as unknown as GameSession;
+        jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+        const result = gateway.handleMessageSent({ content: 'Allo' }, mockClient as Socket);
+
+        expect(mockSession.broadcastMessage).toHaveBeenCalled();
+        expect(result).toEqual({ isSuccess: true, message: 'Message envoyé' });
     });
 });
