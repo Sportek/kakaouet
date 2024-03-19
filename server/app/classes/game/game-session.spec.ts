@@ -69,7 +69,6 @@ describe('GameSession', () => {
             speedUp: jest.fn(),
         } as any;
         serverMock = new Server() as unknown as Server;
-        // const mockServer = {} as Server;
         const mockGameService = {} as GameService;
         room = new Room('test-room', serverMock, mockGameService);
         quiz = {
@@ -451,7 +450,6 @@ describe('GameSession', () => {
         });
     });
     describe('sortPlayersAnswersByTime', () => {
-        // A revoir ----> erreur
         const mockAnswer1: CompletePlayerAnswer = {
             hasInterracted: true,
             hasConfirmed: true,
@@ -529,13 +527,6 @@ describe('GameSession', () => {
         });
     });
 
-    describe('filterCorrectAnswerPlayers', () => {});
-    describe('hasMultiplePlayersAnsweredCorrectly', () => {});
-    describe('calculateScores', () => {});
-    describe('sendScores', () => {});
-    describe('broadcastGameNextQuestion', () => {});
-    describe('calculateCorrectChoices', () => {});
-    describe('broadcastPlayerResults', () => {});
     describe('sortPlayersByScore', () => {
         const mockPlayer1: Player = {
             name: 'Player1',
