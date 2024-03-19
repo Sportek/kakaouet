@@ -5,6 +5,7 @@ import { GameService } from '@app/services/game/game.service';
 import { GameType } from '@common/game-types';
 import { GameState, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
+import { Player } from '../player';
 import { GameSession } from './game-session';
 
 jest.mock('socket.io', () => {
@@ -244,6 +245,59 @@ describe('GameSession', () => {
             const simpleDelaySpy = jest.spyOn(gameSession as any, 'simpleDelay');
             gameSession.displayResults();
             expect(simpleDelaySpy).toHaveBeenCalledWith(NEXT_QUESTION_DELAY, expect.any(Function));
+        });
+    });
+
+    describe('sendResultsToPlayers', () => {
+        it('should not send results if gameState is not DisplayQuizResults', () => {
+            gameSession.gameState = GameState.WaitingPlayers;
+
+            const sortPlayersByScoreAny = gameSession as any;
+            const sortPlayersByScoreSpy = jest.spyOn(sortPlayersByScoreAny, 'sortPlayersByScore');
+            const broadcastPlayerResultsAny = gameSession as any;
+            const broadcastPlayerResultsSpy = jest.spyOn(broadcastPlayerResultsAny, 'broadcastPlayerResults');
+            const calculateCorrectChoicesAny = gameSession as any;
+            const calculateCorrectChoicesSpy = jest.spyOn(calculateCorrectChoicesAny, 'calculateCorrectChoices');
+
+            gameSession.sendResultsToPlayers();
+
+            expect(sortPlayersByScoreSpy).not.toHaveBeenCalled();
+            expect(broadcastPlayerResultsSpy).not.toHaveBeenCalled();
+            expect(calculateCorrectChoicesSpy).not.toHaveBeenCalled();
+        });
+
+        it('should send results if gameState is DisplayQuizResults', () => {
+            gameSession.gameState = GameState.DisplayQuizResults;
+            const sortedPlayers = [
+                { name: 'Player 1', score: 10, bonus: 5 },
+                { name: 'Player 2', score: 15, bonus: 10 },
+            ];
+
+            const getOnlyGamePlayersMock = jest.fn(() => sortedPlayers as Player[]);
+            jest.spyOn(gameSession.room, 'getOnlyGamePlayers').mockImplementation(getOnlyGamePlayersMock);
+
+            const sortPlayersByScoreMock = jest.fn(() => sortedPlayers);
+            const sortPlayersByScoreAny = gameSession as any;
+            jest.spyOn(sortPlayersByScoreAny, 'sortPlayersByScore').mockImplementation(sortPlayersByScoreMock);
+
+            const broadcastPlayerResultsAny = gameSession as any;
+            const broadcastPlayerResultsSpy = jest.spyOn(broadcastPlayerResultsAny, 'broadcastPlayerResults');
+            const calculateCorrectChoicesMock = jest.fn(() => []);
+
+            const calculateCorrectChoicesAny = gameSession as any;
+            jest.spyOn(calculateCorrectChoicesAny, 'calculateCorrectChoices').mockImplementation(calculateCorrectChoicesMock);
+
+            gameSession.sendResultsToPlayers();
+
+            expect(sortPlayersByScoreMock).toHaveBeenCalled();
+            expect(broadcastPlayerResultsSpy).toHaveBeenCalledWith(
+                [
+                    { name: 'Player 1', score: 10, bonus: 5 },
+                    { name: 'Player 2', score: 15, bonus: 10 },
+                ],
+                [],
+            );
+            expect(calculateCorrectChoicesMock).toHaveBeenCalled();
         });
     });
 });
