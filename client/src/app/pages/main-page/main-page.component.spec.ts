@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BackgroundComponent } from '@app/components/background/background.component';
 import { SocketService } from '@app/services/socket/socket.service';
 import { MainPageComponent } from './main-page.component';
 
@@ -13,7 +14,7 @@ describe('MainPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [MainPageComponent],
+            declarations: [MainPageComponent, BackgroundComponent],
 
             providers: [{ provide: SocketService, useClass: MockSocketService }],
         }).compileComponents();
