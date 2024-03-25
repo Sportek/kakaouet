@@ -31,6 +31,13 @@ export class SocketEventHandlerService {
         }
     }
 
+    handlePlayerMuted(data: GameEventsData.PlayerMuted, players: BehaviorSubject<PlayerClient[]>, client: BehaviorSubject<Client>) {
+        players.next(players.getValue().map((player) => (player.name === data.name ? { ...player, isMuted: true } : player)));
+        if (data.name === client.getValue().name) {
+            this.notificationService.error('Vous avez été banni de la partie');
+        }
+    }
+
     handleUpdateScore(data: GameEventsData.UpdateScore, client: BehaviorSubject<Client>) {
         if (data.hasAnsweredFirst) this.notificationService.info('Vous avez répondu en premier !');
         client.next({ ...client.getValue(), score: data.score });

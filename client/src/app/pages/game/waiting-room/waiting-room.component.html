@@ -44,6 +44,9 @@
                             <div class="player-name">{{ player.name }}</div>
                             <div *ngIf="client.role === 'organisator'" class="ban-player clickable">
                                 <mat-icon>
+                                    <span class="material-symbols-outlined" matTooltip="Mute le joueur" (click)="mutePlayer(player)"> mute </span>
+                                </mat-icon>
+                                <mat-icon>
                                     <span class="material-symbols-outlined" matTooltip="Exclure le joueur" (click)="banPlayer(player)"> block </span>
                                 </mat-icon>
                             </div>

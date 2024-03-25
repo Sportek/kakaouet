@@ -150,6 +150,10 @@ export class GameService {
         this.socketService.send(GameEvents.BanPlayer, { name: player.name });
     }
 
+    mutePlayer(player: PlayerClient) {
+        this.socketService.send(GameEvents.MutePlayer, { name: player.name });
+    }
+
     getCorrectAnswers(): Observable<Choice[]> {
         return this.correctAnswers.asObservable();
     }
@@ -316,6 +320,12 @@ export class GameService {
         });
     }
 
+    private receiveMutedPlayers() {
+        this.socketService.listen(GameEvents.PlayerBanned, (data: GameEventsData.PlayerBanned) => {
+            this.socketEventHandlerService.handlePlayerMuted(data, this.players, this.client);
+        });
+    }
+
     private receiveGiveUpPlayers() {
         this.socketService.listen(GameEvents.PlayerHasGiveUp, (data: GameEventsData.PlayerHasGiveUp) => {
             this.socketEventHandlerService.handlePlayerGivesUp(data, this.players);
@@ -338,5 +348,6 @@ export class GameService {
         this.receiveGiveUpPlayers();
         this.playerSendResultsListener();
         this.receiveCorrectAnswersListener();
+        this.receiveMutedPlayers();
     }
 }

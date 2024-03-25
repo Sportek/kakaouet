@@ -14,6 +14,7 @@ export enum GameEvents {
     ToggleTimer = 'toggleTimer', // Event sent to the server when an organizer wants to toggle the timer
     SpeedUpTimer = 'speedUpTimer', // Event sent to the server when an organizer wants to speed up the timer
     SendMessage = 'sendMessage', // Event sent to the server when a user sends a chat message
+    MutePlayer = 'mutePlayer',
 
     // Events launched by the server
     PlayerSelectAnswer = 'playerSelectedAnswer', // Event sent to organizer a player has selected an answer
@@ -34,6 +35,7 @@ export enum GameEvents {
     PlayerSendMessage = 'playerSendMessage', // Event broadcasted to room containing player
     PlayerSendResults = 'playerSendResults', // Event sent to all players when the results are sent
     SendCorrectAnswers = 'playerSendCorrectAnswers', // Event sent to all players containing the correct answers
+    PlayerMuted = 'playerMuted',
 }
 
 // Différents types définis
@@ -138,6 +140,14 @@ export namespace GameEventsData {
     }
 
     export interface BanPlayer {
+        name: string;
+    }
+
+    export interface PlayerMuted {
+        name: string;
+    }
+
+    export interface MutePlayer {
         name: string;
     }
 

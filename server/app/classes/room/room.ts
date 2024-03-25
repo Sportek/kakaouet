@@ -29,6 +29,12 @@ export class Room {
         player.leaveAllRooms();
     }
 
+    mutePlayer(playerName: string) {
+        const player = this.getPlayer(playerName);
+        this.broadcast(GameEvents.PlayerMuted, {}, { name: playerName });
+        player.isMuted = true;
+    }
+
     giveUpPlayer(playerName: string) {
         const player = this.getPlayer(playerName);
         player.hasGiveUp = true;

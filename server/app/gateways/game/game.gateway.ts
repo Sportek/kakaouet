@@ -123,6 +123,16 @@ export class GameGateway {
         return { isSuccess: true, message: 'Joueur banni' };
     }
 
+    @SubscribeMessage(GameEvents.MutePlayer)
+    handleMutePlayer(@MessageBody() data: GameEventsData.MutePlayer, @ConnectedSocket() client: Socket): SocketResponse {
+        const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        if (!this.hasAutorisation(client, GameRole.Organisator))
+            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+
+        gameSession.room.mutePlayer(data.name);
+        return { isSuccess: true, message: 'Droit au clavardage desactivé' };
+    }
+
     @SubscribeMessage(GameEvents.ToggleTimer)
     handleToggleTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
