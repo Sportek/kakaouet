@@ -160,9 +160,11 @@ export class GameGateway {
     handleMessageSent(@MessageBody() data: GameEventsData.SendMessage, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-
-        gameSession.broadcastMessage(player, data.content);
-        return { isSuccess: true, message: 'Message envoyé' };
+        if(!player.isMuted){
+            gameSession.broadcastMessage(player, data.content);
+            return { isSuccess: true, message: 'Message envoyé' };
+        }
+        return { isSuccess: true, message: 'Non-authorisé' };
     }
 
     afterInit(server: Server): void {
