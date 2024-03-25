@@ -145,6 +145,7 @@ export namespace GameEventsData {
 
     export interface PlayerMuted {
         name: string;
+        isMuted : boolean;
     }
 
     export interface MutePlayer {

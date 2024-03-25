@@ -31,8 +31,9 @@ export class Room {
 
     mutePlayer(playerName: string) {
         const player = this.getPlayer(playerName);
-        this.broadcast(GameEvents.PlayerMuted, {}, { name: playerName });
         player.isMuted = !player.isMuted;
+        this.broadcast(GameEvents.PlayerMuted, {}, { name: playerName, isMuted: player.isMuted});
+       
     }
 
     giveUpPlayer(playerName: string) {
