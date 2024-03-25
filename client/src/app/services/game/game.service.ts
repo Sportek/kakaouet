@@ -321,7 +321,7 @@ export class GameService {
     }
 
     private receiveMutedPlayers() {
-        this.socketService.listen(GameEvents.PlayerBanned, (data: GameEventsData.PlayerBanned) => {
+        this.socketService.listen(GameEvents.PlayerMuted, (data: GameEventsData.PlayerMuted) => {
             this.socketEventHandlerService.handlePlayerMuted(data, this.players, this.client);
         });
     }
