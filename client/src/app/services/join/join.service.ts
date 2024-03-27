@@ -3,8 +3,9 @@ import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH, GAME_USERNAME_MAX_LENGTH } from '@common/constants';
-import { GameEvents, GameEventsData } from '@common/game-types';
+import { GameEvents, GameEventsData, SoundType } from '@common/game-types';
 import { GameRole } from '@common/types';
 
 @Injectable({
@@ -17,6 +18,7 @@ export class JoinService {
         private socketService: SocketService,
         private router: Router,
         private gameService: GameService,
+        private soundService: SoundService,
     ) {
         this.listenerConfirmJoinGame();
     }
@@ -35,6 +37,7 @@ export class JoinService {
                 this.router.navigateByUrl('/waiting-room/' + data.code);
                 this.gameService.players.next(data.players);
                 this.gameService.game.next(data.game);
+                this.soundService.startPlayingSound(SoundType.PlayingRoom, true);
                 return;
             }
 
