@@ -140,3 +140,10 @@ export interface QuestionFeedback {
     incorrectSelectedChoicesIndices: number[];
     correctSelectedChoicesIndices: number[];
 }
+
+export interface GameRecord {
+    gameTitle: string;
+    startTime: Date;
+    numberOfPlayers: number;
+    bestScore: number;
+}
