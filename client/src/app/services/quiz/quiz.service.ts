@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { BASE_URL } from '@app/constants';
 import { ValidateService } from '@app/services/validate/validate.service';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { saveAs } from 'file-saver';
-import { Observable, Subject, of } from 'rxjs';
+import { Observable, Subject, of, throwError } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { QuestionService } from './question.service';
 
@@ -12,6 +13,7 @@ import { QuestionService } from './question.service';
     providedIn: 'root',
 })
 export class QuizService {
+    private randomQuizDetails: Partial<Quiz> | null = null;
     private baseURL = BASE_URL + '/quiz';
     private quizUpdateSubject = new Subject<void>();
     private quizUpdates: Observable<void> = this.quizUpdateSubject.asObservable();
@@ -23,6 +25,7 @@ export class QuizService {
         private http: HttpClient,
         private validateService: ValidateService,
         private questionService: QuestionService,
+        private dialog: MatSnackBar,
     ) {}
 
     getAllQuizzes(): Observable<Quiz[]> {
@@ -32,6 +35,13 @@ export class QuizService {
     getQuizById(id: string): Observable<Quiz> {
         const url = `${BASE_URL}/quiz/${id}`;
         return this.http.get<Quiz>(url);
+    }
+    getQuizDetailsById(id: string): Observable<Quiz> {
+        if (id === 'random-quiz') {
+            return this.randomQuizDetails ? of(this.randomQuizDetails as Quiz) : throwError(() => new Error('Quiz aléatoire non disponible'));
+        } else {
+            return this.getQuizById(id);
+        }
     }
 
     addNewQuiz(quiz: Quiz): Observable<Quiz> {
@@ -152,34 +162,33 @@ export class QuizService {
         saveAs(blob, quiz.name + '.json');
     }
 
-    createOrUpdateRandomQuiz(): Observable<Quiz> {
+    createRandomQuiz(): Observable<Quiz> {
         return this.questionService.hasEnoughQCMQuestions(5).pipe(
             switchMap((hasEnough) => {
                 if (!hasEnough) {
-                    throw new Error('Pas assez de questions QCM pour créer un quiz aléatoire.');
+                    this.dialog.open('Pas assez de questions QCM pour créer un quiz aléatoire.', 'Fermer', {
+                        duration: 3000,
+                    });
+                    return throwError(() => new Error('Pas assez de questions QCM pour créer un quiz aléatoire'));
                 }
                 return this.questionService.getRandomQuestions(5);
             }),
-            switchMap((questions) => {
-                return this.getAllQuizzes().pipe(
-                    map((quizzes) => quizzes.find((q) => q.name === 'Mode Aléatoire')),
-                    switchMap((existingQuiz) => {
-                        if (existingQuiz) {
-                            // eslint-disable-next-line no-underscore-dangle
-                            return this.updateQuizById(existingQuiz._id, { ...existingQuiz, questions });
-                        } else {
-                            const newRandomQuiz: Partial<Quiz> = {
-                                name: 'Mode Aléatoire',
-                                description: 'Un quiz généré aléatoirement.',
-                                duration: 20,
-                                visibility: true,
-                                questions,
-                            };
-                            return this.addNewQuiz(newRandomQuiz as Quiz);
-                        }
-                    }),
-                );
+            map((questions) => {
+                const randomQuiz: Partial<Quiz> = {
+                    _id: 'random-quiz',
+                    name: 'Mode Aléatoire',
+                    description: 'Un quiz généré aléatoirement.',
+                    duration: 20,
+                    visibility: true,
+                    questions,
+                };
+                this.randomQuizDetails = randomQuiz;
+                return randomQuiz as Quiz;
             }),
         );
+    }
+
+    getRandomQuizDetails(): Partial<Quiz> | null {
+        return this.randomQuizDetails;
     }
 }

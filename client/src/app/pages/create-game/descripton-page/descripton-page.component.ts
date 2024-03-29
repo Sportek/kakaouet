@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { Variables } from '@common/enum-variables';
 import { GameType, Question, Quiz } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -17,6 +16,7 @@ export class DescriptonPageComponent implements OnInit {
     question: Question[];
     notFound: number;
     private subscriptions = new Subscription();
+    private randomQuizId = 'random-quiz';
 
     // Toutes ces dépendances sont nécessaires
     // eslint-disable-next-line max-params
@@ -30,28 +30,43 @@ export class DescriptonPageComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        const routeParams = this.route.snapshot.paramMap;
-        this.notFound = Variables.NotFound;
-        const gameIdFromRoute = routeParams.get('gameId');
-        if (gameIdFromRoute) this.getQuiz(gameIdFromRoute);
+        this.loadQuizDetails();
     }
 
-    getQuiz(id: string): void {
+    loadQuizDetails() {
+        const quizId = this.route.snapshot.paramMap.get('gameId');
+        if (!quizId) {
+            this.router.navigateByUrl('/error-404');
+            return;
+        }
+        if (quizId === this.randomQuizId) {
+            this.getQuizDetails(quizId);
+        } else {
+            this.getQuizDetails(quizId);
+        }
+    }
+
+    getQuizDetails(quizId: string) {
         this.subscriptions.add(
-            this.quizService.getQuizById(id).subscribe({
+            this.quizService.getQuizDetailsById(quizId).subscribe({
                 next: (quiz) => {
+                    if (!quiz) {
+                        this.notificationService.error('Quiz introuvable.');
+                        this.router.navigateByUrl('/error-404');
+                        return;
+                    }
                     this.quiz = quiz;
                     this.question = quiz.questions;
                     this.changeDetectorRef.detectChanges();
                 },
-                error: (caughtError) => {
-                    if (caughtError.status === Variables.NotFound) {
-                        this.router.navigateByUrl('/error-404', { replaceUrl: true });
-                    }
+                error: () => {
+                    this.notificationService.error('Une erreur est survenue lors de la récupération du quiz.');
+                    this.router.navigateByUrl('/error-404', { replaceUrl: true });
                 },
             }),
         );
     }
+
     testGame(quizId: string) {
         this.gameService.createNewGame(quizId, GameType.Test);
     }
