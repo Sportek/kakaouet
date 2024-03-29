@@ -5,7 +5,8 @@ import { ValidateService } from '@app/services/validate/validate.service';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { saveAs } from 'file-saver';
 import { Observable, Subject, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
+import { QuestionService } from './question.service';
 
 @Injectable({
     providedIn: 'root',
@@ -21,6 +22,7 @@ export class QuizService {
     constructor(
         private http: HttpClient,
         private validateService: ValidateService,
+        private questionService: QuestionService,
     ) {}
 
     getAllQuizzes(): Observable<Quiz[]> {
@@ -148,5 +150,36 @@ export class QuizService {
         const fileContent = JSON.stringify(quizNoVisibilityNoId, null, space);
         const blob = new Blob([fileContent], { type: 'application/json' });
         saveAs(blob, quiz.name + '.json');
+    }
+
+    createOrUpdateRandomQuiz(): Observable<Quiz> {
+        return this.questionService.hasEnoughQCMQuestions(5).pipe(
+            switchMap((hasEnough) => {
+                if (!hasEnough) {
+                    throw new Error('Pas assez de questions QCM pour créer un quiz aléatoire.');
+                }
+                return this.questionService.getRandomQuestions(5);
+            }),
+            switchMap((questions) => {
+                return this.getAllQuizzes().pipe(
+                    map((quizzes) => quizzes.find((q) => q.name === 'Mode Aléatoire')),
+                    switchMap((existingQuiz) => {
+                        if (existingQuiz) {
+                            // eslint-disable-next-line no-underscore-dangle
+                            return this.updateQuizById(existingQuiz._id, { ...existingQuiz, questions });
+                        } else {
+                            const newRandomQuiz: Partial<Quiz> = {
+                                name: 'Mode Aléatoire',
+                                description: 'Un quiz généré aléatoirement.',
+                                duration: 20,
+                                visibility: true,
+                                questions,
+                            };
+                            return this.addNewQuiz(newRandomQuiz as Quiz);
+                        }
+                    }),
+                );
+            }),
+        );
     }
 }

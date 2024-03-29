@@ -15,6 +15,7 @@ export class CreatePageComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.getQuizzes();
+        this.initializeRandomQuiz();
     }
 
     ngOnDestroy() {
@@ -27,6 +28,19 @@ export class CreatePageComponent implements OnInit, OnDestroy {
         this.quizSubscription = this.quizService.getAllQuizzes().subscribe({
             next: (quizzes) => {
                 this.games = quizzes;
+            },
+        });
+    }
+
+    initializeRandomQuiz() {
+        this.quizService.createOrUpdateRandomQuiz().subscribe({
+            next: (randomQuiz) => {
+                if (randomQuiz) {
+                    this.games.unshift(randomQuiz);
+                }
+            },
+            error: (error) => {
+                console.error('Erreur lors de la création ou de la mise à jour du quiz aléatoire', error);
             },
         });
     }
