@@ -82,4 +82,8 @@ export class QuestionService {
             this.logger.error('Error adding new question: ', error);
         }
     }
+
+    async getQCMQuestions(): Promise<Question[]> {
+        return this.questionModel.find({ type: 'QCM' }).exec();
+    }
 }

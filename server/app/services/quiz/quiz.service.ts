@@ -4,6 +4,7 @@ import { QuestionFeedback } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { QuestionService } from '../question/question.service';
 import { mockQuizTable } from './mock-quiz';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class QuizService {
     constructor(
         @InjectModel(Quiz.name) public quizModel: Model<QuizDocument>,
         private readonly logger: Logger,
+        private questionService: QuestionService,
     ) {
         this.start();
     }
@@ -102,5 +104,21 @@ export class QuizService {
             }
         }
         return null;
+    }
+
+    async generateRandomQuiz(): Promise<Quiz> {
+        const qcmQuestions = await this.questionService.getQCMQuestions();
+        if (qcmQuestions.length < 5) throw new Error('Not enough QCM questions available.');
+        const randomQuestions = qcmQuestions.sort(() => 0.5 - Math.random()).slice(0, 5);
+
+        const randomQuiz: Quiz = {
+            name: 'Quiz Aléatoire',
+            description: 'Ce quiz est généré aléatoirement à partir des questions QCM.',
+            duration: 20,
+            visibility: true,
+            questions: randomQuestions,
+        };
+
+        return randomQuiz;
     }
 }

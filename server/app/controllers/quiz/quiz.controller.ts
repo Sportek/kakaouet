@@ -68,4 +68,14 @@ export class QuizController {
         if (feedback) return feedback;
         throw new HttpException('Impossible to find answers matching quizId and questionId', HttpStatus.BAD_REQUEST);
     }
+
+    @Get('/random')
+    async getRandomQuiz() {
+        try {
+            const randomQuiz = await this.quizService.generateRandomQuiz();
+            return randomQuiz;
+        } catch (error) {
+            throw new HttpException('Impossible to get random quiz', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

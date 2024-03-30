@@ -30,7 +30,7 @@ export class CreatePageComponent implements OnInit, OnDestroy {
     getQuizzes(): void {
         this.quizSubscription = this.quizService.getAllQuizzes().subscribe({
             next: (quizzes) => {
-                this.quizService.createRandomQuiz().subscribe({
+                this.quizService.getRandomQuiz().subscribe({
                     next: (randomQuiz) => {
                         this.games = [randomQuiz, ...quizzes];
                     },

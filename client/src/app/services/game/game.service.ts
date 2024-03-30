@@ -35,7 +35,7 @@ export class GameService {
         private socketService: SocketService,
         private notificationService: NotificationService,
         private chatService: ChatService,
-        private socketEventHandlerService: SocketEventHandlerService,
+        private socketEventHandlerService: SocketEventHandlerService, // private questionService: QuestionService,
     ) {
         this.initialise();
         this.registerListeners();
@@ -112,6 +112,9 @@ export class GameService {
                     case GameType.Test:
                         this.createTestGame(game);
                         break;
+                    case GameType.Random:
+                        this.createRandomGame(game);
+                        break;
                     default:
                         break;
                 }
@@ -162,6 +165,10 @@ export class GameService {
     }
 
     private createDefaultGame(game: Game) {
+        this.router.navigateByUrl('/waiting-room/' + game.code);
+        this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
+    }
+    private createRandomGame(game: Game) {
         this.router.navigateByUrl('/waiting-room/' + game.code);
         this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
     }
