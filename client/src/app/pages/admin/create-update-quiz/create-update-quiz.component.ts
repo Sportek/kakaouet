@@ -15,7 +15,7 @@ export class CreateUpdateQuizComponent implements OnInit {
     @ViewChild(QuestionOverlayComponent) questionOverlayComponent!: QuestionOverlayComponent;
 
     quiz: Quiz = {
-        name: '',
+        title: '',
         description: '',
         duration: 0,
         visibility: false,

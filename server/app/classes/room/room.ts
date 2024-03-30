@@ -45,7 +45,7 @@ export class Room {
         player.send(GameEvents.PlayerConfirmJoinGame, {
             code: this.code,
             isSuccess: true,
-            game: { code: this.game.code, quizName: this.game.quiz.name, type: GameType.Default },
+            game: { code: this.game.code, quizName: this.game.quiz.title, type: GameType.Default },
             players: this.players.map(
                 (p) =>
                     ({

@@ -12,28 +12,28 @@ export class OverlayService {
     private baseChoices: Choice[] = [
         {
             _id: 1,
-            label: 'Réponse A',
+            text: 'Réponse A',
             isCorrect: true,
         },
         {
             _id: 2,
-            label: 'Réponse B',
+            text: 'Réponse B',
             isCorrect: false,
         },
         {
             _id: 3,
-            label: 'Réponse C',
+            text: 'Réponse C',
             isCorrect: false,
         },
         {
             _id: 4,
-            label: 'Réponse D',
+            text: 'Réponse D',
             isCorrect: false,
         },
     ];
 
     private baseQuestion: Question = {
-        label: '',
+        text: '',
         points: 10,
         choices: cloneDeep(this.baseChoices),
     } as Question;
@@ -88,7 +88,7 @@ export class OverlayService {
             const currentIndex = this.currentQuestion.choices.length + 1;
             const newChoice: Choice = {
                 _id: currentIndex,
-                label: 'Ma réponse ' + currentIndex,
+                text: 'Ma réponse ' + currentIndex,
                 isCorrect: true,
             };
             this.currentQuestion.choices.push(newChoice);
@@ -128,7 +128,7 @@ export class OverlayService {
         }
         const validatedQuestion = this.validationService.validateQuestion(this.currentQuestion).object;
         const partialQuestionNoId: Partial<Question> = {
-            label: validatedQuestion.label,
+            text: validatedQuestion.text,
             points: validatedQuestion.points,
             createdAt: validatedQuestion.createdAt,
             lastModification: validatedQuestion.lastModification,

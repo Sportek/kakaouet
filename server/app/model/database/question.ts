@@ -16,7 +16,7 @@ export class Question {
 
     @ApiProperty()
     @Prop({ required: true })
-    label: string;
+    text: string;
 
     @ApiProperty()
     @Prop({ required: true })

@@ -35,7 +35,7 @@
                         <div class="text large-text">{{ getQuestion()?.points }}</div>
                     </div>
                     <div class="question large-text">
-                        {{ getQuestion()?.label }}
+                        {{ getQuestion()?.text }}
                     </div>
                 </div>
                 <div class="stats-container">
@@ -43,7 +43,7 @@
                         <div
                             *ngFor="let column of answers.choices[currentQuestion]; let i = index"
                             class="column-container"
-                            [matTooltip]="column.label"
+                            [matTooltip]="column.text"
                         >
                             <div
                                 class="column"

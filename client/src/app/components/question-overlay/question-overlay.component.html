@@ -15,7 +15,7 @@
                     <div class="first">
                         <mat-form-field appearance="fill">
                             <mat-label>Titre</mat-label>
-                            <input [(ngModel)]="currentQuestion.label" matInput placeholder="Titre de la question" name="title" />
+                            <input [(ngModel)]="currentQuestion.text" matInput placeholder="Titre de la question" name="title" />
                         </mat-form-field>
                         <mat-form-field *ngIf="!hasQuestionId" appearance="fill">
                             <mat-label>Type de question</mat-label>
@@ -60,10 +60,10 @@
                                 {{ i + 1 + '.' }}
                             </div>
                             <div *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)">
-                                {{ choice.label }}
+                                {{ choice.text }}
                             </div>
                             <div *ngIf="isModifyingChoiceMap.get(choice) && isModifyingChoiceMap.has(choice)">
-                                <input [(ngModel)]="choice.label" matInput placeholder="Titre de la question" name="title" class="input" />
+                                <input [(ngModel)]="choice.text" matInput placeholder="Titre de la question" name="title" class="input" />
                             </div>
                             <div class="icons">
                                 <mat-icon

@@ -146,7 +146,7 @@ describe('GameService', () => {
             updatedAt: new Date(),
             createdAt: new Date(),
             quiz: {
-                name: 'd',
+                title: 'd',
                 duration: 90,
                 description: 'dd',
                 visibility: true,

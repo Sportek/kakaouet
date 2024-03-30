@@ -1,7 +1,7 @@
 <div class="background">
     <div class="game" *ngFor="let quiz of quizList">
         <div class="quiz-name">
-            <div class="large-text">{{ quiz.name }}</div>
+            <div class="large-text">{{ quiz.title }}</div>
         </div>
         <div class="icons">
             <mat-icon [routerLink]="['/admin/create/quiz', quiz._id]" class="title-text">edit</mat-icon>

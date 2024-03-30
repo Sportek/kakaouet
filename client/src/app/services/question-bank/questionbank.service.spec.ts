@@ -20,13 +20,13 @@ describe('QuestionBankService', () => {
         const mockQuestions: Question[] = [
             {
                 _id: 'q1',
-                label: 'What is the capital of France?',
+                text: 'What is the capital of France?',
                 type: QuestionType.QCM,
                 choices: [
-                    { _id: 1, label: 'Paris', isCorrect: true },
-                    { _id: 2, label: 'Berlin', isCorrect: false },
-                    { _id: 3, label: 'Madrid', isCorrect: false },
-                    { _id: 4, label: 'Lisbon', isCorrect: false },
+                    { _id: 1, text: 'Paris', isCorrect: true },
+                    { _id: 2, text: 'Berlin', isCorrect: false },
+                    { _id: 3, text: 'Madrid', isCorrect: false },
+                    { _id: 4, text: 'Lisbon', isCorrect: false },
                 ],
                 points: 5,
                 createdAt: new Date(),
@@ -58,12 +58,12 @@ describe('QuestionBankService', () => {
     it('should toggle question selection correctly', () => {
         const question: Question = {
             _id: 'q1',
-            label: 'What is the capital of France?',
+            text: 'What is the capital of France?',
             type: QuestionType.QCM,
             choices: [
-                { _id: 1, label: 'Paris', isCorrect: true },
-                { _id: 2, label: 'Berlin', isCorrect: false },
-                { _id: 3, label: 'Madrid', isCorrect: false },
+                { _id: 1, text: 'Paris', isCorrect: true },
+                { _id: 2, text: 'Berlin', isCorrect: false },
+                { _id: 3, text: 'Madrid', isCorrect: false },
             ],
             points: 5,
             createdAt: new Date(),
@@ -81,12 +81,12 @@ describe('QuestionBankService', () => {
     it('should clear selected questions', () => {
         const question: Question = {
             _id: 'q1',
-            label: 'What is the capital of France?',
+            text: 'What is the capital of France?',
             type: QuestionType.QCM,
             choices: [
-                { _id: 1, label: 'Paris', isCorrect: true },
-                { _id: 2, label: 'Berlin', isCorrect: false },
-                { _id: 3, label: 'Madrid', isCorrect: false },
+                { _id: 1, text: 'Paris', isCorrect: true },
+                { _id: 2, text: 'Berlin', isCorrect: false },
+                { _id: 3, text: 'Madrid', isCorrect: false },
             ],
             points: 5,
             createdAt: new Date(),

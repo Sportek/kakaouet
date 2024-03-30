@@ -12,28 +12,28 @@ import { OverlayService } from './overlay.service';
 const baseChoices: Choice[] = [
     {
         _id: 1,
-        label: 'Réponse A',
+        text: 'Réponse A',
         isCorrect: true,
     },
     {
         _id: 2,
-        label: 'Réponse B',
+        text: 'Réponse B',
         isCorrect: false,
     },
     {
         _id: 3,
-        label: 'Réponse C',
+        text: 'Réponse C',
         isCorrect: false,
     },
     {
         _id: 4,
-        label: 'Réponse D',
+        text: 'Réponse D',
         isCorrect: false,
     },
 ];
 
 const baseQuestion: Question = {
-    label: '',
+    text: '',
     points: 10,
     choices: cloneDeep(baseChoices),
 } as Question;
@@ -207,17 +207,17 @@ describe('OverlayService', () => {
 
     it('should move last choice up', () => {
         const choices: Choice[] = [
-            { _id: 1, label: 'Answer 1', isCorrect: true },
-            { _id: 2, label: 'Answer 2', isCorrect: false },
-            { _id: 3, label: 'Answer 3', isCorrect: true },
-            { _id: 4, label: 'Answer 4', isCorrect: false },
+            { _id: 1, text: 'Answer 1', isCorrect: true },
+            { _id: 2, text: 'Answer 2', isCorrect: false },
+            { _id: 3, text: 'Answer 3', isCorrect: true },
+            { _id: 4, text: 'Answer 4', isCorrect: false },
         ];
 
         const modifiedChoices: Choice[] = [
-            { _id: 1, label: 'Answer 1', isCorrect: true },
-            { _id: 2, label: 'Answer 2', isCorrect: false },
-            { _id: 4, label: 'Answer 4', isCorrect: false },
-            { _id: 3, label: 'Answer 3', isCorrect: true },
+            { _id: 1, text: 'Answer 1', isCorrect: true },
+            { _id: 2, text: 'Answer 2', isCorrect: false },
+            { _id: 4, text: 'Answer 4', isCorrect: false },
+            { _id: 3, text: 'Answer 3', isCorrect: true },
         ];
 
         // @ts-ignore
@@ -233,10 +233,10 @@ describe('OverlayService', () => {
 
     it("shouldn't move choice up", () => {
         const choices: Choice[] = [
-            { _id: 1, label: 'Answer 1', isCorrect: true },
-            { _id: 2, label: 'Answer 2', isCorrect: false },
-            { _id: 3, label: 'Answer 3', isCorrect: true },
-            { _id: 4, label: 'Answer 4', isCorrect: false },
+            { _id: 1, text: 'Answer 1', isCorrect: true },
+            { _id: 2, text: 'Answer 2', isCorrect: false },
+            { _id: 3, text: 'Answer 3', isCorrect: true },
+            { _id: 4, text: 'Answer 4', isCorrect: false },
         ];
 
         // @ts-ignore
@@ -254,17 +254,17 @@ describe('OverlayService', () => {
 
     it('should move first choice down', () => {
         const choices: Choice[] = [
-            { _id: 1, label: 'Answer 1', isCorrect: true },
-            { _id: 2, label: 'Answer 2', isCorrect: false },
-            { _id: 3, label: 'Answer 3', isCorrect: true },
-            { _id: 4, label: 'Answer 4', isCorrect: false },
+            { _id: 1, text: 'Answer 1', isCorrect: true },
+            { _id: 2, text: 'Answer 2', isCorrect: false },
+            { _id: 3, text: 'Answer 3', isCorrect: true },
+            { _id: 4, text: 'Answer 4', isCorrect: false },
         ];
 
         const modifiedChoices: Choice[] = [
-            { _id: 2, label: 'Answer 2', isCorrect: false },
-            { _id: 1, label: 'Answer 1', isCorrect: true },
-            { _id: 3, label: 'Answer 3', isCorrect: true },
-            { _id: 4, label: 'Answer 4', isCorrect: false },
+            { _id: 2, text: 'Answer 2', isCorrect: false },
+            { _id: 1, text: 'Answer 1', isCorrect: true },
+            { _id: 3, text: 'Answer 3', isCorrect: true },
+            { _id: 4, text: 'Answer 4', isCorrect: false },
         ];
 
         // @ts-ignore
@@ -280,10 +280,10 @@ describe('OverlayService', () => {
 
     it("shouldn't move choice down", () => {
         const choices: Choice[] = [
-            { _id: 1, label: 'Answer 1', isCorrect: true },
-            { _id: 2, label: 'Answer 2', isCorrect: false },
-            { _id: 3, label: 'Answer 3', isCorrect: true },
-            { _id: 4, label: 'Answer 4', isCorrect: false },
+            { _id: 1, text: 'Answer 1', isCorrect: true },
+            { _id: 2, text: 'Answer 2', isCorrect: false },
+            { _id: 3, text: 'Answer 3', isCorrect: true },
+            { _id: 4, text: 'Answer 4', isCorrect: false },
         ];
         // @ts-ignore
         service.currentQuestion.choices = cloneDeep(choices);
