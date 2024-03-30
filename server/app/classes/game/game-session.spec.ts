@@ -348,7 +348,7 @@ describe('GameSession', () => {
             // eslint-disable-next-line @typescript-eslint/no-shadow
             const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
 
-            gameSession.broadcastMessage(mockPlayer as Player, messageContent);
+            gameSession.broadcastMessage(messageContent, mockPlayer as Player);
 
             expect(mockRoom.broadcast).toHaveBeenCalledWith(
                 GameEvents.PlayerSendMessage,
