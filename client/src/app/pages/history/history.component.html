@@ -1,0 +1,22 @@
+<div class="history-container">
+    <h1>KAKAOJET</h1>
+    <h2>Historique des parties</h2>
+    <div class="sort-controls">
+        <button (click)="sortByStartDate()">Trier selon Temps de début de partie</button>
+        <button (click)="sortByTitle()">Nom de Jeu</button>
+    </div>
+    <div class="order-controls">
+        <button (click)="sortAscending = !sortAscending">En ordre {{ sortAscending ? 'Ascendant' : 'Descendant' }}</button>
+    </div>
+    <div class="history-list">
+        <div *ngFor="let record of gameRecords" class="history-item">
+            <span>{{ record.gameTitle }}</span>
+            <span>{{ record.startTime | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
+            <span>{{ record.numberOfPlayers }} joueurs</span>
+            <span>Meilleur Score: {{ record.bestScore }}</span>
+        </div>
+    </div>
+    <div class="history-actions">
+        <button (click)="clearHistory()">Réinitialiser l'historique</button>
+    </div>
+</div>

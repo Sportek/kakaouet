@@ -141,7 +141,7 @@ export interface QuestionFeedback {
     correctSelectedChoicesIndices: number[];
 }
 
-export interface GameRecord {
+export interface History {
     gameTitle: string;
     startTime: Date;
     numberOfPlayers: number;

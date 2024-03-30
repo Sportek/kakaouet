@@ -1,14 +1,16 @@
+/* eslint-disable max-lines */
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BASE_URL } from '@app/constants';
 import { ChatService } from '@app/services/chat/chat.service';
+import { HistoryService } from '@app/services/history/history.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { NEGATIVE_SCORE } from '@common/constants';
 import { Variables } from '@common/enum-variables';
 import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
-import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
+import { Choice, Game, GameRole, GameState, GameType, History, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 import { SocketEventHandlerService } from './socket-event-handler.service';
 
@@ -36,6 +38,7 @@ export class GameService {
         private notificationService: NotificationService,
         private chatService: ChatService,
         private socketEventHandlerService: SocketEventHandlerService,
+        private historyService: HistoryService,
     ) {
         this.initialise();
         this.registerListeners();
@@ -212,6 +215,19 @@ export class GameService {
     }
 
     private handleDisplayQuizResults() {
+        const numberOfPlayers = this.players.getValue().length;
+
+        const bestScore = Math.max(...this.players.getValue().map((user) => user.score));
+
+        const history: History = {
+            gameTitle: this.game.getValue().quizName,
+            startTime: new Date(),
+            numberOfPlayers,
+            bestScore,
+        };
+
+        this.historyService.addToHistory(history).subscribe({});
+
         if (this.game.getValue().type === GameType.Test) {
             this.router.navigate(['/create/'], { replaceUrl: true });
             return;

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HistoryService } from '@app/services/history/history.service';
-import { GameRecord } from '@common/types';
+import { History } from '@common/types';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./history.component.scss'],
 })
 export class HistoryComponent implements OnInit {
-    gameRecords: GameRecord[] = [];
+    gameRecords: History[] = [];
     sortAscending = true;
     recordsSubscription: Subscription;
     historyCleared: boolean = false;
@@ -17,10 +17,9 @@ export class HistoryComponent implements OnInit {
     constructor(private historyService: HistoryService) {}
 
     ngOnInit(): void {
-        this.recordsSubscription = this.historyService.getAllRecords().subscribe((data: GameRecord[]) => {
+        this.recordsSubscription = this.historyService.getAllRecords().subscribe((data: History[]) => {
             this.gameRecords = data;
-            // eslint-disable-next-line eqeqeq
-            if (this.gameRecords.length == 0) {
+            if (this.gameRecords.length === 0) {
                 this.historyCleared = true;
             }
         });

@@ -1,0 +1,74 @@
+.history-container {
+    background: #5c00ff; // Adjust the color to match your theme
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    text-align: center;
+
+    h1 {
+        color: #ffd700; // Adjust the color to match your logo
+    }
+
+    .sort-controls,
+    .order-controls {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+
+        button {
+            background: #00ff00; // Green background for sorting buttons
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 0 5px;
+            color: white;
+            cursor: pointer;
+
+            &:hover {
+                background: lighten($color: #00ff00, $amount: 10); // Lighten the button on hover
+            }
+        }
+    }
+
+    .history-list {
+        margin: 20px 0;
+        .history-item {
+            background: #4b0082; // Deep purple for items
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            span {
+                margin: 0 10px;
+            }
+        }
+    }
+
+    .history-actions {
+        button {
+            background: #ff4500; // Orangered background for actions
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 0 5px;
+            color: white;
+            cursor: pointer;
+
+            &:hover {
+                background: lighten($color: #ff4500, $amount: 10); // Lighten the button on hover
+            }
+
+            &.disabled-button {
+                background: #ccc;
+                color: #666;
+                cursor: not-allowed;
+            }
+        }
+    }
+}
+
+// Function to handle lighten effect on hover
+@function lighten($color, $amount) {
+    @return mix(white, $color, $amount);
+}
