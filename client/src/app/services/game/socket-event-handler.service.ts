@@ -17,8 +17,10 @@ export class SocketEventHandlerService {
     handlePlayerGivesUp(data: GameEventsData.PlayerHasGiveUp, players: BehaviorSubject<PlayerClient[]>): void {
         players.next(
             players.getValue().map((player) => {
-                if (player.name === data.name) {player.interactionStatus = InteractionStatus.abandoned;
-                    player.hasGiveUp = true;}
+                if (player.name === data.name) {
+                    player.interactionStatus = InteractionStatus.abandoned;
+                    player.hasGiveUp = true;
+                }
                 return player;
             }),
         );
@@ -35,10 +37,10 @@ export class SocketEventHandlerService {
     handlePlayerMuted(data: GameEventsData.PlayerMuted, players: BehaviorSubject<PlayerClient[]>, client: BehaviorSubject<Client>) {
         players.next(players.getValue().map((player) => (player.name === data.name ? { ...player, isMuted: data.isMuted } : player)));
         if (data.name === client.getValue().name) {
-            if(data.isMuted){
+            if (data.isMuted) {
                 this.notificationService.error("Vous n'avez pas droit de clavarder");
-            }else{
-                this.notificationService.error("Vous avez le droit de clavarder a nouveau");
+            } else {
+                this.notificationService.error('Vous avez le droit de clavarder a nouveau');
             }
         }
     }
@@ -88,7 +90,15 @@ export class SocketEventHandlerService {
     handlePlayerJoinGame(data: GameEventsData.PlayerJoinGame, players: BehaviorSubject<PlayerClient[]>) {
         players.next([
             ...players.getValue(),
-            { name: data.name, role: data.role, isExcluded: data.isExcluded, score: data.score, hasGiveUp: data.hasGiveUp, isMuted: data.isMuted, interactionStatus: InteractionStatus.noInteraction},
+            {
+                name: data.name,
+                role: data.role,
+                isExcluded: data.isExcluded,
+                score: data.score,
+                hasGiveUp: data.hasGiveUp,
+                isMuted: data.isMuted,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
         ]);
     }
 

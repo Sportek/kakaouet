@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -119,11 +120,11 @@ export class GameService {
     }
 
     nextQuestion(): void {
-            this.players.getValue().forEach(player => {
-                if (player.interactionStatus !== InteractionStatus.abandoned) {
-                    player.interactionStatus = InteractionStatus.noInteraction;
-                }
-            });
+        this.players.getValue().forEach((player) => {
+            if (player.interactionStatus !== InteractionStatus.abandoned) {
+                player.interactionStatus = InteractionStatus.noInteraction;
+            }
+        });
         this.socketService.send(GameEvents.NextQuestion);
     }
 
@@ -178,7 +179,17 @@ export class GameService {
         this.client.next({ name: 'Organisateur', role: GameRole.Player, score: 0 });
         this.changeLockState();
         this.isLocked.next(true);
-        this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false, isMuted:false, interactionStatus: InteractionStatus.noInteraction }]);
+        this.players.next([
+            {
+                name: 'Organisateur',
+                role: GameRole.Player,
+                isExcluded: false,
+                score: 0,
+                hasGiveUp: false,
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
+        ]);
         this.startGame();
     }
 
