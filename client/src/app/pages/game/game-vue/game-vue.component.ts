@@ -98,6 +98,7 @@ export class GameVueComponent implements OnInit, OnDestroy {
     }
 
     setResponseAsFinal(): void {
+        if (this.actualQuestion?.question.type === QuestionType.QRL && this.answer) this.gameService.enterAnswer(this.answer as string);
         this.gameService.setResponseAsFinal();
     }
 

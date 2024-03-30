@@ -36,6 +36,11 @@
                             {{ i + 1 + '. ' + choice.label }}
                         </div></ng-container
                     >
+                    <ng-container *ngIf="actualQuestion.question.type === 'QRL'">
+                        <mat-form-field>
+                            <textarea matInput placeholder="Veuillez entrer votre réponse" [(ngModel)]="answer"></textarea>
+                        </mat-form-field>
+                    </ng-container>
                 </div>
             </div>
             <div class="buttons-container">

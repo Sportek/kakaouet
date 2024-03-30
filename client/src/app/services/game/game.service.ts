@@ -135,11 +135,21 @@ export class GameService {
         if (newAnswer) this.sendAnswer(newAnswer);
     }
 
+    enterAnswer(text: string): void {
+        if (this.isFinalAnswer.getValue()) return;
+        this.answer.next(text);
+        this.sendAnswer(text);
+    }
+
     setResponseAsFinal(): void {
         if (this.isFinalAnswer.getValue()) return;
         if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) {
             const answer = this.answer.getValue() as number[];
             if (answer.length === 0) return this.notificationService.error('Veuillez sélectionner au moins une réponse');
+        }
+        if (this.actualQuestion.getValue()?.question?.type === QuestionType.QRL) {
+            const answer = this.answer.getValue() as string;
+            if (answer.trim().length === 0) return this.notificationService.error('Veuillez entrer une réponse');
         }
         this.isFinalAnswer.next(true);
         this.confirmAnswer();
@@ -325,7 +335,6 @@ export class GameService {
             this.socketEventHandlerService.handleSpeedUpTimer();
         });
     }
-
     private registerListeners() {
         this.playerJoinGameListener();
         this.playerQuitGameListener();
