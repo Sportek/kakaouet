@@ -40,6 +40,19 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.filterPlayers().filter((player) => player.answers?.hasConfirmed).length;
     }
 
+    getAnswerQRL(): string[] {
+        const response: string[] = [];
+        if (this.actualQuestion?.question.type === 'QRL') {
+            for (const player of this.players) {
+                const answer = player.answers?.answer;
+                if (typeof answer === 'string') {
+                    response.push(answer);
+                }
+            }
+        }
+        return response;
+    }
+
     calculateChoices(): void {
         if (this.actualQuestion?.question?.type === QuestionType.QCM) {
             this.choices = this.actualQuestion.question.choices.map((choice, index) => {

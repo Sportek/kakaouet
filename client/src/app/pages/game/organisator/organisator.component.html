@@ -47,8 +47,8 @@
             <div class="game-controller-container">
                 <div class="title">Panneau de contrôle</div>
                 <div class="controls" *ngIf="true">
-                    <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
-                    <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button>
+                    <!-- <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button> -->
+                    <!-- <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button> -->
                     <div class="timer">
                         <mat-icon>
                             <span
@@ -83,6 +83,12 @@
                         <div [ngClass]="{ 'has-giveup': player.hasGiveUp }" class="player-name">{{ player.name }}</div>
                         <div class="player-name">(score: {{ player.score }})</div>
                     </div>
+                </div>
+            </div>
+
+            <div class="players-container-answer-qrl">
+                <div *ngFor="let ans of getAnswerQRL()">
+                {{ ans }}
                 </div>
             </div>
 
