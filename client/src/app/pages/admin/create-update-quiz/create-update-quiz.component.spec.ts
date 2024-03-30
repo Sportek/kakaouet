@@ -23,20 +23,20 @@ const currentDate = new Date();
 
 const mockQuestion1 = {
     _id: '1',
-    label: 'Question 1',
+    text: 'Question 1',
     points: 10,
     createdAt: currentDate,
     lastModification: currentDate,
     type: QuestionType.QCM,
     choices: [
-        { _id: 1, label: 'Choice 1', isCorrect: true },
-        { _id: 2, label: 'Choice 2', isCorrect: false },
+        { _id: 1, text: 'Choice 1', isCorrect: true },
+        { _id: 2, text: 'Choice 2', isCorrect: false },
     ],
 };
 
 const mockQuestion2 = {
     _id: '2',
-    label: 'Question 2',
+    text: 'Question 2',
     points: 5,
     createdAt: new Date('2024-02-12T00:00:00'),
     lastModification: new Date('2024-02-12T00:00:00'),
@@ -45,7 +45,7 @@ const mockQuestion2 = {
 
 const mockQuiz: Quiz = {
     _id: 'fakeID',
-    name: 'Test Quiz',
+    title: 'Test Quiz',
     description: "Ceci est la description d'un quiz",
     duration: 10,
     // Quiz is accessible to all users
@@ -162,10 +162,10 @@ describe('CreateUpdateQuizComponent', () => {
     describe('updateQuiz', () => {
         it('should update the quiz and call updateQuizById with the correct parameters', () => {
             const updatedQuiz: Quiz = cloneDeep(mockQuiz);
-            updatedQuiz.name = 'Updated Quiz Name';
+            updatedQuiz.title = 'Updated Quiz Name';
             updatedQuiz.lastModification = new Date();
 
-            component.quiz.name = updatedQuiz.name;
+            component.quiz.title = updatedQuiz.title;
             component.quiz.description = updatedQuiz.description;
             component.quiz.duration = updatedQuiz.duration;
             component.quiz.visibility = updatedQuiz.visibility;
@@ -196,14 +196,14 @@ describe('CreateUpdateQuizComponent', () => {
             component.quiz.questions = [mockQuestion1, mockQuestion2];
             const questionToRemove: Question = {
                 _id: '5',
-                label: 'Question 5',
+                text: 'Question 5',
                 points: 8,
                 createdAt: new Date('2024-02-12T00:00:00'),
                 lastModification: new Date('2024-02-12T00:00:00'),
                 type: QuestionType.QCM,
                 choices: [
-                    { _id: 1, label: 'Choice 1', isCorrect: true },
-                    { _id: 2, label: 'Choice 2', isCorrect: false },
+                    { _id: 1, text: 'Choice 1', isCorrect: true },
+                    { _id: 2, text: 'Choice 2', isCorrect: false },
                 ],
             };
             component.removeQuestion(questionToRemove);
@@ -216,7 +216,7 @@ describe('CreateUpdateQuizComponent', () => {
         it('should create a new quiz and call addNewQuiz with the correct parameters', () => {
             const newQuiz: Quiz = {
                 _id: 'fakeID',
-                name: 'New Quiz Name',
+                title: 'New Quiz Name',
                 description: 'New Quiz Description',
                 duration: 60,
                 visibility: false,
@@ -225,7 +225,7 @@ describe('CreateUpdateQuizComponent', () => {
                 lastModification: new Date(),
             };
 
-            component.quiz.name = newQuiz.name;
+            component.quiz.title = newQuiz.title;
             component.quiz.description = newQuiz.description;
             component.quiz.duration = newQuiz.duration;
             component.quiz.questions = [mockQuestion1, mockQuestion2];
@@ -235,7 +235,7 @@ describe('CreateUpdateQuizComponent', () => {
             component.createQuiz();
 
             expect(addNewQuizSpy).toHaveBeenCalledWith({
-                name: 'New Quiz Name',
+                title: 'New Quiz Name',
                 description: 'New Quiz Description',
                 duration: 60,
                 visibility: false,
@@ -247,14 +247,14 @@ describe('CreateUpdateQuizComponent', () => {
     describe('importQuestionToBank', () => {
         it('should import the question to the question bank if it does not already exist', () => {
             const questionToImport: Partial<Question> = {
-                label: 'Question 1',
+                text: 'Question 1',
                 points: 10,
                 createdAt: currentDate,
                 lastModification: currentDate,
                 type: QuestionType.QCM,
                 choices: [
-                    { _id: 1, label: 'Choice 1', isCorrect: true },
-                    { _id: 2, label: 'Choice 2', isCorrect: false },
+                    { _id: 1, text: 'Choice 1', isCorrect: true },
+                    { _id: 2, text: 'Choice 2', isCorrect: false },
                 ],
             };
 
@@ -322,7 +322,7 @@ describe('CreateUpdateQuizComponent', () => {
 
     describe('hasError', () => {
         it('should give no error message', () => {
-            component.quiz.name = 'TestId';
+            component.quiz.title = 'TestId';
             component.quiz.duration = 10;
             component.quiz.description = 'Voici un quiz de test';
             component.quiz.questions = [mockQuestion1];
@@ -331,13 +331,13 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger empty title error', () => {
-            component.quiz.name = '';
+            component.quiz.title = '';
 
             expect(component.hasError()).toEqual(QuizValidation.checkRequiredName.errorMessage);
         });
 
         it('should trigger too long title error', () => {
-            component.quiz.name =
+            component.quiz.title =
                 // eslint-disable-next-line max-len
                 'Ce titre est très loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong';
 
@@ -345,7 +345,7 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger too long word in title error', () => {
-            component.quiz.name =
+            component.quiz.title =
                 // eslint-disable-next-line max-len
                 'Ce mot est très looooooooooooooooooooooooooooooooooong';
 
@@ -353,7 +353,7 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger too short answer duration error', () => {
-            component.quiz.name = 'TestId';
+            component.quiz.title = 'TestId';
             component.quiz.duration = 1;
             component.quiz.description = 'Blablablabla';
             component.quiz.questions = [mockQuestion1];
@@ -362,7 +362,7 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger too long answer duration error', () => {
-            component.quiz.name = 'TestId';
+            component.quiz.title = 'TestId';
             component.quiz.duration = 100;
             component.quiz.description = 'Blablablabla';
             component.quiz.questions = [mockQuestion1];
@@ -371,7 +371,7 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger too short description error', () => {
-            component.quiz.name = 'TestId';
+            component.quiz.title = 'TestId';
             component.quiz.duration = 10;
             component.quiz.description = '';
 
@@ -379,7 +379,7 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger too long description error', () => {
-            component.quiz.name = 'TestId';
+            component.quiz.title = 'TestId';
             component.quiz.duration = 10;
             component.quiz.description =
                 // eslint-disable-next-line max-len
@@ -389,7 +389,7 @@ describe('CreateUpdateQuizComponent', () => {
         });
 
         it('should trigger missing questions error message', () => {
-            component.quiz.name = 'TestId';
+            component.quiz.title = 'TestId';
             component.quiz.duration = 10;
             component.quiz.description = 'Voici un quiz de test';
             component.quiz.questions = [];
@@ -406,7 +406,7 @@ describe('CreateUpdateQuizComponent', () => {
             // eslint-disable-next-line no-underscore-dangle
             component.getQuiz(mockQuiz._id);
 
-            expect(component.quiz.name).toEqual(mockQuiz.name);
+            expect(component.quiz.title).toEqual(mockQuiz.title);
             expect(component.quiz.duration).toEqual(mockQuiz.duration);
             expect(component.quiz.description).toEqual(mockQuiz.description);
             // eslint-disable-next-line no-underscore-dangle

@@ -13,13 +13,13 @@ describe('QuestionService', () => {
     const mockQuestion: Question = {
         _id: '123',
         type: QuestionType.QCM,
-        label: 'Who is the author of "The Lord of the Rings"?',
+        text: 'Who is the author of "The Lord of the Rings"?',
         points: 10,
         choices: [
-            { _id: 0, label: 'J.K. Rowling', isCorrect: true },
-            { _id: 1, label: 'J.R.R. Tolkien', isCorrect: false },
-            { _id: 2, label: 'George R.R. Martin', isCorrect: false },
-            { _id: 3, label: 'C.S. Lewis', isCorrect: false },
+            { _id: 0, text: 'J.K. Rowling', isCorrect: true },
+            { _id: 1, text: 'J.R.R. Tolkien', isCorrect: false },
+            { _id: 2, text: 'George R.R. Martin', isCorrect: false },
+            { _id: 3, text: 'C.S. Lewis', isCorrect: false },
         ],
         createdAt: new Date(),
         lastModification: new Date(),
@@ -143,46 +143,46 @@ describe('QuestionService', () => {
     describe('onQuestionListUpdate', () => {
         it('should modify question', () => {
             const quiz = {
-                name: 'Thomas',
+                title: 'Thomas',
                 description: 'Salut, je suis thomas et je pue',
                 duration: 10,
                 questions: [
                     {
                         _id: '1',
-                        label: 'Quelle est la capitale de la France ?',
+                        text: 'Quelle est la capitale de la France ?',
                         type: 'QCM',
                         points: 10,
                         choices: [
                             {
-                                label: 'Paris',
+                                text: 'Paris',
                                 isCorrect: true,
                             },
                             {
-                                label: 'Londres',
+                                text: 'Londres',
                                 isCorrect: false,
                             },
                             {
-                                label: 'Berlin',
+                                text: 'Berlin',
                                 isCorrect: false,
                             },
                         ],
                     },
                     {
                         _id: '2',
-                        label: "Quelle est la capitale de l'Allemagne ?",
+                        text: "Quelle est la capitale de l'Allemagne ?",
                         type: 'QCM',
                         points: 10,
                         choices: [
                             {
-                                label: 'Paris',
+                                text: 'Paris',
                                 isCorrect: false,
                             },
                             {
-                                label: 'Londres',
+                                text: 'Londres',
                                 isCorrect: false,
                             },
                             {
-                                label: 'Berlin',
+                                text: 'Berlin',
                                 isCorrect: true,
                             },
                         ],

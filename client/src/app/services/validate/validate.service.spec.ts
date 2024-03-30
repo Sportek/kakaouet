@@ -53,13 +53,13 @@ describe('ValidateService', () => {
     it('should validate quiz title length correctly', () => {
         const quizWithLongWord: Quiz = {
             _id: '1',
-            name: 'ThisIsAVeryLongWordThatExceedsTheLimit',
+            title: 'ThisIsAVeryLongWordThatExceedsTheLimit',
             description: 'Valid description',
             duration: 30,
             questions: [
                 {
                     _id: '1',
-                    label: 'Question 1',
+                    text: 'Question 1',
                     type: QuestionType.QCM,
                     points: 20,
                     choices: [],
@@ -81,7 +81,7 @@ describe('ValidateService', () => {
     it('should not validate question with unsupported type', () => {
         const invalidQuestion: Question = {
             _id: '1',
-            label: 'Question 1',
+            text: 'Question 1',
             type: 'INVALID_TYPE' as QuestionType,
             points: 20,
             choices: [],
@@ -97,7 +97,7 @@ describe('ValidateService', () => {
     it('should not validate question without choices for QCM type', () => {
         const invalidQuestion: Question = {
             _id: '1',
-            label: 'Question 1',
+            text: 'Question 1',
             type: QuestionType.QCM,
             points: 20,
             choices: [],
@@ -114,7 +114,7 @@ describe('ValidateService', () => {
     it('should not validate question with negative points', () => {
         const invalidQuestion: Question = {
             _id: '1',
-            label: 'Question 1',
+            text: 'Question 1',
             type: QuestionType.QCM,
             points: -20,
             choices: [],
@@ -130,7 +130,7 @@ describe('ValidateService', () => {
     it('should not validate question with non-integer points', () => {
         const invalidQuestion: Question = {
             _id: '1',
-            label: 'Question 1',
+            text: 'Question 1',
             type: QuestionType.QCM,
             points: 20.5,
             choices: [],
@@ -146,7 +146,7 @@ describe('ValidateService', () => {
     it('should not validate question with too long label', () => {
         const invalidQuestion: Question = {
             _id: '1',
-            label: 'ThisIsAVeryLongLabelThatExceedsTheLimitThisIsAVeryLongLabelThatExceedsTheLimit',
+            text: 'ThisIsAVeryLongLabelThatExceedsTheLimitThisIsAVeryLongLabelThatExceedsTheLimit',
             type: QuestionType.QCM,
             points: 20,
             choices: [],

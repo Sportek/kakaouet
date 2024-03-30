@@ -53,7 +53,7 @@ export interface Client { name: string; role: GameRole; score: number };
 export interface GameRestricted { code: string; quizName: string; type: GameType };
 export interface SocketResponse { isSuccess: boolean; message?: string };
 export interface ActualQuestion { question: Question; totalQuestion: number; actualIndex: number };
-export interface ChoiceData { label: string; amount: number; isCorrect: boolean };
+export interface ChoiceData { text: string; amount: number; isCorrect: boolean };
 export interface PlayerAnswers { [questionId: number]: CompletePlayerAnswer }
 export interface CompletePlayerAnswer { hasInterracted: boolean; hasConfirmed: boolean; hasConfirmedAt?: Date; answer: string | number[] }
 export enum SoundType {

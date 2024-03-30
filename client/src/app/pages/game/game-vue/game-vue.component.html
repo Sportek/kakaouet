@@ -9,7 +9,7 @@
                     <div class="text large-text">{{ actualQuestion?.question?.points }}</div>
                 </div>
                 <div class="question large-text">
-                    {{ actualQuestion?.question?.label }}
+                    {{ actualQuestion?.question?.text }}
                 </div>
                 <div class="icon-container">
                     <mat-icon>
@@ -40,7 +40,7 @@
                             <mat-icon class="full-icon" *ngIf="!choice.isCorrect && isDisplayingResults()"
                                 ><span class="material-symbols-outlined icon" style="color: white"> cancel </span></mat-icon
                             >
-                            <div>{{ i + 1 + '. ' + choice.label }}</div>
+                            <div>{{ i + 1 + '. ' + choice.text }}</div>
                         </div></ng-container
                     >
                 </div>

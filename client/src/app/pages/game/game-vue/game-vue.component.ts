@@ -105,7 +105,7 @@ export class GameVueComponent implements OnInit, OnDestroy {
         if (this.gameService.gameState.getValue() !== GameState.DisplayQuestionResults) return false;
         let isIncorrect = true;
         this.correctAnswers.forEach((correctChoice) => {
-            if (choice.label === correctChoice.label) isIncorrect = false;
+            if (choice.text === correctChoice.text) isIncorrect = false;
         });
         return isIncorrect;
     }
