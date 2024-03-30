@@ -36,9 +36,18 @@
                             {{ i + 1 + '. ' + choice.text }}
                         </div></ng-container
                     >
+                </div>
+            </div>
+            <div class="textbox-container">
+                <div *ngIf="actualQuestion">
                     <ng-container *ngIf="actualQuestion.question.type === 'QRL'">
-                        <mat-form-field>
-                            <textarea matInput placeholder="Veuillez entrer votre réponse" [(ngModel)]="answer"></textarea>
+                        <mat-form-field class="textbox-container">
+                            <textarea
+                                matInput
+                                placeholder="Veuillez entrer votre réponse"
+                                [(ngModel)]="answer"
+                                [disabled]="gameService.isFinalAnswer.getValue()"
+                            ></textarea>
                         </mat-form-field>
                     </ng-container>
                 </div>
