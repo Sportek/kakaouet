@@ -77,17 +77,17 @@
                 </div>
             </div>
 
-            <div class="players-container">
-                <div class="players">
-                    <div *ngFor="let player of filterPlayers()" class="player">
-                        <div [ngClass]="{ 'has-giveup': player.hasGiveUp }" class="player-name">{{ player.name }}</div>
-                        <div class="player-name">(score: {{ player.score }})</div>
-                    </div>
-                </div>
-            </div>
-
             <div class="chat">
                 <app-chat />
+            </div>
+        </div>
+
+        <div class="players-container">
+            <div class="players">
+                <div *ngFor="let player of filterPlayers()" class="player">
+                    <div [ngClass]="{ 'has-giveup': player.hasGiveUp }" class="player-name">{{ player.name }}</div>
+                    <div class="player-name">(score: {{ player.score }})</div>
+                </div>
             </div>
         </div>
     </div>
