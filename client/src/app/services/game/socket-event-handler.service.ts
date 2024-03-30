@@ -32,7 +32,7 @@ export class SocketEventHandlerService {
     }
 
     handlePlayerMuted(data: GameEventsData.PlayerMuted, players: BehaviorSubject<PlayerClient[]>, client: BehaviorSubject<Client>) {
-        players.next(players.getValue().map((player) => (player.name === data.name ? { ...player, isMuted: !data.isMuted } : player)));
+        players.next(players.getValue().map((player) => (player.name === data.name ? { ...player, isMuted: data.isMuted } : player)));
         if (data.name === client.getValue().name) {
             if(data.isMuted){
                 this.notificationService.error("Vous n'avez pas droit de clavarder");
