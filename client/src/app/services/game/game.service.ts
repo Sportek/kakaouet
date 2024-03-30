@@ -10,7 +10,17 @@ import { SoundService } from '@app/services/sound/sound.service';
 import { NEGATIVE_SCORE } from '@common/constants';
 import { Variables } from '@common/enum-variables';
 
-import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient, SoundType, InteractionStatus } from '@common/game-types';
+import {
+    ActualQuestion,
+    Answer,
+    Client,
+    GameEvents,
+    GameEventsData,
+    GameRestricted,
+    PlayerClient,
+    SoundType,
+    InteractionStatus,
+} from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 import { SocketEventHandlerService } from './socket-event-handler.service';
