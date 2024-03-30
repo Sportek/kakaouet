@@ -118,21 +118,21 @@ describe('GameVueComponent', () => {
     describe('isIncorrectAnswer', () => {
         it('should return false if not displaying results', () => {
             gameService.gameState.next(GameState.WaitingPlayers);
-            const result = component.isIncorrectAnswer({ _id: 1, label: 'Choix 1', isCorrect: true });
+            const result = component.isIncorrectAnswer({ _id: 1, text: 'Choix 1', isCorrect: true });
             expect(result).toBeFalse();
         });
 
         it('should return true if choice is incorrect', () => {
             gameService.gameState.next(GameState.DisplayQuestionResults);
-            gameService.correctAnswers.next([{ _id: 2, label: 'Choix 2', isCorrect: true }]);
-            const result = component.isIncorrectAnswer({ _id: 1, label: 'Choix 1', isCorrect: true });
+            gameService.correctAnswers.next([{ _id: 2, text: 'Choix 2', isCorrect: true }]);
+            const result = component.isIncorrectAnswer({ _id: 1, text: 'Choix 1', isCorrect: true });
             expect(result).toBeTrue();
         });
 
         it('should return false if choice is correct', () => {
             gameService.gameState.next(GameState.DisplayQuestionResults);
-            gameService.correctAnswers.next([{ _id: 1, label: 'Choix 1', isCorrect: true }]);
-            const result = component.isIncorrectAnswer({ _id: 1, label: 'Choix 1', isCorrect: true });
+            gameService.correctAnswers.next([{ _id: 1, text: 'Choix 1', isCorrect: true }]);
+            const result = component.isIncorrectAnswer({ _id: 1, text: 'Choix 1', isCorrect: true });
             expect(result).toBeFalse();
         });
     });

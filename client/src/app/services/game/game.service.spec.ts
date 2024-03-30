@@ -229,7 +229,7 @@ describe('GameService', () => {
             });
 
             const game = service.game.getValue();
-            expect(game).toEqual({ code: mockGame.code, quizName: mockGame.quiz.name, type: mockGame.type });
+            expect(game).toEqual({ code: mockGame.code, quizName: mockGame.quiz.title, type: mockGame.type });
         });
 
         it('should send to waiting room', () => {
@@ -557,7 +557,7 @@ describe('GameService', () => {
         mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
             callback({
                 scores: [{ name: 'Sportek', score: 12, bonus: 1 }],
-                choices: [[{ label: 'choice1', amount: 1, isCorrect: true }]],
+                choices: [[{ text: 'choice1', amount: 1, isCorrect: true }]],
                 questions: [WORKING_QUIZ.questions[0] as Question],
             });
         });
@@ -566,7 +566,7 @@ describe('GameService', () => {
         service.playerSendResultsListener();
         expect(service.answers.getValue()).toEqual({
             scores: [{ name: 'Sportek', score: 12, bonus: 1 }],
-            choices: [[{ label: 'choice1', amount: 1, isCorrect: true }]],
+            choices: [[{ text: 'choice1', amount: 1, isCorrect: true }]],
             questions: [WORKING_QUIZ.questions[0] as Question],
         });
     });

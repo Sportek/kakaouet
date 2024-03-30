@@ -89,7 +89,7 @@ export class QuestionService {
         const newQuestions = importedQuestions.filter(
             // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
-            (importedQuestion) => !quiz.questions.some((existingQuestion) => existingQuestion.label === importedQuestion.label),
+            (importedQuestion) => !quiz.questions.some((existingQuestion) => existingQuestion.text === importedQuestion.text),
         );
         // _id est forcé par MongoDB, accepté par le prof
         // eslint-disable-next-line no-underscore-dangle
@@ -98,7 +98,7 @@ export class QuestionService {
 
     importQuestionToBank(question: Question): void {
         const partialQuestionNoId: Partial<Question> = {
-            label: question.label,
+            text: question.text,
             points: question.points,
             createdAt: question.createdAt,
             lastModification: question.lastModification,
@@ -106,7 +106,7 @@ export class QuestionService {
         };
         if (partialQuestionNoId.type === 'QCM' && question.type === 'QCM') partialQuestionNoId.choices = question.choices;
         this.getQuestions().subscribe((questionsFromBank: Question[]) => {
-            const questionExistsInBank = questionsFromBank.some((existingQuestion: Question) => existingQuestion.label === partialQuestionNoId.label);
+            const questionExistsInBank = questionsFromBank.some((existingQuestion: Question) => existingQuestion.text === partialQuestionNoId.text);
             if (!questionExistsInBank) {
                 this.createQuestion(partialQuestionNoId as Question).subscribe({});
                 this.dialog.open('La question a bien était importé à la banque de question', 'Fermer', {

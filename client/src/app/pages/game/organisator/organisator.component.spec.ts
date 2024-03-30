@@ -72,8 +72,8 @@ describe('OrganisatorComponent', () => {
 
     it('calculatePercentage should return correct percentage', () => {
         component.choices = [
-            { label: 'Option 1', amount: 2, isCorrect: true },
-            { label: 'Option 2', amount: 3, isCorrect: false },
+            { text: 'Option 1', amount: 2, isCorrect: true },
+            { text: 'Option 2', amount: 3, isCorrect: false },
         ];
         const percentage = component.calculatePercentage(component.choices[0].amount);
         expect(percentage).toBeCloseTo(0.4, 1);

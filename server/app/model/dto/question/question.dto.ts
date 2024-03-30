@@ -20,7 +20,7 @@ export class QuestionDto {
     type: string;
 
     @IsString()
-    label: string;
+    text: string;
 
     @IsNumber()
     @IsDivisibleBy(QUESTION_MIN_POINTS)

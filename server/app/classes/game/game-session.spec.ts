@@ -63,26 +63,26 @@ describe('GameSession', () => {
         room = new Room('test-room', serverMock, mockGameService);
         quiz = {
             _id: 'quiz123',
-            name: 'Test Quiz',
+            title: 'Test Quiz',
             duration: 60,
             description: 'A quiz for testing',
             visibility: true,
             questions: [
                 {
                     _id: 'question1',
-                    label: 'Test Question',
+                    text: 'Test Question',
                     type: QuestionType.QCM,
                     points: 5,
-                    choices: [{ _id: 1, label: 'Choice 1', isCorrect: true }],
+                    choices: [{ _id: 1, text: 'Choice 1', isCorrect: true }],
                     createdAt: new Date(),
                     lastModification: new Date(),
                 },
                 {
                     _id: 'question2',
-                    label: 'Test Question 2',
+                    text: 'Test Question 2',
                     type: QuestionType.QCM,
                     points: 5,
-                    choices: [{ _id: 1, label: 'Choice 2', isCorrect: true }],
+                    choices: [{ _id: 1, text: 'Choice 2', isCorrect: true }],
                     createdAt: new Date(),
                     lastModification: new Date(),
                 },
@@ -392,7 +392,7 @@ describe('GameSession', () => {
         it('should not broadcast correct answers for a non-QCM question', () => {
             const mockQuestion: Question = {
                 _id: '123',
-                label: 'What is the capital of France?',
+                text: 'What is the capital of France?',
                 points: 10,
                 createdAt: new Date(),
                 lastModification: new Date(),
@@ -409,16 +409,16 @@ describe('GameSession', () => {
         it('should broadcast correct answers for a QCM question', () => {
             const mockQuestion: Question = {
                 _id: '123',
-                label: 'What is the capital of France?',
+                text: 'What is the capital of France?',
                 points: 10,
                 createdAt: new Date(),
                 lastModification: new Date(),
                 type: QuestionType.QCM,
                 choices: [
-                    { _id: 1, label: 'Paris', isCorrect: true },
-                    { _id: 2, label: 'London', isCorrect: false },
-                    { _id: 3, label: 'Berlin', isCorrect: false },
-                    { _id: 4, label: 'Rome', isCorrect: true },
+                    { _id: 1, text: 'Paris', isCorrect: true },
+                    { _id: 2, text: 'London', isCorrect: false },
+                    { _id: 3, text: 'Berlin', isCorrect: false },
+                    { _id: 4, text: 'Rome', isCorrect: true },
                 ],
             };
 
@@ -432,8 +432,8 @@ describe('GameSession', () => {
                 {},
                 {
                     choices: [
-                        { _id: 1, label: 'Paris', isCorrect: true },
-                        { _id: 4, label: 'Rome', isCorrect: true },
+                        { _id: 1, text: 'Paris', isCorrect: true },
+                        { _id: 4, text: 'Rome', isCorrect: true },
                     ],
                 },
             );

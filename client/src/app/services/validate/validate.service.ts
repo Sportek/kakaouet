@@ -86,14 +86,14 @@ const isoDateValidator = (dateString: string | undefined) => {
 
 export const choiceSchema = z
     .object({
-        label: z.string(),
+        text: z.string(),
         isCorrect: z.boolean(),
     })
     .strip();
 
 export const questionSchema = z
     .object({
-        label: z.string(),
+        text: z.string(),
         type: z.nativeEnum(QuestionType),
         points: z.number(),
         choices: z.array(choiceSchema).optional(),
@@ -105,7 +105,7 @@ export const questionSchema = z
 
 export const quizSchema = z
     .object({
-        name: z.string(),
+        title: z.string(),
         description: z.string(),
         duration: z.number(),
         questions: z.array(questionSchema),

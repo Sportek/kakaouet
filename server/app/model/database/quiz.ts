@@ -12,7 +12,7 @@ export class Quiz {
 
     @ApiProperty()
     @Prop({ required: true })
-    name: string;
+    title: string;
 
     @ApiProperty()
     @Prop({ required: true })
@@ -26,7 +26,6 @@ export class Quiz {
     @Prop({ default: false })
     visibility: boolean;
 
-    // TODO: Add questions
     @ApiProperty()
     @Prop({ type: () => [Question] })
     questions: Question[];
