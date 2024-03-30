@@ -42,10 +42,9 @@ export class HistoryComponent implements OnInit {
     }
 
     clearHistory(): void {
-        this.historyService.clearHistory().subscribe(() => {
-            this.gameRecords = [];
+        this.historyService.clearHistory().subscribe((data: History[]) => {
+            this.gameRecords = data;
         });
         this.historyCleared = true;
-        this.gameRecords = [];
     }
 }

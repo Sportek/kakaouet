@@ -3,11 +3,11 @@ import { IsDate, IsNumber, IsString, Min } from 'class-validator';
 
 export class HistoryDto {
     @IsString()
-    title: string;
+    gameTitle: string;
 
     @IsDate()
     @Type(() => Date)
-    date: Date;
+    startTime: Date;
 
     @IsNumber()
     @Min(1)

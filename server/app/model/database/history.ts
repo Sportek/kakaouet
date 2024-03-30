@@ -11,11 +11,11 @@ export class History extends Document {
 
     @ApiProperty()
     @Prop({ required: true })
-    title: string;
+    gameTitle: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    date: Date;
+    startTime: Date;
 
     @ApiProperty()
     @Prop({ required: true })

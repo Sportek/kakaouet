@@ -37,12 +37,13 @@ export class HistoryService {
         }
     }
 
-    async deleteHistory(): Promise<void> {
+    async deleteHistory(): Promise<History[]> {
         try {
             await this.historyModel.deleteMany({});
         } catch (error) {
             this.logger.error('Error deleting history records: ', error);
             throw error;
         }
+        return [];
     }
 }

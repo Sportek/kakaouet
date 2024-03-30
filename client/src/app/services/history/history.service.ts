@@ -15,8 +15,10 @@ export class HistoryService {
     addRecord(record: History) {
         this.history.push(record);
     }
+
     getAllRecords(): Observable<History[]> {
-        return this.http.get<History[]>(BASE_URL);
+        const url = `${BASE_URL}/history/`;
+        return this.http.get<History[]>(url);
     }
 
     getHistory(): History[] {
@@ -27,7 +29,9 @@ export class HistoryService {
         const url = `${BASE_URL}/history/`;
         return this.http.post<History>(url, { history });
     }
+
     clearHistory(): Observable<History[]> {
-        return this.http.delete<History[]>(BASE_URL);
+        const url = `${BASE_URL}/history/`;
+        return this.http.delete<History[]>(url);
     }
 }
