@@ -111,4 +111,9 @@ export const mockQuestions: QuestionDto[] = [
             { label: 'Lobelia', isCorrect: false },
         ],
     },
+    {
+        type: 'QRL',
+        label: 'Japon-Chine : concurrences régionales, ambitions mondiales ?',
+        points: 10,
+    },
 ];

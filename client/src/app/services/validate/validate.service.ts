@@ -33,13 +33,14 @@ export class ValidateService {
     validateQuestion(question: Question): ValidatedObject<Question> {
         const questionToValidate = ValidatedObject.fromObject<Question>(question);
         questionToValidate.check(QuestionValidation.checkRequiredLabel);
+        questionToValidate.check(QuestionValidation.checkMaxTitleLength);
         questionToValidate.check(QuestionValidation.checkRequiredType);
         questionToValidate.check(QuestionValidation.checkMaxPoints);
         questionToValidate.check(QuestionValidation.checkEnoughChoices);
         questionToValidate.check(QuestionValidation.checkMinPoints);
         questionToValidate.check(QuestionValidation.checkFormatPoints);
         questionToValidate.check(QuestionValidation.checkRequiredAnswers);
-        if (questionToValidate.object.type === QuestionType.QCM) {
+        if (questionToValidate.object.type === QuestionType.QCM && questionToValidate.object.choices) {
             questionToValidate.object.choices.forEach((choice, index) => {
                 const validatedChoice = this.validateChoice(choice);
                 if (!validatedChoice.isValid) {
@@ -95,7 +96,7 @@ export const questionSchema = z
         label: z.string(),
         type: z.nativeEnum(QuestionType),
         points: z.number(),
-        choices: z.array(choiceSchema),
+        choices: z.array(choiceSchema).optional(),
         createdAt: z.string().optional().refine(isoDateValidator, {
             message: 'createdAt doit être une date sous format ISO valide',
         }),
