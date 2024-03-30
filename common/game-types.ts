@@ -49,6 +49,7 @@ export interface PlayerClient {
     isExcluded: boolean;
     hasGiveUp: boolean;
     answers?: ExtendedAnswer;
+    isMuted: boolean;
 };
 export interface Client { name: string; role: GameRole; score: number };
 export interface GameRestricted { code: string; quizName: string; type: GameType };
@@ -95,6 +96,7 @@ export namespace GameEventsData {
         score: number;
         isExcluded: boolean;
         hasGiveUp: boolean;
+        isMuted: boolean;
     }
 
     export interface PlayerQuitGame {

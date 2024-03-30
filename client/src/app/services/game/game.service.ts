@@ -175,7 +175,7 @@ export class GameService {
         this.client.next({ name: 'Organisateur', role: GameRole.Player, score: 0 });
         this.changeLockState();
         this.isLocked.next(true);
-        this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false }]);
+        this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false, isMuted:false }]);
         this.startGame();
     }
 
