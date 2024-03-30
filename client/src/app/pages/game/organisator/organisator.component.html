@@ -82,6 +82,8 @@
                     <div *ngFor="let player of filterPlayers()" class="player">
                         <div [ngClass]="{ 'has-giveup': player.hasGiveUp }" class="player-name">{{ player.name }}</div>
                         <div class="player-name">(score: {{ player.score }})</div>
+                        <mat-icon *ngIf="player.isMuted" class="material-symbols-outlined" matTooltip="Unmute le joueur" (click)="toggleMutePlayer(player)">speaker_notes_off</mat-icon>
+                                <mat-icon *ngIf="!player.isMuted" class="material-symbols-outlined" matTooltip="Mute le joueur" (click)="toggleMutePlayer(player)">speaker_notes</mat-icon>
                     </div>
                 </div>
             </div>
