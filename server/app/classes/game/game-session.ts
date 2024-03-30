@@ -7,6 +7,7 @@ import { GameState, GameType, Question, QuestionType, Quiz } from '@common/types
 
 const START_GAME_DELAY = 5;
 const NEXT_QUESTION_DELAY = 3;
+const QRL_DELAY = 60;
 
 export class GameSession {
     code: string;
@@ -49,7 +50,8 @@ export class GameSession {
 
     startQuestionCooldown(): void {
         if (this.gameState !== GameState.PlayersAnswerQuestion) return;
-        this.simpleDelay(this.quiz.duration, () => {
+        const delay = this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QCM ? this.quiz.duration : QRL_DELAY;
+        this.simpleDelay(delay, () => {
             this.displayQuestionResults();
         });
     }
