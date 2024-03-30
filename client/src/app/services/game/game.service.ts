@@ -7,7 +7,7 @@ import { NotificationService } from '@app/services/notification/notification.ser
 import { SocketService } from '@app/services/socket/socket.service';
 import { NEGATIVE_SCORE } from '@common/constants';
 import { Variables } from '@common/enum-variables';
-import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
+import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, InteractionStatus, PlayerClient } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 import { SocketEventHandlerService } from './socket-event-handler.service';
@@ -119,9 +119,12 @@ export class GameService {
     }
 
     nextQuestion(): void {
-        // if (this.gameState.getValue() === GameState.DisplayQuestionResults && this.cooldown.getValue() === 0) {
+            this.players.getValue().forEach(player => {
+                if (player.interactionStatus !== InteractionStatus.abandoned) {
+                    player.interactionStatus = InteractionStatus.noInteraction;
+                }
+            });
         this.socketService.send(GameEvents.NextQuestion);
-        // }
     }
 
     selectAnswer(index: number): void {
@@ -175,7 +178,7 @@ export class GameService {
         this.client.next({ name: 'Organisateur', role: GameRole.Player, score: 0 });
         this.changeLockState();
         this.isLocked.next(true);
-        this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false, isMuted:false }]);
+        this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false, isMuted:false, interactionStatus: InteractionStatus.noInteraction }]);
         this.startGame();
     }
 

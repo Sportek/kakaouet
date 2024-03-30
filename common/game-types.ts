@@ -50,7 +50,15 @@ export interface PlayerClient {
     hasGiveUp: boolean;
     answers?: ExtendedAnswer;
     isMuted: boolean;
+    interactionStatus : InteractionStatus;
 };
+export enum InteractionStatus {
+    noInteraction = 'noInteraction',
+    interacted = 'interacted', 
+    finalized = 'finalized',
+    abandoned = 'abandoned'
+
+}
 export interface Client { name: string; role: GameRole; score: number };
 export interface GameRestricted { code: string; quizName: string; type: GameType };
 export interface SocketResponse { isSuccess: boolean; message?: string };

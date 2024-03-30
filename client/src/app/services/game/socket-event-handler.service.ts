@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { NotificationService } from '@app/services/notification/notification.service';
-import { ActualQuestion, Answer, Client, GameEventsData, PlayerClient } from '@common/game-types';
+import { ActualQuestion, Answer, Client, GameEventsData, InteractionStatus, PlayerClient } from '@common/game-types';
 import { QuestionType } from '@common/types';
 import { BehaviorSubject } from 'rxjs';
 
@@ -17,7 +17,8 @@ export class SocketEventHandlerService {
     handlePlayerGivesUp(data: GameEventsData.PlayerHasGiveUp, players: BehaviorSubject<PlayerClient[]>): void {
         players.next(
             players.getValue().map((player) => {
-                if (player.name === data.name) player.hasGiveUp = true;
+                if (player.name === data.name) {player.interactionStatus = InteractionStatus.abandoned;
+                    player.hasGiveUp = true;}
                 return player;
             }),
         );
@@ -51,6 +52,7 @@ export class SocketEventHandlerService {
         const player = players.getValue().find((p) => p.name === data.name);
         if (player) {
             if (player.answers) {
+                player.interactionStatus = InteractionStatus.finalized;
                 player.answers.hasConfirmed = true;
             }
             players.next([...players.getValue()]);
@@ -61,6 +63,7 @@ export class SocketEventHandlerService {
         const player = players.getValue().find((p) => p.name === data.name);
         if (player) {
             player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
+            player.interactionStatus = InteractionStatus.interacted;
             players.next([...players.getValue()]);
         }
     }
@@ -85,7 +88,7 @@ export class SocketEventHandlerService {
     handlePlayerJoinGame(data: GameEventsData.PlayerJoinGame, players: BehaviorSubject<PlayerClient[]>) {
         players.next([
             ...players.getValue(),
-            { name: data.name, role: data.role, isExcluded: data.isExcluded, score: data.score, hasGiveUp: data.hasGiveUp, isMuted: data.isMuted},
+            { name: data.name, role: data.role, isExcluded: data.isExcluded, score: data.score, hasGiveUp: data.hasGiveUp, isMuted: data.isMuted, interactionStatus: InteractionStatus.noInteraction},
         ]);
     }
 
