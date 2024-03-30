@@ -21,7 +21,7 @@ export class GameGateway {
         const player = gameSession.room.getPlayerWithSocketId(client.id);
         if (!(player && !player.isExcluded)) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
         
-        gameSession.broadcastMessage(null, 'Joueur '+ player.name + " n'est plus dans la partie.");
+        gameSession.broadcastMessage('Joueur '+ player.name + " n'est plus dans la partie.");
         if (gameSession.gameState === GameState.WaitingPlayers) {
             gameSession.room.removePlayer(player.name);
             return { isSuccess: true, message: 'Vous avez quitté la partie' };
@@ -120,7 +120,7 @@ export class GameGateway {
         if (!this.hasAutorisation(client, GameRole.Organisator))
             return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
-        gameSession.broadcastMessage(null, 'Joueur '+ data.name + " n'est plus dans la partie.");
+        gameSession.broadcastMessage('Joueur '+ data.name + " n'est plus dans la partie.");
         gameSession.room.banPlayer(data.name);
         return { isSuccess: true, message: 'Joueur banni' };
     }
@@ -163,7 +163,7 @@ export class GameGateway {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
         if(!player.isMuted){
-            gameSession.broadcastMessage(player, data.content);
+            gameSession.broadcastMessage(data.content, player);
             return { isSuccess: true, message: 'Message envoyé' };
         }
         return { isSuccess: true, message: 'Non-authorisé' };

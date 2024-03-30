@@ -114,7 +114,7 @@ export class GameSession {
         if (this.timer) this.timer.speedUp();
     }
 
-    broadcastMessage(player: Player | null, content: string): void {
+    broadcastMessage(content: string, player?: Player): void {
         const newDate: Date = new Date();
         const playerName = player && player.name ? player.name : '';
         this.room.broadcast(GameEvents.PlayerSendMessage, {}, { name: playerName, content, createdAt: newDate });
