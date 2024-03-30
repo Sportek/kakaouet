@@ -61,9 +61,13 @@ describe('WaitingRoomComponent', () => {
 
     it('should ban player when banPlayer method is called', () => {
         const player: PlayerClient = {
-            name: 'Test Player', role: GameRole.Player, score: 10, isExcluded: false, hasGiveUp: false,
+            name: 'Test Player',
+            role: GameRole.Player,
+            score: 10,
+            isExcluded: false,
+            hasGiveUp: false,
             isMuted: false,
-            interactionStatus: InteractionStatus.abandoned
+            interactionStatus: InteractionStatus.abandoned,
         };
         component.banPlayer(player);
         expect(gameService.banPlayer).toHaveBeenCalledWith(player);

@@ -46,7 +46,7 @@ const mockPlayer: PlayerClient = {
     isExcluded: false,
     hasGiveUp: false,
     isMuted: false,
-    interactionStatus: InteractionStatus.noInteraction
+    interactionStatus: InteractionStatus.noInteraction,
 };
 
 const mockOrganisator = {
@@ -56,7 +56,7 @@ const mockOrganisator = {
     isExcluded: false,
     hasGiveUp: false,
     isMuted: false,
-    interactionStatus: InteractionStatus.noInteraction
+    interactionStatus: InteractionStatus.noInteraction,
 };
 
 describe('GameService', () => {
@@ -255,7 +255,15 @@ describe('GameService', () => {
             expect(changeLockStateSpy).toHaveBeenCalled();
             expect(service.isLocked.getValue()).toBeTrue();
             expect(service.players.getValue()).toEqual([
-                { name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false, isMuted: false, interactionStatus: InteractionStatus.noInteraction },
+                {
+                    name: 'Organisateur',
+                    role: GameRole.Player,
+                    isExcluded: false,
+                    score: 0,
+                    hasGiveUp: false,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.noInteraction,
+                },
             ]);
             expect(startGameSpy).toHaveBeenCalled();
         });
@@ -649,10 +657,9 @@ describe('GameService', () => {
                 score: 0,
                 isExcluded: false,
                 hasGiveUp: false,
-                answers: { hasInterracted: false, hasConfirmed: false, answer: [0],
-                },isMuted: false,
+                answers: { hasInterracted: false, hasConfirmed: false, answer: [0] },
+                isMuted: false,
                 interactionStatus: InteractionStatus.noInteraction,
-            
             },
         ]);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -726,7 +733,7 @@ describe('GameService', () => {
                 isExcluded: true,
                 hasGiveUp: false,
                 isMuted: false,
-               interactionStatus: InteractionStatus.noInteraction,
+                interactionStatus: InteractionStatus.noInteraction,
             },
         ]);
         expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home', { replaceUrl: true });
@@ -752,7 +759,7 @@ describe('GameService', () => {
                 isExcluded: false,
                 hasGiveUp: true,
                 isMuted: false,
-               interactionStatus: InteractionStatus.abandoned,
+                interactionStatus: InteractionStatus.abandoned,
             },
         ]);
     });
