@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { SoundService } from '@app/services/sound/sound.service';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -15,7 +16,10 @@ export class SocketService {
     private messageQueue: unknown[] = [];
     private isSendingMessage = false;
 
-    constructor(private router: Router) {
+    constructor(
+        private router: Router,
+        private soundService: SoundService,
+    ) {
         this.socket = io(this.url);
         this.router.events.subscribe((event) => {
             if (!(event instanceof NavigationEnd)) return;
@@ -72,6 +76,7 @@ export class SocketService {
     private disconnect(): void {
         this.isConnected = false;
         this.socket.disconnect();
+        this.soundService.stopPlayingSound();
     }
 
     private processQueue() {

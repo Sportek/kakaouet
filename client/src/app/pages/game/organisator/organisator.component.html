@@ -9,7 +9,7 @@
                     <div class="text large-text">{{ actualQuestion?.question?.points }}</div>
                 </div>
                 <div class="question large-text">
-                    {{ actualQuestion?.question?.label }}
+                    {{ actualQuestion?.question?.text }}
                 </div>
                 <div class="icon-container">
                     <mat-icon>
@@ -21,7 +21,7 @@
 
             <div class="stats-container">
                 <div class="columns">
-                    <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.label">
+                    <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
                         <div
                             class="column"
                             [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"

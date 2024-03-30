@@ -15,12 +15,20 @@
                     <div class="first">
                         <mat-form-field appearance="fill">
                             <mat-label>Titre</mat-label>
-                            <input [(ngModel)]="currentQuestion.label" matInput placeholder="Titre de la question" name="title" />
+                            <input [(ngModel)]="currentQuestion.text" matInput placeholder="Titre de la question" name="title" />
                         </mat-form-field>
-                        <mat-form-field appearance="fill">
+                        <mat-form-field *ngIf="!hasQuestionId" appearance="fill">
                             <mat-label>Type de question</mat-label>
                             <mat-select [(ngModel)]="currentQuestion.type" name="type">
                                 <mat-option value="QCM">Choix multiples</mat-option>
+                                <mat-option value="QRL">Réponse libre</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field *ngIf="hasQuestionId" appearance="fill">
+                            <mat-label>Type de question</mat-label>
+                            <mat-select [(ngModel)]="currentQuestion.type" name="type">
+                                <mat-option *ngIf="currentQuestion.type === 'QCM'" value="QCM">Choix multiples</mat-option>
+                                <mat-option *ngIf="currentQuestion.type === 'QRL'" value="QRL">Réponse libre</mat-option>
                             </mat-select>
                         </mat-form-field>
                         <mat-form-field appearance="fill">
@@ -52,10 +60,10 @@
                                 {{ i + 1 + '.' }}
                             </div>
                             <div *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)">
-                                {{ choice.label }}
+                                {{ choice.text }}
                             </div>
                             <div *ngIf="isModifyingChoiceMap.get(choice) && isModifyingChoiceMap.has(choice)">
-                                <input [(ngModel)]="choice.label" matInput placeholder="Titre de la question" name="title" class="input" />
+                                <input [(ngModel)]="choice.text" matInput placeholder="Titre de la question" name="title" class="input" />
                             </div>
                             <div class="icons">
                                 <mat-icon
@@ -81,7 +89,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="choices-buttons" *ngIf="currentQuestion.choices.length < 4">
+                    <div class="choices-buttons" *ngIf="!currentQuestion.choices || currentQuestion.choices.length < 4">
                         <button mat-raised-button color="primary" (click)="addChoice()">Ajouter une réponse</button>
                     </div>
                 </div>

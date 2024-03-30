@@ -49,13 +49,13 @@ export enum QuestionType {
 
 export interface Choice {
     _id: number;
-    label: string;
+    text: string;
     isCorrect: boolean;
 }
 
 export interface BaseQuestion {
     _id: string;
-    label: string;
+    text: string;
     points: number;
     createdAt: Date;
     lastModification: Date;
@@ -63,12 +63,12 @@ export interface BaseQuestion {
 
 export type Question =
     | ({
-          type: QuestionType.QCM;
-          choices: Choice[];
-      } & BaseQuestion)
+        type: QuestionType.QCM;
+        choices: Choice[];
+    } & BaseQuestion)
     | ({
-          type: QuestionType.QRL;
-      } & BaseQuestion);
+        type: QuestionType.QRL;
+    } & BaseQuestion);
 
 export interface BaseUserResponse {
     _id: string;
@@ -78,17 +78,17 @@ export interface BaseUserResponse {
 }
 export type UserResponse =
     | ({
-          type: QuestionType.QCM;
-          choicesId: string[];
-      } & BaseUserResponse)
+        type: QuestionType.QCM;
+        choicesId: string[];
+    } & BaseUserResponse)
     | {
-          type: QuestionType.QRL;
-          answer: string;
-      };
+        type: QuestionType.QRL;
+        answer: string;
+    };
 
 export interface Quiz {
     _id: string;
-    name: string;
+    title: string;
     description: string;
     duration: number;
     // Quiz is accessible to all users

@@ -8,8 +8,8 @@ describe('QuestionDto', () => {
     it('should transform choices using ChoiceDto', () => {
         const plainObject = {
             type: 'example',
-            label: 'Sample Question',
-            choices: [{ label: 'Choice 1' }, { label: 'Choice 2' }],
+            text: 'Sample Question',
+            choices: [{ text: 'Choice 1' }, { text: 'Choice 2' }],
         };
         const questionDto = plainToClass(QuestionDto, plainObject);
 

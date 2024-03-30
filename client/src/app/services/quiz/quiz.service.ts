@@ -85,7 +85,7 @@ export class QuizService {
 
     createQuiz(quiz: Quiz): void {
         const newQuiz: Partial<Quiz> = {
-            name: quiz.name,
+            title: quiz.title,
             description: quiz.description,
             duration: quiz.duration,
             visibility: false,
@@ -97,7 +97,7 @@ export class QuizService {
     getQuiz(id: string, quiz: Quiz): void {
         this.getQuizById(id).subscribe({
             next: (quizToGet) => {
-                quiz.name = quizToGet.name;
+                quiz.title = quizToGet.title;
                 quiz.duration = quizToGet.duration;
                 quiz.description = quizToGet.description;
                 // _id est forcé par MongoDB, accepté par le prof
@@ -114,7 +114,7 @@ export class QuizService {
     }
 
     updateQuiz(updatedQuiz: Quiz, quiz: Quiz): void {
-        updatedQuiz.name = quiz.name;
+        updatedQuiz.title = quiz.title;
         updatedQuiz.description = quiz.description;
         updatedQuiz.duration = quiz.duration;
         updatedQuiz.visibility = false;
@@ -149,7 +149,7 @@ export class QuizService {
 
     generateQuizAsFile(quiz: Quiz) {
         const quizNoVisibilityNoId: Partial<Quiz> = {
-            name: quiz.name,
+            title: quiz.title,
             description: quiz.description,
             duration: quiz.duration,
             questions: quiz.questions,
@@ -159,7 +159,7 @@ export class QuizService {
         const space = 2;
         const fileContent = JSON.stringify(quizNoVisibilityNoId, null, space);
         const blob = new Blob([fileContent], { type: 'application/json' });
-        saveAs(blob, quiz.name + '.json');
+        saveAs(blob, quiz.title + '.json');
     }
 
     getRandomQuizDetails(): Partial<Quiz> | null {

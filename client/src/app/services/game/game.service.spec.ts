@@ -8,6 +8,7 @@ import { WORKING_QUIZ } from '@app/fake-quizzes';
 import { ChatService } from '@app/services/chat/chat.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { GameEvents, PlayerClient } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, Question, Quiz } from '@common/types';
 import { cloneDeep } from 'lodash';
@@ -62,6 +63,7 @@ describe('GameService', () => {
     let mockChatService: jasmine.SpyObj<ChatService>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockHttpService: jasmine.SpyObj<HttpClient>;
+    let soundServiceMocked: jasmine.SpyObj<SoundService>;
 
     beforeEach(() => {
         mockChatService = jasmine.createSpyObj(ChatService, ['initialize']);
@@ -69,6 +71,7 @@ describe('GameService', () => {
         mockNotificationService = jasmine.createSpyObj(NotificationService, ['error', 'success', 'info']);
         mockRouter = jasmine.createSpyObj(Router, ['navigateByUrl', 'navigate']);
         mockHttpService = jasmine.createSpyObj(HttpClient, ['post']);
+        soundServiceMocked = jasmine.createSpyObj(SoundService, ['startPlayingSound']);
 
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
@@ -79,6 +82,7 @@ describe('GameService', () => {
                 { provide: ChatService, useValue: mockChatService },
                 { provide: Router, useValue: mockRouter },
                 { provide: HttpClient, useValue: mockHttpService },
+                { provide: SoundService, useValue: soundServiceMocked },
             ],
         });
         service = TestBed.inject(GameService);
@@ -176,7 +180,7 @@ describe('GameService', () => {
         it('should send cooldown exceeded error', () => {
             service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            service.cooldown.next(15);
+            service.cooldown.next(9);
             service.speedUpTimer();
             expect(mockNotificationService.error).toHaveBeenCalledWith('Le temps requis minimum pour accélérer le timer est dépassé');
         });
@@ -199,7 +203,7 @@ describe('GameService', () => {
         it('should speed up timer', () => {
             service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            service.cooldown.next(5);
+            service.cooldown.next(12);
             service.speedUpTimer();
             expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.SpeedUpTimer);
         });
@@ -225,7 +229,7 @@ describe('GameService', () => {
             });
 
             const game = service.game.getValue();
-            expect(game).toEqual({ code: mockGame.code, quizName: mockGame.quiz.name, type: mockGame.type });
+            expect(game).toEqual({ code: mockGame.code, quizName: mockGame.quiz.title, type: mockGame.type });
         });
 
         it('should send to waiting room', () => {
@@ -553,7 +557,7 @@ describe('GameService', () => {
         mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
             callback({
                 scores: [{ name: 'Sportek', score: 12, bonus: 1 }],
-                choices: [[{ label: 'choice1', amount: 1, isCorrect: true }]],
+                choices: [[{ text: 'choice1', amount: 1, isCorrect: true }]],
                 questions: [WORKING_QUIZ.questions[0] as Question],
             });
         });
@@ -562,7 +566,7 @@ describe('GameService', () => {
         service.playerSendResultsListener();
         expect(service.answers.getValue()).toEqual({
             scores: [{ name: 'Sportek', score: 12, bonus: 1 }],
-            choices: [[{ label: 'choice1', amount: 1, isCorrect: true }]],
+            choices: [[{ text: 'choice1', amount: 1, isCorrect: true }]],
             questions: [WORKING_QUIZ.questions[0] as Question],
         });
     });

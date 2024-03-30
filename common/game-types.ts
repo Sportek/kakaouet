@@ -34,6 +34,7 @@ export enum GameEvents {
     PlayerSendMessage = 'playerSendMessage', // Event broadcasted to room containing player
     PlayerSendResults = 'playerSendResults', // Event sent to all players when the results are sent
     SendCorrectAnswers = 'playerSendCorrectAnswers', // Event sent to all players containing the correct answers
+    GameSpeedUpTimer = 'gameSpeedUpTimer', // Event sent to all players when the timer is speed up
 }
 
 // Différents types définis
@@ -52,9 +53,14 @@ export interface Client { name: string; role: GameRole; score: number };
 export interface GameRestricted { code: string; quizName: string; type: GameType };
 export interface SocketResponse { isSuccess: boolean; message?: string };
 export interface ActualQuestion { question: Question; totalQuestion: number; actualIndex: number };
-export interface ChoiceData { label: string; amount: number; isCorrect: boolean };
+export interface ChoiceData { text: string; amount: number; isCorrect: boolean };
 export interface PlayerAnswers { [questionId: number]: CompletePlayerAnswer }
 export interface CompletePlayerAnswer { hasInterracted: boolean; hasConfirmed: boolean; hasConfirmedAt?: Date; answer: string | number[] }
+export enum SoundType {
+    TimerSpeedUp = 'assets/sounds/speed-up.wav',
+    PlayingRoom = 'assets/sounds/lobby.mp3',
+}
+
 export interface Score {
     name: string;
     score: number;

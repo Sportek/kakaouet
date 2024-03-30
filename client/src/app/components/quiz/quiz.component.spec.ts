@@ -16,7 +16,7 @@ describe('QuizComponent', () => {
         mockQuizzes = [
             {
                 _id: '1',
-                name: 'Test Quiz 1',
+                title: 'Test Quiz 1',
                 description: 'A quiz for testing',
                 duration: 30,
                 visibility: true,
@@ -27,7 +27,7 @@ describe('QuizComponent', () => {
         ];
         const mockQuiz: Quiz = {
             _id: '1',
-            name: 'Test Quiz',
+            title: 'Test Quiz',
             description: 'Description for test quiz',
             duration: 30,
             visibility: true,
