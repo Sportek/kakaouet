@@ -17,10 +17,18 @@
                             <mat-label>Titre</mat-label>
                             <input [(ngModel)]="currentQuestion.label" matInput placeholder="Titre de la question" name="title" />
                         </mat-form-field>
-                        <mat-form-field appearance="fill">
+                        <mat-form-field *ngIf="!hasQuestionId" appearance="fill">
                             <mat-label>Type de question</mat-label>
                             <mat-select [(ngModel)]="currentQuestion.type" name="type">
                                 <mat-option value="QCM">Choix multiples</mat-option>
+                                <mat-option value="QRL">Réponse libre</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field *ngIf="hasQuestionId" appearance="fill">
+                            <mat-label>Type de question</mat-label>
+                            <mat-select [(ngModel)]="currentQuestion.type" name="type">
+                                <mat-option *ngIf="currentQuestion.type === 'QCM'" value="QCM">Choix multiples</mat-option>
+                                <mat-option *ngIf="currentQuestion.type === 'QRL'" value="QRL">Réponse libre</mat-option>
                             </mat-select>
                         </mat-form-field>
                         <mat-form-field appearance="fill">
@@ -81,7 +89,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="choices-buttons" *ngIf="currentQuestion.choices.length < 4">
+                    <div class="choices-buttons" *ngIf="!currentQuestion.choices || currentQuestion.choices.length < 4">
                         <button mat-raised-button color="primary" (click)="addChoice()">Ajouter une réponse</button>
                     </div>
                 </div>
