@@ -111,7 +111,10 @@ export class GameSession {
     }
 
     speedUpTimer(): void {
-        if (this.timer) this.timer.speedUp();
+        if (this.timer) {
+            this.timer.speedUp();
+            this.room.broadcast(GameEvents.GameSpeedUpTimer, {});
+        }
     }
 
     broadcastMessage(player: Player, content: string): void {
@@ -205,9 +208,9 @@ export class GameSession {
             const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
             const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
                 const amount = globalPlayerAnswers[i];
-                const name = choice.label;
+                const name = choice.text;
                 const isCorrect = choice.isCorrect;
-                return { label: name, amount, isCorrect };
+                return { text: name, amount, isCorrect };
             });
             choices.push(choiceData);
         });

@@ -12,7 +12,7 @@ describe('QuestionController', () => {
 
     const mockQuestion: Question = {
         type: 'QCM',
-        label: 'What is NestJS?',
+        text: 'What is NestJS?',
         points: 10,
         choices: [],
     };
@@ -27,7 +27,7 @@ describe('QuestionController', () => {
                         getAllQuestions: jest.fn().mockResolvedValue([mockQuestion]),
                         getQuestionById: jest.fn().mockResolvedValue(mockQuestion),
                         addNewQuestion: jest.fn().mockResolvedValue(mockQuestion),
-                        updateQuestionById: jest.fn().mockResolvedValue({ ...mockQuestion, label: 'Updated Question' }),
+                        updateQuestionById: jest.fn().mockResolvedValue({ ...mockQuestion, text: 'Updated Question' }),
                         deleteQuestionById: jest.fn().mockResolvedValue(undefined),
                         deleteAllQuestions: jest.fn().mockResolvedValue(undefined),
                         validateQuestionObject: jest.fn().mockResolvedValue(true),

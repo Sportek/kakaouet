@@ -14,7 +14,7 @@
                 <form #quizForm="ngForm" (ngSubmit)="onSubmit()">
                     <mat-form-field appearance="fill">
                         <mat-label>Titre</mat-label>
-                        <input [(ngModel)]="quiz.name" matInput placeholder="Titre du jeu" name="title" required />
+                        <input [(ngModel)]="quiz.title" matInput placeholder="Titre du jeu" name="title" required />
                     </mat-form-field>
 
                     <mat-form-field appearance="fill">
@@ -48,7 +48,7 @@
             <div class="questions-container">
                 <div class="questions large-text" required="true">
                     <div *ngFor="let quest of quiz.questions; let i = index" class="question-bar">
-                        <div class="question">{{ i + 1 }}. {{ quest.label }} ({{ quest.type }})</div>
+                        <div class="question">{{ i + 1 }}. ({{ quest.type }}) {{ quest.text }}</div>
                         <div class="icons">
                             <mat-icon (click)="moveQuestionUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
                             <mat-icon (click)="moveQuestionDown(i)" *ngIf="i < quiz.questions.length - 1">arrow_downward</mat-icon>

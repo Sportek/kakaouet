@@ -1,42 +1,42 @@
 export const WORKING_QUIZ = {
-    name: 'Thomas',
+    title: 'Thomas',
     description: 'Salut, je suis thomas et je pue',
     duration: 10,
     questions: [
         {
-            label: 'Quelle est la capitale de la France ?',
+            text: 'Quelle est la capitale de la France ?',
             type: 'QCM',
             points: 10,
             choices: [
                 {
-                    label: 'Paris',
+                    text: 'Paris',
                     isCorrect: true,
                 },
                 {
-                    label: 'Londres',
+                    text: 'Londres',
                     isCorrect: false,
                 },
                 {
-                    label: 'Berlin',
+                    text: 'Berlin',
                     isCorrect: false,
                 },
             ],
         },
         {
-            label: "Quelle est la capitale de l'Allemagne ?",
+            text: "Quelle est la capitale de l'Allemagne ?",
             type: 'QCM',
             points: 10,
             choices: [
                 {
-                    label: 'Paris',
+                    text: 'Paris',
                     isCorrect: false,
                 },
                 {
-                    label: 'Londres',
+                    text: 'Londres',
                     isCorrect: false,
                 },
                 {
-                    label: 'Berlin',
+                    text: 'Berlin',
                     isCorrect: true,
                 },
             ],
@@ -45,63 +45,63 @@ export const WORKING_QUIZ = {
 };
 
 export const BAD_QUIZ = {
-    name: 'Mon quiz',
+    title: 'Mon quiz',
     description: 'Description de mon quiz',
     duration: 12,
     questions: [
         {
-            label: '',
+            text: '',
             type: 'QCM',
             points: 12,
             choices: [
                 {
-                    label: 'Paris',
+                    text: 'Paris',
                     isCorrect: true,
                 },
                 {
-                    label: 'Londres',
+                    text: 'Londres',
                     isCorrect: true,
                 },
                 {
-                    label: 'Berlin',
+                    text: 'Berlin',
                     isCorrect: true,
                 },
             ],
         },
         {
-            label: "Quelle est la capitale de l'Allemagne ?",
+            text: "Quelle est la capitale de l'Allemagne ?",
             type: 'QCM',
             points: 10,
             choices: [
                 {
-                    label: '',
+                    text: '',
                     isCorrect: true,
                 },
                 {
-                    label: 'Londres',
+                    text: 'Londres',
                     isCorrect: false,
                 },
                 {
-                    label: 'Berlin',
+                    text: 'Berlin',
                     isCorrect: false,
                 },
             ],
         },
         {
-            label: "Quelle est la capitale de l'Allemagne ?",
+            text: "Quelle est la capitale de l'Allemagne ?",
             type: 'QRL',
             points: 10,
             choices: [
                 {
-                    label: 'Bobinours',
+                    text: 'Bobinours',
                     isCorrect: true,
                 },
                 {
-                    label: 'Londres',
+                    text: 'Londres',
                     isCorrect: false,
                 },
                 {
-                    label: 'Berlin',
+                    text: 'Berlin',
                     isCorrect: false,
                 },
             ],

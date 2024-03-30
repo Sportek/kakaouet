@@ -3,7 +3,7 @@
         <div class="game-information-container">
             <div class="game-title-container">
                 <div class="title title-text">
-                    {{ quiz.name }}
+                    {{ quiz.title }}
                 </div>
                 <div class="game-description-container">
                     <div class="description">{{ quiz.description }}</div>
@@ -13,7 +13,7 @@
             <div class="game-questions-container">
                 <div class="box-description">
                     <div *ngFor="let quest of question; let i = index">
-                        <p>{{ i + 1 }} - {{ quest.label }} ({{ quest.type }})</p>
+                        <p>{{ i + 1 }} - {{ quest.text }} ({{ quest.type }})</p>
                     </div>
                 </div>
             </div>

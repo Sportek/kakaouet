@@ -13,7 +13,7 @@ describe('QuizService', () => {
 
     const mockQuiz: Quiz = {
         _id: 'jjj',
-        name: 'Quiz Seigneur',
+        title: 'Quiz Seigneur',
         duration: 10,
         description: 'Testez vos connaissances sur le Seigneur des Anneaux.',
         visibility: true,
@@ -21,13 +21,13 @@ describe('QuizService', () => {
             {
                 _id: 'ddd',
                 type: QuestionType.QCM,
-                label: 'Qui a créé les Anneaux de Pouvoir ?',
+                text: 'Qui a créé les Anneaux de Pouvoir ?',
                 points: 10,
                 choices: [
-                    { _id: 0, label: 'Sauron', isCorrect: true },
-                    { _id: 0, label: 'Gandalf', isCorrect: false },
-                    { _id: 0, label: 'Elrond', isCorrect: false },
-                    { _id: 0, label: 'Celebrimbor', isCorrect: false },
+                    { _id: 0, text: 'Sauron', isCorrect: true },
+                    { _id: 0, text: 'Gandalf', isCorrect: false },
+                    { _id: 0, text: 'Elrond', isCorrect: false },
+                    { _id: 0, text: 'Celebrimbor', isCorrect: false },
                 ],
                 createdAt: new Date(),
                 lastModification: new Date(),
@@ -196,7 +196,7 @@ describe('QuizService', () => {
     it('should generate and save a quiz as a JSON file', () => {
         const quiz: Quiz = {
             _id: 'exampleId',
-            name: 'Example Quiz',
+            title: 'Example Quiz',
             description: 'A sample quiz for testing.',
             duration: 30,
             visibility: true,
@@ -204,7 +204,7 @@ describe('QuizService', () => {
             createdAt: new Date(),
             lastModification: new Date(),
         };
-        const expectedFileName = `${quiz.name}.json`;
+        const expectedFileName = `${quiz.title}.json`;
 
         // eslint-disable-next-line deprecation/deprecation
         const saveAsSpy = spyOn(FileSaver, 'saveAs');

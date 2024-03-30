@@ -20,7 +20,7 @@ export class QuestionDto {
     type: string;
 
     @IsString()
-    label: string;
+    text: string;
 
     @IsNumber()
     @IsDivisibleBy(QUESTION_MIN_POINTS)
@@ -33,6 +33,7 @@ export class QuestionDto {
     @ArrayMaxSize(QUESTION_MAX_CHOICES)
     @ValidateNested({ each: true })
     @Type(() => ChoiceDto)
+    @IsOptional()
     choices?: ChoiceDto[];
 
     @IsDate()

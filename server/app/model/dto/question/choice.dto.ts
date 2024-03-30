@@ -2,7 +2,7 @@ import { IsBoolean, IsString } from 'class-validator';
 
 export class ChoiceDto {
     @IsString()
-    label: string;
+    text: string;
 
     @IsBoolean()
     isCorrect: boolean;

@@ -5,7 +5,7 @@ import { QUIZ_DESCRIPTION_MAX_LENGTH, QUIZ_DESCRIPTION_MIN_LENGTH, QUIZ_MAX_SECO
 
 export class QuizDto {
     @IsString()
-    name: string;
+    title: string;
 
     @IsNumber()
     @Min(QUIZ_MIN_SECOND_TIME)

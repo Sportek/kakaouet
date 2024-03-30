@@ -16,7 +16,7 @@ describe('CreatePageComponent', () => {
         mockQuizzes = [
             {
                 _id: '123',
-                name: 'Quiz 1',
+                title: 'Quiz 1',
                 duration: 60,
                 description: 'This is the description of question 1',
                 visibility: true,
@@ -26,7 +26,7 @@ describe('CreatePageComponent', () => {
             },
             {
                 _id: '456',
-                name: 'Quiz 2',
+                title: 'Quiz 2',
                 duration: 60,
                 description: 'This is the description of question 2',
                 visibility: true,

@@ -7,6 +7,7 @@ import { ChatService } from '@app/services/chat/chat.service';
 import { HistoryService } from '@app/services/history/history.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { NEGATIVE_SCORE } from '@common/constants';
 import { Variables } from '@common/enum-variables';
 import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient } from '@common/game-types';
@@ -29,7 +30,6 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
-
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
         private router: Router,
@@ -38,12 +38,12 @@ export class GameService {
         private notificationService: NotificationService,
         private chatService: ChatService,
         private socketEventHandlerService: SocketEventHandlerService,
+        private soundService: SoundService,
         private historyService: HistoryService,
     ) {
         this.initialise();
         this.registerListeners();
     }
-
     initialise() {
         this.players = new BehaviorSubject<PlayerClient[]>([]);
         this.client = new BehaviorSubject<Client>({ name: '', role: GameRole.Organisator, score: 0 });
@@ -93,7 +93,7 @@ export class GameService {
     }
 
     speedUpTimer() {
-        if (this.getRequiredTime() < this.cooldown.getValue())
+        if (this.getRequiredTime() > this.cooldown.getValue())
             return this.notificationService.error('Le temps requis minimum pour accélérer le timer est dépassé');
         this.socketService.send(GameEvents.SpeedUpTimer);
     }
@@ -108,6 +108,7 @@ export class GameService {
             .pipe(catchError((error) => this.handleError(error)))
             .subscribe((game) => {
                 this.reinitialise(quizId, game);
+                this.soundService.startPlayingSound(SoundType.PlayingRoom, true);
                 switch (type) {
                     case GameType.Default:
                         this.createDefaultGame(game);
@@ -122,9 +123,7 @@ export class GameService {
     }
 
     nextQuestion(): void {
-        // if (this.gameState.getValue() === GameState.DisplayQuestionResults && this.cooldown.getValue() === 0) {
         this.socketService.send(GameEvents.NextQuestion);
-        // }
     }
 
     selectAnswer(index: number): void {
@@ -161,7 +160,7 @@ export class GameService {
         this.initialise();
         this.socketService.connect();
         this.socketService.send(GameEvents.CreateGame, { code: game.code, quizId: id, gameType: game.type });
-        this.game.next({ code: game.code, quizName: game.quiz.name, type: game.type });
+        this.game.next({ code: game.code, quizName: game.quiz.title, type: game.type });
     }
 
     private createDefaultGame(game: Game) {
@@ -179,8 +178,7 @@ export class GameService {
     }
 
     private getRequiredTime(): number {
-        if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) return Variables.QCMRequiredTimeLeft;
-        return Variables.QRLRequiredTimeLeft;
+        return this.actualQuestion.getValue()?.question?.type === QuestionType.QCM ? Variables.QCMRequiredTimeLeft : Variables.QRLRequiredTimeLeft;
     }
 
     private handleError(error: HttpErrorResponse) {
@@ -338,6 +336,12 @@ export class GameService {
         });
     }
 
+    private receiveSpeedUpTimer() {
+        this.socketService.listen(GameEvents.GameSpeedUpTimer, () => {
+            this.socketEventHandlerService.handleSpeedUpTimer();
+        });
+    }
+
     private registerListeners() {
         this.playerJoinGameListener();
         this.playerQuitGameListener();
@@ -354,5 +358,6 @@ export class GameService {
         this.receiveGiveUpPlayers();
         this.playerSendResultsListener();
         this.receiveCorrectAnswersListener();
+        this.receiveSpeedUpTimer();
     }
 }

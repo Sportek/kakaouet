@@ -77,7 +77,7 @@ describe('Room', () => {
     const roomCode = 'TEST123';
     const mockQuiz: Quiz = {
         _id: 'mockQuizId',
-        name: 'Mock Quiz',
+        title: 'Mock Quiz',
         description: 'A mock quiz for testing',
         duration: 30,
         visibility: true,

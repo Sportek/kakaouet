@@ -14,31 +14,31 @@ describe('Player', () => {
     let mockgameService: GameService;
     const six = 6;
     const quiz: Quiz = {
-        name: 'Quiz Héros de la Terre du Milieu',
+        title: 'Quiz Héros de la Terre du Milieu',
         duration: 10,
         description: 'Découvrez les héros emblématiques de la saga.',
         visibility: true,
         questions: [
             {
                 type: QuestionType.QCM,
-                label: 'Quel est le titre donné à Gandalf après sa résurrection ?',
+                text: 'Quel est le titre donné à Gandalf après sa résurrection ?',
                 points: 10,
                 choices: [
-                    { label: 'Gandalf le Gris', isCorrect: false },
-                    { label: 'Gandalf le Blanc', isCorrect: true },
-                    { label: 'Gandalf le Noir', isCorrect: false },
-                    { label: 'Gandalf le Rouge', isCorrect: false },
+                    { text: 'Gandalf le Gris', isCorrect: false },
+                    { text: 'Gandalf le Blanc', isCorrect: true },
+                    { text: 'Gandalf le Noir', isCorrect: false },
+                    { text: 'Gandalf le Rouge', isCorrect: false },
                 ],
             } as Question,
             {
                 type: 'QCM',
-                label: 'Quelle est la race de Legolas ?',
+                text: 'Quelle est la race de Legolas ?',
                 points: 10,
                 choices: [
-                    { label: 'Nain', isCorrect: false },
-                    { label: 'Elfe', isCorrect: true },
-                    { label: 'Homme', isCorrect: false },
-                    { label: 'Hobbit', isCorrect: false },
+                    { text: 'Nain', isCorrect: false },
+                    { text: 'Elfe', isCorrect: true },
+                    { text: 'Homme', isCorrect: false },
+                    { text: 'Hobbit', isCorrect: false },
                 ],
             } as Question,
         ],

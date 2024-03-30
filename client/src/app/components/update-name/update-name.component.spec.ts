@@ -74,7 +74,7 @@ describe('UpdateNameComponent', () => {
 
         component.sendNewName();
         fixture.detectChanges();
-        expect(quizServiceMock.addNewQuiz).toHaveBeenCalledWith(jasmine.objectContaining({ name: newName }));
+        expect(quizServiceMock.addNewQuiz).toHaveBeenCalledWith(jasmine.objectContaining({ title: newName }));
         expect(notificationService.success).toHaveBeenCalledWith('Le quiz a été importé avec succès');
         expect(dialogRefMock.close).toHaveBeenCalled();
     }));

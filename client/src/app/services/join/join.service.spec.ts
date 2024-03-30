@@ -4,8 +4,9 @@ import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { GAME_CODE_CHARACTERS, GAME_USERNAME_MAX_LENGTH } from '@common/constants';
-import { GameEvents } from '@common/game-types';
+import { GameEvents, SoundType } from '@common/game-types';
 import { GameRole } from '@common/types';
 import { JoinService } from './join.service';
 
@@ -39,8 +40,10 @@ describe('JoinService', () => {
     let gameService: MockGameService;
     let notificationService: MockNotificationService;
     let socketService: MockSocketService;
+    let soundServiceMock: jasmine.SpyObj<SoundService>;
 
     beforeEach(() => {
+        soundServiceMock = jasmine.createSpyObj('SoundService', ['startPlayingSound']);
         TestBed.configureTestingModule({
             providers: [
                 JoinService,
@@ -48,6 +51,7 @@ describe('JoinService', () => {
                 { provide: GameService, useClass: MockGameService },
                 { provide: NotificationService, useClass: MockNotificationService },
                 { provide: SocketService, useClass: MockSocketService },
+                { provide: SoundService, useValue: soundServiceMock },
             ],
         });
         service = TestBed.inject(JoinService);
@@ -137,6 +141,12 @@ describe('JoinService', () => {
             service['listenerConfirmJoinGame']();
 
             expect(notificationService.error).toHaveBeenCalledWith('Error joining game');
+        });
+
+        it('should start playing sound if player confirm join game is successful', () => {
+            service['listenerConfirmJoinGame']();
+
+            expect(soundServiceMock.startPlayingSound).toHaveBeenCalledWith(SoundType.PlayingRoom, true);
         });
     });
 });
