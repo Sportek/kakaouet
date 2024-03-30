@@ -57,6 +57,11 @@ export namespace QuizValidation {
 export namespace QuestionValidation {
     export const checkRequiredLabel = new Validate((question: Question) => !!question.label.trim(), "Le label d'une question est requis");
 
+    export const checkMaxTitleLength = new Validate(
+        (question: Question) => question.label.trim().length < Variables.MaxTitleCharacters,
+        'Le titre doit avoir moins de 150 caractères',
+    );
+
     export const checkRequiredType = new Validate(
         (question: Question) => question.type === QuestionType.QCM || question.type === QuestionType.QRL,
         "Le type d'une question est requis",
@@ -64,6 +69,7 @@ export namespace QuestionValidation {
 
     export const checkEnoughChoices = new Validate((question: Question) => {
         if (question.type !== QuestionType.QCM) return true;
+        if (!question.choices) return false;
         return question.choices.length >= Variables.QCMMinChoicesAmount && question.choices.length <= Variables.QCMMaxChoicesAmount;
     }, 'Une question QCM doit avoir de deux à quatre réponses');
 
@@ -84,6 +90,7 @@ export namespace QuestionValidation {
 
     export const checkRequiredAnswers = new Validate((question: Question) => {
         if (question.type !== QuestionType.QCM) return true;
+        if (!question.choices) return false;
         const correctChoices = question.choices.map((choice) => choice.isCorrect);
         return correctChoices.includes(true) && correctChoices.includes(false);
     }, 'Une question QCM doit avoir au moins une réponse correcte et une réponse incorrecte');

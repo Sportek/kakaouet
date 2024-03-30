@@ -151,4 +151,28 @@ export const mockQuizTable: QuizDto[] = [
             },
         ],
     },
+    {
+        name: 'Quiz de mathématique',
+        duration: 10,
+        description: 'Questions de mathématique du Cégép',
+        visibility: true,
+        questions: [
+            {
+                type: 'QCM',
+                label: 'Que vaut Integer(cos(x))dx" ?',
+                points: 50,
+                choices: [
+                    { label: 'sin(x) + C', isCorrect: true },
+                    { label: '- sin(x) + C', isCorrect: false },
+                    { label: '- cos(x) + C', isCorrect: false },
+                    { label: 'log(x) + C', isCorrect: false },
+                ],
+            },
+            {
+                type: 'QRL',
+                label: 'Combien y a-t-il de dizaines dans 10 000 ?',
+                points: 10,
+            },
+        ],
+    },
 ];

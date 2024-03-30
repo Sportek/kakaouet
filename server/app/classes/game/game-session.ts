@@ -111,7 +111,10 @@ export class GameSession {
     }
 
     speedUpTimer(): void {
-        if (this.timer) this.timer.speedUp();
+        if (this.timer) {
+            this.timer.speedUp();
+            this.room.broadcast(GameEvents.GameSpeedUpTimer, {});
+        }
     }
 
     broadcastMessage(content: string, player?: Player): void {

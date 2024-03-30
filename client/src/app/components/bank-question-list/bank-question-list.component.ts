@@ -2,6 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { sortQuestionByDate } from '@app/classes/utils';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
+import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question } from '@common/types';
 import { Subscription } from 'rxjs';
@@ -19,11 +20,13 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
     constructor(
         private questionService: QuestionService,
         public dialog: MatDialog,
+        private overlayService: OverlayService,
     ) {}
 
     ngOnInit(): void {
         this.subscriptions.add(this.questionService.getQuestionUpdates().subscribe(() => this.getAllQuestions()));
         this.getAllQuestions();
+        this.overlayService.resetIsPartOfQuiz();
     }
 
     ngOnDestroy(): void {

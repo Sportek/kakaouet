@@ -6,9 +6,11 @@ import { BASE_URL } from '@app/constants';
 import { ChatService } from '@app/services/chat/chat.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { NEGATIVE_SCORE } from '@common/constants';
 import { Variables } from '@common/enum-variables';
-import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, InteractionStatus, PlayerClient } from '@common/game-types';
+
+import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient, SoundType, InteractionStatus } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 import { SocketEventHandlerService } from './socket-event-handler.service';
@@ -28,7 +30,6 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
-
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
         private router: Router,
@@ -37,11 +38,11 @@ export class GameService {
         private notificationService: NotificationService,
         private chatService: ChatService,
         private socketEventHandlerService: SocketEventHandlerService,
+        private soundService: SoundService,
     ) {
         this.initialise();
         this.registerListeners();
     }
-
     initialise() {
         this.players = new BehaviorSubject<PlayerClient[]>([]);
         this.client = new BehaviorSubject<Client>({ name: '', role: GameRole.Organisator, score: 0 });
@@ -91,7 +92,7 @@ export class GameService {
     }
 
     speedUpTimer() {
-        if (this.getRequiredTime() < this.cooldown.getValue())
+        if (this.getRequiredTime() > this.cooldown.getValue())
             return this.notificationService.error('Le temps requis minimum pour accélérer le timer est dépassé');
         this.socketService.send(GameEvents.SpeedUpTimer);
     }
@@ -106,6 +107,7 @@ export class GameService {
             .pipe(catchError((error) => this.handleError(error)))
             .subscribe((game) => {
                 this.reinitialise(quizId, game);
+                this.soundService.startPlayingSound(SoundType.PlayingRoom, true);
                 switch (type) {
                     case GameType.Default:
                         this.createDefaultGame(game);
@@ -194,8 +196,7 @@ export class GameService {
     }
 
     private getRequiredTime(): number {
-        if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) return Variables.QCMRequiredTimeLeft;
-        return Variables.QRLRequiredTimeLeft;
+        return this.actualQuestion.getValue()?.question?.type === QuestionType.QCM ? Variables.QCMRequiredTimeLeft : Variables.QRLRequiredTimeLeft;
     }
 
     private handleError(error: HttpErrorResponse) {
@@ -346,6 +347,12 @@ export class GameService {
         });
     }
 
+    private receiveSpeedUpTimer() {
+        this.socketService.listen(GameEvents.GameSpeedUpTimer, () => {
+            this.socketEventHandlerService.handleSpeedUpTimer();
+        });
+    }
+
     private registerListeners() {
         this.playerJoinGameListener();
         this.playerQuitGameListener();
@@ -363,5 +370,6 @@ export class GameService {
         this.playerSendResultsListener();
         this.receiveCorrectAnswersListener();
         this.receiveMutedPlayers();
+        this.receiveSpeedUpTimer();
     }
 }

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { NotificationService } from '@app/services/notification/notification.service';
-import { ActualQuestion, Answer, Client, GameEventsData, InteractionStatus, PlayerClient } from '@common/game-types';
+
+import { SoundService } from '@app/services/sound/sound.service';
+import { ActualQuestion, Answer, Client, GameEventsData, PlayerClient, SoundType, InteractionStatus } from '@common/game-types';
 import { QuestionType } from '@common/types';
 import { BehaviorSubject } from 'rxjs';
 
@@ -12,6 +14,7 @@ export class SocketEventHandlerService {
     constructor(
         private router: Router,
         private notificationService: NotificationService,
+        private soundService: SoundService,
     ) {}
 
     handlePlayerGivesUp(data: GameEventsData.PlayerHasGiveUp, players: BehaviorSubject<PlayerClient[]>): void {
@@ -110,5 +113,9 @@ export class SocketEventHandlerService {
                 return player;
             }),
         );
+    }
+
+    handleSpeedUpTimer() {
+        this.soundService.startPlayingSound(SoundType.TimerSpeedUp);
     }
 }

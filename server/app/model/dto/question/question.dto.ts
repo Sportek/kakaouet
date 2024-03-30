@@ -33,6 +33,7 @@ export class QuestionDto {
     @ArrayMaxSize(QUESTION_MAX_CHOICES)
     @ValidateNested({ each: true })
     @Type(() => ChoiceDto)
+    @IsOptional()
     choices?: ChoiceDto[];
 
     @IsDate()
