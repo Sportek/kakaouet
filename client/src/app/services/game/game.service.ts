@@ -150,6 +150,8 @@ export class GameService {
         if (this.actualQuestion.getValue()?.question?.type === QuestionType.QRL) {
             const answer = this.answer.getValue() as string;
             if (answer.trim().length === 0) return this.notificationService.error('Veuillez entrer une réponse');
+            if (answer.trim().length > Variables.MaxCharacters)
+                return this.notificationService.error('Le texte doit être de moins de 200 caractères');
         }
         this.isFinalAnswer.next(true);
         this.confirmAnswer();
