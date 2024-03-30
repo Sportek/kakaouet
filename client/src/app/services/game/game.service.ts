@@ -150,7 +150,7 @@ export class GameService {
         this.socketService.send(GameEvents.BanPlayer, { name: player.name });
     }
 
-    mutePlayer(player: PlayerClient) {
+    toggleMutePlayer(player: PlayerClient) {
         this.socketService.send(GameEvents.MutePlayer, { name: player.name });
     }
 
