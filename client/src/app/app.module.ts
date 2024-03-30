@@ -37,6 +37,7 @@ import { JoinComponent } from './pages/game/join/join.component';
 import { OrganisatorComponent } from './pages/game/organisator/organisator.component';
 import { ResultsComponent } from './pages/game/result-statistics/result-statistics.component';
 import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.component';
+import { HistoryComponent } from './pages/history/history.component';
 
 /**
  * Main module that is used in main.ts.
@@ -74,6 +75,7 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         UpdateNameComponent,
         OrganisatorComponent,
         ResultsComponent,
+        HistoryComponent,
     ],
     imports: [
         AppMaterialModule,
