@@ -47,7 +47,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                     if (!player.answers) return false;
                     return (player.answers.answer as number[]).includes(index);
                 }).length;
-                return { label: choice.label, amount, isCorrect: choice.isCorrect };
+                return { text: choice.text, amount, isCorrect: choice.isCorrect };
             });
         }
     }

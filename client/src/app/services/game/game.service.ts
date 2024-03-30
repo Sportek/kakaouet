@@ -157,7 +157,7 @@ export class GameService {
         this.initialise();
         this.socketService.connect();
         this.socketService.send(GameEvents.CreateGame, { code: game.code, quizId: id, gameType: game.type });
-        this.game.next({ code: game.code, quizName: game.quiz.name, type: game.type });
+        this.game.next({ code: game.code, quizName: game.quiz.title, type: game.type });
     }
 
     private createDefaultGame(game: Game) {

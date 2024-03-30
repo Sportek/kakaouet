@@ -13,15 +13,15 @@ export class Validate {
 }
 
 export namespace QuizValidation {
-    export const checkRequiredName = new Validate((quiz: Quiz) => !!quiz.name.trim(), "Le nom d'un quiz est requis");
+    export const checkRequiredName = new Validate((quiz: Quiz) => !!quiz.title.trim(), "Le nom d'un quiz est requis");
 
     export const checkMaxTitleLength = new Validate(
-        (quiz: Quiz) => quiz.name.trim().length < Variables.MaxTitleCharacters,
+        (quiz: Quiz) => quiz.title.trim().length < Variables.MaxTitleCharacters,
         'Le titre doit avoir moins de 150 caractères',
     );
 
-    export const checkMaxWordLength = new Validate(({ name }: Quiz) => {
-        for (const word of name.split(' ')) {
+    export const checkMaxWordLength = new Validate(({ title }: Quiz) => {
+        for (const word of title.split(' ')) {
             if (word.length > Variables.MaxWordLength) {
                 return false;
             }
@@ -55,10 +55,10 @@ export namespace QuizValidation {
 }
 
 export namespace QuestionValidation {
-    export const checkRequiredLabel = new Validate((question: Question) => !!question.label.trim(), "Le label d'une question est requis");
+    export const checkRequiredLabel = new Validate((question: Question) => !!question.text.trim(), "Le label d'une question est requis");
 
     export const checkMaxTitleLength = new Validate(
-        (question: Question) => question.label.trim().length < Variables.MaxTitleCharacters,
+        (question: Question) => question.text.trim().length < Variables.MaxTitleCharacters,
         'Le titre doit avoir moins de 150 caractères',
     );
 
@@ -98,6 +98,6 @@ export namespace QuestionValidation {
 
 export namespace ChoiceValidation {
     export const checkRequiredLabel = new Validate((choice: Choice) => {
-        return !!choice.label.trim();
+        return !!choice.text.trim();
     }, "Le label d'une réponse est requis");
 }

@@ -27,7 +27,7 @@ export class UpdateNameComponent implements OnDestroy {
     ) {}
 
     sendNewName() {
-        this.data.quiz.name = this.newName;
+        this.data.quiz.title = this.newName;
         this.subscription.add(
             this.quizService.addNewQuiz(this.data.quiz).subscribe({
                 next: () => {

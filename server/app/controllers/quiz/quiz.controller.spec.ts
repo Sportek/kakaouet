@@ -11,7 +11,7 @@ describe('QuizController', () => {
     let service: QuizService;
 
     const mockQuiz = {
-        name: 'Test Quiz',
+        title: 'Test Quiz',
         duration: 30,
         description: 'A test quiz',
         visibility: true,
@@ -64,20 +64,20 @@ describe('QuizController', () => {
 
         it('should return array of correct choices indices if index is provided', async () => {
             jest.spyOn(service, 'getQuizById').mockResolvedValue({
-                name: 'Quiz 1',
+                title: 'Quiz 1',
                 duration: 60,
                 description: 'This is the description of question 1',
                 visibility: true,
                 questions: [
                     {
                         type: 'QCM',
-                        label: 'What is the capital of France?',
+                        text: 'What is the capital of France?',
                         points: 10,
                         choices: [
-                            { label: 'Paris', isCorrect: true },
-                            { label: 'Berlin', isCorrect: false },
-                            { label: 'London', isCorrect: false },
-                            { label: 'Madrid', isCorrect: false },
+                            { text: 'Paris', isCorrect: true },
+                            { text: 'Berlin', isCorrect: false },
+                            { text: 'London', isCorrect: false },
+                            { text: 'Madrid', isCorrect: false },
                         ],
                     },
                 ],

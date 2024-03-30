@@ -9,7 +9,7 @@
                     <div class="text large-text">{{ actualQuestion?.question?.points }}</div>
                 </div>
                 <div class="question large-text">
-                    {{ actualQuestion?.question?.label }}
+                    {{ actualQuestion?.question?.text }}
                 </div>
                 <div class="icon-container">
                     <mat-icon>
@@ -33,7 +33,7 @@
                             }"
                             (click)="selectAnswer(i)"
                         >
-                            {{ i + 1 + '. ' + choice.label }}
+                            {{ i + 1 + '. ' + choice.text }}
                         </div></ng-container
                     >
                 </div>

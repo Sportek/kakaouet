@@ -44,7 +44,7 @@ describe('BankQuestionListComponent', () => {
         const questionMock: Question[] = [
             {
                 _id: '1',
-                label: 'Question 1',
+                text: 'Question 1',
                 type: QuestionType.QRL,
                 points: 10,
                 createdAt: new Date(),
@@ -67,7 +67,7 @@ describe('BankQuestionListComponent', () => {
     it('should open a confirmation dialog and delete a question on confirm', fakeAsync(() => {
         const questionMock: Question = {
             _id: '1',
-            label: 'Question 1',
+            text: 'Question 1',
             type: QuestionType.QRL,
             points: 10,
             createdAt: new Date(),
@@ -93,7 +93,7 @@ describe('BankQuestionListComponent', () => {
     it('should not delete a question if confirmation dialog is declined', fakeAsync(() => {
         const questionMock: Question = {
             _id: '1',
-            label: 'Question 1',
+            text: 'Question 1',
             type: QuestionType.QRL,
             points: 10,
             createdAt: new Date(),
@@ -118,7 +118,7 @@ describe('BankQuestionListComponent', () => {
         component.visibility = [QuestionType.QCM];
         const questionMock: Question = {
             _id: '1',
-            label: 'Question 1',
+            text: 'Question 1',
             type: QuestionType.QRL,
             points: 10,
             createdAt: new Date(),
@@ -132,7 +132,7 @@ describe('BankQuestionListComponent', () => {
         const questionMocks: Question[] = [
             {
                 _id: '1',
-                label: 'Question 1',
+                text: 'Question 1',
                 type: QuestionType.QRL,
                 points: 10,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
@@ -140,7 +140,7 @@ describe('BankQuestionListComponent', () => {
             },
             {
                 _id: '2',
-                label: 'Question 2',
+                text: 'Question 2',
                 type: QuestionType.QRL,
                 points: 20,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
@@ -162,7 +162,7 @@ describe('BankQuestionListComponent', () => {
         const questionMocks: Question[] = [
             {
                 _id: '1',
-                label: 'Question 1',
+                text: 'Question 1',
                 type: QuestionType.QRL,
                 points: 10,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
@@ -170,7 +170,7 @@ describe('BankQuestionListComponent', () => {
             },
             {
                 _id: '2',
-                label: 'Question 2',
+                text: 'Question 2',
                 type: QuestionType.QRL,
                 points: 20,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),

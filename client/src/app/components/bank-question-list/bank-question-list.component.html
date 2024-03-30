@@ -3,7 +3,7 @@
         <div *ngFor="let question of questionList">
             <div *ngIf="isVisible(question)" class="question">
                 <div class="question-name">
-                    <div class="large-text">({{ question.type }}) {{ question.label }}</div>
+                    <div class="large-text">({{ question.type }}) {{ question.text }}</div>
                 </div>
                 <div class="icons">
                     <mat-icon class="title-text" (click)="modifyQuestionById(question._id)">edit</mat-icon>

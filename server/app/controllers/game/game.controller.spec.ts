@@ -22,17 +22,17 @@ const mockGame: Game = {
     ],
     quiz: {
         _id: 'quiz1',
-        name: 'Test Quiz',
+        title: 'Test Quiz',
         description: 'A quiz for testing',
         duration: 30,
         visibility: true,
         questions: [
             {
                 _id: 'question1',
-                label: 'Test Question',
+                text: 'Test Question',
                 type: QuestionType.QCM,
                 points: 5,
-                choices: [{ _id: 1, label: 'Choice 1', isCorrect: true }],
+                choices: [{ _id: 1, text: 'Choice 1', isCorrect: true }],
                 createdAt: new Date(),
                 lastModification: new Date(),
             },

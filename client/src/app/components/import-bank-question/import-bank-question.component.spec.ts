@@ -11,19 +11,19 @@ describe('QuestionBankImportComponent', () => {
     const mockQuestions: Question[] = [
         {
             _id: 'q1',
-            label: 'Question 1',
+            text: 'Question 1',
             points: 10,
             createdAt: new Date(),
             lastModification: new Date(),
             type: QuestionType.QCM,
             choices: [
-                { _id: 1, label: 'Choice 1', isCorrect: true },
-                { _id: 2, label: 'Choice 2', isCorrect: false },
+                { _id: 1, text: 'Choice 1', isCorrect: true },
+                { _id: 2, text: 'Choice 2', isCorrect: false },
             ],
         },
         {
             _id: 'q2',
-            label: 'Question 2',
+            text: 'Question 2',
             points: 5,
             createdAt: new Date(),
             lastModification: new Date(),
