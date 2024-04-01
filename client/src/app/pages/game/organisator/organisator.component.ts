@@ -42,7 +42,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     getAnswerQRL(): string[] {
         const response: string[] = [];
-        if (this.actualQuestion?.question.type === 'QRL') {
+        if (this.actualQuestion?.question.type === QuestionType.QRL) {
             for (const player of this.players) {
                 const answer = player.answers?.answer;
                 if (typeof answer === 'string') {
@@ -51,6 +51,10 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
             }
         }
         return response;
+    }
+
+    isQRL(): boolean {
+        return this.actualQuestion?.question.type === QuestionType.QRL;
     }
 
     calculateChoices(): void {

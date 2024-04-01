@@ -18,37 +18,50 @@
                     <div class="text large-text">{{ cooldown }}</div>
                 </div>
             </div>
-
-            <div class="stats-container">
-                <div class="columns">
-                    <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
-                        <div
-                            class="column"
-                            [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
-                            [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
-                        ></div>
-                        <div class="column-label">{{ 'Choix ' + (i + 1) }} ({{ column.amount }})</div>
-                    </div>
-                </div>
-                <div class="legend">
-                    <div class="state">
-                        <div class="color isCorrect"></div>
-                        <div class="label">Correct</div>
-                    </div>
-                    <div class="stats">
-                        {{ getAnswerAmount() + '/' + players.length }}
-                    </div>
-                    <div class="state">
-                        <div class="color isIncorrect"></div>
-                        <div class="label">Incorrect</div>
+            
+            <div class="stats-container" *ngIf="isQRL()">
+                <div class="players-container-answer-qrl">
+                    <div *ngFor="let ans of getAnswerQRL()">
+                        réponse : {{ ans }}
                     </div>
                 </div>
             </div>
+
+            <ng-container *ngIf="!isQRL()">
+                <div class="stats-container">
+                    <div class="columns">
+                        <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
+                            <div
+                                class="column"
+                                [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
+                                [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
+                            ></div>
+                            <div class="column-label">{{ 'Choix ' + (i + 1) }} ({{ column.amount }})</div>
+                        </div>
+                    </div>
+                    <div class="legend">
+                        <div class="state">
+                            <div class="color isCorrect"></div>
+                            <div class="label">Correct</div>
+                        </div>
+                        <div class="stats">
+                            {{ getAnswerAmount() + '/' + players.length }}
+                        </div>
+                        <div class="state">
+                            <div class="color isIncorrect"></div>
+                            <div class="label">Incorrect</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+
+
             <div class="game-controller-container">
                 <div class="title">Panneau de contrôle</div>
                 <div class="controls" *ngIf="true">
-                    <!-- <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button> -->
-                    <!-- <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button> -->
+                    <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
+                    <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button>
                     <div class="timer">
                         <mat-icon>
                             <span
@@ -85,13 +98,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="players-container-answer-qrl">
-                <div *ngFor="let ans of getAnswerQRL()">
-                {{ ans }}
-                </div>
-            </div>
-
             <div class="chat">
                 <app-chat />
             </div>
