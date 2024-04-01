@@ -109,6 +109,67 @@
             }
         }
 
+        .stats-container-qrl {
+            background-color: $purple-800;
+            height: 20rem;
+            width: 100%;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: baseline;
+            justify-content: flex-start;
+            gap: 1rem;
+            .players-container-answer-qrl {
+                width: auto; 
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+                padding: 0.5rem;
+            }
+            .columns {
+                height: 80%;
+                width: 100%;
+                text-align: center;
+                padding: 0 2rem;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: row;
+                align-items: flex-end;
+                justify-content: space-around;
+                gap: 0.5rem;
+                .column-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-end;
+                    height: 100%;
+                    gap: 0.5rem;
+                    .column {
+                        width: 5rem;
+                    }
+                }
+            }
+
+            .legend {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-around;
+                gap: 0.5rem;
+                width: 100%;
+
+                .state {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                }
+            }
+        }
+
         .game-controller-container {
             width: 100%;
             background-color: $purple-800;

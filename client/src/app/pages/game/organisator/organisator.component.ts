@@ -16,6 +16,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     players: PlayerClient[];
     choices: ChoiceData[];
     timerIsRunning;
+    selectedResponse: string | null = null;
 
     currentQuestion: number;
     private subscriptions: Subscription[];
@@ -40,17 +41,26 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.filterPlayers().filter((player) => player.answers?.hasConfirmed).length;
     }
 
-    getAnswerQRL(): string[] {
-        const response: string[] = [];
+    getAnswerQRL(): { name: string; answer: string }[] {
+        const responses: { name: string; answer: string }[] = [];
         if (this.actualQuestion?.question.type === QuestionType.QRL) {
             for (const player of this.players) {
                 const answer = player.answers?.answer;
                 if (typeof answer === 'string') {
-                    response.push(answer);
+                    responses.push({ name: player.name, answer });
                 }
             }
         }
-        return response;
+        return responses.sort((playerA, playerB) => playerA.name.localeCompare(playerB.name));
+    }
+
+    getPlayers(): string[] {
+        return this.getAnswerQRL().map((player) => player.name);
+    }
+
+    selectPlayer(name: string): void {
+        const player = this.getAnswerQRL().find((p) => p.name === name);
+        this.selectedResponse = player ? player.answer : null;
     }
 
     isQRL(): boolean {

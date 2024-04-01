@@ -19,13 +19,20 @@
                 </div>
             </div>
             
-            <div class="stats-container" *ngIf="isQRL()">
+            <div class="stats-container-qrl" *ngIf="isQRL()">
                 <div class="players-container-answer-qrl">
-                    <div *ngFor="let ans of getAnswerQRL()">
-                        réponse : {{ ans }}
+                    <div *ngFor="let player of getPlayers()">
+                        <div (click)="selectPlayer(player)">
+                            {{ player }}
+                        </div>
                     </div>
                 </div>
+                <div *ngIf="selectedResponse">
+                    <div>Réponse : {{ selectedResponse }} </div>
+                    <div>Veuillez noter sa réponse:</div>
+                </div>
             </div>
+            
 
             <ng-container *ngIf="!isQRL()">
                 <div class="stats-container">
