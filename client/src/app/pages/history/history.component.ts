@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { HistoryService } from '@app/services/history/history.service';
 import { History } from '@common/types';
 import { Subscription } from 'rxjs';
@@ -14,7 +16,10 @@ export class HistoryComponent implements OnInit {
     recordsSubscription: Subscription;
     historyCleared: boolean = false;
 
-    constructor(private historyService: HistoryService) {}
+    constructor(
+        private historyService: HistoryService,
+        public dialog: MatDialog,
+    ) {}
 
     ngOnInit(): void {
         this.recordsSubscription = this.historyService.getAllRecords().subscribe((data: History[]) => {
@@ -42,9 +47,21 @@ export class HistoryComponent implements OnInit {
     }
 
     clearHistory(): void {
-        this.historyService.clearHistory().subscribe((data: History[]) => {
-            this.gameRecords = data;
+        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+            width: '350px',
+            data: {
+                title: 'Confirmation de la suppression',
+                message: 'Êtes-vous sûr de vouloir supprimer votre historique?',
+            },
         });
-        this.historyCleared = true;
+
+        dialogRef.afterClosed().subscribe((confirm) => {
+            if (confirm) {
+                this.historyService.clearHistory().subscribe((data: History[]) => {
+                    this.gameRecords = data;
+                });
+                this.historyCleared = true;
+            }
+        });
     }
 }
