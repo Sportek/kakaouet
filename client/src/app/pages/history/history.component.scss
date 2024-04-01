@@ -1,74 +1,80 @@
-.history-container {
-    background: #5c00ff; // Adjust the color to match your theme
-    padding: 20px;
-    border-radius: 8px;
-    color: white;
-    text-align: center;
+@import '../../../colors.scss';
 
-    h1 {
-        color: #ffd700; // Adjust the color to match your logo
-    }
-
-    .sort-controls,
-    .order-controls {
-        display: flex;
-        justify-content: center;
-        margin: 10px 0;
-
-        button {
-            background: #00ff00; // Green background for sorting buttons
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            margin: 0 5px;
-            color: white;
-            cursor: pointer;
-
-            &:hover {
-                background: lighten($color: #00ff00, $amount: 10); // Lighten the button on hover
-            }
-        }
-    }
-
-    .history-list {
-        margin: 20px 0;
-        .history-item {
-            background: #4b0082; // Deep purple for items
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            span {
-                margin: 0 10px;
-            }
-        }
-    }
-
-    .history-actions {
-        button {
-            background: #ff4500; // Orangered background for actions
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            margin: 0 5px;
-            color: white;
-            cursor: pointer;
-
-            &:hover {
-                background: lighten($color: #ff4500, $amount: 10); // Lighten the button on hover
-            }
-
-            &.disabled-button {
-                background: #ccc;
-                color: #666;
-                cursor: not-allowed;
-            }
-        }
-    }
+:host {
+    height: 100%;
 }
 
-// Function to handle lighten effect on hover
+.background {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-container {
+    max-height: 18.5rem;
+    width: 100%;
+    overflow-y: auto;
+    padding: 0rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    border: 0.4rem solid black;
+    border-radius: 15px;
+    margin-top: 1rem;
+}
+
+.history-item {
+    width: 100%;
+    min-height: 3rem;
+    display: flex;
+    justify-content: space-between;
+    border: 0.25rem solid black;
+    background-color: $purple-900;
+    box-sizing: border-box;
+    align-items: center;
+}
+.game-title {
+    flex: 3;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.game-title .large-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.history-item .game-title {
+    flex: 2;
+    margin-right: 20px;
+}
+
+.history-item .number-players {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.history-item .best-score {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.history-item .start-time {
+    flex: 1;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
 @function lighten($color, $amount) {
     @return mix(white, $color, $amount);
 }
