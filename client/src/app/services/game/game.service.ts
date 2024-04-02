@@ -213,19 +213,20 @@ export class GameService {
     }
 
     private handleDisplayQuizResults() {
-        const numberOfPlayers = this.players.getValue().length;
+        if (this.client.value.role === GameRole.Organisator) {
+            const numberOfPlayers = this.players.getValue().length;
 
-        const bestScore = Math.max(...this.players.getValue().map((user) => user.score));
+            const bestScore = Math.max(...this.players.getValue().map((user) => user.score));
 
-        const history: History = {
-            gameTitle: this.game.getValue().quizName,
-            startTime: new Date(),
-            numberOfPlayers,
-            bestScore,
-        };
+            const history: History = {
+                gameTitle: this.game.getValue().quizName,
+                startTime: new Date(),
+                numberOfPlayers,
+                bestScore,
+            };
 
-        this.historyService.addToHistory(history).subscribe({});
-
+            this.historyService.addToHistory(history).subscribe({});
+        }
         if (this.game.getValue().type === GameType.Test) {
             this.router.navigate(['/create/'], { replaceUrl: true });
             return;
