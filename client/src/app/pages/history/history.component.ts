@@ -1,8 +1,12 @@
+/* eslint-disable no-case-declarations */
+// Pour éviter les erreurs de portée dans les blocs switch.
+
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { HistoryService } from '@app/services/history/history.service';
-import { History } from '@common/types';
+import { SelectorService } from '@app/services/selector/selector.service';
+import { History, Ordering, OrderingField } from '@common/types';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -12,14 +16,15 @@ import { Subscription } from 'rxjs';
 })
 export class HistoryComponent implements OnInit {
     gameRecords: History[] = [];
-    currentSortField: string = 'gameTitle';
-    currentSortOrder: string = 'asc';
+    currentSortField: OrderingField = OrderingField.GameTitle;
+    currentSortOrder: Ordering = Ordering.Ascendant;
     recordsSubscription: Subscription;
     historyCleared: boolean = false;
 
     constructor(
         private historyService: HistoryService,
         public dialog: MatDialog,
+        private selectorService: SelectorService,
     ) {}
 
     ngOnInit(): void {
@@ -28,38 +33,41 @@ export class HistoryComponent implements OnInit {
             this.sortRecords();
             this.historyCleared = this.gameRecords.length === 0;
         });
+
+        this.selectorService.getCurrentChoice().subscribe((choice) => {
+            this.updateSort(choice);
+        });
+    }
+
+    updateSort(choice: string): void {
+        if (choice.includes('Temps de début de partie')) {
+            this.currentSortField = OrderingField.StartTime;
+        } else if (choice.includes('Nom de Jeu')) {
+            this.currentSortField = OrderingField.GameTitle;
+        }
+        if (choice.includes('Ascendant')) {
+            this.currentSortOrder = Ordering.Ascendant;
+        } else if (choice.includes('Descendant')) {
+            this.currentSortOrder = Ordering.Descendant;
+        }
+        this.sortRecords();
     }
 
     sortRecords(): void {
-        if (this.currentSortField === 'gameTitle') {
-            this.sortByTitle();
-        } else if (this.currentSortField === 'startTime') {
-            this.sortByStartDate();
-        }
-    }
-
-    sortByTitle(): void {
-        this.gameRecords = this.gameRecords.sort((a, b) => {
-            return this.currentSortOrder === 'asc' ? a.gameTitle.localeCompare(b.gameTitle) : b.gameTitle.localeCompare(a.gameTitle);
+        this.gameRecords.sort((a, b) => {
+            let comparison = 0;
+            switch (this.currentSortField) {
+                case OrderingField.GameTitle:
+                    comparison = a.gameTitle.localeCompare(b.gameTitle);
+                    break;
+                case OrderingField.StartTime:
+                    const dateA = new Date(a.startTime).getTime();
+                    const dateB = new Date(b.startTime).getTime();
+                    comparison = dateA - dateB;
+                    break;
+            }
+            return this.currentSortOrder === Ordering.Ascendant ? comparison : -comparison;
         });
-    }
-
-    sortByStartDate(): void {
-        this.gameRecords = this.gameRecords.sort((a, b) => {
-            const dateA = new Date(a.startTime).getTime();
-            const dateB = new Date(b.startTime).getTime();
-            return this.currentSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        });
-    }
-
-    handleSort(field: string): void {
-        this.currentSortField = field === 'Temps de début de partie' ? 'startTime' : 'gameTitle';
-        this.sortRecords();
-    }
-
-    handleOrderChange(order: string): void {
-        this.currentSortOrder = order === 'Ascendant' ? 'asc' : 'desc';
-        this.sortRecords();
     }
 
     clearHistory(): void {
@@ -73,8 +81,8 @@ export class HistoryComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe((confirm) => {
             if (confirm) {
-                this.historyService.clearHistory().subscribe((data: History[]) => {
-                    this.gameRecords = data;
+                this.historyService.clearHistory().subscribe(() => {
+                    this.gameRecords = [];
                     this.historyCleared = true;
                 });
             }
