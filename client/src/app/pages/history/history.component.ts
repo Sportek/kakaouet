@@ -12,7 +12,8 @@ import { Subscription } from 'rxjs';
 })
 export class HistoryComponent implements OnInit {
     gameRecords: History[] = [];
-    sortAscending = true;
+    currentSortField: string = 'gameTitle';
+    currentSortOrder: string = 'asc';
     recordsSubscription: Subscription;
     historyCleared: boolean = false;
 
@@ -24,26 +25,41 @@ export class HistoryComponent implements OnInit {
     ngOnInit(): void {
         this.recordsSubscription = this.historyService.getAllRecords().subscribe((data: History[]) => {
             this.gameRecords = data;
-            if (this.gameRecords.length === 0) {
-                this.historyCleared = true;
-            }
+            this.sortRecords();
+            this.historyCleared = this.gameRecords.length === 0;
         });
+    }
+
+    sortRecords(): void {
+        if (this.currentSortField === 'gameTitle') {
+            this.sortByTitle();
+        } else if (this.currentSortField === 'startTime') {
+            this.sortByStartDate();
+        }
     }
 
     sortByTitle(): void {
-        this.gameRecords.sort((a, b) => {
-            return this.sortAscending ? a.gameTitle.localeCompare(b.gameTitle) : b.gameTitle.localeCompare(a.gameTitle);
+        this.gameRecords = this.gameRecords.sort((a, b) => {
+            return this.currentSortOrder === 'asc' ? a.gameTitle.localeCompare(b.gameTitle) : b.gameTitle.localeCompare(a.gameTitle);
         });
-        this.sortAscending = !this.sortAscending;
     }
 
     sortByStartDate(): void {
-        this.gameRecords.sort((a, b) => {
-            return this.sortAscending
-                ? new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-                : new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+        this.gameRecords = this.gameRecords.sort((a, b) => {
+            const dateA = new Date(a.startTime).getTime();
+            const dateB = new Date(b.startTime).getTime();
+            return this.currentSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
         });
-        this.sortAscending = !this.sortAscending;
+    }
+
+    handleSort(field: string): void {
+        this.currentSortField = field === 'Temps de début de partie' ? 'startTime' : 'gameTitle';
+        this.sortRecords();
+    }
+
+    handleOrderChange(order: string): void {
+        this.currentSortOrder = order === 'Ascendant' ? 'asc' : 'desc';
+        this.sortRecords();
     }
 
     clearHistory(): void {
@@ -59,8 +75,8 @@ export class HistoryComponent implements OnInit {
             if (confirm) {
                 this.historyService.clearHistory().subscribe((data: History[]) => {
                     this.gameRecords = data;
+                    this.historyCleared = true;
                 });
-                this.historyCleared = true;
             }
         });
     }

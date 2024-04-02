@@ -4,8 +4,16 @@
             <div class="container">
                 <div class="title-text">Historique des parties</div>
                 <div class="selectors">
-                    <app-selector [label]="'Trier selon'" [choices]="['Temps de début de partie', 'Nom de Jeu']"></app-selector>
-                    <app-selector [label]="'Ordre'" [choices]="['Ascendant', 'Descendant']"></app-selector>
+                    <app-selector
+                        [label]="'Trier selon'"
+                        [choices]="['Temps de début de partie', 'Nom de Jeu']"
+                        (choiceSelected)="historyComponent.handleSort($event)"
+                    ></app-selector>
+                    <app-selector
+                        [label]="'Ordre'"
+                        [choices]="['Ascendant', 'Descendant']"
+                        (choiceSelected)="historyComponent.handleOrderChange($event)"
+                    ></app-selector>
                 </div>
                 <app-history></app-history>
                 <div class="history-actions">
