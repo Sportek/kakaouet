@@ -69,7 +69,7 @@ export class QuizController {
         throw new HttpException('Impossible to find answers matching quizId and questionId', HttpStatus.BAD_REQUEST);
     }
 
-    @Get('/generate/random')
+    @Get('/random')
     async getRandomQuiz() {
         try {
             const randomQuiz = await this.quizService.generateRandomQuiz();

@@ -110,8 +110,9 @@ export class QuizService {
         const qcmQuestions = await this.questionService.getQCMQuestions();
         if (qcmQuestions.length < 5) throw new Error('Not enough QCM questions available.');
         const randomQuestions = qcmQuestions.sort(() => 0.5 - Math.random()).slice(0, 5);
+
         const randomQuiz: Quiz = {
-            title: 'Quiz Aléatoire',
+            name: 'Quiz Aléatoire',
             description: 'Ce quiz est généré aléatoirement à partir des questions QCM.',
             duration: 20,
             visibility: true,

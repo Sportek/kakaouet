@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { BASE_URL } from '@app/constants';
 import { ValidateService } from '@app/services/validate/validate.service';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { saveAs } from 'file-saver';
 import { Observable, Subject, of, throwError } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
+import { QuestionService } from './question.service';
 
 @Injectable({
     providedIn: 'root',
@@ -22,6 +24,8 @@ export class QuizService {
     constructor(
         private http: HttpClient,
         private validateService: ValidateService,
+        private questionService: QuestionService,
+        private dialog: MatSnackBar,
     ) {}
 
     getAllQuizzes(): Observable<Quiz[]> {
@@ -162,6 +166,16 @@ export class QuizService {
         return this.randomQuizDetails;
     }
     getRandomQuiz(): Observable<Quiz> {
-        return this.http.get<Quiz>(BASE_URL + '/quiz/generate/random');
+        return this.questionService.hasEnoughQCMQuestions(5).pipe(
+            switchMap((hasEnough) => {
+                if (!hasEnough) {
+                    this.dialog.open('Pas assez de questions QCM pour créer un quiz aléatoire.', 'Fermer', {
+                        duration: 3000,
+                    });
+                    return throwError(() => new Error('Pas assez de questions QCM pour créer un quiz aléatoire'));
+                }
+                return this.http.get<Quiz>(BASE_URL + '/quiz/random');
+            }),
+        );
     }
 }
