@@ -34,8 +34,8 @@ export class CreatePageComponent implements OnInit, OnDestroy {
                     next: (randomQuiz) => {
                         this.games = [randomQuiz, ...quizzes];
                     },
-                    error: (error) => {
-                        this.dialog.open(error, 'Fermer', {
+                    error: () => {
+                        this.dialog.open('Pas assez de question pour générer un random quiz', 'Fermer', {
                             duration: 3000,
                         });
                         this.games = quizzes;

@@ -1,4 +1,6 @@
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
+export const cinq = 5;
+export const unDemi = 0.5;
 
 export const mockQuizTable: QuizDto[] = [
     {

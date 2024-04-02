@@ -71,11 +71,7 @@ export class QuizController {
 
     @Get('/generate/random')
     async getRandomQuiz() {
-        try {
-            const randomQuiz = await this.quizService.generateRandomQuiz();
-            return randomQuiz;
-        } catch (error) {
-            throw new HttpException('Impossible to get random quiz', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        const randomQuiz = await this.quizService.generateRandomQuiz();
+        return randomQuiz;
     }
 }

@@ -1,11 +1,11 @@
 import { Quiz, QuizDocument } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
+import { QuestionService } from '@app/services/question/question.service';
 import { QuestionFeedback } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { QuestionService } from '../question/question.service';
-import { mockQuizTable } from './mock-quiz';
+import { cinq, mockQuizTable, unDemi } from './mock-quiz';
 
 @Injectable()
 export class QuizService {
@@ -108,10 +108,9 @@ export class QuizService {
 
     async generateRandomQuiz(): Promise<Quiz> {
         const qcmQuestions = await this.questionService.getQCMQuestions();
-        if (qcmQuestions.length < 5) throw new Error('Not enough QCM questions available.');
-        const randomQuestions = qcmQuestions.sort(() => 0.5 - Math.random()).slice(0, 5);
+        const randomQuestions = qcmQuestions.sort(() => unDemi - Math.random()).slice(0, cinq);
         const randomQuiz: Quiz = {
-            title: 'Quiz Aléatoire',
+            title: 'Mode Aléatoire',
             description: 'Ce quiz est généré aléatoirement à partir des questions QCM.',
             duration: 20,
             visibility: true,

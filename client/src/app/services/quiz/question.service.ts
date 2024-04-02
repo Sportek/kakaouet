@@ -130,12 +130,10 @@ export class QuestionService {
             quiz.questions[index] = modifiedQuestion;
         }
     }
-    // Cette méthode vérifie si nous avons suffisamment de questions QCM.
     hasEnoughQCMQuestions(minimumCount: number): Observable<boolean> {
         return this.getQuestions().pipe(map((questions) => questions.filter((q) => q.type === QuestionType.QCM).length >= minimumCount));
     }
 
-    // Cette méthode récupère un nombre spécifique de questions QCM aléatoirement.
     getRandomQuestions(count: number): Observable<Question[]> {
         return this.getQuestions().pipe(
             map((questions) => questions.filter((q) => q.type === QuestionType.QCM)),
@@ -143,7 +141,6 @@ export class QuestionService {
         );
     }
 
-    // Sélection aléatoire de questions QCM.
     private selectRandomQuestions(questions: Question[], count: number): Question[] {
         return questions.sort(() => Math.random() - 0.5).slice(0, count);
     }

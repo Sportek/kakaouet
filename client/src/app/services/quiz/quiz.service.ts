@@ -5,7 +5,8 @@ import { ValidateService } from '@app/services/validate/validate.service';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { saveAs } from 'file-saver';
 import { Observable, Subject, of, throwError } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
+import { QuestionService } from './question.service';
 
 @Injectable({
     providedIn: 'root',
@@ -22,6 +23,7 @@ export class QuizService {
     constructor(
         private http: HttpClient,
         private validateService: ValidateService,
+        private questionService: QuestionService,
     ) {}
 
     getAllQuizzes(): Observable<Quiz[]> {
@@ -158,10 +160,22 @@ export class QuizService {
         saveAs(blob, quiz.title + '.json');
     }
 
-    getRandomQuizDetails(): Partial<Quiz> | null {
-        return this.randomQuizDetails;
+    submitRandomQuiz(): void {
+        this.getRandomQuiz().subscribe({
+            next: (quiz) => {
+                this.randomQuizDetails = quiz;
+            },
+        });
     }
     getRandomQuiz(): Observable<Quiz> {
-        return this.http.get<Quiz>(BASE_URL + '/quiz/generate/random');
+        return this.questionService.hasEnoughQCMQuestions(5).pipe(
+            switchMap((hasEnough) => {
+                if (hasEnough) {
+                    return this.http.get<Quiz>(`${BASE_URL}/quiz/generate/random`);
+                } else {
+                    return throwError(() => new Error('Pas assez de questions QCM pour créer un quiz aléatoire.'));
+                }
+            }),
+        );
     }
 }
