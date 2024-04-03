@@ -16,7 +16,7 @@ export class DescriptonPageComponent implements OnInit {
     question: Question[];
     notFound: number;
     private subscriptions = new Subscription();
-    private randomQuizId = 'random-quiz';
+    // private randomQuizId = 'random-quiz';
 
     // Toutes ces dépendances sont nécessaires
     // eslint-disable-next-line max-params
@@ -38,9 +38,6 @@ export class DescriptonPageComponent implements OnInit {
         if (!quizId) {
             this.router.navigateByUrl('/error-404');
             return;
-        }
-        if (quizId === this.randomQuizId) {
-            this.getQuizDetails(quizId);
         } else {
             this.getQuizDetails(quizId);
         }
