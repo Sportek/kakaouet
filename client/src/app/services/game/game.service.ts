@@ -30,6 +30,8 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
+    startTime: BehaviorSubject<Date | null> = new BehaviorSubject<Date | null>(null);
+
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
         private router: Router,
@@ -63,6 +65,7 @@ export class GameService {
         if (!this.isLocked.getValue()) return this.notificationService.error('Veuillez verrouiller la partie avant de la démarrer');
         if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length)
             return this.notificationService.error('Il doit y avoir au moins un joueur pour démarrer la partie');
+        this.startTime.next(new Date());
         this.socketService.send(GameEvents.StartGame);
     }
 
@@ -214,15 +217,17 @@ export class GameService {
 
     private handleDisplayQuizResults() {
         if (this.client.value.role === GameRole.Organisator) {
-            const numberOfPlayers = this.players.getValue().length;
+            const startTime = this.startTime.value;
 
-            const bestScore = Math.max(...this.players.getValue().map((user) => user.score));
+            if (!startTime) {
+                return;
+            }
 
             const history: History = {
                 gameTitle: this.game.getValue().quizName,
-                startTime: new Date(),
-                numberOfPlayers,
-                bestScore,
+                startTime,
+                numberOfPlayers: this.players.getValue().length,
+                bestScore: Math.max(...this.players.getValue().map((user) => user.score)),
             };
 
             this.historyService.addToHistory(history).subscribe({});
