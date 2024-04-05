@@ -16,7 +16,9 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     players: PlayerClient[];
     choices: ChoiceData[];
     timerIsRunning;
-    selectedResponse: string | null = null;
+
+    selectedResponseQRL: string | null = null;
+    playersQRL: string | undefined;
 
     currentQuestion: number;
     private subscriptions: Subscription[];
@@ -60,7 +62,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     selectPlayer(name: string): void {
         const player = this.getAnswerQRL().find((p) => p.name === name);
-        this.selectedResponse = player ? player.answer : null;
+        this.playersQRL = player?.name;
+        this.selectedResponseQRL = player ? player.answer : null;
     }
 
     isQRL(): boolean {
