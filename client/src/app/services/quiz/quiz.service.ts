@@ -12,8 +12,6 @@ import { QuestionService } from './question.service';
     providedIn: 'root',
 })
 export class QuizService {
-    private isRandomQuizLoaded: boolean;
-    private randomQuizDetails: Quiz | null = null;
     private baseURL = BASE_URL + '/quiz';
     private quizUpdateSubject = new Subject<void>();
     private quizUpdates: Observable<void> = this.quizUpdateSubject.asObservable();
@@ -37,16 +35,7 @@ export class QuizService {
     }
     getQuizDetailsById(id: string): Observable<Quiz> {
         if (id === 'random-quiz') {
-            if (this.isRandomQuizLoaded && this.randomQuizDetails) {
-                return of(this.randomQuizDetails);
-            } else {
-                return this.getRandomQuiz().pipe(
-                    tap((quiz) => {
-                        this.randomQuizDetails = quiz;
-                        this.isRandomQuizLoaded = true;
-                    }),
-                );
-            }
+            return this.getRandomQuiz();
         } else {
             return this.getQuizById(id);
         }
@@ -170,15 +159,6 @@ export class QuizService {
         saveAs(blob, quiz.title + '.json');
     }
 
-    submitRandomQuiz(): void {
-        this.isRandomQuizLoaded = false;
-        this.getRandomQuiz().subscribe({
-            next: (quiz) => {
-                this.randomQuizDetails = quiz;
-                this.isRandomQuizLoaded = true;
-            },
-        });
-    }
     getRandomQuiz(): Observable<Quiz> {
         return this.questionService.hasEnoughQCMQuestions(5).pipe(
             switchMap((hasEnough) => {

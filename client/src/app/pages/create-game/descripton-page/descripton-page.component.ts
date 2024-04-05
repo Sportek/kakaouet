@@ -69,6 +69,9 @@ export class DescriptonPageComponent implements OnInit {
     }
 
     createGame(quizId: string) {
+        if (quizId === 'random-quiz') {
+            this.gameService.createNewGame(quizId, GameType.Random);
+        }
         this.gameService.createNewGame(quizId, GameType.Default);
     }
 
