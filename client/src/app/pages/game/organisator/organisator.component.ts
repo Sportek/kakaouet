@@ -17,8 +17,12 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     choices: ChoiceData[];
     timerIsRunning;
 
+    // for QRL
     selectedResponseQRL: string | null = null;
+    // for QRL
     playersQRL: string | undefined;
+    // for QRL
+    playerRatings: { [key: string]: number } = {};
 
     currentQuestion: number;
     private subscriptions: Subscription[];
@@ -43,6 +47,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.filterPlayers().filter((player) => player.answers?.hasConfirmed).length;
     }
 
+    // for QRL
     getAnswerQRL(): { name: string; answer: string }[] {
         const responses: { name: string; answer: string }[] = [];
         if (this.actualQuestion?.question.type === QuestionType.QRL) {
@@ -56,18 +61,45 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return responses.sort((playerA, playerB) => playerA.name.localeCompare(playerB.name));
     }
 
+    // for QRL
     getPlayers(): string[] {
         return this.getAnswerQRL().map((player) => player.name);
     }
 
+    // for QRL
     selectPlayer(name: string): void {
         const player = this.getAnswerQRL().find((p) => p.name === name);
         this.playersQRL = player?.name;
         this.selectedResponseQRL = player ? player.answer : null;
     }
 
+    // for QRL
     isQRL(): boolean {
         return this.actualQuestion?.question.type === QuestionType.QRL;
+    }
+
+    // for QRL
+    rateAnswerQRL(playerName: string, rating: number): void {
+        const questionPoints = this.actualQuestion?.question.points ?? 0; // car potentiellement undefined
+        const score = questionPoints * rating;
+        this.gameService.rateAnswerQRL(playerName, score);
+
+        if (this.allPlayersRated()) {
+            // eslint-disable-next-line no-console
+            console.log('Tout le monde est noté');
+        }
+        this.playerRatings[playerName] = score;
+    }
+
+    // for QRL
+    allPlayersRated(): boolean {
+        const players = this.getAnswerQRL();
+        return players.every((player) => this.playerRatings[player.name] !== undefined);
+    }
+
+    // for QRL
+    getRatingForPlayer(playerName: string): number | undefined {
+        return this.playerRatings[playerName];
     }
 
     calculateChoices(): void {
@@ -92,6 +124,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     nextQuestion(): void {
+        console.log('Brooo');
         this.gameService.nextQuestion();
     }
 

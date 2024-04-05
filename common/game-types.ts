@@ -14,6 +14,7 @@ export enum GameEvents {
     ToggleTimer = 'toggleTimer', // Event sent to the server when an organizer wants to toggle the timer
     SpeedUpTimer = 'speedUpTimer', // Event sent to the server when an organizer wants to speed up the timer
     SendMessage = 'sendMessage', // Event sent to the server when a user sends a chat message
+    RateAnswerQRL = 'rateAnswerQRL', // Event sent to the server when a organisator rate QRL answers of players
 
     // Events launched by the server
     PlayerSelectAnswer = 'playerSelectedAnswer', // Event sent to organizer a player has selected an answer
@@ -68,6 +69,12 @@ export interface Score {
 };
 
 export namespace GameEventsData {
+
+    export interface RateAnswerQRL {
+        playerName: string,
+        score: number, 
+    }
+
     export interface SelectAnswer {
         answers: Answer;
     }

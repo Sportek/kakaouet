@@ -19,7 +19,7 @@
                 </div>
             </div>
             
-            <div class="stats-container-qrl" *ngIf="isQRL()">
+            <!-- <div class="stats-container-qrl" *ngIf="isQRL()">
                 <div class="players-container-answer-qrl">
                     <div *ngFor="let player of getPlayers()">
                         <div (click)="selectPlayer(player)">
@@ -31,7 +31,23 @@
                     <div>Réponse du joueur "{{ playersQRL }}": {{ selectedResponseQRL }} </div>
                     <div>Veuillez noter sa réponse:</div>
                 </div>
+            </div> -->
+
+            <div class="stats-container-qrl" *ngIf="isQRL()">
+                <div class="players-container-answer-qrl">
+                    <div *ngFor="let player of getAnswerQRL()">
+                        <div>{{ player.name }}: {{ player.answer }}</div>
+                        <div>Veuillez noter sa réponse:</div>
+                        <select (change)="rateAnswerQRL(player.name, $any($event.target).value)">
+                            <option value="0">0%</option>
+                            <option value="50">50%</option>
+                            <option value="100">100%</option>
+                        </select>
+                        <div>Note actuelle: {{ getRatingForPlayer(player.name) || 'Non noté' }}</div>
+                    </div>
+                </div>
             </div>
+            
             
 
             <ng-container *ngIf="!isQRL()">

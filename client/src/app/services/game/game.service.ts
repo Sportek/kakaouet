@@ -136,10 +136,23 @@ export class GameService {
         if (newAnswer) this.sendAnswer(newAnswer);
     }
 
+    // -----------------------------------------------------------> ICIIIIIIIIIIIIIIIIIIII
     enterAnswer(text: string): void {
         if (this.isFinalAnswer.getValue()) return;
         this.answer.next(text);
         this.sendAnswer(text);
+    }
+
+    rateAnswerQRL(name: string, scoreQRL: number): void {
+        const player = this.players.getValue().find((p) => p.name === name);
+        if (!player) {
+            return;
+        }
+
+        this.socketService.send(GameEvents.RateAnswerQRL, {
+            playerName: name,
+            score: scoreQRL,
+        } as GameEventsData.RateAnswerQRL);
     }
 
     setResponseAsFinal(): void {
