@@ -14,15 +14,21 @@ export class GameGateway {
     constructor(private gameService: GameService) {}
 
     // for QRL
-    /* @SubscribeMessage(GameEvents.RateAnswerQRL)
+    @SubscribeMessage(GameEvents.RateAnswerQRL)
     handleRateAnswerQRL(@MessageBody() data: GameEventsData.RateAnswerQRL, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        if (!gameSession) {
-            return { isSuccess: false, message: "La partie n'existe pas" };
-        }
-        gameSession.nextQuestion();
-        return { isSuccess: true, message: 'Passage à la question suivante' };
-    }*/
+        if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
+
+        const player = gameSession.room.getPlayer(data.playerName);
+        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+    }
+
+    @SubscribeMessage(GameEvents.FinishedRatingQRL)
+    handleFinishRatingQRL(@ConnectedSocket() client: Socket): SocketResponse {
+        const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        gameSession.displayQuestionResults();
+        return { isSuccess: true, message: 'Les résultats ont bien été envoyés' };
+    }
 
     @SubscribeMessage(GameEvents.Disconnect)
     handleDisconnect(@ConnectedSocket() client: Socket): SocketResponse {

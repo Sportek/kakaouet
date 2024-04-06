@@ -52,6 +52,8 @@ export class GameSession {
         if (this.gameState !== GameState.PlayersAnswerQuestion) return;
         const delay = this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QCM ? this.quiz.duration : QRL_DELAY;
         this.simpleDelay(delay, () => {
+            if (this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QRL)
+                return this.changeGameState(GameState.OrganisatorCorrectingAnswers);
             this.displayQuestionResults();
         });
     }

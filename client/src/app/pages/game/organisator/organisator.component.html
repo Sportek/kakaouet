@@ -18,7 +18,7 @@
                     <div class="text large-text">{{ cooldown }}</div>
                 </div>
             </div>
-            
+
             <!-- <div class="stats-container-qrl" *ngIf="isQRL()">
                 <div class="players-container-answer-qrl">
                     <div *ngFor="let player of getPlayers()">
@@ -33,7 +33,7 @@
                 </div>
             </div> -->
 
-            <div class="stats-container-qrl" *ngIf="isQRL()">
+            <div class="stats-container-qrl" *ngIf="isCorrectingAnswers()">
                 <div class="players-container-answer-qrl">
                     <div *ngFor="let player of getAnswerQRL()">
                         <div>{{ player.name }}: {{ player.answer }}</div>
@@ -47,10 +47,8 @@
                     </div>
                 </div>
             </div>
-            
-            
 
-            <ng-container *ngIf="!isQRL()">
+            <ng-container *ngIf="!isCorrectingAnswers()">
                 <div class="stats-container">
                     <div class="columns">
                         <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
@@ -77,8 +75,6 @@
                     </div>
                 </div>
             </ng-container>
-
-
 
             <div class="game-controller-container">
                 <div class="title">Panneau de contrôle</div>

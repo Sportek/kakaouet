@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 // import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
-import { QuestionType } from '@common/types';
+import { GameState, QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -74,8 +74,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     // for QRL
-    isQRL(): boolean {
-        return this.actualQuestion?.question.type === QuestionType.QRL;
+    isCorrectingAnswers(): boolean {
+        return this.gameService.gameState.getValue() === GameState.OrganisatorCorrectingAnswers;
     }
 
     // for QRL

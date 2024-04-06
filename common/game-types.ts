@@ -15,6 +15,7 @@ export enum GameEvents {
     SpeedUpTimer = 'speedUpTimer', // Event sent to the server when an organizer wants to speed up the timer
     SendMessage = 'sendMessage', // Event sent to the server when a user sends a chat message
     RateAnswerQRL = 'rateAnswerQRL', // Event sent to the server when a organisator rate QRL answers of players
+    FinishedRatingQRL = 'finishedRatingQRL', // Event sent to the server when the organizer is done rating
 
     // Events launched by the server
     PlayerSelectAnswer = 'playerSelectedAnswer', // Event sent to organizer a player has selected an answer
@@ -41,7 +42,11 @@ export enum GameEvents {
 // Différents types définis
 
 export type Answer = string | number[];
-export interface ExtendedAnswer { hasInterracted: boolean; hasConfirmed: boolean; answer: Answer };
+export interface ExtendedAnswer {
+    hasInterracted: boolean;
+    hasConfirmed: boolean;
+    answer: Answer;
+}
 export interface PlayerClient {
     name: string;
     role: GameRole;
@@ -49,14 +54,40 @@ export interface PlayerClient {
     isExcluded: boolean;
     hasGiveUp: boolean;
     answers?: ExtendedAnswer;
-};
-export interface Client { name: string; role: GameRole; score: number };
-export interface GameRestricted { code: string; quizName: string; type: GameType };
-export interface SocketResponse { isSuccess: boolean; message?: string };
-export interface ActualQuestion { question: Question; totalQuestion: number; actualIndex: number };
-export interface ChoiceData { text: string; amount: number; isCorrect: boolean };
-export interface PlayerAnswers { [questionId: number]: CompletePlayerAnswer }
-export interface CompletePlayerAnswer { hasInterracted: boolean; hasConfirmed: boolean; hasConfirmedAt?: Date; answer: string | number[] }
+}
+export interface Client {
+    name: string;
+    role: GameRole;
+    score: number;
+}
+export interface GameRestricted {
+    code: string;
+    quizName: string;
+    type: GameType;
+}
+export interface SocketResponse {
+    isSuccess: boolean;
+    message?: string;
+}
+export interface ActualQuestion {
+    question: Question;
+    totalQuestion: number;
+    actualIndex: number;
+}
+export interface ChoiceData {
+    text: string;
+    amount: number;
+    isCorrect: boolean;
+}
+export interface PlayerAnswers {
+    [questionId: number]: CompletePlayerAnswer;
+}
+export interface CompletePlayerAnswer {
+    hasInterracted: boolean;
+    hasConfirmed: boolean;
+    hasConfirmedAt?: Date;
+    answer: string | number[];
+}
 export enum SoundType {
     TimerSpeedUp = 'assets/sounds/speed-up.wav',
     PlayingRoom = 'assets/sounds/lobby.mp3',
@@ -66,13 +97,12 @@ export interface Score {
     name: string;
     score: number;
     bonus: number;
-};
+}
 
 export namespace GameEventsData {
-
     export interface RateAnswerQRL {
-        playerName: string,
-        score: number, 
+        playerName: string;
+        score: number;
     }
 
     export interface SelectAnswer {
@@ -183,4 +213,3 @@ export namespace GameEventsData {
     }
 }
 export { GameState, GameType };
-
