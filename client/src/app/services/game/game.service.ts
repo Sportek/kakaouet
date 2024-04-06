@@ -120,11 +120,6 @@ export class GameService {
             });
     }
 
-    nextQuestion(): void {
-        console.log('im in game service');
-        this.socketService.send(GameEvents.NextQuestion);
-    }
-
     selectAnswer(index: number): void {
         if (this.isFinalAnswer.getValue()) return;
         const answer = this.answer.getValue() as number[];
@@ -157,8 +152,14 @@ export class GameService {
         } as GameEventsData.RateAnswerQRL);
     }
 
-    notifyAllQRLRated(): void {
-        this.socketService.send(GameEvents.AllPlayersAnswered); // Assurez-vous que cet événement est géré côté serveur
+    // for QRL
+    /* notifyAllQRLRated(): void {
+        this.socketService.send(GameEvents.AllPlayersAnswered);
+    }*/
+
+    nextQuestion(): void {
+        console.log('im in game service');
+        this.socketService.send(GameEvents.NextQuestion);
     }
 
     setResponseAsFinal(): void {

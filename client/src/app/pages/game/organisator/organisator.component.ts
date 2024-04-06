@@ -83,11 +83,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         const questionPoints = this.actualQuestion?.question.points ?? 0; // car potentiellement undefined
         const score = questionPoints * rating;
         this.gameService.rateAnswerQRL(playerName, score);
-
-        if (this.allPlayersRated()) {
-            // eslint-disable-next-line no-console
-            console.log('Tout le monde est noté');
-        }
         this.playerRatings[playerName] = score;
     }
 
@@ -124,7 +119,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     nextQuestion(): void {
-        console.log('organisator');
+        console.log('oragnisator');
         this.gameService.nextQuestion();
     }
 

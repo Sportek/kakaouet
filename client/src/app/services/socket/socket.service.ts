@@ -47,7 +47,9 @@ export class SocketService {
     send(eventName: string, ...args: unknown[]) {
         console.log('im on socket service');
         this.messageQueue.push({ eventName, args });
+        // Lors d'une QRL, isSendingMessage is true, et on rentre pas dans la condition
         if (!this.isSendingMessage) {
+            console.log('inside isSendingMessage is false');
             this.processQueue();
         }
     }
