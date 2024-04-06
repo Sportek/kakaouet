@@ -13,6 +13,18 @@ export class GameGateway {
 
     constructor(private gameService: GameService) {}
 
+    // for QRL
+    @SubscribeMessage(GameEvents.RateAnswerQRL)
+    handleRateAnswerQRL(@MessageBody() data: GameEventsData.RateAnswerQRL, @ConnectedSocket() client: Socket): SocketResponse {
+        const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        if (!gameSession) {
+            return { isSuccess: false, message: "La partie n'existe pas" };
+        }
+
+        gameSession.nextQuestion(); // Assurez-vous que cette méthode est prête à gérer le passage à la question suivante pour les QRL
+        return { isSuccess: true, message: 'Passage à la question suivante' };
+    }
+
     @SubscribeMessage(GameEvents.Disconnect)
     handleDisconnect(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
@@ -44,7 +56,7 @@ export class GameGateway {
     }
 
     @SubscribeMessage(GameEvents.ConfirmAnswers)
-    handleConfirmAnswers(@ConnectedSocket() client: Socket): SocketResponse {
+    handleCnonfirmAnswers(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 

@@ -144,6 +144,7 @@ export class GameService {
         this.sendAnswer(text);
     }
 
+    // for QRL
     rateAnswerQRL(name: string, scoreQRL: number): void {
         const player = this.players.getValue().find((p) => p.name === name);
         if (!player) {
@@ -154,6 +155,10 @@ export class GameService {
             playerName: name,
             score: scoreQRL,
         } as GameEventsData.RateAnswerQRL);
+    }
+
+    notifyAllQRLRated(): void {
+        this.socketService.send(GameEvents.AllPlayersAnswered); // Assurez-vous que cet événement est géré côté serveur
     }
 
     setResponseAsFinal(): void {
