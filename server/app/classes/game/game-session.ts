@@ -63,7 +63,9 @@ export class GameSession {
     }
 
     nextQuestion(): void {
+        console.log('im in the server');
         if (this.gameState !== GameState.DisplayQuestionResults) return;
+        console.log('im not in the state DisplayQuestionResult');
         if (this.isAlreadyChangingQuestion) return;
         this.isAlreadyChangingQuestion = true;
         if (++this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();

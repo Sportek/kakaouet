@@ -45,6 +45,7 @@ export class SocketService {
      * @param args Arguments à envoyer
      * @returns void */
     send(eventName: string, ...args: unknown[]) {
+        console.log('im on socket service');
         this.messageQueue.push({ eventName, args });
         if (!this.isSendingMessage) {
             this.processQueue();

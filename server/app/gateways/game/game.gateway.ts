@@ -105,6 +105,7 @@ export class GameGateway {
 
     @SubscribeMessage(GameEvents.NextQuestion)
     handleNextQuestion(@ConnectedSocket() client: Socket): SocketResponse {
+        console.log('im in gate gateway in the server');
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (!this.hasAutorisation(client, GameRole.Organisator))
             return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };

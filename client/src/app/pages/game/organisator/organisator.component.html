@@ -40,8 +40,8 @@
                         <div>Veuillez noter sa réponse:</div>
                         <select (change)="rateAnswerQRL(player.name, $any($event.target).value)">
                             <option value="0">0%</option>
-                            <option value="50">50%</option>
-                            <option value="100">100%</option>
+                            <option value="0.5">50%</option>
+                            <option value="1">100%</option>
                         </select>
                         <div>Note actuelle: {{ getRatingForPlayer(player.name) || 'Non noté' }}</div>
                     </div>

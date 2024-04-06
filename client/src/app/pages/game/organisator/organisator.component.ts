@@ -124,7 +124,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     nextQuestion(): void {
-        console.log('Brooo');
+        console.log('organisator');
         this.gameService.nextQuestion();
     }
 

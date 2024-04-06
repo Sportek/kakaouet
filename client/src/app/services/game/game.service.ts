@@ -121,6 +121,7 @@ export class GameService {
     }
 
     nextQuestion(): void {
+        console.log('im in game service');
         this.socketService.send(GameEvents.NextQuestion);
     }
 
