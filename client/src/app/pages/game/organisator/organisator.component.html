@@ -24,33 +24,31 @@
                     <div class="histogram-column interacted" [style.height]="interactedHeight + '%'">
                         <span class="histogram-label">{{ interactedCount }} ont modifié</span>
                     </div>
-                    <div class="histogram-column not-interacted" [style.height]="notInteractedHeight + '%'"> 
-                         <span class="histogram-label">{{ notInteractedCount }} n'ont pas modifié</span>
+                    <div class="histogram-column not-interacted" [style.height]="notInteractedHeight + '%'">
+                        <span class="histogram-label">{{ notInteractedCount }} n'ont pas modifié</span>
                     </div>
                 </div>
             </div>
 
             <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
                 <div class="players-container-answer-qrl">
-                    <div *ngFor="let player of getAnswerQRL()">
-                        <div>{{ player.name }}: {{ player.answer }}</div>
-                        <div>Veuillez noter sa réponse:</div>
-                        <select (change)="rateAnswerQRL(player.name, $any($event.target).value)">
-                            <option [defaultSelected]="">{{ 'Choisir' }}</option>
-                            <option value="0">0%</option>
-                            <option value="0.5">50%</option>
-                            <option value="1">100%</option>
-                        </select>
-                        <div>Note actuelle: {{ getRatingForPlayer(player.name)?.toString() }}</div>
-                        <button
-                            *ngIf="getRatingForPlayer(player.name)?.toString()"
-                            mat-raised-button
-                            color="primary"
-                            (click)="sendRating(player.name)"
-                        >
-                            Noter
-                        </button>
-                    </div>
+                    <div>{{ currentPlayer.name }}: {{ currentPlayer.answers?.answer }}</div>
+                    <div>Veuillez noter sa réponse:</div>
+                    <select (change)="rateAnswerQRL(currentPlayer.name, $any($event.target).value)">
+                        <option [defaultSelected]="">{{ 'Choisir' }}</option>
+                        <option value="0">0%</option>
+                        <option value="0.5">50%</option>
+                        <option value="1">100%</option>
+                    </select>
+                    <div>Note actuelle: {{ getRatingForPlayer(currentPlayer.name)?.toString() }}</div>
+                    <button
+                        *ngIf="getRatingForPlayer(currentPlayer.name)?.toString()"
+                        mat-raised-button
+                        color="primary"
+                        (click)="sendRating(currentPlayer.name)"
+                    >
+                        Noter
+                    </button>
                 </div>
             </div>
 

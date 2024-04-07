@@ -17,13 +17,15 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     players: PlayerClient[];
     choices: ChoiceData[];
     timerIsRunning;
+    currentPlayer: PlayerClient;
+    currentPlayerIndex: number;
+    playerRatings: Map<string, number> = new Map<string, number>();
 
     // for QRL
     selectedResponseQRL: string | null = null;
     // for QRL
     playersQRL: string | undefined;
     // for QRL
-    playerRatings: Map<string, number> = new Map<string, number>();
     // for QRL
     interactedCount: number = 0;
     // for QRL
@@ -59,29 +61,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     // for QRL
-    getAnswerQRL(): { name: string; answer: string }[] {
-        const responses: { name: string; answer: string }[] = [];
-        if (this.actualQuestion?.question.type === QuestionType.QRL) {
-            for (const player of this.players) {
-                const answer = player.answers?.answer;
-                if (typeof answer === 'string') {
-                    responses.push({ name: player.name, answer });
-                }
-            }
-        }
-        return responses.sort((playerA, playerB) => playerA.name.localeCompare(playerB.name));
-    }
-
-    // for QRL
     getPlayers(): string[] {
-        return this.getAnswerQRL().map((player) => player.name);
-    }
-
-    // for QRL
-    selectPlayer(name: string): void {
-        const player = this.getAnswerQRL().find((p) => p.name === name);
-        this.playersQRL = player?.name;
-        this.selectedResponseQRL = player ? player.answer : null;
+        return this.players.map((player) => player.name);
     }
 
     // for QRL
@@ -102,6 +83,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     sendRating(playerName: string) {
         this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
+        this.currentPlayer = this.players[++this.currentPlayerIndex];
     }
 
     // for QRL
