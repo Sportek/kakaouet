@@ -46,6 +46,10 @@ export class GameVueComponent implements OnInit, OnDestroy {
         this.gameService.selectAnswer(index);
     }
 
+    modifyAnswerQRL(): void {
+        this.gameService.modifyAnswerQRL(this.answer as string);
+    }
+
     giveUp() {
         this.gameService.giveUp();
     }

@@ -30,10 +30,10 @@ export class GameService {
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
 
-    private showHistogramSubject = new BehaviorSubject<boolean>(false); // for QRL
+    // private showHistogramSubject = new BehaviorSubject<boolean>(false); // for QRL
 
     // eslint-disable-next-line @typescript-eslint/member-ordering
-    showHistogram$ = this.showHistogramSubject.asObservable(); // for QRL
+    // showHistogram$ = this.showHistogramSubject.asObservable(); // for QRL
     // crée un Observable à partir du BehaviorSubject qui permet aux autres parties
     // de l'application de s'abonner et de réagir aux changements de son état
 
@@ -77,8 +77,10 @@ export class GameService {
         this.socketService.send(GameEvents.ChangeLockedState);
     }
 
+    // ==================> passe par la lorsque le joueur envoie sa réponse
     sendAnswer(answer: Answer) {
         this.socketService.send(GameEvents.SelectAnswer, { answers: answer });
+        console.log('le joueur a envoyé sa reponse');
     }
 
     isLastQuestion(): boolean {
@@ -141,10 +143,25 @@ export class GameService {
         if (newAnswer) this.sendAnswer(newAnswer);
     }
 
+    modifyAnswerQRL(value: string): void {
+        const currentPlayerName = this.client.getValue().name;
+        console.log('le joueur modifie sa reponse QRL');
+
+        if (this.isFinalAnswer.getValue()) return;
+        const player = this.players.getValue().find((p) => p.name === currentPlayerName);
+        if (player?.answers) {
+            player.answers.hasInterracted = true;
+            this.players.next([...this.players.getValue()]); // permet de mettre à jour la liste des joueurs
+        }
+        this.answer.next(value);
+        if (this.answer.getValue()) this.sendAnswer(this.answer.getValue() as Answer);
+    }
+
     // -----------------------------------------------------------> ICIIIIIIIIIIIIIIIIIIII
     enterAnswer(text: string): void {
         if (this.isFinalAnswer.getValue()) return;
         this.answer.next(text);
+        console.log('le joueur enterAnswer');
         this.sendAnswer(text);
     }
 
@@ -286,9 +303,9 @@ export class GameService {
     private gameCooldownListener() {
         this.socketService.listen(GameEvents.GameCooldown, (data: GameEventsData.GameCooldown) => {
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            if (this.cooldown.value <= 5 && this.actualQuestion.getValue()?.question.type === QuestionType.QRL) {
+            /* if (this.cooldown.value <= 5 && this.actualQuestion.getValue()?.question.type === QuestionType.QRL) {
                 this.showHistogramSubject.next(true);
-            }
+            }*/
             this.cooldown.next(data.cooldown);
         });
     }

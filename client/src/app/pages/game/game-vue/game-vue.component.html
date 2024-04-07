@@ -47,6 +47,7 @@
                                 placeholder="Veuillez entrer votre réponse"
                                 [(ngModel)]="answer"
                                 [disabled]="gameService.isFinalAnswer.getValue()"
+                                (ngModelChange)="modifyAnswerQRL()"
                             ></textarea>
                         </mat-form-field>
                     </ng-container>

@@ -163,12 +163,38 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.calculateChoices();
             }),
         );
+
         // for QRL
-        this.gameService.showHistogram$.subscribe((show) => {
-            if (show) {
-                this.showHistogram();
-            }
-        });
+        this.subscriptions.push(
+            this.gameService.players.subscribe((players) => {
+                this.players = players;
+                this.calculateHistogramData();
+            }),
+        );
+
+        /* this.gameService.gameState.subscribe((state) => {
+            if (this.actualQuestion?.question.type === QuestionType.QRL && state === GameState.DisplayQuestionResults) {
+                this.choices = [
+                    { text: '0%', amount: 0, isCorrect: true },
+                    { text: '50%', amount: 0, isCorrect: true },
+                    { text: '100%', amount: 0, isCorrect: true },
+                ];
+
+                 this.playerRatings.forEach((value) => {
+                     switch (value) {
+                        case 'zero':
+                            this.choices[0].amount++;
+                            break;
+                        case 'half':
+                            this.choices[1].amount++;
+                            break;
+                        case 'full':
+                            this.choices[2].amount++;
+                            break;
+                    }
+                });
+            });
+        }*/
     }
 
     filterPlayers(): PlayerClient[] {
@@ -198,14 +224,17 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.notInteractedHeight = (this.notInteractedCount / totalPlayers) * 100;
     }
 
+    // for QRL
     isQRL(): boolean {
         return this.gameService.actualQuestion.getValue()?.question.type === QuestionType.QRL;
     }
 
+    // for QRL
     isDisplayingResults(): boolean {
         return this.gameService.gameState.getValue() === GameState.DisplayQuestionResults;
     }
 
+    // for QRL
     isAnsweringQRL(): boolean {
         return this.gameService.gameState.getValue() === GameState.PlayersAnswerQuestion && this.actualQuestion?.question.type === QuestionType.QRL;
     }

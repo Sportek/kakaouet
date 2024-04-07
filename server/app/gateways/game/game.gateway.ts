@@ -51,7 +51,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.SelectAnswer)
     handleSelectAnswer(@MessageBody() data: GameEventsData.SelectAnswer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-
+        console.log('le joueur a selectionner une reponse');
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
         const player = gameSession.room.getPlayerWithSocketId(client.id);
@@ -64,6 +64,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.ConfirmAnswers)
     handleConfirmAnswers(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        console.log('le joueur a confirmer une reponse');
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
         const player = gameSession.room.getPlayerWithSocketId(client.id);
