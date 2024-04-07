@@ -23,7 +23,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     // for QRL
     playersQRL: string | undefined;
     // for QRL
-    playerRatings: { [key: string]: number } = {};
+    playerRatings: Map<string, string> = new Map<string, string>();
     // for QRL
     interactedCount: number = 0;
     // for QRL
@@ -88,35 +88,42 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     // for QRL
-    rateAnswerQRL(playerName: string, rating: number): void {
+    rateAnswerQRL(playerName: string, rating: string): void {
         const questionPoints = this.actualQuestion?.question.points ?? 0; // car potentiellement undefined
         const score = questionPoints * parseInt(rating, 10);
         this.gameService.rateAnswerQRL(playerName, score);
         switch (rating) {
-            case '0':
-                this.choices[0].amount++;
+            case 'zero':
+                this.playerRatings.set(playerName, 'zero');
                 break;
-            case '0.5':
-                this.choices[1].amount++;
+            case 'half':
+                this.playerRatings.set(playerName, 'half');
                 break;
-            case '1':
-                this.choices[2].amount++;
+            case 'full':
+                this.playerRatings.set(playerName, 'full');
                 break;
             default:
                 break;
         }
-        console.log(this.choices);
-    }
 
-    // for QRL
-    allPlayersRated(): boolean {
-        const players = this.getAnswerQRL();
-        return players.every((player) => this.playerRatings[player.name] !== undefined);
+        console.log(this.playerRatings);
     }
 
     // for QRL
     getRatingForPlayer(playerName: string): number | undefined {
-        return this.playerRatings[playerName];
+        switch (this.playerRatings.get(playerName)) {
+            case 'zero':
+                return 0;
+            case 'half':
+                if (this.actualQuestion) return this.actualQuestion?.question.points * 0.5;
+                break;
+            case 'full':
+                if (this.actualQuestion) return this.actualQuestion?.question.points;
+                break;
+            default:
+                break;
+        }
+        return undefined;
     }
 
     calculateChoices(): void {
@@ -148,13 +155,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.actualQuestion.subscribe((actualQuestion) => {
                 this.actualQuestion = actualQuestion;
-                if (actualQuestion?.question.type === QuestionType.QRL) {
-                    this.choices = [
-                        { text: '0%', amount: 0, isCorrect: true },
-                        { text: '50%', amount: 0, isCorrect: true },
-                        { text: '100%', amount: 0, isCorrect: true },
-                    ];
-                }
+                this.calculateChoices();
             }),
         );
 
@@ -174,6 +175,30 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.gameService.showHistogram$.subscribe((show) => {
             if (show) {
                 this.showHistogram();
+            }
+        });
+
+        this.gameService.gameState.subscribe((state) => {
+            if (this.actualQuestion?.question.type === QuestionType.QRL && state === GameState.DisplayQuestionResults) {
+                this.choices = [
+                    { text: '0%', amount: 0, isCorrect: true },
+                    { text: '50%', amount: 0, isCorrect: true },
+                    { text: '100%', amount: 0, isCorrect: true },
+                ];
+
+                this.playerRatings.forEach((value) => {
+                    switch (value) {
+                        case 'zero':
+                            this.choices[0].amount++;
+                            break;
+                        case 'half':
+                            this.choices[1].amount++;
+                            break;
+                        case 'full':
+                            this.choices[2].amount++;
+                            break;
+                    }
+                });
             }
         });
     }

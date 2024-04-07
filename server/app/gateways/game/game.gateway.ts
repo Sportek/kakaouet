@@ -24,7 +24,6 @@ export class GameGateway {
         if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         player.hasAnswered = true;
-        player.currentQuestionMultiplier = data.score;
 
         if (!gameSession.room.getPlayers().some((currPlayer) => currPlayer.role === GameRole.Player && !currPlayer.hasAnswered)) {
             gameSession.displayQuestionResults();

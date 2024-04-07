@@ -50,16 +50,17 @@
                         <div>{{ player.name }}: {{ player.answer }}</div>
                         <div>Veuillez noter sa réponse:</div>
                         <select (change)="rateAnswerQRL(player.name, $any($event.target).value)">
-                            <option value="0">0%</option>
-                            <option value="0.5">50%</option>
-                            <option value="1">100%</option>
+                            <option [defaultSelected]="">{{ 'Choisir' }}</option>
+                            <option value="zero">0%</option>
+                            <option value="half">50%</option>
+                            <option value="full">100%</option>
                         </select>
-                        <div>Note actuelle: {{ getRatingForPlayer(player.name) || 'Non noté' }}</div>
+                        <div>Note actuelle: {{ getRatingForPlayer(player.name)?.toString() }}</div>
                     </div>
                 </div>
             </div>
 
-            <ng-container *ngIf="isDisplayingResults() && !isQRL()">
+            <ng-container *ngIf="!isQRL()">
                 <div class="stats-container">
                     <div class="columns">
                         <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
