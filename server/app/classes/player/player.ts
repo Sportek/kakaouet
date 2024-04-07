@@ -11,6 +11,7 @@ export class Player {
     score: number;
     isExcluded: boolean;
     hasGiveUp: boolean;
+    hasAnswered: boolean;
     private room: Room;
     private game: GameSession;
     private answers: PlayerAnswers;
@@ -23,6 +24,7 @@ export class Player {
         this.score = 0;
         this.bonus = 0;
         this.hasGiveUp = false;
+        this.hasAnswered = true;
     }
 
     setRoom(room: Room): void {

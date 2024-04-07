@@ -21,13 +21,11 @@ export class GameGateway {
 
         const player = gameSession.room.getPlayer(data.playerName);
         if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
-    }
 
-    @SubscribeMessage(GameEvents.FinishedRatingQRL)
-    handleFinishRatingQRL(@ConnectedSocket() client: Socket): SocketResponse {
-        const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        gameSession.displayQuestionResults();
-        return { isSuccess: true, message: 'Les résultats ont bien été envoyés' };
+        player.hasAnswered = true;
+        // if (!gameSession.room.getPlayers().some((currPlayer) => !currPlayer.hasAnswered)) gameSession.displayQuestionResults();
+
+        return { isSuccess: true, message: 'La question a été notée' };
     }
 
     @SubscribeMessage(GameEvents.Disconnect)
