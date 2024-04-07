@@ -41,8 +41,10 @@
                 <div class="players-container">
                     <div class="players">
                         <div *ngFor="let player of filterPlayers()" class="player">
-                            <div class="player-name">{{ player.name }}</div>
+                            <div  class="player-name">{{ player.name }}</div>
                             <div *ngIf="client.role === 'organisator'" class="ban-player clickable">
+                                <mat-icon *ngIf="player.isMuted" class="material-symbols-outlined" matTooltip="Unmute le joueur" (click)="toggleMutePlayer(player)">speaker_notes_off</mat-icon>
+                                <mat-icon *ngIf="!player.isMuted" class="material-symbols-outlined" matTooltip="Mute le joueur" (click)="toggleMutePlayer(player)">speaker_notes</mat-icon>
                                 <mat-icon>
                                     <span class="material-symbols-outlined" matTooltip="Exclure le joueur" (click)="banPlayer(player)"> block </span>
                                 </mat-icon>
