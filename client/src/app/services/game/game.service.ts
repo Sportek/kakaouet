@@ -29,6 +29,14 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
+
+    private showHistogramSubject = new BehaviorSubject<boolean>(false); // for QRL
+
+    // eslint-disable-next-line @typescript-eslint/member-ordering
+    showHistogram$ = this.showHistogramSubject.asObservable(); // for QRL
+    // crée un Observable à partir du BehaviorSubject qui permet aux autres parties
+    // de l'application de s'abonner et de réagir aux changements de son état
+
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
         private router: Router,
@@ -42,6 +50,7 @@ export class GameService {
         this.initialise();
         this.registerListeners();
     }
+
     initialise() {
         this.players = new BehaviorSubject<PlayerClient[]>([]);
         this.client = new BehaviorSubject<Client>({ name: '', role: GameRole.Organisator, score: 0 });
@@ -158,7 +167,6 @@ export class GameService {
     }*/
 
     nextQuestion(): void {
-        console.log('im in game service');
         this.socketService.send(GameEvents.NextQuestion);
     }
 
@@ -274,8 +282,13 @@ export class GameService {
         });
     }
 
+    // ========================================================================> ICI
     private gameCooldownListener() {
         this.socketService.listen(GameEvents.GameCooldown, (data: GameEventsData.GameCooldown) => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            if (this.cooldown.value <= 5 && this.actualQuestion.getValue()?.question.type === QuestionType.QRL) {
+                this.showHistogramSubject.next(true);
+            }
             this.cooldown.next(data.cooldown);
         });
     }

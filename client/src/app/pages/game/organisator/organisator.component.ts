@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 // import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
@@ -23,6 +24,14 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     playersQRL: string | undefined;
     // for QRL
     playerRatings: { [key: string]: number } = {};
+    // for QRL
+    interactedCount: number = 0;
+    // for QRL
+    notInteractedCount: number = 0;
+    // for QRL
+    interactedHeight: number = 0; // pour l'histogramme
+    // for QRL
+    notInteractedHeight: number = 0; // pour l'histogramme
 
     currentQuestion: number;
     private subscriptions: Subscription[];
@@ -79,6 +88,16 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     // for QRL
+    isAnsweringQRL(): boolean {
+        return this.gameService.gameState.getValue() === GameState.PlayersAnswerQuestion && this.actualQuestion?.question.type === QuestionType.QRL;
+    }
+
+    // for QRL
+    isQRL(): boolean {
+        return this.actualQuestion?.question.type === QuestionType.QRL;
+    }
+
+    // for QRL
     rateAnswerQRL(playerName: string, rating: number): void {
         const questionPoints = this.actualQuestion?.question.points ?? 0; // car potentiellement undefined
         const score = questionPoints * rating;
@@ -119,7 +138,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     nextQuestion(): void {
-        console.log('oragnisator');
         this.gameService.nextQuestion();
     }
 
@@ -142,6 +160,12 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.calculateChoices();
             }),
         );
+        // for QRL
+        this.gameService.showHistogram$.subscribe((show) => {
+            if (show) {
+                this.showHistogram();
+            }
+        });
     }
 
     filterPlayers(): PlayerClient[] {
@@ -154,5 +178,20 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     isLastQuestion(): boolean {
         return this.gameService.isLastQuestion();
+    }
+
+    // for QRL
+    showHistogram() {
+        this.calculateHistogramData();
+    }
+
+    // for QRL
+    calculateHistogramData() {
+        const totalPlayers = this.players.length;
+        this.interactedCount = this.players.filter((player) => player.answers?.hasInterracted).length;
+        this.notInteractedCount = totalPlayers - this.interactedCount;
+
+        this.interactedHeight = (this.interactedCount / totalPlayers) * 100;
+        this.notInteractedHeight = (this.notInteractedCount / totalPlayers) * 100;
     }
 }

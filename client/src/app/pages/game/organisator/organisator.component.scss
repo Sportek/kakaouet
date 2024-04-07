@@ -261,3 +261,35 @@
     width: 10px;
     height: 10px;
 }
+
+// A revoir le CSS 
+.histogram-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.histogram {
+    display: flex;
+    width: 50%;
+    background-color: #f1f1f1;
+}
+
+.histogram-column {  
+    flex-grow: 1;
+    margin: 0 5px;
+    background-color: #4CAF50;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    color: white;
+    transition: height 0.5s ease-in-out;
+
+    &.not-interacted {
+        background-color: #f44336;
+    }
+
+    .histogram-label {
+        padding: 10px;
+    }
+}

@@ -40,8 +40,8 @@ export enum GameEvents {
 }
 
 // Différents types définis
-
 export type Answer = string | number[];
+
 export interface ExtendedAnswer {
     hasInterracted: boolean;
     hasConfirmed: boolean;
