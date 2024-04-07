@@ -24,7 +24,7 @@ export class Player {
         this.score = 0;
         this.bonus = 0;
         this.hasGiveUp = false;
-        this.hasAnswered = true;
+        this.hasAnswered = false;
     }
 
     setRoom(room: Room): void {

@@ -23,8 +23,9 @@ export class GameGateway {
         if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         player.hasAnswered = true;
-        // if (!gameSession.room.getPlayers().some((currPlayer) => !currPlayer.hasAnswered)) gameSession.displayQuestionResults();
-
+        if (!gameSession.room.getPlayers().some((currPlayer) => currPlayer.role === GameRole.Player && !currPlayer.hasAnswered)) {
+            gameSession.displayQuestionResults();
+        }
         return { isSuccess: true, message: 'La question a été notée' };
     }
 
