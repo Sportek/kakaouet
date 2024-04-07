@@ -90,6 +90,10 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.filterPlayers();
     }
 
+    toggleMutePlayer(player: PlayerClient) {
+        this.gameService.toggleMutePlayer(player);
+    }
+
     ngOnDestroy(): void {
         this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }

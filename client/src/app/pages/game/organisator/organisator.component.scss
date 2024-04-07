@@ -173,6 +173,10 @@
                     display: flex;
                     flex-direction: row;
                     gap: 0.5rem;
+                    .player-name-no-interaction { color: red; }
+                    .player-name-interacted { color: yellow; }
+                    .player-name-finalized { color: green; }
+                    .player-name-abandoned { color: black; }
                 }
 
                 .has-giveup {
