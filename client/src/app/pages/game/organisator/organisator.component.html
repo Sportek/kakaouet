@@ -19,7 +19,32 @@
                 </div>
             </div>
 
-            <div class="stats-container-qrl" *ngIf="isCorrectingAnswers()">
+            <!-- <div class="stats-container-qrl" *ngIf="isQRL()">
+                <div class="players-container-answer-qrl">
+                    <div *ngFor="let player of getPlayers()">
+                        <div (click)="selectPlayer(player)">
+                            {{ player }}
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="selectedResponseQRL">
+                    <div>Réponse du joueur "{{ playersQRL }}": {{ selectedResponseQRL }} </div>
+                    <div>Veuillez noter sa réponse:</div>
+                </div>
+            </div> -->
+
+            <div class="histogram-container" *ngIf="isAnsweringQRL()">
+                <div class="histogram">
+                    <div class="histogram-column interacted" [style.height]="interactedHeight + '%'">
+                        <span class="histogram-label">{{ interactedCount }} ont modifié</span>
+                    </div>
+                    <div class="histogram-column not-interacted" [style.height]="notInteractedHeight + '%'">
+                        <span class="histogram-label">{{ notInteractedCount }} n'ont pas modifié</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
                 <div class="players-container-answer-qrl">
                     <div *ngFor="let player of getAnswerQRL()">
                         <div>{{ player.name }}: {{ player.answer }}</div>
