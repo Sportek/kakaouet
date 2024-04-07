@@ -120,7 +120,7 @@ export class Room {
     }
 
     allPlayerAnswered(): boolean {
-        return this.getOnlyGamePlayers().every((player) => player.getAnswer(this.game.gameQuestionIndex));
+        return this.getOnlyGamePlayers().every((player) => player.getAnswer(this.game.gameQuestionIndex)?.hasConfirmed);
     }
 
     getPlayingPlayers(): Player[] {
