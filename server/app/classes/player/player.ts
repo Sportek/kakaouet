@@ -10,6 +10,7 @@ export class Player {
     bonus: number;
     score: number;
     isExcluded: boolean;
+    isMuted: boolean;
     hasGiveUp: boolean;
     private room: Room;
     private game: GameSession;

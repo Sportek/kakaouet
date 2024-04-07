@@ -42,6 +42,10 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
         this.gameService.banPlayer(player);
     }
 
+    toggleMutePlayer(player: PlayerClient) {
+        this.gameService.toggleMutePlayer(player);
+    }
+
     filterPlayers(): PlayerClient[] {
         return this.gameService.filterPlayers();
     }
