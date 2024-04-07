@@ -16,7 +16,6 @@ export class GameGateway {
     // for QRL
     @SubscribeMessage(GameEvents.RateAnswerQRL)
     handleRateAnswerQRL(@MessageBody() data: GameEventsData.RateAnswerQRL, @ConnectedSocket() client: Socket): SocketResponse {
-        console.log(data);
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
@@ -24,6 +23,7 @@ export class GameGateway {
         if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
         player.hasAnswered = true;
+        player.score += data.score;
 
         if (!gameSession.room.getPlayers().some((currPlayer) => currPlayer.role === GameRole.Player && !currPlayer.hasAnswered)) {
             gameSession.displayQuestionResults();

@@ -23,7 +23,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     // for QRL
     playersQRL: string | undefined;
     // for QRL
-    playerRatings: Map<string, string> = new Map<string, string>();
+    playerRatings: Map<string, number> = new Map<string, number>();
     // for QRL
     interactedCount: number = 0;
     // for QRL
@@ -90,40 +90,25 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     // for QRL
     rateAnswerQRL(playerName: string, rating: string): void {
         const questionPoints = this.actualQuestion?.question.points ?? 0; // car potentiellement undefined
-        const score = questionPoints * parseInt(rating, 10);
-        this.gameService.rateAnswerQRL(playerName, score);
-        switch (rating) {
-            case 'zero':
-                this.playerRatings.set(playerName, 'zero');
-                break;
-            case 'half':
-                this.playerRatings.set(playerName, 'half');
-                break;
-            case 'full':
-                this.playerRatings.set(playerName, 'full');
-                break;
-            default:
-                break;
-        }
+        const score: number = questionPoints * parseFloat(rating);
+        this.choices.forEach((choice) => {
+            if (parseFloat(choice.text) * questionPoints === this.playerRatings.get(playerName)) choice.amount--;
+            if (choice.text === rating) choice.amount++;
+        });
+        this.playerRatings.set(playerName, score);
+    }
 
-        console.log(this.playerRatings);
+    sendRating(playerName: string) {
+        this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
     }
 
     // for QRL
     getRatingForPlayer(playerName: string): number | undefined {
-        switch (this.playerRatings.get(playerName)) {
-            case 'zero':
-                return 0;
-            case 'half':
-                if (this.actualQuestion) return this.actualQuestion?.question.points * 0.5;
-                break;
-            case 'full':
-                if (this.actualQuestion) return this.actualQuestion?.question.points;
-                break;
-            default:
-                break;
-        }
-        return undefined;
+        return this.playerRatings.get(playerName);
+    }
+
+    formatColumn(column: ChoiceData): string {
+        return parseFloat(column.text) * 100 + '%';
     }
 
     calculateChoices(): void {
@@ -155,6 +140,13 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.actualQuestion.subscribe((actualQuestion) => {
                 this.actualQuestion = actualQuestion;
+                if (this.actualQuestion?.question?.type === QuestionType.QRL) {
+                    this.choices = [
+                        { text: '0', amount: 0, isCorrect: true },
+                        { text: '0.5', amount: 0, isCorrect: true },
+                        { text: '1', amount: 0, isCorrect: true },
+                    ];
+                }
                 this.calculateChoices();
             }),
         );
@@ -175,30 +167,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.gameService.showHistogram$.subscribe((show) => {
             if (show) {
                 this.showHistogram();
-            }
-        });
-
-        this.gameService.gameState.subscribe((state) => {
-            if (this.actualQuestion?.question.type === QuestionType.QRL && state === GameState.DisplayQuestionResults) {
-                this.choices = [
-                    { text: '0%', amount: 0, isCorrect: true },
-                    { text: '50%', amount: 0, isCorrect: true },
-                    { text: '100%', amount: 0, isCorrect: true },
-                ];
-
-                this.playerRatings.forEach((value) => {
-                    switch (value) {
-                        case 'zero':
-                            this.choices[0].amount++;
-                            break;
-                        case 'half':
-                            this.choices[1].amount++;
-                            break;
-                        case 'full':
-                            this.choices[2].amount++;
-                            break;
-                    }
-                });
             }
         });
     }

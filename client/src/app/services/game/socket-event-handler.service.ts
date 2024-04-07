@@ -45,7 +45,6 @@ export class SocketEventHandlerService {
                 player.answers.hasConfirmed = true;
             }
             players.next([...players.getValue()]);
-            console.log(players.getValue());
         }
     }
 

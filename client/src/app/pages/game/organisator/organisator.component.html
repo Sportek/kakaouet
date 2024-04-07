@@ -19,20 +19,6 @@
                 </div>
             </div>
 
-            <!-- <div class="stats-container-qrl" *ngIf="isQRL()">
-                <div class="players-container-answer-qrl">
-                    <div *ngFor="let player of getPlayers()">
-                        <div (click)="selectPlayer(player)">
-                            {{ player }}
-                        </div>
-                    </div>
-                </div>
-                <div *ngIf="selectedResponseQRL">
-                    <div>Réponse du joueur "{{ playersQRL }}": {{ selectedResponseQRL }} </div>
-                    <div>Veuillez noter sa réponse:</div>
-                </div>
-            </div> -->
-
             <div class="histogram-container" *ngIf="isAnsweringQRL()">
                 <div class="histogram">
                     <div class="histogram-column interacted" [style.height]="interactedHeight + '%'">
@@ -51,11 +37,19 @@
                         <div>Veuillez noter sa réponse:</div>
                         <select (change)="rateAnswerQRL(player.name, $any($event.target).value)">
                             <option [defaultSelected]="">{{ 'Choisir' }}</option>
-                            <option value="zero">0%</option>
-                            <option value="half">50%</option>
-                            <option value="full">100%</option>
+                            <option value="0">0%</option>
+                            <option value="0.5">50%</option>
+                            <option value="1">100%</option>
                         </select>
                         <div>Note actuelle: {{ getRatingForPlayer(player.name)?.toString() }}</div>
+                        <button
+                            *ngIf="getRatingForPlayer(player.name)?.toString()"
+                            mat-raised-button
+                            color="primary"
+                            (click)="sendRating(player.name)"
+                        >
+                            Noter
+                        </button>
                     </div>
                 </div>
             </div>
@@ -91,13 +85,13 @@
             <ng-container *ngIf="isDisplayingResults() && isQRL()">
                 <div class="stats-container">
                     <div class="columns">
-                        <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
+                        <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="formatColumn(column)">
                             <div
                                 class="column"
                                 [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
                                 [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
                             ></div>
-                            <div class="column-label">{{ column.text }} ({{ column.amount }})</div>
+                            <div class="column-label">{{ formatColumn(column) }} ({{ column.amount }})</div>
                         </div>
                     </div>
                     <div class="legend">
