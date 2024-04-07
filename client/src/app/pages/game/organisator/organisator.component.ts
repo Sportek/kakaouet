@@ -32,6 +32,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     interactedHeight: number = 0; // pour l'histogramme
     // for QRL
     notInteractedHeight: number = 0; // pour l'histogramme
+    // for QRL
+    itsTime: boolean = false;
 
     currentQuestion: number;
     private subscriptions: Subscription[];
@@ -167,34 +169,17 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         // for QRL
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
-                this.players = players;
-                this.calculateHistogramData();
+                if (this.cooldown <= 50) {
+                    this.players = players;
+                    this.calculateHistogramData();
+                }
             }),
         );
+    }
 
-        /* this.gameService.gameState.subscribe((state) => {
-            if (this.actualQuestion?.question.type === QuestionType.QRL && state === GameState.DisplayQuestionResults) {
-                this.choices = [
-                    { text: '0%', amount: 0, isCorrect: true },
-                    { text: '50%', amount: 0, isCorrect: true },
-                    { text: '100%', amount: 0, isCorrect: true },
-                ];
-
-                 this.playerRatings.forEach((value) => {
-                     switch (value) {
-                        case 'zero':
-                            this.choices[0].amount++;
-                            break;
-                        case 'half':
-                            this.choices[1].amount++;
-                            break;
-                        case 'full':
-                            this.choices[2].amount++;
-                            break;
-                    }
-                });
-            });
-        }*/
+    allowed(): boolean {
+        if (this.cooldown <= 50) return true;
+        return false;
     }
 
     filterPlayers(): PlayerClient[] {

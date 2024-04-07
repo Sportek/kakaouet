@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div class="histogram-container" *ngIf="isAnsweringQRL()">
+            <div class="histogram-container" *ngIf="isAnsweringQRL() &&  allowed()">
                 <div class="histogram">
                     <div class="histogram-column interacted" [style.height]="interactedHeight + '%'">
                         <span class="histogram-label">{{ interactedCount }} ont modifié</span>
