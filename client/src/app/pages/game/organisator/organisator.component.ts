@@ -26,7 +26,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     // for QRL
     playersQRL: string | undefined;
     // for QRL
-    // for QRL
     interactedCount: number = 0;
     // for QRL
     notInteractedCount: number = 0;
@@ -81,6 +80,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.playerRatings.set(playerName, score);
     }
 
+    // for QRL
     sendRating(playerName: string) {
         this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
         this.currentPlayer = this.players[++this.currentPlayerIndex];
@@ -143,17 +143,17 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
-                this.players = players;
-                this.calculateChoices();
-            }),
-        );
-
-        // for QRL
-        this.subscriptions.push(
-            this.gameService.players.subscribe((players) => {
-                if (this.cooldown <= 50) {
+                if (this.actualQuestion?.question.type === QuestionType.QCM) {
                     this.players = players;
-                    this.calculateHistogramData();
+                    this.calculateChoices();
+                } else if (this.actualQuestion?.question.type === QuestionType.QRL) {
+                    if (this.cooldown <= 50) {
+                        this.players = players;
+                        // this.gameService.recordInteraction(this.currentPlayer.name);
+                        this.calculateHistogramData();
+                        this.currentPlayer = players[0];
+                        this.currentPlayerIndex = 0;
+                    }
                 }
             }),
         );
@@ -177,14 +177,17 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     // for QRL
-    showHistogram() {
+    /* showHistogram() {
         this.calculateHistogramData();
-    }
+    }*/
 
     // for QRL
     calculateHistogramData() {
         const totalPlayers = this.players.length;
         this.interactedCount = this.players.filter((player) => player.answers?.hasInterracted).length;
+        // this.interactedCount = Array.from(this.gameService.recentInteractions.values()).filter((interacted) => interacted).length; // a revoir
+        console.log(this.interactedCount);
+        console.log('allo');
         this.notInteractedCount = totalPlayers - this.interactedCount;
 
         this.interactedHeight = (this.interactedCount / totalPlayers) * 100;

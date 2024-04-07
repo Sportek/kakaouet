@@ -31,6 +31,7 @@ export class GameService {
     correctAnswers: BehaviorSubject<Choice[]>;
 
     // private showHistogramSubject = new BehaviorSubject<boolean>(false); // for QRL
+    recentInteractions: Map<string, boolean> = new Map();
 
     // eslint-disable-next-line @typescript-eslint/member-ordering
     // showHistogram$ = this.showHistogramSubject.asObservable(); // for QRL
@@ -81,6 +82,14 @@ export class GameService {
     sendAnswer(answer: Answer) {
         this.socketService.send(GameEvents.SelectAnswer, { answers: answer });
         console.log('le joueur a envoyé sa reponse');
+    }
+
+    // ============================================> Arevoir!!!!!!!!!!!!!!!!!!!!!!!
+    recordInteraction(playerName: string) {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        if (this.cooldown.getValue() <= 50) {
+            this.recentInteractions.set(playerName, true);
+        }
     }
 
     isLastQuestion(): boolean {
