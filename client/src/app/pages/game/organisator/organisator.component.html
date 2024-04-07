@@ -19,20 +19,6 @@
                 </div>
             </div>
 
-            <!-- <div class="stats-container-qrl" *ngIf="isQRL()">
-                <div class="players-container-answer-qrl">
-                    <div *ngFor="let player of getPlayers()">
-                        <div (click)="selectPlayer(player)">
-                            {{ player }}
-                        </div>
-                    </div>
-                </div>
-                <div *ngIf="selectedResponseQRL">
-                    <div>Réponse du joueur "{{ playersQRL }}": {{ selectedResponseQRL }} </div>
-                    <div>Veuillez noter sa réponse:</div>
-                </div>
-            </div> -->
-
             <div class="stats-container-qrl" *ngIf="isCorrectingAnswers()">
                 <div class="players-container-answer-qrl">
                     <div *ngFor="let player of getAnswerQRL()">
@@ -48,7 +34,7 @@
                 </div>
             </div>
 
-            <ng-container *ngIf="!isCorrectingAnswers()">
+            <ng-container *ngIf="isDisplayingResults() && !isQRL()">
                 <div class="stats-container">
                     <div class="columns">
                         <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
@@ -71,6 +57,26 @@
                         <div class="state">
                             <div class="color isIncorrect"></div>
                             <div class="label">Incorrect</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="isDisplayingResults() && isQRL()">
+                <div class="stats-container">
+                    <div class="columns">
+                        <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
+                            <div
+                                class="column"
+                                [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
+                                [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
+                            ></div>
+                            <div class="column-label">{{ column.text }} ({{ column.amount }})</div>
+                        </div>
+                    </div>
+                    <div class="legend">
+                        <div class="stats">
+                            {{ getAnswerAmount() + '/' + players.length }}
                         </div>
                     </div>
                 </div>

@@ -358,6 +358,7 @@ export class GameService {
             this.socketEventHandlerService.handleSpeedUpTimer();
         });
     }
+
     private registerListeners() {
         this.playerJoinGameListener();
         this.playerQuitGameListener();

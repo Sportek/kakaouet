@@ -79,11 +79,25 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     // for QRL
-    rateAnswerQRL(playerName: string, rating: number): void {
+    rateAnswerQRL(playerName: string, rating: string): void {
+        console.log(playerName, rating);
         const questionPoints = this.actualQuestion?.question.points ?? 0; // car potentiellement undefined
-        const score = questionPoints * rating;
+        const score = questionPoints * parseInt(rating, 10);
         this.gameService.rateAnswerQRL(playerName, score);
-        this.playerRatings[playerName] = score;
+        switch (rating) {
+            case '0':
+                this.choices[0].amount++;
+                break;
+            case '0.5':
+                this.choices[1].amount++;
+                break;
+            case '1':
+                this.choices[2].amount++;
+                break;
+            default:
+                break;
+        }
+        console.log(this.choices);
     }
 
     // for QRL
@@ -127,6 +141,13 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.actualQuestion.subscribe((actualQuestion) => {
                 this.actualQuestion = actualQuestion;
+                if (actualQuestion?.question.type === QuestionType.QRL) {
+                    this.choices = [
+                        { text: '0%', amount: 0, isCorrect: true },
+                        { text: '50%', amount: 0, isCorrect: true },
+                        { text: '100%', amount: 0, isCorrect: true },
+                    ];
+                }
             }),
         );
 
@@ -154,5 +175,13 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     isLastQuestion(): boolean {
         return this.gameService.isLastQuestion();
+    }
+
+    isQRL(): boolean {
+        return this.gameService.actualQuestion.getValue()?.question.type === QuestionType.QRL;
+    }
+
+    isDisplayingResults(): boolean {
+        return this.gameService.gameState.getValue() === GameState.DisplayQuestionResults;
     }
 }

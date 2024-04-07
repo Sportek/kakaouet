@@ -150,7 +150,11 @@ export class GameSession {
         const correctAnswerPlayers: Player[] = players.flatMap((player) => {
             const answer = player.getAnswer(this.gameQuestionIndex);
             if (answer && this.isCorrectAnswer(answer.answer as number[], correctAnswersIndex)) {
-                player.score += question.points;
+                if (question.type === QuestionType.QCM) {
+                    player.score += question.points;
+                } else {
+                    player.score += question.points * player.currentQuestionMultiplier;
+                }
                 return player;
             }
             return [];

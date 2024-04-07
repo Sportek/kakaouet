@@ -9,6 +9,7 @@ export class Player {
     socket: Socket;
     bonus: number;
     score: number;
+    currentQuestionMultiplier: number;
     isExcluded: boolean;
     hasGiveUp: boolean;
     hasAnswered: boolean;
