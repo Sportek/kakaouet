@@ -6,9 +6,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { cinq, mockQuizTable, unDemi } from './mock-quiz';
+import { RANDOM_ID } from '@common/constants';
 
 @Injectable()
 export class QuizService {
+    randomId = RANDOM_ID;
     constructor(
         @InjectModel(Quiz.name) public quizModel: Model<QuizDocument>,
         private readonly logger: Logger,
@@ -110,7 +112,7 @@ export class QuizService {
         const qcmQuestions = await this.questionService.getQCMQuestions();
         const randomQuestions = qcmQuestions.sort(() => unDemi - Math.random()).slice(0, cinq);
         const randomQuiz: QuizObjet = {
-            _id: 'random-quiz',
+            _id: this.randomId,
             title: 'Mode Aléatoire',
             description: 'Ce quiz est généré aléatoirement à partir des questions QCM.',
             duration: 20,

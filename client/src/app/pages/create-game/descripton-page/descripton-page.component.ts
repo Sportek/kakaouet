@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { RANDOM_ID } from '@common/constants';
 import { GameType, Question, Quiz } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -13,10 +14,10 @@ import { Subscription } from 'rxjs';
 })
 export class DescriptonPageComponent implements OnInit {
     quiz: Quiz;
+    ramdomId = RANDOM_ID;
     question: Question[];
     notFound: number;
     private subscriptions = new Subscription();
-    // private randomQuizId = 'random-quiz';
 
     // Toutes ces dépendances sont nécessaires
     // eslint-disable-next-line max-params
@@ -69,10 +70,8 @@ export class DescriptonPageComponent implements OnInit {
     }
 
     createGame(quizId: string) {
-        if (quizId === 'random-quiz') {
-            this.gameService.createNewGame(quizId, GameType.Random);
-        }
-        this.gameService.createNewGame(quizId, GameType.Default);
+        const gameType = quizId === this.ramdomId ? GameType.Random : GameType.Default;
+        this.gameService.createNewGame(quizId, gameType);
     }
 
     checkQuizBeforeNavigation(gameId: string, path: string, includeId: boolean = true) {

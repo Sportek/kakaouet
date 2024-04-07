@@ -112,12 +112,16 @@ export class GameService {
         });
         return newGame.save();
     }
-
     // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
     async createGameSession(code: string, server: Server, quizId: string, gameType: GameType): Promise<GameSession> {
         const room = new Room(code, server, this);
-        const quiz = await this.quizModel.findById(quizId);
-        const gameSession = new GameSession(code, room, quiz.toObject(), gameType);
+        let quiz;
+        if (gameType === GameType.Random) {
+            quiz = await this.quizService.generateRandomQuiz();
+        } else {
+            quiz = await this.quizModel.findById(quizId);
+        }
+        const gameSession = new GameSession(code, room, quiz, gameType);
         this.gameSessions.set(code, gameSession);
         return gameSession;
     }

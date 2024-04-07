@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
 import { ValidateService } from '@app/services/validate/validate.service';
+import { RANDOM_ID } from '@common/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { saveAs } from 'file-saver';
 import { Observable, Subject, of, throwError } from 'rxjs';
@@ -12,6 +13,7 @@ import { QuestionService } from './question.service';
     providedIn: 'root',
 })
 export class QuizService {
+    randomId = RANDOM_ID;
     private baseURL = BASE_URL + '/quiz';
     private quizUpdateSubject = new Subject<void>();
     private quizUpdates: Observable<void> = this.quizUpdateSubject.asObservable();
@@ -34,7 +36,7 @@ export class QuizService {
         return this.http.get<Quiz>(url);
     }
     getQuizDetailsById(id: string): Observable<Quiz> {
-        if (id === 'random-quiz') {
+        if (id === this.randomId) {
             return this.getRandomQuiz();
         } else {
             return this.getQuizById(id);
