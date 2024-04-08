@@ -90,6 +90,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.calculateChoices();
             }),
         );
+        this.sortPlayers();
     }
 
     filterPlayers(): PlayerClient[] {
