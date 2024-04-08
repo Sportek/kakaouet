@@ -57,9 +57,16 @@ export class GameService {
     }
 
     startGame() {
-        if (!this.isLocked.getValue()) return this.notificationService.error('Veuillez verrouiller la partie avant de la démarrer');
-        if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length)
+        if (!this.isLocked.getValue()) {
+            return this.notificationService.error('Veuillez verrouiller la partie avant de la démarrer');
+        }
+        if (this.game.getValue().type === GameType.Random) {
+            this.socketService.send(GameEvents.StartGame);
+            return;
+        }
+        if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length) {
             return this.notificationService.error('Il doit y avoir au moins un joueur pour démarrer la partie');
+        }
         this.socketService.send(GameEvents.StartGame);
     }
 
