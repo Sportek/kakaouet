@@ -14,6 +14,7 @@ export enum GameEvents {
     ToggleTimer = 'toggleTimer', // Event sent to the server when an organizer wants to toggle the timer
     SpeedUpTimer = 'speedUpTimer', // Event sent to the server when an organizer wants to speed up the timer
     SendMessage = 'sendMessage', // Event sent to the server when a user sends a chat message
+    MutePlayer = 'mutePlayer',
 
     // Events launched by the server
     PlayerSelectAnswer = 'playerSelectedAnswer', // Event sent to organizer a player has selected an answer
@@ -34,6 +35,7 @@ export enum GameEvents {
     PlayerSendMessage = 'playerSendMessage', // Event broadcasted to room containing player
     PlayerSendResults = 'playerSendResults', // Event sent to all players when the results are sent
     SendCorrectAnswers = 'playerSendCorrectAnswers', // Event sent to all players containing the correct answers
+    PlayerMuted = 'playerMuted',
     GameSpeedUpTimer = 'gameSpeedUpTimer', // Event sent to all players when the timer is speed up
 }
 
@@ -48,7 +50,16 @@ export interface PlayerClient {
     isExcluded: boolean;
     hasGiveUp: boolean;
     answers?: ExtendedAnswer;
+    isMuted: boolean;
+    interactionStatus : InteractionStatus;
 };
+export enum InteractionStatus {
+    noInteraction = 'noInteraction',
+    interacted = 'interacted', 
+    finalized = 'finalized',
+    abandoned = 'abandoned'
+
+}
 export interface Client { name: string; role: GameRole; score: number };
 export interface GameRestricted { code: string; quizName: string; type: GameType };
 export interface SocketResponse { isSuccess: boolean; message?: string };
@@ -99,6 +110,7 @@ export namespace GameEventsData {
         score: number;
         isExcluded: boolean;
         hasGiveUp: boolean;
+        isMuted: boolean;
     }
 
     export interface PlayerQuitGame {
@@ -144,6 +156,15 @@ export namespace GameEventsData {
     }
 
     export interface BanPlayer {
+        name: string;
+    }
+
+    export interface PlayerMuted {
+        name: string;
+        isMuted : boolean;
+    }
+
+    export interface MutePlayer {
         name: string;
     }
 

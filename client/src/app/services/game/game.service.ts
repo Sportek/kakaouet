@@ -9,7 +9,18 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { SoundService } from '@app/services/sound/sound.service';
 import { NEGATIVE_SCORE } from '@common/constants';
 import { Variables } from '@common/enum-variables';
-import { ActualQuestion, Answer, Client, GameEvents, GameEventsData, GameRestricted, PlayerClient, SoundType } from '@common/game-types';
+
+import {
+    ActualQuestion,
+    Answer,
+    Client,
+    GameEvents,
+    GameEventsData,
+    GameRestricted,
+    PlayerClient,
+    SoundType,
+    InteractionStatus,
+} from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 import { SocketEventHandlerService } from './socket-event-handler.service';
@@ -132,6 +143,11 @@ export class GameService {
     }
 
     nextQuestion(): void {
+        this.players.getValue().forEach((player) => {
+            if (player.interactionStatus !== InteractionStatus.abandoned) {
+                player.interactionStatus = InteractionStatus.noInteraction;
+            }
+        });
         this.socketService.send(GameEvents.NextQuestion);
     }
 
@@ -161,6 +177,10 @@ export class GameService {
         this.socketService.send(GameEvents.BanPlayer, { name: player.name });
     }
 
+    toggleMutePlayer(player: PlayerClient) {
+        this.socketService.send(GameEvents.MutePlayer, { name: player.name });
+    }
+
     getCorrectAnswers(): Observable<Choice[]> {
         return this.correctAnswers.asObservable();
     }
@@ -186,7 +206,17 @@ export class GameService {
         this.client.next({ name: 'Organisateur', role: GameRole.Player, score: 0 });
         this.changeLockState();
         this.isLocked.next(true);
-        this.players.next([{ name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false }]);
+        this.players.next([
+            {
+                name: 'Organisateur',
+                role: GameRole.Player,
+                isExcluded: false,
+                score: 0,
+                hasGiveUp: false,
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
+        ]);
         this.startGame();
     }
 
@@ -330,6 +360,12 @@ export class GameService {
         });
     }
 
+    private receiveMutedPlayers() {
+        this.socketService.listen(GameEvents.PlayerMuted, (data: GameEventsData.PlayerMuted) => {
+            this.socketEventHandlerService.handlePlayerMuted(data, this.players, this.client);
+        });
+    }
+
     private receiveGiveUpPlayers() {
         this.socketService.listen(GameEvents.PlayerHasGiveUp, (data: GameEventsData.PlayerHasGiveUp) => {
             this.socketEventHandlerService.handlePlayerGivesUp(data, this.players);
@@ -358,6 +394,7 @@ export class GameService {
         this.receiveGiveUpPlayers();
         this.playerSendResultsListener();
         this.receiveCorrectAnswersListener();
+        this.receiveMutedPlayers();
         this.receiveSpeedUpTimer();
     }
 }
