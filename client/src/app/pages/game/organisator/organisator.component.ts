@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 // import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { ActualQuestion, ChoiceData, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
 import { QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
@@ -26,6 +27,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     constructor(
         private gameService: GameService, 
+        private playerService: PlayerService,
     ) {
         this.actualQuestion = null;
         this.cooldown = 0;
@@ -107,32 +109,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     sortPlayers(): void {
-        this.players.sort((a, b) => {
-          let comparison = 0;
-      
-          switch (this.selectedCriterion) {
-            case SortingCriteria.name:
-              comparison = a.name.localeCompare(b.name);
-              break;
-            case SortingCriteria.score:
-              comparison = a.score - b.score;
-              if (comparison === 0) {
-                comparison = a.name.localeCompare(b.name);
-              }
-              break;
-            case SortingCriteria.status:
-              comparison = this.getStateValue(a) - this.getStateValue(b);
-              if (comparison === 0) {
-                comparison = a.name.localeCompare(b.name);
-              }
-              break;
-          }
-      
-          if (this.sortOrder === SortOrder.descending) {
-            comparison = -comparison;
-          }
-          return comparison;
-        });
+        this.playerService.sortPlayers(this.players, this.selectedCriterion, this.sortOrder);
       }
       
     
