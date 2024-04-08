@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BASE_URL } from '@app/constants';
-import { unDemi } from '@common/constants';
 import { Question, QuestionType, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -133,16 +132,5 @@ export class QuestionService {
     }
     hasEnoughQCMQuestions(minimumCount: number): Observable<boolean> {
         return this.getQuestions().pipe(map((questions) => questions.filter((q) => q.type === QuestionType.QCM).length >= minimumCount));
-    }
-
-    getRandomQuestions(count: number): Observable<Question[]> {
-        return this.getQuestions().pipe(
-            map((questions) => questions.filter((q) => q.type === QuestionType.QCM)),
-            map((qcmQuestions) => this.selectRandomQuestions(qcmQuestions, count)),
-        );
-    }
-
-    private selectRandomQuestions(questions: Question[], count: number): Question[] {
-        return questions.sort(() => Math.random() - unDemi).slice(0, count);
     }
 }
