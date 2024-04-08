@@ -8,7 +8,7 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { GameService } from '@app/services/game/game.service';
-import { PlayerClient } from '@common/game-types';
+import { InteractionStatus, PlayerClient } from '@common/game-types';
 import { GameRole, GameType } from '@common/types';
 import { Observable, of } from 'rxjs';
 import { WaitingRoomComponent } from './waiting-room.component';
@@ -60,7 +60,15 @@ describe('WaitingRoomComponent', () => {
     });
 
     it('should ban player when banPlayer method is called', () => {
-        const player: PlayerClient = { name: 'Test Player', role: GameRole.Player, score: 10, isExcluded: false, hasGiveUp: false };
+        const player: PlayerClient = {
+            name: 'Test Player',
+            role: GameRole.Player,
+            score: 10,
+            isExcluded: false,
+            hasGiveUp: false,
+            isMuted: false,
+            interactionStatus: InteractionStatus.abandoned,
+        };
         component.banPlayer(player);
         expect(gameService.banPlayer).toHaveBeenCalledWith(player);
     });

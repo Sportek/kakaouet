@@ -9,7 +9,7 @@ import { ChatService } from '@app/services/chat/chat.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { SoundService } from '@app/services/sound/sound.service';
-import { GameEvents, PlayerClient } from '@common/game-types';
+import { GameEvents, InteractionStatus, PlayerClient } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, Question, Quiz } from '@common/types';
 import { cloneDeep } from 'lodash';
 import { of } from 'rxjs';
@@ -45,6 +45,8 @@ const mockPlayer: PlayerClient = {
     score: 0,
     isExcluded: false,
     hasGiveUp: false,
+    isMuted: false,
+    interactionStatus: InteractionStatus.noInteraction,
 };
 
 const mockOrganisator = {
@@ -53,6 +55,8 @@ const mockOrganisator = {
     score: 0,
     isExcluded: false,
     hasGiveUp: false,
+    isMuted: false,
+    interactionStatus: InteractionStatus.noInteraction,
 };
 
 describe('GameService', () => {
@@ -251,7 +255,15 @@ describe('GameService', () => {
             expect(changeLockStateSpy).toHaveBeenCalled();
             expect(service.isLocked.getValue()).toBeTrue();
             expect(service.players.getValue()).toEqual([
-                { name: 'Organisateur', role: GameRole.Player, isExcluded: false, score: 0, hasGiveUp: false },
+                {
+                    name: 'Organisateur',
+                    role: GameRole.Player,
+                    isExcluded: false,
+                    score: 0,
+                    hasGiveUp: false,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.noInteraction,
+                },
             ]);
             expect(startGameSpy).toHaveBeenCalled();
         });
@@ -377,6 +389,8 @@ describe('GameService', () => {
                 isExcluded: false,
                 hasGiveUp: false,
                 answers: { hasInterracted: true, hasConfirmed: true, answer: [0] },
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
             },
         ]);
         service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, actualIndex: 1, totalQuestion: 2 });
@@ -390,6 +404,8 @@ describe('GameService', () => {
                 isExcluded: false,
                 hasGiveUp: false,
                 answers: { hasInterracted: false, hasConfirmed: false, answer: [] },
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
             },
         ]);
     });
@@ -588,6 +604,8 @@ describe('GameService', () => {
                 score: 12,
                 isExcluded: false,
                 hasGiveUp: false,
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
             },
         ]);
     });
@@ -640,6 +658,8 @@ describe('GameService', () => {
                 isExcluded: false,
                 hasGiveUp: false,
                 answers: { hasInterracted: false, hasConfirmed: false, answer: [0] },
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
             },
         ]);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -712,6 +732,8 @@ describe('GameService', () => {
                 score: 0,
                 isExcluded: true,
                 hasGiveUp: false,
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
             },
         ]);
         expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home', { replaceUrl: true });
@@ -736,6 +758,8 @@ describe('GameService', () => {
                 score: 0,
                 isExcluded: false,
                 hasGiveUp: true,
+                isMuted: false,
+                interactionStatus: InteractionStatus.abandoned,
             },
         ]);
     });
