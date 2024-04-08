@@ -112,12 +112,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.playerService.sortPlayers(this.players, this.selectedCriterion, this.sortOrder);
       }
       
-    
-      getStateValue(player: PlayerClient): number {
-        const order = ['finalized', 'interacted', 'noInteraction', 'abandoned'];
-        return order.indexOf(player.interactionStatus);
-      }
-    
       toggleSortOrder(): void {
         this.sortOrder = this.sortOrder === SortOrder.ascending ? SortOrder.descending : SortOrder.ascending;
         this.sortPlayers(); 
