@@ -41,6 +41,7 @@
             <div class="textbox-container">
                 <div *ngIf="actualQuestion">
                     <ng-container *ngIf="actualQuestion.question.type === 'QRL'">
+                        <div>{{ displayCharactersLeft() }}</div>
                         <mat-form-field class="textbox-container">
                             <textarea
                                 matInput

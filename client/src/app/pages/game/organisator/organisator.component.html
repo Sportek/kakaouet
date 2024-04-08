@@ -21,28 +21,33 @@
 
             <div *ngIf="allowed() && isAnsweringQRL()">
                 Activité des joueurs
-            <div class="histogram-container">
-                <div class="histogram">
-                    <div class="histogram-column interacted" [style.height]="interactedHeight + '%'">
-                        <span class="histogram-label">{{ interactedCount }} modifié leur reponse</span>
-                    </div>
-                    <div class="histogram-column not-interacted" [style.height]="notInteractedHeight + '%'">
-                        <span class="histogram-label">{{ notInteractedCount }} n'ont pas modifié leur reponse</span>
+                <div class="histogram-container">
+                    <div class="histogram">
+                        <div class="histogram-column interacted" [style.height]="interactedHeight + '%'">
+                            <span class="histogram-label">{{ interactedCount }} modifié leur reponse</span>
+                        </div>
+                        <div class="histogram-column not-interacted" [style.height]="notInteractedHeight + '%'">
+                            <span class="histogram-label">{{ notInteractedCount }} n'ont pas modifié leur reponse</span>
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
 
             <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
                 <div class="players-container-answer-qrl">
                     <div>{{ currentPlayer.name }}: {{ currentPlayer.answers?.answer }}</div>
                     <div>Veuillez noter sa réponse:</div>
-                    <mat-select [(ngModel)]="currentRating" (ngModelChange)="rateAnswerQRL(currentPlayer.name)">
-                        <mat-option value="0">0%</mat-option>
-                        <mat-option value="0.5">50%</mat-option>
-                        <mat-option value="1">100%</mat-option>
-                    </mat-select>
-                    <div>Note actuelle: {{ getRatingForPlayer(currentPlayer.name)?.toString() }}</div>
+                    <div class="middle">
+                        <mat-form-field appearance="fill" class="middle">
+                            <mat-select [(ngModel)]="currentRating" (ngModelChange)="rateAnswerQRL(currentPlayer.name)">
+                                <mat-option value="0">0%</mat-option>
+                                <mat-option value="0.5">50%</mat-option>
+                                <mat-option value="1">100%</mat-option>
+                            </mat-select>
+                            <mat-hint class="hide-subscript-wrapper"></mat-hint>
+                        </mat-form-field>
+                        Note actuelle: {{ getRatingForPlayer(currentPlayer.name)?.toString() }}
+                    </div>
                     <button
                         *ngIf="getRatingForPlayer(currentPlayer.name)?.toString()"
                         mat-raised-button
