@@ -44,6 +44,7 @@ export class GameGateway {
         }
 
         gameSession.room.giveUpPlayer(player.name);
+        if (gameSession.room.allPlayerAnswered()) gameSession.timer.stop();
         return { isSuccess: true, message: 'Vous avez abandonné la partie' };
     }
 
