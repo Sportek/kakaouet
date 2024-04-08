@@ -19,22 +19,8 @@
                 </div>
             </div>
 
-            <!-- <div *ngIf="allowed() && isAnsweringQRL()">
-                Activité des joueurs
-            <div class="histogram-container">
-                <div class="histogram">
-                    <div class="histogram-column interacted" [style.height]="interactedHeight + '%'">
-                        <span class="histogram-label">{{ interactedCount }} modifié leur reponse</span>
-                    </div>
-                    <div class="histogram-column not-interacted" [style.height]="notInteractedHeight + '%'">
-                        <span class="histogram-label">{{ notInteractedCount }} n'ont pas modifié leur reponse</span>
-                    </div>
-                </div>
-            </div>
-            </div>-->
             <div *ngIf="isAnsweringQRL()">
-                Activité des joueurs
-                <div class="histogram-container">
+                <div class="stats-container">
                     <div class="histogram">
                         <div class="histogram-column interacted" [style.height]="(histogram.hasModified / (histogram.hasModified + histogram.hasNotModified) * 100) + '%'">
                             <span class="histogram-label">{{ histogram.hasModified }} ont modifié leur réponse</span>
@@ -45,6 +31,26 @@
                     </div>
                 </div>
             </div>
+
+            <ng-container *ngIf="isDisplayingResults() && isQRL()">
+                <div class="stats-container">
+                    <div class="columns">
+                        <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="formatColumn(column)">
+                            <div
+                                class="column"
+                                [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
+                                [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
+                            ></div>
+                            <div class="column-label">{{ formatColumn(column) }} ({{ column.amount }})</div>
+                        </div>
+                    </div>
+                    <div class="legend">
+                        <div class="stats">
+                            {{ getAnswerAmount() + '/' + players.length }}
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
             
 
             <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
@@ -91,26 +97,6 @@
                         <div class="state">
                             <div class="color isIncorrect"></div>
                             <div class="label">Incorrect</div>
-                        </div>
-                    </div>
-                </div>
-            </ng-container>
-
-            <ng-container *ngIf="isDisplayingResults() && isQRL()">
-                <div class="stats-container">
-                    <div class="columns">
-                        <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="formatColumn(column)">
-                            <div
-                                class="column"
-                                [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
-                                [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
-                            ></div>
-                            <div class="column-label">{{ formatColumn(column) }} ({{ column.amount }})</div>
-                        </div>
-                    </div>
-                    <div class="legend">
-                        <div class="stats">
-                            {{ getAnswerAmount() + '/' + players.length }}
                         </div>
                     </div>
                 </div>

@@ -72,18 +72,9 @@ export class GameService {
         this.socketService.send(GameEvents.ChangeLockedState);
     }
 
-    // ==================> passe par la lorsque le joueur envoie sa réponse
     sendAnswer(answer: Answer) {
         this.socketService.send(GameEvents.SelectAnswer, { answers: answer });
     }
-
-    // ============================================> Arevoir!!!!!!!!!!!!!!!!!!!!!!!
-    /* recordInteraction(playerName: string) {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        if (this.cooldown.getValue() <= 50) {
-            this.recentInteractions.set(playerName, true);
-        }
-    }*/
 
     isLastQuestion(): boolean {
         const actualQuestion = this.actualQuestion.getValue();
@@ -151,13 +142,12 @@ export class GameService {
         const player = this.players.getValue().find((p) => p.name === currentPlayerName);
         if (player?.answers) {
             player.answers.hasInterracted = true;
-            this.players.next([...this.players.getValue()]); // permet de mettre à jour la liste des joueurs
+            this.players.next([...this.players.getValue()]);
         }
         this.answer.next(value);
         if (this.answer.getValue()) this.sendAnswer(this.answer.getValue() as Answer);
     }
 
-    // -----------------------------------------------------------> ICIIIIIIIIIIIIIIIIIIII
     enterAnswer(text: string): void {
         if (this.isFinalAnswer.getValue()) return;
         this.answer.next(text);
@@ -293,7 +283,6 @@ export class GameService {
         });
     }
 
-    // ========================================================================> ICI
     private gameCooldownListener() {
         this.socketService.listen(GameEvents.GameCooldown, (data: GameEventsData.GameCooldown) => {
             this.cooldown.next(data.cooldown);

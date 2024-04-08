@@ -182,38 +182,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         }
     }
 
-    /* calculateHistogram() {
-        let isFound = false;
-        for (const player of this.players) {
-            if (this.playerHasModified) {
-                this.playerHasModified.forEach((playerName) => {
-                    if (player.name === playerName) isFound = true;
-                });
-            }
-            const interactionCount = this.gameService.recentInteractions.get(player.name);
-            if (interactionCount !== undefined && interactionCount <= 50 && !isFound) {
-                this.histogram.hasModified++;
-                this.playerHasModified.push(player.name);
-            }
-        }
-    }*/
-
-    // for QRL
-    /* showHistogram() {
-        this.calculateHistogramData();
-    }*/
-
-    // for QRL
-    // calculateHistogramData() {
-    //     const totalPlayers = this.players.length;
-    //     this.interactedCount = this.players.filter((player) => player.answers?.hasInterracted).length;
-    //     // this.interactedCount = Array.from(this.gameService.recentInteractions.values()).filter((interacted) => interacted).length; // a revoir
-    //     this.notInteractedCount = totalPlayers - this.interactedCount;
-
-    //     this.interactedHeight = (this.interactedCount / totalPlayers) * 100;
-    //     this.notInteractedHeight = (this.notInteractedCount / totalPlayers) * 100;
-    // }
-
     // for QRL
     isQRL(): boolean {
         return this.gameService.actualQuestion.getValue()?.question.type === QuestionType.QRL;
