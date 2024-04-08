@@ -21,7 +21,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
 
     constructor(
-        private gameService: GameService, // private router: Router,
+        private gameService: GameService, 
     ) {
         this.actualQuestion = null;
         this.cooldown = 0;

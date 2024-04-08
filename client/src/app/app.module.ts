@@ -22,6 +22,7 @@ import { QuestionOverlayComponent } from './components/question-overlay/question
 import { QuizHistoryComponent } from './components/quiz-history/quiz-history.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { SelectorComponent } from './components/selector/selector.component';
+import { SortPlayersComponent } from './components/sort-players/sort-players.component';
 import { UpdateNameComponent } from './components/update-name/update-name.component';
 import { AuthentificationInterceptor } from './interceptors/authentification.interceptor';
 import { AdminGameHistoryComponent } from './pages/admin/admin-game-history/admin-game-history.component';
@@ -74,6 +75,7 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         UpdateNameComponent,
         OrganisatorComponent,
         ResultsComponent,
+        SortPlayersComponent,
     ],
     imports: [
         AppMaterialModule,
