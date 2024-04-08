@@ -30,13 +30,7 @@ export class GameService {
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
 
-    // private showHistogramSubject = new BehaviorSubject<boolean>(false); // for QRL
-    recentInteractions: Map<string, boolean> = new Map();
-
-    // eslint-disable-next-line @typescript-eslint/member-ordering
-    // showHistogram$ = this.showHistogramSubject.asObservable(); // for QRL
-    // crée un Observable à partir du BehaviorSubject qui permet aux autres parties
-    // de l'application de s'abonner et de réagir aux changements de son état
+    recentInteractions: Map<string, number> = new Map();
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
@@ -84,12 +78,12 @@ export class GameService {
     }
 
     // ============================================> Arevoir!!!!!!!!!!!!!!!!!!!!!!!
-    recordInteraction(playerName: string) {
+    /* recordInteraction(playerName: string) {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         if (this.cooldown.getValue() <= 50) {
             this.recentInteractions.set(playerName, true);
         }
-    }
+    }*/
 
     isLastQuestion(): boolean {
         const actualQuestion = this.actualQuestion.getValue();
@@ -302,10 +296,6 @@ export class GameService {
     // ========================================================================> ICI
     private gameCooldownListener() {
         this.socketService.listen(GameEvents.GameCooldown, (data: GameEventsData.GameCooldown) => {
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            /* if (this.cooldown.value <= 5 && this.actualQuestion.getValue()?.question.type === QuestionType.QRL) {
-                this.showHistogramSubject.next(true);
-            }*/
             this.cooldown.next(data.cooldown);
         });
     }
@@ -343,7 +333,7 @@ export class GameService {
 
     private receiveAnswerListener() {
         this.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
-            this.socketEventHandlerService.handlePlayerSelectAnswer(data, this.players);
+            this.socketEventHandlerService.handlePlayerSelectAnswer(data, this.players, this.recentInteractions, this.cooldown.getValue());
         });
     }
 

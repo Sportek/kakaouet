@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div *ngIf="allowed() && isAnsweringQRL()">
+            <!-- <div *ngIf="allowed() && isAnsweringQRL()">
                 Activité des joueurs
             <div class="histogram-container">
                 <div class="histogram">
@@ -31,7 +31,21 @@
                     </div>
                 </div>
             </div>
+            </div>-->
+            <div *ngIf="isAnsweringQRL()">
+                Activité des joueurs
+                <div class="histogram-container">
+                    <div class="histogram">
+                        <div class="histogram-column interacted" [style.height]="(histogram.hasModified / (histogram.hasModified + histogram.hasNotModified) * 100) + '%'">
+                            <span class="histogram-label">{{ histogram.hasModified }} ont modifié leur réponse</span>
+                        </div>
+                        <div class="histogram-column not-interacted" [style.height]="(histogram.hasNotModified / (histogram.hasModified + histogram.hasNotModified) * 100) + '%'">
+                            <span class="histogram-label">{{ histogram.hasNotModified }} n'ont pas modifié leur réponse</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+            
 
             <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
                 <div class="players-container-answer-qrl">
