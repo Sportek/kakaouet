@@ -86,9 +86,13 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     // for QRL
     sendRating(playerName: string) {
+        this.players = this.filterPlayers();
         this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
         if (this.currentPlayerIndex + 1 < this.players.length) this.currentPlayer = this.players[++this.currentPlayerIndex];
         this.currentRating = '';
+        console.log(this.currentPlayer);
+        console.log(this.currentPlayerIndex);
+        console.log(this.players);
     }
 
     // for QRL
@@ -151,16 +155,19 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
-                this.players = sortPlayerByName(players).filter((player) => !player.hasGiveUp);
-                this.currentPlayer = players[0];
+                this.players = sortPlayerByName(players);
+                this.players = this.filterPlayers();
+                this.currentPlayer = this.players[0];
                 this.currentPlayerIndex = 0;
+                console.log(this.currentPlayer);
+                console.log(this.currentPlayerIndex);
                 this.calculateChoices();
             }),
         );
     }
 
     filterPlayers(): PlayerClient[] {
-        return this.gameService.filterPlayers();
+        return this.gameService.filterPlayers().filter((player) => !player.hasGiveUp);
     }
 
     ngOnDestroy(): void {

@@ -24,7 +24,11 @@ export class GameGateway {
 
         gameSession.saveAnswerRatings(player, data.score);
 
-        if (!gameSession.room.getPlayers().some((currPlayer) => currPlayer.role === GameRole.Player && !currPlayer.hasAnswered)) {
+        if (
+            !gameSession.room
+                .getPlayers()
+                .some((currPlayer) => currPlayer.role === GameRole.Player && !currPlayer.hasAnswered && !currPlayer.hasGiveUp)
+        ) {
             gameSession.displayQuestionResults();
         }
         return { isSuccess: true, message: 'La question a été notée' };

@@ -73,6 +73,7 @@ export class GameSession {
         if (++this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();
         this.simpleDelay(NEXT_QUESTION_DELAY, () => {
             this.changeGameState(GameState.PlayersAnswerQuestion);
+            this.room.players.forEach((player) => (player.hasAnswered = false));
             this.broadcastGameNextQuestion();
             this.startQuestionCooldown();
         });

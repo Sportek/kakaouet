@@ -29,7 +29,6 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
-
     recentInteractions: Map<string, number> = new Map();
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
@@ -229,6 +228,7 @@ export class GameService {
     }
 
     private resetPlayerAnswers() {
+        this.recentInteractions = new Map();
         this.players.next(
             this.players.getValue().map((player) => {
                 if (player.answers)
@@ -321,7 +321,6 @@ export class GameService {
         });
     }
 
-    // =====================================================================================================================================================> HERE
     private receiveAnswerListener() {
         this.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
             this.socketEventHandlerService.handlePlayerSelectAnswer(data, this.players, this.recentInteractions, this.cooldown.getValue());
