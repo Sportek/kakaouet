@@ -109,29 +109,35 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     sortPlayers(): void {
         this.players.sort((a, b) => {
           let comparison = 0;
-    
+      
           switch (this.selectedCriterion) {
             case SortingCriteria.name:
               comparison = a.name.localeCompare(b.name);
               break;
             case SortingCriteria.score:
               comparison = a.score - b.score;
+              if (comparison === 0) {
+                comparison = a.name.localeCompare(b.name);
+              }
               break;
             case SortingCriteria.status:
               comparison = this.getStateValue(a) - this.getStateValue(b);
+              if (comparison === 0) {
+                comparison = a.name.localeCompare(b.name);
+              }
               break;
           }
-    
+      
           if (this.sortOrder === SortOrder.descending) {
             comparison = -comparison;
           }
-    
           return comparison;
         });
       }
+      
     
       getStateValue(player: PlayerClient): number {
-        const order = ['noInteraction', 'interacted', 'finalized', 'abandoned'];
+        const order = ['finalized', 'interacted', 'noInteraction', 'abandoned'];
         return order.indexOf(player.interactionStatus);
       }
     
