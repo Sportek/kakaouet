@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
 import { ValidateService } from '@app/services/validate/validate.service';
-import { RANDOM_ID } from '@common/constants';
+import { RANDOM_ID, cinq } from '@common/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { saveAs } from 'file-saver';
 import { Observable, Subject, of, throwError } from 'rxjs';
@@ -162,7 +162,7 @@ export class QuizService {
     }
 
     getRandomQuiz(): Observable<Quiz> {
-        return this.questionService.hasEnoughQCMQuestions(5).pipe(
+        return this.questionService.hasEnoughQCMQuestions(cinq).pipe(
             switchMap((hasEnough) => {
                 if (hasEnough) {
                     return this.http.get<Quiz>(`${BASE_URL}/quiz/generate/random`);

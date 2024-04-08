@@ -87,7 +87,7 @@ export class QuestionService {
     mapDbQuestionToCommonQuestion(dbQuestion: Question): CommonQuestion {
         return {
             // eslint-disable-next-line no-underscore-dangle
-            _id: Question._id,
+            _id: dbQuestion._id.toString(),
             text: dbQuestion.text,
             points: dbQuestion.points,
             createdAt: dbQuestion.createdAt,

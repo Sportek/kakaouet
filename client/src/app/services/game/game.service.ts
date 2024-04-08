@@ -63,8 +63,8 @@ export class GameService {
         }
         if (this.game.getValue().type === GameType.Random) {
             this.client.next({ ...this.client.getValue(), role: GameRole.Player });
-            // this.soundService.startPlayingSound(SoundType.PlayingRoom, true);
             this.socketService.send(GameEvents.StartGame);
+            return;
         }
         if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length) {
             return this.notificationService.error('Il doit y avoir au moins un joueur pour démarrer la partie');

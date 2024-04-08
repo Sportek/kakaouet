@@ -31,7 +31,6 @@ export class Question {
 
     @ApiProperty()
     lastModification?: Date;
-    static _id: any;
 }
 
 export const questionSchema = SchemaFactory.createForClass(Question);
