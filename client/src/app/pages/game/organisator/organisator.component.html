@@ -82,19 +82,16 @@
             </div>
         </div>
 
-        <div class="players-container">
-            <div class="players">
-                <div *ngFor="let player of filterPlayers()" class="player">
-                    <div
-                        [ngClass]="{
-                            'player-name-no-interaction': player.interactionStatus === 'noInteraction',
-                            'player-name-interacted': player.interactionStatus === 'interacted',
-                            'player-name-finalized': player.interactionStatus === 'finalized',
-                            'player-name-abandoned': player.interactionStatus === 'abandoned'
-                        }"
-                        class="player-name"
-                    >
-                        {{ player.name }}
+            <div class="players-container">
+                <div class="players">
+                    <div *ngFor="let player of filterPlayers()" class="player">
+                        <div [ngClass]="{ 'player-name-no-interaction': player.interactionStatus === 'noInteraction',
+                        'player-name-interacted': player.interactionStatus === 'interacted',
+                        'player-name-finalized': player.interactionStatus === 'finalized',
+                        'player-name-abandoned': player.interactionStatus === 'abandoned', 'has-giveup': player.hasGiveUp }" class="player-name">{{ player.name }}</div>
+                        <div class="player-name">(score: {{ player.score }})</div>
+                        <mat-icon *ngIf="player.isMuted" class="material-symbols-outlined" matTooltip="Unmute le joueur" (click)="toggleMutePlayer(player)">speaker_notes_off</mat-icon>
+                                <mat-icon *ngIf="!player.isMuted" class="material-symbols-outlined" matTooltip="Mute le joueur" (click)="toggleMutePlayer(player)">speaker_notes</mat-icon>
                     </div>
                     <div class="player-name">(score: {{ player.score }})</div>
                     <mat-icon
