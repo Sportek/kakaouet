@@ -43,7 +43,7 @@ export class PlayerService {
     }
 
     private getStateValue(player: PlayerClient): number {
-        const order = ['noInteraction', 'interacted', 'finalized', 'abandoned'];
+        const order = ['finalized', 'interacted', 'noInteraction', 'abandoned'];
         return order.indexOf(player.interactionStatus);
     }
 }
