@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { sortPlayerByName } from '@app/classes/utils';
-// import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
 import { GameState, QuestionType } from '@common/types';
@@ -35,6 +34,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     interactedHeight: number = 0; // pour l'histogramme
     // for QRL
     notInteractedHeight: number = 0; // pour l'histogramme
+    // for QRL
+    itsTime: boolean = false;
 
     currentQuestion: number;
     private subscriptions: Subscription[];
@@ -80,6 +81,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.playerRatings.set(playerName, score);
     }
 
+    // for QRL
     sendRating(playerName: string) {
         this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
         if (this.currentPlayerIndex + 1 < this.players.length) this.currentPlayer = this.players[++this.currentPlayerIndex];
@@ -143,20 +145,25 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
-                this.players = sortPlayerByName(players);
-                this.calculateChoices();
+                if (this.actualQuestion?.question.type === QuestionType.QCM) {
+                    this.players = sortPlayerByName(players);
+                    this.calculateChoices();
+                } else if (this.actualQuestion?.question.type === QuestionType.QRL) {
+                    if (this.cooldown <= 50) {
+                        this.players = sortPlayerByName(players);
+                        // this.gameService.recordInteraction(this.currentPlayer.name);
+                        this.calculateHistogramData();
+                        this.currentPlayer = players[0];
+                        this.currentPlayerIndex = 0;
+                    }
+                }
             }),
         );
+    }
 
-        // for QRL
-        this.subscriptions.push(
-            this.gameService.players.subscribe((players) => {
-                this.players = players;
-                this.calculateHistogramData();
-                this.currentPlayer = players[0];
-                this.currentPlayerIndex = 0;
-            }),
-        );
+    allowed(): boolean {
+        if (this.cooldown <= 50) return true;
+        return false;
     }
 
     filterPlayers(): PlayerClient[] {
@@ -172,14 +179,17 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     // for QRL
-    showHistogram() {
+    /* showHistogram() {
         this.calculateHistogramData();
-    }
+    }*/
 
     // for QRL
     calculateHistogramData() {
         const totalPlayers = this.players.length;
         this.interactedCount = this.players.filter((player) => player.answers?.hasInterracted).length;
+        // this.interactedCount = Array.from(this.gameService.recentInteractions.values()).filter((interacted) => interacted).length; // a revoir
+        console.log(this.interactedCount);
+        console.log('allo');
         this.notInteractedCount = totalPlayers - this.interactedCount;
 
         this.interactedHeight = (this.interactedCount / totalPlayers) * 100;

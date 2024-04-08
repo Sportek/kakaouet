@@ -19,15 +19,18 @@
                 </div>
             </div>
 
-            <div class="histogram-container" *ngIf="isAnsweringQRL()">
+            <div *ngIf="allowed() && isAnsweringQRL()">
+                Activité des joueurs
+            <div class="histogram-container">
                 <div class="histogram">
                     <div class="histogram-column interacted" [style.height]="interactedHeight + '%'">
-                        <span class="histogram-label">{{ interactedCount }} ont modifié</span>
+                        <span class="histogram-label">{{ interactedCount }} modifié leur reponse</span>
                     </div>
                     <div class="histogram-column not-interacted" [style.height]="notInteractedHeight + '%'">
-                        <span class="histogram-label">{{ notInteractedCount }} n'ont pas modifié</span>
+                        <span class="histogram-label">{{ notInteractedCount }} n'ont pas modifié leur reponse</span>
                     </div>
                 </div>
+            </div>
             </div>
 
             <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
