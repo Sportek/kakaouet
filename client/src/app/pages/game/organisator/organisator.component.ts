@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { sortPlayerByName } from '@app/classes/utils';
 // import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
@@ -19,13 +20,13 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     timerIsRunning;
     currentPlayer: PlayerClient;
     currentPlayerIndex: number;
+    currentRating: string = '';
     playerRatings: Map<string, number> = new Map<string, number>();
 
     // for QRL
     selectedResponseQRL: string | null = null;
     // for QRL
     playersQRL: string | undefined;
-    // for QRL
     // for QRL
     interactedCount: number = 0;
     // for QRL
@@ -69,19 +70,20 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     // for QRL
-    rateAnswerQRL(playerName: string, rating: string): void {
+    rateAnswerQRL(playerName: string): void {
         const questionPoints = this.actualQuestion?.question.points ?? 0; // car potentiellement undefined
-        const score: number = questionPoints * parseFloat(rating);
+        const score: number = questionPoints * parseFloat(this.currentRating);
         this.choices.forEach((choice) => {
             if (parseFloat(choice.text) * questionPoints === this.playerRatings.get(playerName)) choice.amount--;
-            if (choice.text === rating) choice.amount++;
+            if (choice.text === this.currentRating) choice.amount++;
         });
         this.playerRatings.set(playerName, score);
     }
 
     sendRating(playerName: string) {
         this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
-        this.currentPlayer = this.players[++this.currentPlayerIndex];
+        if (this.currentPlayerIndex + 1 < this.players.length) this.currentPlayer = this.players[++this.currentPlayerIndex];
+        this.currentRating = '';
     }
 
     // for QRL
@@ -141,7 +143,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
-                this.players = players;
+                this.players = sortPlayerByName(players);
                 this.calculateChoices();
             }),
         );

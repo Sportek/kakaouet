@@ -19,6 +19,7 @@ export class GameSession {
     gameQuestionIndex: number;
     isLocked: boolean;
     private isAlreadyChangingQuestion: boolean;
+    private ratingAmounts: Map<string, number[]>;
 
     // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
     constructor(code: string, room: Room, quiz: Quiz, gameType: GameType) {
@@ -31,6 +32,7 @@ export class GameSession {
         this.room.setGame(this);
         this.type = gameType;
         this.isAlreadyChangingQuestion = false;
+        this.ratingAmounts = new Map<string, number[]>();
     }
 
     startGameDelayed(): void {
@@ -52,7 +54,7 @@ export class GameSession {
         if (this.gameState !== GameState.PlayersAnswerQuestion) return;
         const delay = this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QCM ? this.quiz.duration : QRL_DELAY;
         this.simpleDelay(delay, () => {
-            if (this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QRL)
+            if (this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QRL && this.type !== GameType.Test)
                 return this.changeGameState(GameState.OrganisatorCorrectingAnswers);
             this.displayQuestionResults();
         });
@@ -65,9 +67,7 @@ export class GameSession {
     }
 
     nextQuestion(): void {
-        console.log('im in the server game session');
         if (this.gameState !== GameState.DisplayQuestionResults) return;
-        console.log('im not in the state DisplayQuestionResult');
         if (this.isAlreadyChangingQuestion) return;
         this.isAlreadyChangingQuestion = true;
         if (++this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();
@@ -126,6 +126,18 @@ export class GameSession {
     broadcastMessage(player: Player, content: string): void {
         const newDate: Date = new Date();
         this.room.broadcast(GameEvents.PlayerSendMessage, {}, { name: player.name, content, createdAt: newDate });
+    }
+
+    saveAnswerRatings(player: Player, score: number) {
+        player.hasAnswered = true;
+        player.confirmAnswer();
+        player.score += score;
+        const rating = score / (this.quiz.questions[this.gameQuestionIndex].points ?? 1);
+        const questionTitle: string = this.quiz.questions[this.gameQuestionIndex].text;
+        if (!this.ratingAmounts[questionTitle]) {
+            this.ratingAmounts[questionTitle] = [0, 0, 0];
+        }
+        this.ratingAmounts[questionTitle][rating * 2]++;
     }
 
     private broadcastCorrectAnswers(question: Question): void {
@@ -191,6 +203,9 @@ export class GameSession {
 
     private sendScores(): void {
         this.calculateScores().forEach(({ player, hasAnsweredFirst }) => {
+            if (this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QRL && this.type === GameType.Test) {
+                return player.send(GameEvents.UpdateScore, { score: this.quiz.questions[this.gameQuestionIndex].points, hasAnsweredFirst: false });
+            }
             player.send(GameEvents.UpdateScore, { score: player.score, hasAnsweredFirst });
         });
         const scores = this.room.getOnlyGamePlayers().map((player) => ({ name: player.name, score: player.score }));
@@ -214,15 +229,23 @@ export class GameSession {
     private calculateCorrectChoices() {
         const choices: ChoiceData[][] = [];
         this.quiz.questions.forEach((question, index) => {
-            if (question.type !== QuestionType.QCM) return;
-            const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
-            const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
-                const amount = globalPlayerAnswers[i];
-                const name = choice.text;
-                const isCorrect = choice.isCorrect;
-                return { text: name, amount, isCorrect };
-            });
-            choices.push(choiceData);
+            if (question.type === QuestionType.QCM) {
+                const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
+                const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
+                    const amount = globalPlayerAnswers[i];
+                    const name = choice.text;
+                    const isCorrect = choice.isCorrect;
+                    return { text: name, amount, isCorrect };
+                });
+                choices.push(choiceData);
+            }
+            if (this.type !== GameType.Test) {
+                return choices.push([
+                    { text: '0%', amount: this.ratingAmounts[question.text][0], isCorrect: true },
+                    { text: '50%', amount: this.ratingAmounts[question.text][1], isCorrect: true },
+                    { text: '100%', amount: this.ratingAmounts[question.text][2], isCorrect: true },
+                ]);
+            }
         });
 
         return choices;

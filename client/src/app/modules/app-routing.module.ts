@@ -37,7 +37,6 @@ const routes: Routes = [
     { path: 'waiting-room/:code', component: WaitingRoomComponent, canActivate: [socketConnectionGuard] },
     { path: 'join', component: JoinComponent, canActivate: [socketConnectionGuard] },
     { path: 'create/description/:gameId', component: DescriptonPageComponent },
-    // { path: 'results', component: ResultsComponent },
 
     { path: 'error-404', component: Error404Component },
 

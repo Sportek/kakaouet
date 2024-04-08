@@ -22,8 +22,7 @@ export class GameGateway {
         const player = gameSession.room.getPlayer(data.playerName);
         if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
-        player.hasAnswered = true;
-        player.score += data.score;
+        gameSession.saveAnswerRatings(player, data.score);
 
         if (!gameSession.room.getPlayers().some((currPlayer) => currPlayer.role === GameRole.Player && !currPlayer.hasAnswered)) {
             gameSession.displayQuestionResults();
@@ -51,7 +50,6 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.SelectAnswer)
     handleSelectAnswer(@MessageBody() data: GameEventsData.SelectAnswer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        console.log('le joueur a selectionner une reponse');
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
         const player = gameSession.room.getPlayerWithSocketId(client.id);
@@ -64,7 +62,6 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.ConfirmAnswers)
     handleConfirmAnswers(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        console.log('le joueur a confirmer une reponse');
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
         const player = gameSession.room.getPlayerWithSocketId(client.id);
@@ -124,7 +121,6 @@ export class GameGateway {
 
     @SubscribeMessage(GameEvents.NextQuestion)
     handleNextQuestion(@ConnectedSocket() client: Socket): SocketResponse {
-        console.log('im in gate gateway in the server');
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         if (!this.hasAutorisation(client, GameRole.Organisator))
             return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };

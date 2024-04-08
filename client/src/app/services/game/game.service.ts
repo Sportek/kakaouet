@@ -80,7 +80,6 @@ export class GameService {
     // ==================> passe par la lorsque le joueur envoie sa réponse
     sendAnswer(answer: Answer) {
         this.socketService.send(GameEvents.SelectAnswer, { answers: answer });
-        console.log('le joueur a envoyé sa reponse');
     }
 
     isLastQuestion(): boolean {
@@ -145,8 +144,6 @@ export class GameService {
 
     modifyAnswerQRL(value: string): void {
         const currentPlayerName = this.client.getValue().name;
-        console.log('le joueur modifie sa reponse QRL');
-
         if (this.isFinalAnswer.getValue()) return;
         const player = this.players.getValue().find((p) => p.name === currentPlayerName);
         if (player?.answers) {
@@ -161,7 +158,6 @@ export class GameService {
     enterAnswer(text: string): void {
         if (this.isFinalAnswer.getValue()) return;
         this.answer.next(text);
-        console.log('le joueur enterAnswer');
         this.sendAnswer(text);
     }
 
@@ -177,11 +173,6 @@ export class GameService {
             score: scoreQRL,
         } as GameEventsData.RateAnswerQRL);
     }
-
-    // for QRL
-    /* notifyAllQRLRated(): void {
-        this.socketService.send(GameEvents.AllPlayersAnswered);
-    }*/
 
     nextQuestion(): void {
         this.socketService.send(GameEvents.NextQuestion);

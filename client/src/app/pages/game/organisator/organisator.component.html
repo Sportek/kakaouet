@@ -34,12 +34,11 @@
                 <div class="players-container-answer-qrl">
                     <div>{{ currentPlayer.name }}: {{ currentPlayer.answers?.answer }}</div>
                     <div>Veuillez noter sa réponse:</div>
-                    <select (change)="rateAnswerQRL(currentPlayer.name, $any($event.target).value)">
-                        <option [defaultSelected]="">{{ 'Choisir' }}</option>
-                        <option value="0">0%</option>
-                        <option value="0.5">50%</option>
-                        <option value="1">100%</option>
-                    </select>
+                    <mat-select [(ngModel)]="currentRating" (ngModelChange)="rateAnswerQRL(currentPlayer.name)">
+                        <mat-option value="0">0%</mat-option>
+                        <mat-option value="0.5">50%</mat-option>
+                        <mat-option value="1">100%</mat-option>
+                    </mat-select>
                     <div>Note actuelle: {{ getRatingForPlayer(currentPlayer.name)?.toString() }}</div>
                     <button
                         *ngIf="getRatingForPlayer(currentPlayer.name)?.toString()"
@@ -102,7 +101,7 @@
 
             <div class="game-controller-container">
                 <div class="title">Panneau de contrôle</div>
-                <div class="controls" *ngIf="true">
+                <div class="controls">
                     <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
                     <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button>
                     <div class="timer">
