@@ -67,6 +67,11 @@ export enum SortingCriteria{
     status = 'status',
 }
 
+export enum SortOrder{
+    ascending = 'asc',
+    descending = 'desc',
+}
+
 export interface Client { name: string; role: GameRole; score: number };
 export interface GameRestricted { code: string; quizName: string; type: GameType };
 export interface SocketResponse { isSuccess: boolean; message?: string };

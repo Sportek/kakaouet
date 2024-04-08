@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 // import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
-import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
+import { ActualQuestion, ChoiceData, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
 import { QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -16,7 +16,11 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     players: PlayerClient[];
     choices: ChoiceData[];
     timerIsRunning;
-
+    
+  selectedCriterion: SortingCriteria = SortingCriteria.name;
+  sortOrder: SortOrder = SortOrder.ascending;
+  SortingCriteria = SortingCriteria;
+  SortOrder = SortOrder;
     currentQuestion: number;
     private subscriptions: Subscription[];
 
@@ -101,4 +105,38 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     isLastQuestion(): boolean {
         return this.gameService.isLastQuestion();
     }
+
+    sortPlayers(): void {
+        this.players.sort((a, b) => {
+          let comparison = 0;
+    
+          switch (this.selectedCriterion) {
+            case SortingCriteria.name:
+              comparison = a.name.localeCompare(b.name);
+              break;
+            case SortingCriteria.score:
+              comparison = a.score - b.score;
+              break;
+            case SortingCriteria.status:
+              comparison = this.getStateValue(a) - this.getStateValue(b);
+              break;
+          }
+    
+          if (this.sortOrder === SortOrder.descending) {
+            comparison = -comparison;
+          }
+    
+          return comparison;
+        });
+      }
+    
+      getStateValue(player: PlayerClient): number {
+        const order = ['noInteraction', 'interacted', 'finalized', 'abandoned'];
+        return order.indexOf(player.interactionStatus);
+      }
+    
+      toggleSortOrder(): void {
+        this.sortOrder = this.sortOrder === SortOrder.ascending ? SortOrder.descending : SortOrder.ascending;
+        this.sortPlayers(); 
+      }
 }
