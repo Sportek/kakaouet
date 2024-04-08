@@ -145,17 +145,12 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
-                if (this.actualQuestion?.question.type === QuestionType.QCM) {
-                    this.players = sortPlayerByName(players);
-                    this.calculateChoices();
-                } else if (this.actualQuestion?.question.type === QuestionType.QRL) {
-                    if (this.cooldown <= 50) {
-                        this.players = sortPlayerByName(players);
-                        // this.gameService.recordInteraction(this.currentPlayer.name);
-                        this.calculateHistogramData();
-                        this.currentPlayer = players[0];
-                        this.currentPlayerIndex = 0;
-                    }
+                this.players = sortPlayerByName(players);
+                this.currentPlayer = players[0];
+                this.currentPlayerIndex = 0;
+                this.calculateChoices();
+                if (this.cooldown <= 50) {
+                    this.calculateHistogramData();
                 }
             }),
         );
@@ -188,8 +183,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         const totalPlayers = this.players.length;
         this.interactedCount = this.players.filter((player) => player.answers?.hasInterracted).length;
         // this.interactedCount = Array.from(this.gameService.recentInteractions.values()).filter((interacted) => interacted).length; // a revoir
-        console.log(this.interactedCount);
-        console.log('allo');
         this.notInteractedCount = totalPlayers - this.interactedCount;
 
         this.interactedHeight = (this.interactedCount / totalPlayers) * 100;

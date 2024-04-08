@@ -229,23 +229,22 @@ export class GameSession {
     private calculateCorrectChoices() {
         const choices: ChoiceData[][] = [];
         this.quiz.questions.forEach((question, index) => {
-            if (question.type === QuestionType.QCM) {
-                const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
-                const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
-                    const amount = globalPlayerAnswers[i];
-                    const name = choice.text;
-                    const isCorrect = choice.isCorrect;
-                    return { text: name, amount, isCorrect };
-                });
-                choices.push(choiceData);
-            }
-            if (this.type !== GameType.Test) {
+            if (question.type !== QuestionType.QCM) {
+                if (this.type === GameType.Test) return;
                 return choices.push([
                     { text: '0%', amount: this.ratingAmounts[question.text][0], isCorrect: true },
                     { text: '50%', amount: this.ratingAmounts[question.text][1], isCorrect: true },
                     { text: '100%', amount: this.ratingAmounts[question.text][2], isCorrect: true },
                 ]);
             }
+            const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
+            const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
+                const amount = globalPlayerAnswers[i];
+                const name = choice.text;
+                const isCorrect = choice.isCorrect;
+                return { text: name, amount, isCorrect };
+            });
+            choices.push(choiceData);
         });
 
         return choices;
