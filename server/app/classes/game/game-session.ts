@@ -1,6 +1,7 @@
 import { Player } from '@app/classes/player/player';
 import { Room } from '@app/classes/room/room';
 import { Timer } from '@app/classes/timer';
+import { HistoryService } from '@app/services/history/history.service';
 import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';
 import { ActualQuestion, ChoiceData, GameEvents, GameEventsData, Score } from '@common/game-types';
 import { GameState, GameType, Question, QuestionType, Quiz } from '@common/types';
@@ -18,6 +19,8 @@ export class GameSession {
     gameQuestionIndex: number;
     isLocked: boolean;
     private isAlreadyChangingQuestion: boolean;
+    private startTime: Date;
+    private historyService: HistoryService;
 
     // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
     constructor(code: string, room: Room, quiz: Quiz, gameType: GameType) {
@@ -30,6 +33,7 @@ export class GameSession {
         this.room.setGame(this);
         this.type = gameType;
         this.isAlreadyChangingQuestion = false;
+        this.startTime = new Date();
     }
 
     startGameDelayed(): void {
@@ -92,6 +96,19 @@ export class GameSession {
 
     endGame(): void {
         this.changeGameState(GameState.End);
+
+        const historyData = {
+            gameTitle: this.quiz.title, // assuming quiz object has a name field
+            startTime: this.startTime,
+            numberOfPlayers: this.room.getOnlyGamePlayers().length,
+            bestScore: Math.max(...this.room.getOnlyGamePlayers().map((player) => player.score)),
+        };
+
+        this.historyService.createNewHistory(historyData).catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error('Failed to save history:', error);
+        });
+
         // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc : sprint 3.
     }
 

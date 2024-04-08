@@ -1,37 +1,37 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
-import { History } from '@common/types';
+import { GameRecords } from '@common/types';
 import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class HistoryService {
-    private history: History[] = [];
+    private history: GameRecords[] = [];
 
     constructor(private http: HttpClient) {}
 
-    addRecord(record: History) {
+    addRecord(record: GameRecords) {
         this.history.push(record);
     }
 
-    getAllRecords(): Observable<History[]> {
+    getAllRecords(): Observable<GameRecords[]> {
         const url = `${BASE_URL}/history/`;
-        return this.http.get<History[]>(url);
+        return this.http.get<GameRecords[]>(url);
     }
 
-    getHistory(): History[] {
+    getHistory(): GameRecords[] {
         return this.history;
     }
 
-    addToHistory(history: History): Observable<History> {
+    addToHistory(history: GameRecords): Observable<GameRecords> {
         const url = `${BASE_URL}/history/`;
-        return this.http.post<History>(url, { history });
+        return this.http.post<GameRecords>(url, { history });
     }
 
-    clearHistory(): Observable<History[]> {
+    clearHistory(): Observable<GameRecords[]> {
         const url = `${BASE_URL}/history/`;
-        return this.http.delete<History[]>(url);
+        return this.http.delete<GameRecords[]>(url);
     }
 }

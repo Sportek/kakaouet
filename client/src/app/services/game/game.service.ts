@@ -1,11 +1,9 @@
 /* eslint-disable max-lines */
-/* eslint-disable max-lines */
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BASE_URL } from '@app/constants';
 import { ChatService } from '@app/services/chat/chat.service';
-import { HistoryService } from '@app/services/history/history.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { SoundService } from '@app/services/sound/sound.service';
@@ -23,7 +21,7 @@ import {
     PlayerClient,
     SoundType,
 } from '@common/game-types';
-import { Choice, Game, GameRole, GameState, GameType, History, QuestionType } from '@common/types';
+import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 import { SocketEventHandlerService } from './socket-event-handler.service';
 
@@ -53,7 +51,6 @@ export class GameService {
         private chatService: ChatService,
         private socketEventHandlerService: SocketEventHandlerService,
         private soundService: SoundService,
-        private historyService: HistoryService,
     ) {
         this.initialise();
         this.registerListeners();
@@ -247,22 +244,6 @@ export class GameService {
     }
 
     private handleDisplayQuizResults() {
-        if (this.client.value.role === GameRole.Organisator) {
-            const startTime = this.startTime.value;
-
-            if (!startTime) {
-                return;
-            }
-
-            const history: History = {
-                gameTitle: this.game.getValue().quizName,
-                startTime,
-                numberOfPlayers: this.players.getValue().length,
-                bestScore: Math.max(...this.players.getValue().map((user) => user.score)),
-            };
-
-            this.historyService.addToHistory(history).subscribe({});
-        }
         if (this.game.getValue().type === GameType.Test) {
             this.router.navigate(['/create/'], { replaceUrl: true });
             return;

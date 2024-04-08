@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { HistoryService } from '@app/services/history/history.service';
 import { SelectorService } from '@app/services/selector/selector.service';
-import { History, Ordering, OrderingField } from '@common/types';
+import { GameRecords, Ordering, OrderingField } from '@common/types';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./history.component.scss'],
 })
 export class HistoryComponent implements OnInit {
-    gameRecords: History[] = [];
+    gameRecords: GameRecords[] = [];
     currentSortField: OrderingField = OrderingField.GameTitle;
     currentSortOrder: Ordering = Ordering.Ascendant;
     recordsSubscription: Subscription;
@@ -28,7 +28,7 @@ export class HistoryComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.recordsSubscription = this.historyService.getAllRecords().subscribe((data: History[]) => {
+        this.recordsSubscription = this.historyService.getAllRecords().subscribe((data: GameRecords[]) => {
             this.gameRecords = data;
             this.sortRecords();
             this.historyCleared = this.gameRecords.length === 0;

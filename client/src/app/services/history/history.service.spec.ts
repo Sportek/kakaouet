@@ -1,7 +1,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { BASE_URL } from '@app/constants';
-import { History } from '@common/types';
+import { GameRecords } from '@common/types';
 import { HistoryService } from './history.service';
 
 describe('HistoryService', () => {
@@ -43,7 +43,7 @@ describe('HistoryService', () => {
     });
 
     it('addToHistory should make POST request', () => {
-        const newHistory: History = { gameTitle: 'New Game', startTime: new Date(), numberOfPlayers: 4, bestScore: 100 };
+        const newHistory: GameRecords = { gameTitle: 'New Game', startTime: new Date(), numberOfPlayers: 4, bestScore: 100 };
         service.addToHistory(newHistory).subscribe((history) => {
             expect(history).toEqual(newHistory);
         });
