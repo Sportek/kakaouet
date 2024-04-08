@@ -279,6 +279,7 @@ export class GameService {
 
     private playerQuitGameListener() {
         this.socketService.listen(GameEvents.PlayerQuitGame, (data: GameEventsData.PlayerQuitGame) => {
+            this.recentInteractions.delete(data.name);
             this.players.next(this.players.getValue().filter((player) => player.name !== data.name));
         });
     }
@@ -320,6 +321,7 @@ export class GameService {
         });
     }
 
+    // =====================================================================================================================================================> HERE
     private receiveAnswerListener() {
         this.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
             this.socketEventHandlerService.handlePlayerSelectAnswer(data, this.players, this.recentInteractions, this.cooldown.getValue());

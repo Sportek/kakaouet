@@ -151,7 +151,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
-                this.players = sortPlayerByName(players);
+                this.players = sortPlayerByName(players).filter((player) => !player.hasGiveUp);
                 this.currentPlayer = players[0];
                 this.currentPlayerIndex = 0;
                 this.calculateChoices();
@@ -172,6 +172,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     calculateHistogram() {
+        console.log(this.players.length);
         for (const player of this.players) {
             const interactionTime = this.gameService.recentInteractions.get(player.name);
             if (interactionTime && interactionTime - this.cooldown <= 5) {
