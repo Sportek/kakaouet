@@ -537,35 +537,35 @@ describe('GameService', () => {
             expect(service.isFinalAnswer.getValue()).toBeTrue();
         });
 
-        // it('should not show results if game type was test', () => {
-        //     service.game.next({ code: mockTestGame.code, quizName: 'Quiz Test', type: mockTestGame.type });
+        it('should not show results if game type was test', () => {
+            service.game.next({ code: mockTestGame.code, quizName: 'Quiz Test', type: mockTestGame.type });
 
-        //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        //     mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
-        //         callback({ gameState: GameState.DisplayQuizResults });
-        //     });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+                callback({ gameState: GameState.DisplayQuizResults });
+            });
 
-        //     // @ts-ignore
-        //     service.gameChangeStateListener();
+            // @ts-ignore
+            service.gameChangeStateListener();
 
-        //     expect(service.gameState.getValue()).toEqual(GameState.DisplayQuizResults);
-        //     expect(mockRouter.navigate).toHaveBeenCalledWith(['/create/'], { replaceUrl: true });
-        // });
+            expect(service.gameState.getValue()).toEqual(GameState.DisplayQuizResults);
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/create/'], { replaceUrl: true });
+        });
 
-        // it('should show results if game type is default', () => {
-        //     service.game.next({ code: mockGame.code, quizName: 'Quiz Test', type: mockGame.type });
+        it('should show results if game type is default', () => {
+            service.game.next({ code: mockGame.code, quizName: 'Quiz Test', type: mockGame.type });
 
-        //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        //     mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
-        //         callback({ gameState: GameState.DisplayQuizResults });
-        //     });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+                callback({ gameState: GameState.DisplayQuizResults });
+            });
 
-        //     // @ts-ignore
-        //     service.gameChangeStateListener();
+            // @ts-ignore
+            service.gameChangeStateListener();
 
-        //     expect(service.gameState.getValue()).toEqual(GameState.DisplayQuizResults);
-        //     expect(mockRouter.navigate).toHaveBeenCalledWith(['/results', mockGame.code], { replaceUrl: true });
-        // });
+            expect(service.gameState.getValue()).toEqual(GameState.DisplayQuizResults);
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/results', mockGame.code], { replaceUrl: true });
+        });
     });
 
     it('should receive game results', () => {

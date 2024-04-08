@@ -31,7 +31,7 @@ export class HistoryComponent implements OnInit {
         this.recordsSubscription = this.historyService.getAllRecords().subscribe((data: GameRecords[]) => {
             this.gameRecords = data;
             this.sortRecords();
-            this.historyCleared = this.gameRecords.length === 0;
+            this.historyCleared = !this.gameRecords.length;
         });
 
         this.selectorService.getCurrentChoice().subscribe((choice) => {
