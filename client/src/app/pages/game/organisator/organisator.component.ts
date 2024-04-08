@@ -37,6 +37,9 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     // for QRL
     itsTime: boolean = false;
 
+    // for QRL
+    histogram = { hasModified: 0, hasNotModified: 0 };
+
     currentQuestion: number;
     private subscriptions: Subscription[];
 
@@ -140,6 +143,9 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.cooldown.subscribe((cooldown) => {
                 this.cooldown = cooldown;
+                this.histogram.hasNotModified = 0;
+                this.histogram.hasModified = 0;
+                this.calculateHistogram();
             }),
         );
 
@@ -149,16 +155,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.currentPlayer = players[0];
                 this.currentPlayerIndex = 0;
                 this.calculateChoices();
-                if (this.cooldown <= 50) {
-                    this.calculateHistogramData();
-                }
             }),
         );
-    }
-
-    allowed(): boolean {
-        if (this.cooldown <= 50) return true;
-        return false;
     }
 
     filterPlayers(): PlayerClient[] {
@@ -173,20 +171,15 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.isLastQuestion();
     }
 
-    // for QRL
-    /* showHistogram() {
-        this.calculateHistogramData();
-    }*/
-
-    // for QRL
-    calculateHistogramData() {
-        const totalPlayers = this.players.length;
-        this.interactedCount = this.players.filter((player) => player.answers?.hasInterracted).length;
-        // this.interactedCount = Array.from(this.gameService.recentInteractions.values()).filter((interacted) => interacted).length; // a revoir
-        this.notInteractedCount = totalPlayers - this.interactedCount;
-
-        this.interactedHeight = (this.interactedCount / totalPlayers) * 100;
-        this.notInteractedHeight = (this.notInteractedCount / totalPlayers) * 100;
+    calculateHistogram() {
+        for (const player of this.players) {
+            const interactionTime = this.gameService.recentInteractions.get(player.name);
+            if (interactionTime && interactionTime - this.cooldown <= 5) {
+                this.histogram.hasModified++;
+            } else {
+                this.histogram.hasNotModified++;
+            }
+        }
     }
 
     // for QRL
