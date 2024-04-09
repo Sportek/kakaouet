@@ -6,6 +6,7 @@
 import { Player } from '@app/classes/player/player';
 import { Room } from '@app/classes/room/room';
 import { GameService } from '@app/services/game/game.service';
+import { HistoryService } from '@app/services/history/history.service';
 import { CompletePlayerAnswer, GameEvents, GameType } from '@common/game-types';
 import { GameRole, GameState, Question, QuestionType, Quiz } from '@common/types';
 import { Server } from 'socket.io';
@@ -19,6 +20,7 @@ describe('GameSession', () => {
     let serverMock: Server;
     let duration: number;
     let timerMock: Timer;
+    let historyService: HistoryService;
     // eslint-disable-next-line no-unused-vars
     const START_GAME_DELAY = 5;
     const NEXT_QUESTION_DELAY = 3;
@@ -60,6 +62,10 @@ describe('GameSession', () => {
         } as any;
         serverMock = new Server() as unknown as Server;
         const mockGameService = {} as GameService;
+        const historyServiceMock = {
+            createNewHistory: jest.fn().mockResolvedValue(undefined),
+        } as unknown as HistoryService;
+
         room = new Room('test-room', serverMock, mockGameService);
         quiz = {
             _id: 'quiz123',
@@ -90,7 +96,7 @@ describe('GameSession', () => {
             createdAt: new Date(),
             lastModification: new Date(),
         };
-        gameSession = new GameSession('game123', room, quiz, GameType.Default);
+        gameSession = new GameSession('game123', room, quiz, GameType.Default, historyServiceMock);
         duration = 1;
         gameSession.timer = timerMock;
     });
@@ -321,7 +327,7 @@ describe('GameSession', () => {
         it('should change the game state and broadcast the event', () => {
             const newState = GameState.PlayersAnswerQuestion;
             // eslint-disable-next-line @typescript-eslint/no-shadow
-            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default, historyService);
 
             gameSession.changeGameState(newState);
 
@@ -333,7 +339,7 @@ describe('GameSession', () => {
     describe('changeGameLockState', () => {
         it('should change the game lock state and broadcast the event', () => {
             // eslint-disable-next-line @typescript-eslint/no-shadow
-            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default, historyService);
             gameSession.changeGameLockState();
 
             expect(gameSession.isLocked).toBe(true);
@@ -346,7 +352,7 @@ describe('GameSession', () => {
             const messageContent = 'Hello players!';
 
             // eslint-disable-next-line @typescript-eslint/no-shadow
-            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default, historyService);
 
             gameSession.broadcastMessage(messageContent, mockPlayer as Player);
 
@@ -400,7 +406,7 @@ describe('GameSession', () => {
             };
 
             // eslint-disable-next-line @typescript-eslint/no-shadow
-            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default, historyService);
             gameSession['broadcastCorrectAnswers'](mockQuestion);
 
             expect(mockRoom.broadcast).not.toHaveBeenCalled();
@@ -423,7 +429,7 @@ describe('GameSession', () => {
             };
 
             // eslint-disable-next-line @typescript-eslint/no-shadow
-            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default);
+            const gameSession = new GameSession('game123', mockRoom as unknown as Room, quiz, GameType.Default, historyService);
 
             gameSession['broadcastCorrectAnswers'](mockQuestion);
 
@@ -677,7 +683,7 @@ describe('GameSession', () => {
 
         it('should correctly count players who answered each choice', () => {
             // eslint-disable-next-line @typescript-eslint/no-shadow
-            const gameSession = new GameSession('test-code', mockRoom as unknown as Room, quiz, GameType.Default);
+            const gameSession = new GameSession('test-code', mockRoom as unknown as Room, quiz, GameType.Default, historyService);
             // @ts-ignore
             const result = gameSession.getAmountOfPlayersWhoAnswered(2);
             expect(result).toEqual([2, 2, 0, 0]);

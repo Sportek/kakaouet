@@ -1,6 +1,7 @@
 import { GameSession } from '@app/classes/game/game-session';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
+import { HistoryService } from '@app/services/history/history.service';
 import { GameState, GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
@@ -8,6 +9,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { mockGame } from './mock-game';
+
+const mockHistoryService = {
+    createGameHistory: jest.fn(),
+    deleteGameHistory: jest.fn(),
+    getGameHistory: jest.fn(),
+};
 
 const mockGameModel = {
     find: jest.fn(),
@@ -38,6 +45,11 @@ describe('GameService', () => {
                 {
                     provide: getModelToken(Quiz.name),
                     useValue: mockQuizModel,
+                },
+
+                {
+                    provide: HistoryService,
+                    useValue: mockHistoryService,
                 },
             ],
         }).compile();
