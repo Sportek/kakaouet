@@ -90,9 +90,9 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
         if (this.currentPlayerIndex + 1 < this.players.length) this.currentPlayer = this.players[++this.currentPlayerIndex];
         this.currentRating = '';
-        console.log(this.currentPlayer);
-        console.log(this.currentPlayerIndex);
-        console.log(this.players);
+        // console.log(this.currentPlayer);
+        // console.log(this.currentPlayerIndex);
+        // console.log(this.players);
     }
 
     // for QRL
@@ -150,6 +150,10 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.histogram.hasNotModified = 0;
                 this.histogram.hasModified = 0;
                 this.calculateHistogram();
+
+                console.log('Mon console.log');
+                console.log(this.histogram.hasNotModified, this.histogram.hasModified);
+                console.log((this.histogram.hasNotModified / (this.histogram.hasModified + this.histogram.hasNotModified)) * 100 + '%');
             }),
         );
 
