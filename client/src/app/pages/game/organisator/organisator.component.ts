@@ -90,9 +90,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
         if (this.currentPlayerIndex + 1 < this.players.length) this.currentPlayer = this.players[++this.currentPlayerIndex];
         this.currentRating = '';
-        // console.log(this.currentPlayer);
-        // console.log(this.currentPlayerIndex);
-        // console.log(this.players);
     }
 
     // for QRL
@@ -150,10 +147,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.histogram.hasNotModified = 0;
                 this.histogram.hasModified = 0;
                 this.calculateHistogram();
-
-                console.log('Mon console.log');
-                console.log(this.histogram.hasNotModified, this.histogram.hasModified);
-                console.log((this.histogram.hasNotModified / (this.histogram.hasModified + this.histogram.hasNotModified)) * 100 + '%');
             }),
         );
 
@@ -163,8 +156,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.players = this.filterPlayers();
                 this.currentPlayer = this.players[0];
                 this.currentPlayerIndex = 0;
-                console.log(this.currentPlayer);
-                console.log(this.currentPlayerIndex);
                 this.calculateChoices();
             }),
         );
@@ -183,7 +174,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     calculateHistogram() {
-        console.log(this.players.length);
         for (const player of this.players) {
             const interactionTime = this.gameService.recentInteractions.get(player.name);
             if (interactionTime && interactionTime - this.cooldown <= 5) {
