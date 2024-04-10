@@ -6,9 +6,10 @@ const SORT_MULTIPLYER = -1;
     providedIn: 'root',
 })
 export class PlayerService {
-
     private sortedPlayersSubject: BehaviorSubject<PlayerClient[]> = new BehaviorSubject<PlayerClient[]>([]);
-    
+    getSortedPlayersObservable(): Observable<PlayerClient[]> {
+        return this.sortedPlayersSubject.asObservable();
+    }
     sortPlayers(players: PlayerClient[], selectedCriterion: SortingCriteria, sortOrder: SortOrder): PlayerClient[] {
         return players.sort((a, b) => {
             let comparison = this.getComparison(a, b, selectedCriterion);
@@ -49,9 +50,5 @@ export class PlayerService {
     private getStateValue(player: PlayerClient): number {
         const order = ['finalized', 'interacted', 'noInteraction', 'abandoned'];
         return order.indexOf(player.interactionStatus);
-    }
-
-    getSortedPlayersObservable(): Observable<PlayerClient[]> {
-        return this.sortedPlayersSubject.asObservable();
     }
 }

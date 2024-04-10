@@ -113,9 +113,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     toggleSortOrder(): void {
-        this.sortingOrder = this.sortingOrder === this.sortOrder.ascending 
-        ? this.sortOrder.descending 
-        : this.sortOrder.ascending;
+        this.sortingOrder = this.sortingOrder === this.sortOrder.ascending ? this.sortOrder.descending : this.sortOrder.ascending;
         this.sortPlayers();
     }
 }
