@@ -108,8 +108,7 @@ export class GameSession {
 
         // On ne veut pas laisser le console error ici
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-            await this.historyService.createNewHistory(historyData);
-        
+        await this.historyService.createNewHistory(historyData);
 
         // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc : sprint 3.
     }
