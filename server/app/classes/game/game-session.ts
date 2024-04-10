@@ -96,7 +96,7 @@ export class GameSession {
         this.broadcastPlayerResults(scores, this.calculateCorrectChoices());
     }
 
-    endGame(): void {
+    async endGame(): Promise<void> {
         this.changeGameState(GameState.End);
 
         const historyData = {
@@ -108,7 +108,8 @@ export class GameSession {
 
         // On ne veut pas laisser le console error ici
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        this.historyService.createNewHistory(historyData).catch(() => {});
+            await this.historyService.createNewHistory(historyData);
+        
 
         // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc : sprint 3.
     }
