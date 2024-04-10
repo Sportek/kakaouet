@@ -31,9 +31,16 @@
                                 'not-clickable': isFinalAnswer,
                                 'is-incorrect': isIncorrectAnswer(choice)
                             }"
+                            [ngStyle]="{ display: isDisplayingResults() ? 'grid' : 'flex' }"
                             (click)="selectAnswer(i)"
                         >
-                            {{ i + 1 + '. ' + choice.text }}
+                            <mat-icon class="full-icon" *ngIf="choice.isCorrect && isDisplayingResults()"
+                                ><span class="material-symbols-outlined icon" style="color: white"> check_circle </span></mat-icon
+                            >
+                            <mat-icon class="full-icon" *ngIf="!choice.isCorrect && isDisplayingResults()"
+                                ><span class="material-symbols-outlined icon" style="color: white"> cancel </span></mat-icon
+                            >
+                            <div>{{ i + 1 + '. ' + choice.text }}</div>
                         </div></ng-container
                     >
                 </div>
