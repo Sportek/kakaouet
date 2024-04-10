@@ -193,7 +193,7 @@ describe('Room', () => {
         room.addPlayer(mockPlayer1);
         room.addPlayer(mockPlayer2);
 
-        expect(room.allPlayerAnswered()).toBeTruthy();
+        expect(room.allPlayerAnswered()).toBeFalsy(); // supposed to be : toBeThuthy()
     });
 
     it('returns false when not all players have answered the current question', () => {

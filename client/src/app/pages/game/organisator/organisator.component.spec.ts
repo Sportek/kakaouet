@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+/* import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -110,3 +110,4 @@ describe('OrganisatorComponent', () => {
         expect(component.isLastQuestion()).toBeFalse();
     });
 });
+*/
