@@ -4,6 +4,7 @@ import { mockQuestions } from '@app/services/question/mock-question';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { QuestionService } from '../question/question.service';
 import { mockQuizTable } from './mock-quiz';
 import { QuizService } from './quiz.service';
 
@@ -18,6 +19,17 @@ const mockQuizModel = {
     insertMany: jest.fn(),
 };
 
+const mockQuestionService = {
+    getAllQuestions: jest.fn(),
+    getQuestionById: jest.fn(),
+    updateQuestionById: jest.fn(),
+    deleteQuestionById: jest.fn(),
+    addNewQuestion: jest.fn(),
+    deleteAllQuestions: jest.fn(),
+    mapDbQuestionToCommonQuestion: jest.fn(),
+    getQCMQuestions: jest.fn(),
+};
+
 describe('QuizService', () => {
     let service: QuizService;
 
@@ -29,6 +41,10 @@ describe('QuizService', () => {
                 {
                     provide: getModelToken(Quiz.name),
                     useValue: mockQuizModel,
+                },
+                {
+                    provide: QuestionService,
+                    useValue: mockQuestionService,
                 },
             ],
         }).compile();
