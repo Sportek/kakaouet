@@ -90,12 +90,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.calculateChoices();
             }),
         );
-
-        // this.subscriptions.push(
-        //     this.playerService.getSortedPlayersObservable().subscribe((sortedPlayers) => {
-        //         this.players = sortedPlayers;
-        //     }),
-        // );
     }
 
     filterPlayers(): PlayerClient[] {
@@ -119,7 +113,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     toggleSortOrder(): void {
-        this.sortingOrder = this.sortingOrder === this.sortOrder.ascending ? this.sortOrder.descending : this.sortOrder.ascending;
+        this.sortingOrder = this.sortingOrder === this.sortOrder.ascending ? this.sortOrder.ascending : this.sortOrder.descending;
         this.sortPlayers();
     }
 }
