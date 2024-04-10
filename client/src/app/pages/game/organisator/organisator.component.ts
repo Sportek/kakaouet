@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-// import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { ActualQuestion, ChoiceData, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
@@ -87,10 +86,16 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
                 this.players = players;
+                this.sortPlayers();
                 this.calculateChoices();
             }),
         );
-        this.sortPlayers();
+
+        // this.subscriptions.push(
+        //     this.playerService.getSortedPlayersObservable().subscribe((sortedPlayers) => {
+        //         this.players = sortedPlayers;
+        //     }),
+        // );
     }
 
     filterPlayers(): PlayerClient[] {
@@ -110,7 +115,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     sortPlayers(): void {
-        this.playerService.sortPlayers(this.players, this.selectedCriterion, this.sortingOrder);
+        this.players = this.playerService.sortPlayers(this.players, this.selectedCriterion, this.sortingOrder);
     }
 
     toggleSortOrder(): void {
