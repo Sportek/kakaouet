@@ -63,7 +63,7 @@ describe('GameSession', () => {
         serverMock = new Server() as unknown as Server;
         const mockGameService = {} as GameService;
         const historyServiceMock = {
-            createNewHistory: jest.fn().mockResolvedValue(undefined),
+            createNewHistory: jest.fn().mockResolvedValue(Promise.resolve()),
         } as unknown as HistoryService;
 
         room = new Room('test-room', serverMock, mockGameService);
