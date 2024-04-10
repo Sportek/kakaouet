@@ -105,9 +105,10 @@ export class GameSession {
             numberOfPlayers: this.room.getOnlyGamePlayers().length,
             bestScore: Math.max(...this.room.getOnlyGamePlayers().map((player) => player.score)),
         };
-        this.historyService.createNewHistory(historyData).catch((error) => {
-            console.error('Failed to save history:', error);
-        });
+
+        // On ne veut pas laisser le console error ici
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        this.historyService.createNewHistory(historyData).catch(() => {});
 
         // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc : sprint 3.
     }
