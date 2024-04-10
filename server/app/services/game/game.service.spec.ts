@@ -6,7 +6,7 @@ import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Server } from 'socket.io';
-import { QuizService } from '../quiz/quiz.service';
+import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameService } from './game.service';
 import { mockGame } from './mock-game';
 

@@ -1,10 +1,10 @@
 import { Quiz } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { mockQuestions } from '@app/services/question/mock-question';
+import { QuestionService } from '@app/services/question/question.service';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { QuestionService } from '../question/question.service';
 import { mockQuizTable } from './mock-quiz';
 import { QuizService } from './quiz.service';
 
