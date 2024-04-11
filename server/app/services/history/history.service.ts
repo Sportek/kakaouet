@@ -13,8 +13,7 @@ export class HistoryService {
 
     async createNewHistory(historyData: GameRecords): Promise<GameRecords> {
         try {
-            const newHistory = new this.historyModel(historyData);
-            await newHistory.save();
+            const newHistory = await this.historyModel.create(historyData);
             return newHistory;
         } catch (error) {
             this.logger.error('Error adding new history: ', error);

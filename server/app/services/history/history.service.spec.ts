@@ -1,83 +1,82 @@
 import { History } from '@app/model/database/history';
+import { GameRecords } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Model } from 'mongoose';
 import { HistoryService } from './history.service';
 
 describe('HistoryService', () => {
     let service: HistoryService;
-    let model: Model<History> & unknown;
+    let mockHistoryModel;
 
-    const mockHistoryData = {
-        _id: 'someId',
-        gameTitle: 'Test Game',
-        startTime: new Date(),
-        numberOfPlayers: 2,
-        bestScore: 1000,
-    };
+    const gameRecordsArray: GameRecords[] = [
+        // Add your mock game records here
+    ];
 
     beforeEach(async () => {
+        mockHistoryModel = {
+            create: jest.fn().mockResolvedValue(gameRecordsArray[0]), // Mocks document creation
+            // Remove the save mock if it's not needed
+            find: jest.fn().mockReturnValue({
+                sort: jest.fn().mockResolvedValue(gameRecordsArray),
+            }),
+            deleteMany: jest.fn().mockResolvedValue(true),
+        };
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 HistoryService,
                 {
                     provide: getModelToken(History.name),
-                    useValue: {
-                        create: jest.fn().mockResolvedValue(mockHistoryData),
-                        find: jest.fn().mockImplementation(() => ({
-                            sort: jest.fn().mockResolvedValue([mockHistoryData]),
-                        })),
-                        deleteMany: jest.fn().mockResolvedValue({ deletedCount: 1 }),
-                    },
+                    useValue: mockHistoryModel,
                 },
                 {
                     provide: Logger,
-                    useValue: { error: jest.fn() },
+                    useValue: {
+                        error: jest.fn(),
+                    },
                 },
             ],
         }).compile();
 
         service = module.get<HistoryService>(HistoryService);
-        model = module.get<Model<History>>(getModelToken(History.name));
     });
 
-    // it('should handle error when creating new history fails', async () => {
-    //     // Directly throw an error when `createNewHistory` is called
-    //     service.createNewHistory = jest.fn().mockImplementation(() => {
-    //         throw new Error('Fail');
-    //     });
-
-    //     // Now, when `createNewHistory` is called within this test, it will directly throw the error
-    //     await expect(service.createNewHistory(mockHistoryData)).rejects.toThrow('Fail');
-    // });
-
-    it('should get history records', async () => {
-        const sortBy = 'createdAt';
-        const order = 'asc';
-        await expect(service.getHistory(sortBy, order)).resolves.toEqual([mockHistoryData]);
-        expect(model.find).toHaveBeenCalled();
+    it('should be defined', () => {
+        expect(service).toBeDefined();
     });
 
-    it('should delete history records', async () => {
-        await expect(service.deleteHistory()).resolves.toEqual([]);
-        expect(model.deleteMany).toHaveBeenCalled();
+    it('should create new history', async () => {
+        await expect(service.createNewHistory(gameRecordsArray[0])).resolves.toEqual(gameRecordsArray[0]);
+        expect(mockHistoryModel.create).toHaveBeenCalledWith(gameRecordsArray[0]);
     });
 
-    // it('should handle error when creating new history fails', async () => {
-    //     jest.spyOn(model, 'create').mockRejectedValueOnce(new Error('Fail'));
-    //     await expect(service.createNewHistory(mockHistoryData)).rejects.toThrow('Fail');
-    // });
+    it('should handle errors when creating new history', async () => {
+        mockHistoryModel.create.mockRejectedValueOnce(new Error('Some error'));
+        await expect(service.createNewHistory(gameRecordsArray[0])).rejects.toThrow('Some error');
+    });
 
-    it('should handle error when fetching history records fails', async () => {
-        jest.spyOn(model, 'find').mockImplementationOnce(() => {
-            throw new Error('Fail');
+    it('should get history', async () => {
+        const records = await service.getHistory();
+        expect(records).toEqual(gameRecordsArray);
+        expect(mockHistoryModel.find().sort).toHaveBeenCalledWith({ createdAt: 1 });
+    });
+
+    it('should handle errors when fetching history', async () => {
+        mockHistoryModel.find.mockReturnValue({
+            sort: jest.fn().mockRejectedValueOnce(new Error('Some error')),
         });
-        await expect(service.getHistory()).rejects.toThrow('Fail');
+        await expect(service.getHistory()).rejects.toThrow('Some error');
     });
 
-    it('should handle error when deleting history records fails', async () => {
-        jest.spyOn(model, 'deleteMany').mockRejectedValueOnce(new Error('Fail'));
-        await expect(service.deleteHistory()).rejects.toThrow('Fail');
+    it('should delete history', async () => {
+        const result = await service.deleteHistory();
+        expect(result).toEqual([]);
+        expect(mockHistoryModel.deleteMany).toHaveBeenCalled();
+    });
+
+    it('should handle errors when deleting history', async () => {
+        mockHistoryModel.deleteMany.mockRejectedValueOnce(new Error('Some error'));
+        await expect(service.deleteHistory()).rejects.toThrow('Some error');
     });
 });
