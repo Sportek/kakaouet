@@ -103,6 +103,7 @@ export class GameSession {
     }
 
     changeGameState(gameState: GameState): void {
+        if (gameState === GameState.OrganisatorCorrectingAnswers) this.filterNullAnswers();
         this.gameState = gameState;
         this.room.broadcast(GameEvents.GameStateChanged, {}, { gameState: this.gameState });
         this.isAlreadyChangingQuestion = false;
@@ -140,6 +141,12 @@ export class GameSession {
             this.ratingAmounts[questionTitle] = [0, 0, 0];
         }
         this.ratingAmounts[questionTitle][rating * 2]++;
+    }
+
+    private filterNullAnswers() {
+        for (const player of this.room.players) {
+            if (!player.getAnswer(this.gameQuestionIndex)) player.setAnswer(' ');
+        }
     }
 
     private broadcastCorrectAnswers(question: Question): void {

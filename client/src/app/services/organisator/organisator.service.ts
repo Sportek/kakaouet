@@ -4,6 +4,7 @@ import { GameService } from '@app/services/game/game.service';
 import { Variables } from '@common/enum-variables';
 import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
 import { QuestionType } from '@common/types';
+import { cloneDeep } from 'lodash';
 
 const baseQRLRatings = [
     { text: '0', amount: 0, isCorrect: true },
@@ -63,7 +64,7 @@ export class OrganisatorService {
     setActualQuestion(actualQuestion: ActualQuestion | null) {
         this.actualQuestion = actualQuestion;
         if (this.actualQuestion?.question?.type === QuestionType.QRL) {
-            this.choices = baseQRLRatings;
+            this.choices = cloneDeep(baseQRLRatings);
         }
         this.calculateChoices();
     }
