@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { HistoryComponent } from '@app/pages/history/history.component';
+import { HistoryComponent } from '@app/components/history/history.component';
 
 @Component({
     selector: 'app-admin-game-history',
