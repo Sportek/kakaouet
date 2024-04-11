@@ -6,10 +6,10 @@
                     <mat-icon>
                         <span class="material-symbols-outlined"> grade </span>
                     </mat-icon>
-                    <div class="text large-text">{{ actualQuestion?.question?.points }}</div>
+                    <div class="text large-text">{{ getActualQuestion()?.question?.points }}</div>
                 </div>
                 <div class="question large-text">
-                    {{ actualQuestion?.question?.text }}
+                    {{ getActualQuestion()?.question?.text }}
                 </div>
                 <div class="icon-container">
                     <mat-icon>
@@ -24,21 +24,29 @@
                         <div class="column-container" [matTooltip]="'Personnes n\'ayant pas modifiés leur réponse'">
                             <div
                                 class="column isCorrect"
-                                [style]="'height: ' + (histogram.hasNotModified / (histogram.hasModified + histogram.hasNotModified)) * 100 + '%'"
+                                [style]="
+                                    'height: ' +
+                                    (getHistogram().hasNotModified / (getHistogram().hasModified + getHistogram().hasNotModified)) * 100 +
+                                    '%'
+                                "
                             ></div>
-                            <div class="column-label">{{ histogram.hasNotModified }}</div>
+                            <div class="column-label">{{ getHistogram().hasNotModified }}</div>
                         </div>
                         <div class="column-container" [matTooltip]="'Personnes ayant modifiés leur réponse'">
                             <div
                                 class="column isCorrect"
-                                [style]="'height: ' + (histogram.hasModified / (histogram.hasModified + histogram.hasNotModified)) * 100 + '%'"
+                                [style]="
+                                    'height: ' +
+                                    (getHistogram().hasModified / (getHistogram().hasModified + getHistogram().hasNotModified)) * 100 +
+                                    '%'
+                                "
                             ></div>
-                            <div class="column-label">{{ histogram.hasModified }}</div>
+                            <div class="column-label">{{ getHistogram().hasModified }}</div>
                         </div>
                     </div>
                     <div class="legend">
                         <div class="stats">
-                            {{ getAnswerAmount() + '/' + players.length }}
+                            {{ getAnswerAmount() + '/' + getPlayerArray.length }}
                         </div>
                     </div>
                 </div>
@@ -47,7 +55,7 @@
             <ng-container *ngIf="isDisplayingResults() && isQRL()">
                 <div class="stats-container">
                     <div class="columns">
-                        <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="formatColumn(column)">
+                        <div *ngFor="let column of getChoices(); let i = index" class="column-container" [matTooltip]="formatColumn(column)">
                             <div
                                 class="column"
                                 [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
@@ -58,7 +66,7 @@
                     </div>
                     <div class="legend">
                         <div class="stats">
-                            {{ getAnswerAmount() + '/' + players.length }}
+                            {{ getAnswerAmount() + '/' + getPlayerArray.length }}
                         </div>
                     </div>
                 </div>
@@ -66,24 +74,24 @@
 
             <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
                 <div class="players-container-answer-qrl">
-                    <div>{{ currentPlayer.name }}: {{ currentPlayer.answers?.answer }}</div>
+                    <div>{{ getCurrentPlayer().name }}: {{ getCurrentPlayer().answers?.answer }}</div>
                     <div>Veuillez noter sa réponse:</div>
                     <div class="middle">
                         <mat-form-field appearance="fill" class="middle">
-                            <mat-select [(ngModel)]="currentRating" (ngModelChange)="rateAnswerQRL(currentPlayer.name)">
+                            <mat-select [(ngModel)]="currentRating" (ngModelChange)="rateAnswerQRL(getCurrentPlayer().name)">
                                 <mat-option value="0">0%</mat-option>
                                 <mat-option value="0.5">50%</mat-option>
                                 <mat-option value="1">100%</mat-option>
                             </mat-select>
                             <mat-hint class="hide-subscript-wrapper"></mat-hint>
                         </mat-form-field>
-                        Note actuelle: {{ getRatingForPlayer(currentPlayer.name)?.toString() }}
+                        Note actuelle: {{ getRatingForPlayer(getCurrentPlayer().name)?.toString() }}
                     </div>
                     <button
-                        *ngIf="getRatingForPlayer(currentPlayer.name)?.toString()"
+                        *ngIf="getRatingForPlayer(getCurrentPlayer().name)?.toString()"
                         mat-raised-button
                         color="primary"
-                        (click)="sendRating(currentPlayer.name)"
+                        (click)="sendRating(getCurrentPlayer().name)"
                     >
                         Noter
                     </button>
@@ -93,7 +101,7 @@
             <ng-container *ngIf="!isQRL()">
                 <div class="stats-container">
                     <div class="columns">
-                        <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
+                        <div *ngFor="let column of getChoices(); let i = index" class="column-container" [matTooltip]="column.text">
                             <div
                                 class="column"
                                 [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
@@ -108,7 +116,7 @@
                             <div class="label">Correct</div>
                         </div>
                         <div class="stats">
-                            {{ getAnswerAmount() + '/' + players.length }}
+                            {{ getAnswerAmount() + '/' + getPlayerArray().length }}
                         </div>
                         <div class="state">
                             <div class="color isIncorrect"></div>
