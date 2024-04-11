@@ -41,6 +41,7 @@ export class GameGateway {
         const player = gameSession.room.getPlayerWithSocketId(client.id);
         if (!(player && !player.isExcluded)) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
+        gameSession.broadcastMessage('Joueur ' + player.name + " n'est plus dans la partie.");
         if (gameSession.gameState === GameState.WaitingPlayers) {
             gameSession.room.removePlayer(player.name);
             return { isSuccess: true, message: 'Vous avez quitté la partie' };
@@ -139,8 +140,23 @@ export class GameGateway {
         if (!this.hasAutorisation(client, GameRole.Organisator))
             return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
 
+        gameSession.broadcastMessage('Joueur ' + data.name + " n'est plus dans la partie.");
         gameSession.room.banPlayer(data.name);
         return { isSuccess: true, message: 'Joueur banni' };
+    }
+
+    @SubscribeMessage(GameEvents.MutePlayer)
+    handleMutedPlayer(@MessageBody() data: GameEventsData.MutePlayer, @ConnectedSocket() client: Socket): SocketResponse {
+        const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        const player = gameSession.room.getPlayerWithSocketId(client.id);
+        if (!this.hasAutorisation(client, GameRole.Organisator))
+            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        gameSession.room.mutePlayer(data.name);
+        if (player.isMuted) {
+            return { isSuccess: true, message: 'Droit au clavardage activé' };
+        } else {
+            return { isSuccess: true, message: 'Droit au clavardage desactivé' };
+        }
     }
 
     @SubscribeMessage(GameEvents.ToggleTimer)
@@ -166,9 +182,12 @@ export class GameGateway {
     handleMessageSent(@MessageBody() data: GameEventsData.SendMessage, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-
-        gameSession.broadcastMessage(player, data.content);
-        return { isSuccess: true, message: 'Message envoyé' };
+        if (!player.isMuted) {
+            gameSession.broadcastMessage(data.content, player);
+            return { isSuccess: true, message: 'Message envoyé' };
+        }
+        client.emit(GameEvents.MutedNotification, { message: "Vous n'êtes pas autorisé à effectuer cette action" });
+        return { isSuccess: false, message: 'Non-authorisé' };
     }
 
     afterInit(server: Server): void {

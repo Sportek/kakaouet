@@ -11,6 +11,7 @@ export class Player {
     score: number;
     currentQuestionMultiplier: number;
     isExcluded: boolean;
+    isMuted: boolean;
     hasGiveUp: boolean;
     hasAnswered: boolean;
     private room: Room;

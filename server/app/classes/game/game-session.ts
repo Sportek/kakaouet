@@ -124,9 +124,10 @@ export class GameSession {
         }
     }
 
-    broadcastMessage(player: Player, content: string): void {
+    broadcastMessage(content: string, player?: Player): void {
         const newDate: Date = new Date();
-        this.room.broadcast(GameEvents.PlayerSendMessage, {}, { name: player.name, content, createdAt: newDate });
+        const playerName = player && player.name ? player.name : '';
+        this.room.broadcast(GameEvents.PlayerSendMessage, {}, { name: playerName, content, createdAt: newDate });
     }
 
     saveAnswerRatings(player: Player, score: number) {

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { NotificationService } from '@app/services/notification/notification.service';
+
 import { SoundService } from '@app/services/sound/sound.service';
-import { ActualQuestion, Answer, Client, GameEventsData, PlayerClient, SoundType } from '@common/game-types';
+import { ActualQuestion, Answer, Client, GameEventsData, PlayerClient, SoundType, InteractionStatus } from '@common/game-types';
 import { QuestionType } from '@common/types';
 import { BehaviorSubject } from 'rxjs';
 
@@ -19,7 +20,10 @@ export class SocketEventHandlerService {
     handlePlayerGivesUp(data: GameEventsData.PlayerHasGiveUp, players: BehaviorSubject<PlayerClient[]>): void {
         players.next(
             players.getValue().map((player) => {
-                if (player.name === data.name) player.hasGiveUp = true;
+                if (player.name === data.name) {
+                    player.interactionStatus = InteractionStatus.abandoned;
+                    player.hasGiveUp = true;
+                }
                 return player;
             }),
         );
@@ -33,6 +37,17 @@ export class SocketEventHandlerService {
         }
     }
 
+    handlePlayerMuted(data: GameEventsData.PlayerMuted, players: BehaviorSubject<PlayerClient[]>, client: BehaviorSubject<Client>) {
+        players.next(players.getValue().map((player) => (player.name === data.name ? { ...player, isMuted: data.isMuted } : player)));
+        if (data.name === client.getValue().name) {
+            if (data.isMuted) {
+                this.notificationService.error("Vous n'avez pas droit de clavarder");
+            } else {
+                this.notificationService.error('Vous avez le droit de clavarder a nouveau');
+            }
+        }
+    }
+
     handleUpdateScore(data: GameEventsData.UpdateScore, client: BehaviorSubject<Client>) {
         if (data.hasAnsweredFirst) this.notificationService.info('Vous avez répondu en premier !');
         client.next({ ...client.getValue(), score: data.score });
@@ -42,6 +57,7 @@ export class SocketEventHandlerService {
         const player = players.getValue().find((p) => p.name === data.name);
         if (player) {
             if (player.answers) {
+                player.interactionStatus = InteractionStatus.finalized;
                 player.answers.hasConfirmed = true;
             }
             players.next([...players.getValue()]);
@@ -58,6 +74,7 @@ export class SocketEventHandlerService {
         const player = players.getValue().find((p) => p.name === data.name);
         if (player) {
             player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
+            player.interactionStatus = InteractionStatus.interacted;
             players.next([...players.getValue()]);
         }
         recentInteractions.set(data.name, cooldown);
@@ -83,7 +100,15 @@ export class SocketEventHandlerService {
     handlePlayerJoinGame(data: GameEventsData.PlayerJoinGame, players: BehaviorSubject<PlayerClient[]>) {
         players.next([
             ...players.getValue(),
-            { name: data.name, role: data.role, isExcluded: data.isExcluded, score: data.score, hasGiveUp: data.hasGiveUp },
+            {
+                name: data.name,
+                role: data.role,
+                isExcluded: data.isExcluded,
+                score: data.score,
+                hasGiveUp: data.hasGiveUp,
+                isMuted: data.isMuted,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
         ]);
     }
 
