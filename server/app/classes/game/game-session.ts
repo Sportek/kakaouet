@@ -228,25 +228,33 @@ export class GameSession {
     private calculateCorrectChoices() {
         const choices: ChoiceData[][] = [];
         this.quiz.questions.forEach((question, index) => {
-            if (question.type !== QuestionType.QCM) {
-                if (this.type === GameType.Test) return;
-                return choices.push([
-                    { text: '0%', amount: this.ratingAmounts[question.text][0], isCorrect: true },
-                    { text: '50%', amount: this.ratingAmounts[question.text][1], isCorrect: true },
-                    { text: '100%', amount: this.ratingAmounts[question.text][2], isCorrect: true },
-                ]);
+            if (question.type === QuestionType.QRL) {
+                return choices.push(this.qrlRatings(question));
             }
-            const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
-            const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
-                const amount = globalPlayerAnswers[i];
-                const name = choice.text;
-                const isCorrect = choice.isCorrect;
-                return { text: name, amount, isCorrect };
-            });
-            choices.push(choiceData);
+            choices.push(this.qcmCorrectChoices(question, index));
         });
 
         return choices;
+    }
+
+    private qrlRatings(question: Question): ChoiceData[] | null {
+        if (this.type === GameType.Test || question.type !== QuestionType.QRL) return;
+        return [
+            { text: '0%', amount: this.ratingAmounts[question.text][0], isCorrect: true },
+            { text: '50%', amount: this.ratingAmounts[question.text][1], isCorrect: true },
+            { text: '100%', amount: this.ratingAmounts[question.text][2], isCorrect: true },
+        ];
+    }
+
+    private qcmCorrectChoices(question: Question, index: number) {
+        if (question.type !== QuestionType.QCM) return;
+        const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
+            const amount = this.getAmountOfPlayersWhoAnswered(index)[i];
+            const name = choice.text;
+            const isCorrect = choice.isCorrect;
+            return { text: name, amount, isCorrect };
+        });
+        return choiceData;
     }
 
     private broadcastPlayerResults(scores: Score[], choices: ChoiceData[][]): void {

@@ -137,12 +137,7 @@ export class GameService {
 
     modifyAnswerQRL(value: string): void {
         if (this.isFinalAnswer.getValue()) return;
-        const currentPlayerName = this.client.getValue().name;
-        const player = this.players.getValue().find((p) => p.name === currentPlayerName);
-        if (player?.answers) {
-            player.answers.hasInterracted = true;
-            this.players.next([...this.players.getValue()]);
-        }
+        this.setPlayerHasAnswered(this.players.getValue().find((p) => p.name === this.client.getValue().name));
         this.answer.next(value);
         if (this.answer.getValue()) this.sendAnswer(this.answer.getValue() as Answer);
     }
@@ -155,13 +150,11 @@ export class GameService {
 
     rateAnswerQRL(name: string, scoreQRL: number): void {
         const player = this.players.getValue().find((p) => p.name === name);
-        if (!player) {
-            return;
-        }
+        if (!player) return;
         this.socketService.send(GameEvents.RateAnswerQRL, {
             playerName: name,
             score: scoreQRL,
-        } as GameEventsData.RateAnswerQRL);
+        });
     }
 
     nextQuestion(): void {
@@ -171,13 +164,13 @@ export class GameService {
     setResponseAsFinal(): void {
         if (this.isFinalAnswer.getValue()) return;
         if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) {
-            const answer = this.answer.getValue() as number[];
-            if (answer.length === 0) return this.notificationService.error('Veuillez sélectionner au moins une réponse');
+            if ((this.answer.getValue() as number[]).length === 0)
+                return this.notificationService.error('Veuillez sélectionner au moins une réponse');
         }
         if (this.actualQuestion.getValue()?.question?.type === QuestionType.QRL) {
-            const answer = this.answer.getValue() as string;
-            if (answer.trim().length === 0) return this.notificationService.error('Veuillez entrer une réponse');
-            if (answer.trim().length > Variables.MaxCharacters) return this.notificationService.error('Le texte doit faire moins de 200 caractères');
+            if ((this.answer.getValue() as string).trim().length === 0) return this.notificationService.error('Veuillez entrer une réponse');
+            if ((this.answer.getValue() as string).trim().length > Variables.MaxCharacters)
+                return this.notificationService.error('Le texte doit faire moins de 200 caractères');
         }
         this.isFinalAnswer.next(true);
         this.confirmAnswer();
@@ -189,6 +182,13 @@ export class GameService {
 
     getCorrectAnswers(): Observable<Choice[]> {
         return this.correctAnswers.asObservable();
+    }
+
+    private setPlayerHasAnswered(player: PlayerClient | undefined) {
+        if (player?.answers) {
+            player.answers.hasInterracted = true;
+            this.players.next([...this.players.getValue()]);
+        }
     }
 
     private reinitialise(id: string, game: Game) {
