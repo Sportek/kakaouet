@@ -177,10 +177,6 @@ export class GameService {
         });
     }
 
-    nextQuestion(): void {
-        this.socketService.send(GameEvents.NextQuestion);
-    }
-
     setResponseAsFinal(): void {
         if (this.isFinalAnswer.getValue()) return;
         if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) {
