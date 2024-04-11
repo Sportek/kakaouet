@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
@@ -66,7 +65,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     formatColumn(column: ChoiceData): string {
-        return parseFloat(column.text) * 100 + '%';
+        return parseFloat(column.text).toLocaleString('en', { style: 'percent' });
     }
 
     calculateChoices(): void {
