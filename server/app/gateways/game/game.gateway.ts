@@ -13,7 +13,6 @@ export class GameGateway {
 
     constructor(private gameService: GameService) {}
 
-    // for QRL
     @SubscribeMessage(GameEvents.RateAnswerQRL)
     handleRateAnswerQRL(@MessageBody() data: GameEventsData.RateAnswerQRL, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);

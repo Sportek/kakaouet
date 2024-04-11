@@ -186,8 +186,6 @@ export class GameSession {
 
     private calculateScores(): { player: Player; hasAnsweredFirst: boolean }[] {
         const question = this.quiz.questions[this.gameQuestionIndex];
-
-        // TODO: Je ne gère pas les autres types de questions pour l'instant : Sprint 3
         if (question.type !== QuestionType.QCM) return this.room.players.map((player) => ({ player, hasAnsweredFirst: false }));
         const correctAnswersIndex = question.choices.flatMap((choice, index) => (choice.isCorrect ? index : []));
         this.broadcastCorrectAnswers(question);

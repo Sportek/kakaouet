@@ -136,8 +136,8 @@ export class GameService {
     }
 
     modifyAnswerQRL(value: string): void {
-        const currentPlayerName = this.client.getValue().name;
         if (this.isFinalAnswer.getValue()) return;
+        const currentPlayerName = this.client.getValue().name;
         const player = this.players.getValue().find((p) => p.name === currentPlayerName);
         if (player?.answers) {
             player.answers.hasInterracted = true;
@@ -153,13 +153,11 @@ export class GameService {
         this.sendAnswer(text);
     }
 
-    // for QRL
     rateAnswerQRL(name: string, scoreQRL: number): void {
         const player = this.players.getValue().find((p) => p.name === name);
         if (!player) {
             return;
         }
-
         this.socketService.send(GameEvents.RateAnswerQRL, {
             playerName: name,
             score: scoreQRL,
@@ -179,8 +177,7 @@ export class GameService {
         if (this.actualQuestion.getValue()?.question?.type === QuestionType.QRL) {
             const answer = this.answer.getValue() as string;
             if (answer.trim().length === 0) return this.notificationService.error('Veuillez entrer une réponse');
-            if (answer.trim().length > Variables.MaxCharacters)
-                return this.notificationService.error('Le texte doit être de moins de 200 caractères');
+            if (answer.trim().length > Variables.MaxCharacters) return this.notificationService.error('Le texte doit faire moins de 200 caractères');
         }
         this.isFinalAnswer.next(true);
         this.confirmAnswer();
