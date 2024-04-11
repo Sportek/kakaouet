@@ -72,7 +72,6 @@ describe('HistoryComponent', () => {
     });
 
     it('should update sort order to Descendant', fakeAsync(() => {
-        // Assuming 'Nom de Jeu Descendant' triggers the OrderingField.GameTitle to be set and the order to Descendant
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Descendant'));
         component.ngOnInit();
         tick();

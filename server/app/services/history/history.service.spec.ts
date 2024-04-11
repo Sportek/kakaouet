@@ -9,14 +9,11 @@ describe('HistoryService', () => {
     let service: HistoryService;
     let mockHistoryModel;
 
-    const gameRecordsArray: GameRecords[] = [
-        // Add your mock game records here
-    ];
+    const gameRecordsArray: GameRecords[] = [];
 
     beforeEach(async () => {
         mockHistoryModel = {
-            create: jest.fn().mockResolvedValue(gameRecordsArray[0]), // Mocks document creation
-            // Remove the save mock if it's not needed
+            create: jest.fn().mockResolvedValue(gameRecordsArray[0]),
             find: jest.fn().mockReturnValue({
                 sort: jest.fn().mockResolvedValue(gameRecordsArray),
             }),

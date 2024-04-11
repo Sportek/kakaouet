@@ -107,8 +107,6 @@ export class GameSession {
         };
 
         await this.historyService.createNewHistory(historyData);
-
-        // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc : sprint 3.
     }
 
     changeGameState(gameState: GameState): void {
