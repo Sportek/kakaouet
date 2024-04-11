@@ -89,6 +89,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.actualQuestion.subscribe((actualQuestion) => {
                 this.organisatorService.setActualQuestion(actualQuestion);
+                this.organisatorService.playerRatings = new Map();
             }),
         );
 

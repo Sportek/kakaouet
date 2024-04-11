@@ -145,7 +145,12 @@ export class GameSession {
 
     private filterNullAnswers() {
         for (const player of this.room.players) {
-            if (!player.getAnswer(this.gameQuestionIndex)) player.setAnswer(' ');
+            if (!player.getAnswer(this.gameQuestionIndex)) {
+                player.setAnswer(' ');
+                player.confirmAnswer();
+                player.hasAnswered = true;
+                this.room.broadcast(GameEvents.PlayerConfirmAnswers, {}, { name: player.name });
+            }
         }
     }
 
