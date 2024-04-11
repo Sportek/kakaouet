@@ -123,7 +123,7 @@ export class QuestionService {
     onQuestionListUpdate(modifiedQuestion: Question, quiz: Quiz) {
         // _id est forcé par MongoDB, accepté par le prof
         // eslint-disable-next-line no-underscore-dangle
-        const index = quiz.questions.findIndex((question) => question._id === modifiedQuestion._id);
+        const index = quiz.questions.findIndex((question) => question.text === modifiedQuestion.text);
         if (index < 0) {
             quiz.questions.push(modifiedQuestion);
         } else {
