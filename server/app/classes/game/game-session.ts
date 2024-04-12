@@ -63,7 +63,7 @@ export class GameSession {
     displayQuestionResults(): void {
         this.changeGameState(GameState.DisplayQuestionResults);
         this.sendScores();
-        if (this.type === GameType.Test) this.nextQuestion();
+        if (this.type === GameType.Test || this.type === GameType.Random) this.nextQuestion();
     }
 
     nextQuestion(): void {

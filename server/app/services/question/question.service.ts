@@ -1,5 +1,6 @@
 import { Question } from '@app/model/database/question';
 import { QuestionDto } from '@app/model/dto/question/question.dto';
+import { Choice, Question as CommonQuestion, QuestionType as CommonQuestionType } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -81,5 +82,22 @@ export class QuestionService {
         } catch (error) {
             this.logger.error('Error adding new question: ', error);
         }
+    }
+
+    mapDbQuestionToCommonQuestion(dbQuestion: Question): CommonQuestion {
+        return {
+            // eslint-disable-next-line no-underscore-dangle
+            _id: dbQuestion._id.toString(),
+            text: dbQuestion.text,
+            points: dbQuestion.points,
+            createdAt: dbQuestion.createdAt,
+            lastModification: dbQuestion.lastModification,
+            type: dbQuestion.type as CommonQuestionType,
+            choices: dbQuestion.choices as Choice[],
+        };
+    }
+    async getQCMQuestions(): Promise<CommonQuestion[]> {
+        const dbQuestions = await this.questionModel.find({ type: 'QCM' }).exec();
+        return dbQuestions.map(this.mapDbQuestionToCommonQuestion);
     }
 }

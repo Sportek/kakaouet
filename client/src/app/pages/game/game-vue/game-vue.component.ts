@@ -119,8 +119,4 @@ export class GameVueComponent implements OnInit, OnDestroy {
         });
         return isIncorrect;
     }
-
-    isDisplayingResults(): boolean {
-        return this.gameService.gameState.getValue() === GameState.DisplayQuestionResults;
-    }
 }

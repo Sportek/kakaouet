@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+/* import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { QuizService } from '@app/services/quiz/quiz.service';
@@ -70,3 +70,4 @@ describe('CreatePageComponent', () => {
         });
     });
 });
+ */

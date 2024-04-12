@@ -36,9 +36,6 @@ export class ChatService {
         this.socketService.listen(GameEvents.PlayerSendMessage, (data: GameEventsData.PlayerSendMessage) => {
             this.messageHistory.next([...this.messageHistory.getValue(), data]);
         });
-        this.socketService.listen(GameEvents.MutedNotification, () => {
-            return this.notificationService.error("Vous n'avez pas le droit d'envoyer un message.");
-        });
     }
 
     getMessageHistory(): Observable<Message[]> {

@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BASE_URL } from '@app/constants';
-import { Question, Quiz } from '@common/types';
+import { Question, QuestionType, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
@@ -129,5 +129,8 @@ export class QuestionService {
         } else {
             quiz.questions[index] = modifiedQuestion;
         }
+    }
+    hasEnoughQCMQuestions(minimumCount: number): Observable<boolean> {
+        return this.getQuestions().pipe(map((questions) => questions.filter((q) => q.type === QuestionType.QCM).length >= minimumCount));
     }
 }

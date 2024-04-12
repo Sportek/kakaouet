@@ -51,12 +51,10 @@
                         <div *ngFor="let choice of currentQuestion.choices; let i = index" class="choice">
                             <div class="correct-choice" (click)="changeChoiceCorrect(choice)">
                                 <div class="small-text">Correct Answer</div>
-                                <mat-icon class="clickable" *ngIf="!choice.isCorrect"
+                                <mat-icon *ngIf="!choice.isCorrect"
                                     ><span class="material-symbols-outlined"> check_box_outline_blank </span></mat-icon
                                 >
-                                <mat-icon class="clickable" *ngIf="choice.isCorrect"
-                                    ><span class="material-symbols-outlined"> check_box </span></mat-icon
-                                >
+                                <mat-icon *ngIf="choice.isCorrect"><span class="material-symbols-outlined"> check_box </span></mat-icon>
                             </div>
                             <div>
                                 {{ i + 1 + '.' }}
@@ -70,26 +68,24 @@
                             <div class="icons">
                                 <mat-icon
                                     *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)"
-                                    class="large-text clickable"
+                                    class="large-text"
                                     (click)="modifyChoice(choice)"
                                     >edit</mat-icon
                                 >
                                 <mat-icon
                                     *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)"
-                                    class="large-text clickable"
+                                    class="large-text"
                                     (click)="deleteChoice(choice)"
                                     >delete</mat-icon
                                 >
                                 <mat-icon
                                     *ngIf="isModifyingChoiceMap.get(choice) && isModifyingChoiceMap.has(choice)"
-                                    class="large-text clickable"
+                                    class="large-text"
                                     (click)="modifyChoice(choice)"
                                     ><span class="material-symbols-outlined"> check </span></mat-icon
                                 >
-                                <mat-icon class="clickable" (click)="moveChoiceUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
-                                <mat-icon class="clickable" (click)="moveChoiceDown(i)" *ngIf="i < currentQuestion.choices.length - 1"
-                                    >arrow_downward</mat-icon
-                                >
+                                <mat-icon (click)="moveChoiceUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
+                                <mat-icon (click)="moveChoiceDown(i)" *ngIf="i < currentQuestion.choices.length - 1">arrow_downward</mat-icon>
                             </div>
                         </div>
                     </div>
