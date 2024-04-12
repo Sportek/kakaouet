@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-// import { Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
-import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
+import { PlayerService } from '@app/services/player/player.service';
+import { ActualQuestion, ChoiceData, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
 import { QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -17,11 +17,16 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     choices: ChoiceData[];
     timerIsRunning;
 
+    selectedCriterion: SortingCriteria = SortingCriteria.name;
+    sortingOrder: SortOrder = SortOrder.ascending;
+    sortingCriteria = SortingCriteria;
+    sortOrder = SortOrder;
     currentQuestion: number;
     private subscriptions: Subscription[];
 
     constructor(
-        private gameService: GameService, // private router: Router,
+        private gameService: GameService,
+        private playerService: PlayerService,
     ) {
         this.actualQuestion = null;
         this.cooldown = 0;
@@ -81,6 +86,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
                 this.players = players;
+                this.sortPlayers();
                 this.calculateChoices();
             }),
         );
@@ -100,5 +106,14 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     isLastQuestion(): boolean {
         return this.gameService.isLastQuestion();
+    }
+
+    sortPlayers(): void {
+        this.players = this.playerService.sortPlayers(this.players, this.selectedCriterion, this.sortingOrder);
+    }
+
+    toggleSortOrder(): void {
+        this.sortingOrder = this.sortingOrder === this.sortOrder.ascending ? this.sortOrder.descending : this.sortOrder.ascending;
+        this.sortPlayers();
     }
 }
