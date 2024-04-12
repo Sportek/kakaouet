@@ -19,7 +19,7 @@ import {
     GameRestricted,
     InteractionStatus,
     PlayerClient,
-    SoundType
+    SoundType,
 } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
@@ -84,82 +84,84 @@ export class GameService {
         }
         if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length) {
             return this.notificationService.error('Il doit y avoir au moins un joueur pour démarrer la partie');
-            this.startTime.next(new Date());
-            this.socketService.send(GameEvents.StartGame);
         }
 
-        changeLockState() {
-            this.socketService.send(GameEvents.ChangeLockedState);
-        }
+        this.startTime.next(new Date());
+        this.socketService.send(GameEvents.StartGame);
+    }
 
-        sendAnswer(answer: Answer) {
-            this.socketService.send(GameEvents.SelectAnswer, { answers: answer });
-        }
+    changeLockState() {
+        this.socketService.send(GameEvents.ChangeLockedState);
+    }
 
-        isLastQuestion(): boolean {
-            const actualQuestion = this.actualQuestion.getValue();
-            if (!actualQuestion) return false;
-            return actualQuestion.actualIndex === actualQuestion.totalQuestion - 1;
-        }
+    sendAnswer(answer: Answer) {
+        this.socketService.send(GameEvents.SelectAnswer, { answers: answer });
+    }
 
-        confirmAnswer() {
-            this.socketService.send(GameEvents.ConfirmAnswers);
-        }
+    isLastQuestion(): boolean {
+        const actualQuestion = this.actualQuestion.getValue();
+        if (!actualQuestion) return false;
+        return actualQuestion.actualIndex === actualQuestion.totalQuestion - 1;
+    }
 
-        filterPlayers(): PlayerClient[] {
-            return this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded);
-        }
+    confirmAnswer() {
+        this.socketService.send(GameEvents.ConfirmAnswers);
+    }
 
-        toggleTimer() {
-            this.socketService.send(GameEvents.ToggleTimer);
-        }
+    filterPlayers(): PlayerClient[] {
+        return this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded);
+    }
 
-        speedUpTimer() {
-            if (this.getRequiredTime() > this.cooldown.getValue())
-                return this.notificationService.error('Le temps requis minimum pour accélérer le timer est dépassé');
-            this.socketService.send(GameEvents.SpeedUpTimer);
-        }
+    toggleTimer() {
+        this.socketService.send(GameEvents.ToggleTimer);
+    }
 
-        giveUp() {
-            this.router.navigateByUrl('/home', { replaceUrl: true });
-        }
+    speedUpTimer() {
+        if (this.getRequiredTime() > this.cooldown.getValue())
+            return this.notificationService.error('Le temps requis minimum pour accélérer le timer est dépassé');
+        this.socketService.send(GameEvents.SpeedUpTimer);
+    }
 
-        createNewGame(quizId: string, type: GameType): void {
-            this.httpService
-                .post<Game>(BASE_URL + '/game/', { quizId, type })
-                .pipe(catchError((error) => this.handleError(error)))
-                .subscribe((game) => {
-                    this.reinitialise(quizId, game);
-                    this.soundService.startPlayingSound(SoundType.PlayingRoom, true);
-                    switch (type) {
-                        case GameType.Default:
-                            this.createDefaultGame(game);
-                            break;
-                        case GameType.Test:
-                            this.createTestGame(game);
-                            break;
-                        case GameType.Random:
-                            this.createRandomGame(game);
-                            break;
-                        default:
-                            break;
-                    }
-                });
-        }
+    giveUp() {
+        this.router.navigateByUrl('/home', { replaceUrl: true });
+    }
 
-        nextQuestion(): void {
-            this.players.getValue().forEach((player) => {
-                if (player.interactionStatus !== InteractionStatus.abandoned) {
-                    player.interactionStatus = InteractionStatus.noInteraction;
+    createNewGame(quizId: string, type: GameType): void {
+        this.httpService
+            .post<Game>(BASE_URL + '/game/', { quizId, type })
+            .pipe(catchError((error) => this.handleError(error)))
+            .subscribe((game) => {
+                this.reinitialise(quizId, game);
+                this.soundService.startPlayingSound(SoundType.PlayingRoom, true);
+                switch (type) {
+                    case GameType.Default:
+                        this.createDefaultGame(game);
+                        break;
+                    case GameType.Test:
+                        this.createTestGame(game);
+                        break;
+                    case GameType.Random:
+                        this.createRandomGame(game);
+                        break;
+                    default:
+                        break;
                 }
             });
-            this.socketService.send(GameEvents.NextQuestion);
-        }
+    }
 
-        selectAnswer(index: number): void {
-            if(this.isFinalAnswer.getValue()) return;
-            const answer = this.answer.getValue() as number[];
-            if(answer.includes(index)) {
+    nextQuestion(): void {
+        this.players.getValue().forEach((player) => {
+            if (player.interactionStatus !== InteractionStatus.abandoned) {
+                player.interactionStatus = InteractionStatus.noInteraction;
+            }
+        });
+        this.socketService.send(GameEvents.NextQuestion);
+    }
+
+    selectAnswer(index: number): void {
+        if (this.isFinalAnswer.getValue()) return;
+        const answer = this.answer.getValue() as number[];
+        if (answer.includes(index)) {
             this.answer.next(answer.filter((i) => i !== index));
         } else {
             this.answer.next([...answer, index]);
