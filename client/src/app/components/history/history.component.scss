@@ -1,0 +1,80 @@
+@import '../../../colors.scss';
+
+:host {
+    height: 100%;
+}
+
+.background {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-container {
+    max-height: 18.5rem;
+    width: 100%;
+    overflow-y: auto;
+    padding: 0rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    border: 0.4rem solid black;
+    border-radius: 15px;
+    margin-top: 1rem;
+}
+
+.history-item {
+    width: 100%;
+    min-height: 3rem;
+    display: flex;
+    justify-content: space-between;
+    border: 0.25rem solid black;
+    background-color: $purple-900;
+    box-sizing: border-box;
+    align-items: center;
+}
+.game-title {
+    flex: 3;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.game-title .large-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.history-item .game-title {
+    flex: 2;
+    margin-right: 20px;
+}
+
+.history-item .number-players {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.history-item .best-score {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.history-item .start-time {
+    flex: 1;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+@function lighten($color, $amount) {
+    @return mix(white, $color, $amount);
+}
