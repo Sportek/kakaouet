@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { sortQuestionByDate } from '@app/classes/utils';
-import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question } from '@common/types';
@@ -17,10 +17,12 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
     questionList: Question[] = [];
     private subscriptions: Subscription = new Subscription();
 
+    // eslint-disable-next-line max-params -- Ils sont nécessaires
     constructor(
         private questionService: QuestionService,
         public dialog: MatDialog,
         private overlayService: OverlayService,
+        private confirmationService: ConfirmationService,
     ) {}
 
     ngOnInit(): void {
@@ -48,26 +50,9 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
     }
 
     deleteQuestion(question: Question): void {
-        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            width: '350px',
-            data: {
-                title: 'Confirmation de la suppression',
-                message: 'Êtes-vous sûr de vouloir supprimer cette question?',
-            },
-        });
-
-        dialogRef.afterClosed().subscribe((confirm) => {
-            if (confirm) {
-                // _id est forcé par MongoDB, accepté par le prof
-                // eslint-disable-next-line no-underscore-dangle
-                this.questionService.deleteQuestionById(question._id).subscribe({
-                    next: () => {
-                        // _id est forcé par MongoDB, accepté par le prof
-                        // eslint-disable-next-line no-underscore-dangle
-                        this.questionList = this.questionList.filter((quest) => question._id !== quest._id);
-                    },
-                });
-            }
+        this.confirmationService.confirm('Êtes-vous certain de vouloir supprimer cette question?', () => {
+            // eslint-disable-next-line no-underscore-dangle -- accepté le prof, car mongodb utilise _id
+            this.questionList = this.questionList.filter((quest) => question._id !== quest._id);
         });
     }
 

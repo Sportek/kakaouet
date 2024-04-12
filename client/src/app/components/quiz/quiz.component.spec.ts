@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';
 import { of } from 'rxjs';
@@ -11,6 +13,7 @@ describe('QuizComponent', () => {
     let fixture: ComponentFixture<QuizComponent>;
     let quizServiceSpy: jasmine.SpyObj<QuizService>;
     let mockQuizzes: Quiz[];
+    let mockConfirmationService: ConfirmationService;
 
     beforeEach(async () => {
         mockQuizzes = [
@@ -36,6 +39,11 @@ describe('QuizComponent', () => {
             lastModification: new Date(),
         };
 
+        mockConfirmationService = {
+            confirm: jasmine.createSpy('confirm').and.callFake((message, callback) => callback()),
+            dialog: {} as MatDialog, // Add the missing 'dialog' property
+        };
+
         TestBed.configureTestingModule({
             declarations: [QuizComponent],
             imports: [MatIconModule, RouterModule],
@@ -55,6 +63,7 @@ describe('QuizComponent', () => {
                         'generateQuizAsFile',
                     ]),
                 },
+                { provide: ConfirmationService, useValue: mockConfirmationService },
             ],
         }).compileComponents();
 
@@ -66,7 +75,6 @@ describe('QuizComponent', () => {
         quizServiceSpy.getQuizUpdates.and.returnValue(of());
         quizServiceSpy.updateQuizById.and.returnValue(of(mockQuiz));
         quizServiceSpy.deleteQuizById.and.returnValue();
-
         fixture.detectChanges();
     });
 
