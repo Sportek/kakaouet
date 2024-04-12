@@ -1,6 +1,3 @@
-/* eslint-disable no-case-declarations */
-// Pour éviter les erreurs de portée dans les blocs switch.
-
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
@@ -61,9 +58,7 @@ export class HistoryComponent implements OnInit {
                     comparison = a.gameTitle.localeCompare(b.gameTitle);
                     break;
                 case OrderingField.StartTime:
-                    const dateA = new Date(a.startTime).getTime();
-                    const dateB = new Date(b.startTime).getTime();
-                    comparison = dateA - dateB;
+                    comparison = new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
                     break;
             }
             return this.currentSortOrder === Ordering.Ascendant ? comparison : -comparison;
