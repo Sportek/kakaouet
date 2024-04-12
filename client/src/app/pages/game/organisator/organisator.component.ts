@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
-import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
+import { PlayerService } from '@app/services/player/player.service';
+import { ActualQuestion, ChoiceData, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
 import { GameState, QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -12,12 +13,20 @@ import { Subscription } from 'rxjs';
 })
 export class OrganisatorComponent implements OnInit, OnDestroy {
     cooldown: number;
+    players: PlayerClient[];
+    choices: ChoiceData[];
     timerIsRunning: boolean;
     currentRating: string;
+    selectedCriterion: SortingCriteria = SortingCriteria.name;
+    sortingOrder: SortOrder = SortOrder.ascending;
+    sortingCriteria = SortingCriteria;
+    sortOrder = SortOrder;
+    currentQuestion: number;
     private subscriptions: Subscription[];
 
     constructor(
-        private gameService: GameService,
+        private gameService: GameService, // private router: Router,
+        private playerService: PlayerService,
         private organisatorService: OrganisatorService,
     ) {
         this.cooldown = 0;
@@ -102,7 +111,10 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
+                this.players = players;
                 this.organisatorService.setPlayers(players);
+                this.sortPlayers();
+                this.calculateChoices();
             }),
         );
     }
@@ -155,5 +167,14 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     getCurrentPlayer(): PlayerClient {
         return this.organisatorService.currentPlayer;
+    }
+
+    sortPlayers(): void {
+        this.players = this.playerService.sortPlayers(this.players, this.selectedCriterion, this.sortingOrder);
+    }
+
+    toggleSortOrder(): void {
+        this.sortingOrder = this.sortingOrder === this.sortOrder.ascending ? this.sortOrder.descending : this.sortOrder.ascending;
+        this.sortPlayers();
     }
 }

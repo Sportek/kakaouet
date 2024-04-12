@@ -65,6 +65,18 @@ export enum InteractionStatus {
     finalized = 'finalized',
     abandoned = 'abandoned',
 }
+
+export enum SortingCriteria{
+    name = 'name', 
+    score = 'score',
+    status = 'status',
+}
+
+export enum SortOrder{
+    ascending = 'asc',
+    descending = 'desc',
+}
+
 export interface Client {
     name: string;
     role: GameRole;
