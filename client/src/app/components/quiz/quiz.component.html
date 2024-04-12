@@ -4,13 +4,13 @@
             <div class="large-text">{{ quiz.title }}</div>
         </div>
         <div class="icons">
-            <mat-icon [routerLink]="['/admin/create/quiz', quiz._id]" class="title-text clickable">edit</mat-icon>
-            <mat-icon class="title-text clickable" (click)="generateQuizAsFile(quiz)">ios_share</mat-icon>
-            <mat-icon class="title-text clickable" (click)="removeQuiz(quiz)">delete</mat-icon>
-            <mat-icon class="title-text clickable" *ngIf="quiz.visibility" (click)="changeVisibility(quiz)">
+            <mat-icon matTooltip="Modifier le quiz" [routerLink]="['/admin/create/quiz', quiz._id]" class="title-text clickable">edit</mat-icon>
+            <mat-icon matTooltip="Télécharger le quiz" class="title-text clickable" (click)="generateQuizAsFile(quiz)">ios_share</mat-icon>
+            <mat-icon matTooltip="Supprimer le quiz" class="title-text clickable" (click)="removeQuiz(quiz)">delete</mat-icon>
+            <mat-icon matTooltip="Rendre indisponible le quiz" class="title-text clickable" *ngIf="quiz.visibility" (click)="changeVisibility(quiz)">
                 <span class="material-symbols-outlined title-text clickable"> visibility </span></mat-icon
             >
-            <mat-icon class="title-text clickable" *ngIf="!quiz.visibility" (click)="changeVisibility(quiz)"
+            <mat-icon matTooltip="Rendre disponible le quiz" class="title-text clickable" *ngIf="!quiz.visibility" (click)="changeVisibility(quiz)"
                 ><span class="material-symbols-outlined title-text clickable"> visibility_off </span></mat-icon
             >
         </div>

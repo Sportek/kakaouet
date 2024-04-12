@@ -6,8 +6,12 @@
                     <div class="large-text">({{ question.type }}) {{ question.text }}</div>
                 </div>
                 <div class="icons">
-                    <mat-icon class="title-text clickable" (click)="modifyQuestionById(question._id)">edit</mat-icon>
-                    <mat-icon class="title-text delete-icon clickable" (click)="deleteQuestion(question)">delete</mat-icon>
+                    <mat-icon matTooltip="Modifier la question" class="title-text clickable" (click)="modifyQuestionById(question._id)"
+                        >edit</mat-icon
+                    >
+                    <mat-icon matTooltip="Supprimer la question" class="title-text delete-icon clickable" (click)="deleteQuestion(question)"
+                        >delete</mat-icon
+                    >
                 </div>
                 <div class="date">
                     <div class="small-text">{{ 'Modifié le: ' + (question.lastModification | date: 'yyyy/MM/dd HH:mm') }}</div>
