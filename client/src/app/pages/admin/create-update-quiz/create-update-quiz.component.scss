@@ -103,13 +103,6 @@
             justify-content: flex-end;
             align-items: center;
             gap: 0.5rem;
-            > * {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                vertical-align: middle;
-            }
         }
 
         .icons .mat-icon {
@@ -149,18 +142,5 @@
         .white-text {
             color: white;
         }
-    }
-}
-
-.buttons {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-
-    .red {
-        background-color: $red;
-    }
-    .green {
-        background-color: $green;
     }
 }

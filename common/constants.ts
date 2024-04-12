@@ -6,4 +6,3 @@ export const NEGATIVE_SCORE = -1;
 export const RANDOM_ID = '5f3d95e98e6a2b38165c062f';
 export const cinq = 5;
 export const unDemi = 0.5;
-export const INTERVAL_MESSAGES = 100;
