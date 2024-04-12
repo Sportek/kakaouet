@@ -145,10 +145,9 @@ export class GameSession {
 
     private filterNullAnswers() {
         for (const player of this.room.players) {
-            if (!player.getAnswer(this.gameQuestionIndex)) {
+            if (!player.getAnswer(this.gameQuestionIndex) && !player.hasGiveUp) {
                 player.setAnswer(' ');
                 player.confirmAnswer();
-                player.hasAnswered = true;
                 this.room.broadcast(GameEvents.PlayerConfirmAnswers, {}, { name: player.name });
             }
         }

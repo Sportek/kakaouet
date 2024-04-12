@@ -44,11 +44,6 @@
                             <div class="column-label">{{ getHistogram().hasModified }}</div>
                         </div>
                     </div>
-                    <div class="legend">
-                        <div class="stats">
-                            {{ getAnswerAmount() + '/' + getPlayerArray.length }}
-                        </div>
-                    </div>
                 </div>
             </ng-container>
 
@@ -161,33 +156,52 @@
             <div class="sort-controls">
                 <div class="sort-controls">
                     <mat-form-field appearance="fill">
-                      <mat-label>Sort by</mat-label>
-                      <mat-select [(value)]="selectedCriterion" (selectionChange)="sortPlayers()">
-                        <mat-option [value]="sortingCriteria.name">Name</mat-option>
-                        <mat-option [value]="sortingCriteria.score">Score</mat-option>
-                        <mat-option [value]="sortingCriteria.status">Status</mat-option>
-                      </mat-select>
+                        <mat-label>Sort by</mat-label>
+                        <mat-select [(value)]="selectedCriterion" (selectionChange)="sortPlayers()">
+                            <mat-option [value]="sortingCriteria.name">Name</mat-option>
+                            <mat-option [value]="sortingCriteria.score">Score</mat-option>
+                            <mat-option [value]="sortingCriteria.status">Status</mat-option>
+                        </mat-select>
                     </mat-form-field>
-                  
+
                     <button mat-icon-button (click)="toggleSortOrder()">
-                      <mat-icon>{{ sortingOrder === sortOrder.ascending ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                        <mat-icon>{{ sortingOrder === sortOrder.ascending ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
                     </button>
-                  </div>
-                  
-                  <div class="players-container">
+                </div>
+
+                <div class="players-container">
                     <div class="players">
                         <div *ngFor="let player of filterPlayers()" class="player">
-                            <div [ngClass]="{ 'player-name-no-interaction': player.interactionStatus === 'noInteraction',
-                            'player-name-interacted': player.interactionStatus === 'interacted',
-                            'player-name-finalized': player.interactionStatus === 'finalized',
-                            'player-name-abandoned': player.interactionStatus === 'abandoned' }" class="player-name">{{ player.name }}</div>
+                            <div
+                                [ngClass]="{
+                                    'player-name-no-interaction': player.interactionStatus === 'noInteraction',
+                                    'player-name-interacted': player.interactionStatus === 'interacted',
+                                    'player-name-finalized': player.interactionStatus === 'finalized',
+                                    'player-name-abandoned': player.interactionStatus === 'abandoned'
+                                }"
+                                class="player-name"
+                            >
+                                {{ player.name }}
+                            </div>
                             <div class="player-name">(score: {{ player.score }})</div>
-                            <mat-icon *ngIf="player.isMuted" class="material-symbols-outlined" matTooltip="Unmute le joueur" (click)="toggleMutePlayer(player)">speaker_notes_off</mat-icon>
-                                    <mat-icon *ngIf="!player.isMuted" class="material-symbols-outlined" matTooltip="Mute le joueur" (click)="toggleMutePlayer(player)">speaker_notes</mat-icon>
+                            <mat-icon
+                                *ngIf="player.isMuted"
+                                class="material-symbols-outlined"
+                                matTooltip="Unmute le joueur"
+                                (click)="toggleMutePlayer(player)"
+                                >speaker_notes_off</mat-icon
+                            >
+                            <mat-icon
+                                *ngIf="!player.isMuted"
+                                class="material-symbols-outlined"
+                                matTooltip="Mute le joueur"
+                                (click)="toggleMutePlayer(player)"
+                                >speaker_notes</mat-icon
+                            >
                         </div>
                     </div>
                 </div>
-              </div>
+            </div>
 
             <div class="players-container">
                 <div class="players">
