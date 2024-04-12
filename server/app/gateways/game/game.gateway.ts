@@ -13,6 +13,26 @@ export class GameGateway {
 
     constructor(private gameService: GameService) {}
 
+    @SubscribeMessage(GameEvents.RateAnswerQRL)
+    handleRateAnswerQRL(@MessageBody() data: GameEventsData.RateAnswerQRL, @ConnectedSocket() client: Socket): SocketResponse {
+        const gameSession = this.gameService.getGameSessionBySocketId(client.id);
+        if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
+
+        const player = gameSession.room.getPlayer(data.playerName);
+        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+
+        gameSession.saveAnswerRatings(player, data.score);
+
+        if (
+            !gameSession.room
+                .getPlayers()
+                .some((currPlayer) => currPlayer.role === GameRole.Player && !currPlayer.hasAnswered && !currPlayer.hasGiveUp)
+        ) {
+            gameSession.displayQuestionResults();
+        }
+        return { isSuccess: true, message: 'La question a été notée' };
+    }
+
     @SubscribeMessage(GameEvents.Disconnect)
     handleDisconnect(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
@@ -28,13 +48,13 @@ export class GameGateway {
         }
 
         gameSession.room.giveUpPlayer(player.name);
+        if (gameSession.room.allPlayerAnswered()) gameSession.timer.stop();
         return { isSuccess: true, message: 'Vous avez abandonné la partie' };
     }
 
     @SubscribeMessage(GameEvents.SelectAnswer)
     handleSelectAnswer(@MessageBody() data: GameEventsData.SelectAnswer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
         const player = gameSession.room.getPlayerWithSocketId(client.id);

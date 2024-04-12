@@ -40,6 +40,8 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
+    recentInteractions: Map<string, number> = new Map();
+
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
         private router: Router,
@@ -53,6 +55,7 @@ export class GameService {
         this.initialise();
         this.registerListeners();
     }
+
     initialise() {
         this.players = new BehaviorSubject<PlayerClient[]>([]);
         this.client = new BehaviorSubject<Client>({ name: '', role: GameRole.Organisator, score: 0 });
@@ -163,11 +166,38 @@ export class GameService {
         if (newAnswer) this.sendAnswer(newAnswer);
     }
 
+    modifyAnswerQRL(value: string): void {
+        if (this.isFinalAnswer.getValue()) return;
+        this.setPlayerHasAnswered(this.players.getValue().find((p) => p.name === this.client.getValue().name));
+        this.answer.next(value);
+        if (this.answer.getValue()) this.sendAnswer(this.answer.getValue() as Answer);
+    }
+
+    enterAnswer(text: string): void {
+        if (this.isFinalAnswer.getValue()) return;
+        this.answer.next(text);
+        this.sendAnswer(text);
+    }
+
+    rateAnswerQRL(name: string, scoreQRL: number): void {
+        const player = this.players.getValue().find((p) => p.name === name);
+        if (!player) return;
+        this.socketService.send(GameEvents.RateAnswerQRL, {
+            playerName: name,
+            score: scoreQRL,
+        });
+    }
+
     setResponseAsFinal(): void {
         if (this.isFinalAnswer.getValue()) return;
         if (this.actualQuestion.getValue()?.question?.type === QuestionType.QCM) {
-            const answer = this.answer.getValue() as number[];
-            if (answer.length === 0) return this.notificationService.error('Veuillez sélectionner au moins une réponse');
+            if ((this.answer.getValue() as number[]).length === 0)
+                return this.notificationService.error('Veuillez sélectionner au moins une réponse');
+        }
+        if (this.actualQuestion.getValue()?.question?.type === QuestionType.QRL) {
+            if ((this.answer.getValue() as string).trim().length === 0) return this.notificationService.error('Veuillez entrer une réponse');
+            if ((this.answer.getValue() as string).trim().length > Variables.MaxCharacters)
+                return this.notificationService.error('Le texte doit faire moins de 200 caractères');
         }
         this.isFinalAnswer.next(true);
         this.confirmAnswer();
@@ -183,6 +213,13 @@ export class GameService {
 
     getCorrectAnswers(): Observable<Choice[]> {
         return this.correctAnswers.asObservable();
+    }
+
+    private setPlayerHasAnswered(player: PlayerClient | undefined) {
+        if (player?.answers) {
+            player.answers.hasInterracted = true;
+            this.players.next([...this.players.getValue()]);
+        }
     }
 
     private reinitialise(id: string, game: Game) {
@@ -233,6 +270,7 @@ export class GameService {
     }
 
     private resetPlayerAnswers() {
+        this.recentInteractions = new Map();
         this.players.next(
             this.players.getValue().map((player) => {
                 if (player.answers)
@@ -283,6 +321,7 @@ export class GameService {
 
     private playerQuitGameListener() {
         this.socketService.listen(GameEvents.PlayerQuitGame, (data: GameEventsData.PlayerQuitGame) => {
+            this.recentInteractions.delete(data.name);
             this.players.next(this.players.getValue().filter((player) => player.name !== data.name));
         });
     }
@@ -326,7 +365,7 @@ export class GameService {
 
     private receiveAnswerListener() {
         this.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
-            this.socketEventHandlerService.handlePlayerSelectAnswer(data, this.players);
+            this.socketEventHandlerService.handlePlayerSelectAnswer(data, this.players, this.recentInteractions, this.cooldown.getValue());
         });
     }
 

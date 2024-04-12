@@ -26,11 +26,11 @@ class MockGameService {
     ]);
     answers = of({
         scores: [{ name: 'Player One', score: 100, bonus: 0 }],
-        choices: [[{ label: 'Answer 1', amount: 10, isCorrect: true }], [{ label: 'Answer 2', amount: 5, isCorrect: false }]],
+        choices: [[{ text: 'Answer 1', amount: 10, isCorrect: true }], [{ text: 'Answer 2', amount: 5, isCorrect: false }]],
         questions: [
             {
                 _id: 'q1',
-                label: 'Question 1',
+                text: 'Question 1',
                 type: QuestionType.QCM,
                 choices: [],
                 points: 1,
@@ -39,7 +39,7 @@ class MockGameService {
             },
             {
                 _id: 'q2',
-                label: 'Question 2',
+                text: 'Question 2',
                 type: QuestionType.QCM,
                 choices: [],
                 points: 1,
