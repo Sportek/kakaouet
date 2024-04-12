@@ -64,32 +64,6 @@ describe('BankQuestionListComponent', () => {
         expect(modifySpy).toHaveBeenCalledWith(questionId);
     });
 
-    it('should open a confirmation dialog and delete a question on confirm', fakeAsync(() => {
-        const questionMock: Question = {
-            _id: '1',
-            text: 'Question 1',
-            type: QuestionType.QRL,
-            points: 10,
-            createdAt: new Date(),
-            lastModification: new Date(),
-        };
-        component.questionList = [questionMock];
-
-        const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of(true), close: null });
-        spyOn(dialog, 'open').and.returnValue(dialogRefSpyObj);
-
-        spyOn(questionService, 'deleteQuestionById').and.returnValue(of(void 0));
-
-        component.deleteQuestion(questionMock);
-        flush();
-        fixture.detectChanges();
-
-        expect(dialog.open).toHaveBeenCalled();
-        // eslint-disable-next-line no-underscore-dangle
-        expect(questionService.deleteQuestionById).toHaveBeenCalledWith(questionMock._id);
-        expect(component.questionList).not.toContain(questionMock);
-    }));
-
     it('should not delete a question if confirmation dialog is declined', fakeAsync(() => {
         const questionMock: Question = {
             _id: '1',

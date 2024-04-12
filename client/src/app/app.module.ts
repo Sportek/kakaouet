@@ -14,6 +14,7 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { BankQuestionListComponent } from './components/bank-question-list/bank-question-list.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { ConfirmationComponent } from './components/confirmation/confirmation.component';
 import { ConfirmationDialogComponent } from './components/dialog-component/dialog-delete.component';
 import { HeaderComponent } from './components/header/header.component';
 import { HistoryComponent } from './components/history/history.component';
@@ -74,6 +75,7 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         OrganisatorComponent,
         ResultsComponent,
         HistoryComponent,
+        ConfirmationComponent,
     ],
     imports: [
         AppMaterialModule,

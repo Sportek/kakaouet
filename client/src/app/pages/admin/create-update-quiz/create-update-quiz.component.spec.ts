@@ -3,6 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -11,6 +12,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { QuizValidation } from '@app/classes/validate';
 import { ValidatedObject } from '@app/classes/validated-object';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { ValidateService } from '@app/services/validate/validate.service';
@@ -61,8 +63,13 @@ describe('CreateUpdateQuizComponent', () => {
     let questionService: QuestionService;
     let quizService: QuizService;
     let validateService: ValidateService;
+    let mockConfirmationService: ConfirmationService;
 
     beforeEach(async () => {
+        mockConfirmationService = {
+            confirm: jasmine.createSpy('confirm').and.callFake((message, callback) => callback()),
+            dialog: {} as MatDialog, // Add the missing 'dialog' property
+        };
         TestBed.configureTestingModule({
             declarations: [CreateUpdateQuizComponent],
             imports: [HttpClientTestingModule, FormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, BrowserAnimationsModule],
@@ -75,6 +82,7 @@ describe('CreateUpdateQuizComponent', () => {
                     },
                 },
                 { provide: MatSnackBar, useValue: jasmine.createSpyObj('MatSnackBar', ['open']) },
+                { provide: ConfirmationService, useValue: mockConfirmationService },
             ],
         });
 

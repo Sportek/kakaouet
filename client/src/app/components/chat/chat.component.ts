@@ -1,5 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ChatService } from '@app/services/chat/chat.service';
+import { INTERVAL_MESSAGES } from '@common/constants';
 import { Message } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -9,6 +10,8 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./chat.component.scss'],
 })
 export class ChatComponent implements OnInit, OnDestroy {
+    @ViewChild('chat') chatElement: ElementRef;
+
     messages: Message[];
     message: string;
 
@@ -39,5 +42,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     sendMessage() {
         this.chatService.sendMessage(this.message);
         this.message = '';
+        window.setTimeout(() => {
+            this.chatElement.nativeElement.scrollTo(0, this.chatElement.nativeElement.scrollHeight);
+        }, INTERVAL_MESSAGES);
     }
 }

@@ -18,112 +18,35 @@
                     <div class="text large-text">{{ cooldown }}</div>
                 </div>
             </div>
-            <ng-container *ngIf="isAnsweringQRL()">
-                <div class="stats-container">
-                    <div class="columns">
-                        <div class="column-container" [matTooltip]="'Personnes n\'ayant pas modifiés leur réponse'">
-                            <div
-                                class="column isCorrect"
-                                [style]="
-                                    'height: ' +
-                                    (getHistogram().hasNotModified / (getHistogram().hasModified + getHistogram().hasNotModified)) * 100 +
-                                    '%'
-                                "
-                            ></div>
-                            <div class="column-label">{{ getHistogram().hasNotModified }}</div>
-                        </div>
-                        <div class="column-container" [matTooltip]="'Personnes ayant modifiés leur réponse'">
-                            <div
-                                class="column isCorrect"
-                                [style]="
-                                    'height: ' +
-                                    (getHistogram().hasModified / (getHistogram().hasModified + getHistogram().hasNotModified)) * 100 +
-                                    '%'
-                                "
-                            ></div>
-                            <div class="column-label">{{ getHistogram().hasModified }}</div>
-                        </div>
+
+            <div class="stats-container">
+                <div class="columns">
+                    <div *ngFor="let column of choices; let i = index" class="column-container" [matTooltip]="column.text">
+                        <div
+                            class="column"
+                            [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
+                            [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
+                        ></div>
+                        <div class="column-label">{{ 'Choix ' + (i + 1) }} ({{ column.amount }})</div>
                     </div>
                 </div>
-            </ng-container>
-
-            <ng-container *ngIf="isDisplayingResults() && isQRL()">
-                <div class="stats-container">
-                    <div class="columns">
-                        <div *ngFor="let column of getChoices(); let i = index" class="column-container" [matTooltip]="formatColumn(column)">
-                            <div
-                                class="column"
-                                [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
-                                [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
-                            ></div>
-                            <div class="column-label">{{ formatColumn(column) }} ({{ column.amount }})</div>
-                        </div>
+                <div class="legend">
+                    <div class="state">
+                        <div class="color isCorrect"></div>
+                        <div class="label">Correct</div>
                     </div>
-                    <div class="legend">
-                        <div class="stats">
-                            {{ getAnswerAmount() + '/' + getPlayerArray().length }}
-                        </div>
+                    <div class="stats">
+                        {{ getAnswerAmount() + '/' + players.length }}
                     </div>
-                </div>
-            </ng-container>
-
-            <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
-                <div class="players-container-answer-qrl">
-                    <div>{{ getCurrentPlayer().name }}: {{ getCurrentPlayer().answers?.answer }}</div>
-                    <div>Veuillez noter sa réponse:</div>
-                    <div class="middle">
-                        <mat-form-field appearance="fill" class="middle">
-                            <mat-select [(ngModel)]="currentRating" (ngModelChange)="rateAnswerQRL(getCurrentPlayer().name)">
-                                <mat-option value="0">0%</mat-option>
-                                <mat-option value="0.5">50%</mat-option>
-                                <mat-option value="1">100%</mat-option>
-                            </mat-select>
-                            <mat-hint class="hide-subscript-wrapper"></mat-hint>
-                        </mat-form-field>
-                        Note actuelle: {{ getRatingForPlayer(getCurrentPlayer().name)?.toString() }}
+                    <div class="state">
+                        <div class="color isIncorrect"></div>
+                        <div class="label">Incorrect</div>
                     </div>
-                    <button
-                        *ngIf="getRatingForPlayer(getCurrentPlayer().name)?.toString()"
-                        mat-raised-button
-                        color="primary"
-                        (click)="sendRating(getCurrentPlayer().name)"
-                    >
-                        Noter
-                    </button>
                 </div>
             </div>
-
-            <ng-container *ngIf="!isQRL()">
-                <div class="stats-container">
-                    <div class="columns">
-                        <div *ngFor="let column of getChoices(); let i = index" class="column-container" [matTooltip]="column.text">
-                            <div
-                                class="column"
-                                [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
-                                [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
-                            ></div>
-                            <div class="column-label">{{ 'Choix ' + (i + 1) }} ({{ column.amount }})</div>
-                        </div>
-                    </div>
-                    <div class="legend">
-                        <div class="state">
-                            <div class="color isCorrect"></div>
-                            <div class="label">Correct</div>
-                        </div>
-                        <div class="stats">
-                            {{ getAnswerAmount() + '/' + getPlayerArray().length }}
-                        </div>
-                        <div class="state">
-                            <div class="color isIncorrect"></div>
-                            <div class="label">Incorrect</div>
-                        </div>
-                    </div>
-                </div>
-            </ng-container>
-
             <div class="game-controller-container">
                 <div class="title">Panneau de contrôle</div>
-                <div class="controls">
+                <div class="controls" *ngIf="true">
                     <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
                     <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button>
                     <div class="timer">
@@ -153,58 +76,59 @@
                     </div>
                 </div>
             </div>
-            <div class="sort-controls">
-                <div class="sort-controls">
-                    <mat-form-field appearance="fill">
-                        <mat-label>Sort by</mat-label>
-                        <mat-select [(value)]="selectedCriterion" (selectionChange)="sortPlayers()">
-                            <mat-option [value]="sortingCriteria.name">Name</mat-option>
-                            <mat-option [value]="sortingCriteria.score">Score</mat-option>
-                            <mat-option [value]="sortingCriteria.status">Status</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-
-                    <button mat-icon-button (click)="toggleSortOrder()">
-                        <mat-icon>{{ sortingOrder === sortOrder.ascending ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
-                    </button>
-                </div>
-
-                <div class="players-container">
-                    <div class="players">
-                        <div *ngFor="let player of filterPlayers()" class="player">
-                            <div
-                                [ngClass]="{
-                                    'player-name-no-interaction': player.interactionStatus === 'noInteraction',
-                                    'player-name-interacted': player.interactionStatus === 'interacted',
-                                    'player-name-finalized': player.interactionStatus === 'finalized',
-                                    'player-name-abandoned': player.interactionStatus === 'abandoned'
-                                }"
-                                class="player-name"
-                            >
-                                {{ player.name }}
-                            </div>
-                            <div class="player-name">(score: {{ player.score }})</div>
-                            <mat-icon
-                                *ngIf="player.isMuted"
-                                class="material-symbols-outlined"
-                                matTooltip="Unmute le joueur"
-                                (click)="toggleMutePlayer(player)"
-                                >speaker_notes_off</mat-icon
-                            >
-                            <mat-icon
-                                *ngIf="!player.isMuted"
-                                class="material-symbols-outlined"
-                                matTooltip="Mute le joueur"
-                                (click)="toggleMutePlayer(player)"
-                                >speaker_notes</mat-icon
-                            >
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div class="chat">
                 <app-chat />
+            </div>
+        </div>
+
+        <div class="right-side">
+            <div class="sort-controls">
+                <mat-form-field appearance="fill">
+                    <mat-label>Trier par</mat-label>
+                    <mat-select [(value)]="selectedCriterion" (selectionChange)="sortPlayers()">
+                        <mat-option [value]="sortingCriteria.name">Nom</mat-option>
+                        <mat-option [value]="sortingCriteria.score">Points</mat-option>
+                        <mat-option [value]="sortingCriteria.status">Status</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <button mat-icon-button (click)="toggleSortOrder()">
+                    <mat-icon>{{ sortingOrder === sortOrder.ascending ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                </button>
+            </div>
+
+            <div class="players-container">
+                <div class="players">
+                    <div *ngFor="let player of filterPlayers()" class="player">
+                        <div
+                            [ngClass]="{
+                                'player-name-no-interaction': player.interactionStatus === 'noInteraction',
+                                'player-name-interacted': player.interactionStatus === 'interacted',
+                                'player-name-finalized': player.interactionStatus === 'finalized',
+                                'player-name-abandoned': player.interactionStatus === 'abandoned'
+                            }"
+                            class="player-name"
+                        >
+                            {{ player.name }}
+                        </div>
+                        <div class="player-name">(score: {{ player.score }})</div>
+                        <mat-icon
+                            *ngIf="player.isMuted"
+                            class="material-symbols-outlined clickable"
+                            matTooltip="Unmute le joueur"
+                            (click)="toggleMutePlayer(player)"
+                            >speaker_notes_off</mat-icon
+                        >
+                        <mat-icon
+                            *ngIf="!player.isMuted"
+                            class="material-symbols-outlined clickable"
+                            matTooltip="Mute le joueur"
+                            (click)="toggleMutePlayer(player)"
+                            >speaker_notes</mat-icon
+                        >
+                    </div>
+                </div>
             </div>
         </div>
     </div>

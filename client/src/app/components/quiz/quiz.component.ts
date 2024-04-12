@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';
 
@@ -10,7 +11,10 @@ import { Quiz } from '@common/types';
 export class QuizComponent implements OnInit {
     quizList: Quiz[];
 
-    constructor(private quizService: QuizService) {}
+    constructor(
+        private quizService: QuizService,
+        private confirmationService: ConfirmationService,
+    ) {}
 
     ngOnInit() {
         this.getListQuestions();
@@ -30,7 +34,9 @@ export class QuizComponent implements OnInit {
     }
 
     removeQuiz(quiz: Quiz): void {
-        this.quizService.removeQuiz(quiz, this.quizList);
+        this.confirmationService.confirm('Êtes-vous certain de vouloir supprimer ce quiz?', () => {
+            this.quizService.removeQuiz(quiz, this.quizList);
+        });
     }
 
     generateQuizAsFile(quiz: Quiz) {
