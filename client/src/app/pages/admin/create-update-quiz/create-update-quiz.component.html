@@ -50,11 +50,11 @@
                     <div *ngFor="let quest of quiz.questions; let i = index" class="question-bar">
                         <div class="question">{{ i + 1 }}. ({{ quest.type }}) {{ quest.text }}</div>
                         <div class="icons">
-                            <mat-icon class="clickable" (click)="moveQuestionUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
-                            <mat-icon class="clickable" (click)="moveQuestionDown(i)" *ngIf="i < quiz.questions.length - 1">arrow_downward</mat-icon>
-                            <mat-icon class="large-text clickable" (click)="questionOverlayComponent.specifyQuestionObject(quest)">edit</mat-icon>
-                            <mat-icon class="icons large-text clickable" (click)="removeQuestion(quest)">delete</mat-icon>
-                            <mat-icon class="icons large-text clickable" (click)="importQuestionToBank(quest)">ios_share</mat-icon>
+                            <mat-icon (click)="moveQuestionUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
+                            <mat-icon (click)="moveQuestionDown(i)" *ngIf="i < quiz.questions.length - 1">arrow_downward</mat-icon>
+                            <mat-icon class="large-text" (click)="questionOverlayComponent.specifyQuestionObject(quest)">edit</mat-icon>
+                            <mat-icon class="icons large-text" (click)="removeQuestion(quest)">delete</mat-icon>
+                            <mat-icon class="icons large-text" (click)="importQuestionToBank(quest)">ios_share</mat-icon>
                         </div>
                     </div>
                 </div>

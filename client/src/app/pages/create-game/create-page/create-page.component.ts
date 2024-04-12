@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Quiz } from '@common/types';
 import { Subscription } from 'rxjs';
@@ -11,7 +12,10 @@ import { Subscription } from 'rxjs';
 export class CreatePageComponent implements OnInit, OnDestroy {
     games: Quiz[];
     private quizSubscription: Subscription;
-    constructor(private quizService: QuizService) {}
+    constructor(
+        private quizService: QuizService,
+        private dialog: MatSnackBar,
+    ) {}
 
     ngOnInit() {
         this.getQuizzes();
@@ -26,7 +30,17 @@ export class CreatePageComponent implements OnInit, OnDestroy {
     getQuizzes(): void {
         this.quizSubscription = this.quizService.getAllQuizzes().subscribe({
             next: (quizzes) => {
-                this.games = quizzes;
+                this.quizService.getRandomQuiz().subscribe({
+                    next: (randomQuiz) => {
+                        this.games = [randomQuiz, ...quizzes];
+                    },
+                    error: () => {
+                        this.dialog.open('Pas assez de question pour générer un random quiz', 'Fermer', {
+                            duration: 3000,
+                        });
+                        this.games = quizzes;
+                    },
+                });
             },
         });
     }
