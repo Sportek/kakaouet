@@ -17,9 +17,9 @@ import {
     GameEvents,
     GameEventsData,
     GameRestricted,
+    InteractionStatus,
     PlayerClient,
     SoundType,
-    InteractionStatus,
 } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
@@ -47,7 +47,7 @@ export class GameService {
         private socketService: SocketService,
         private notificationService: NotificationService,
         private chatService: ChatService,
-        private socketEventHandlerService: SocketEventHandlerService,
+        private socketEventHandlerService: SocketEventHandlerService, // private questionService: QuestionService,
         private soundService: SoundService,
     ) {
         this.initialise();
@@ -69,9 +69,17 @@ export class GameService {
     }
 
     startGame() {
-        if (!this.isLocked.getValue()) return this.notificationService.error('Veuillez verrouiller la partie avant de la démarrer');
-        if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length)
+        if (!this.isLocked.getValue()) {
+            return this.notificationService.error('Veuillez verrouiller la partie avant de la démarrer');
+        }
+        if (this.game.getValue().type === GameType.Random) {
+            this.client.next({ ...this.client.getValue(), role: GameRole.Player });
+            this.socketService.send(GameEvents.StartGame);
+            return;
+        }
+        if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length) {
             return this.notificationService.error('Il doit y avoir au moins un joueur pour démarrer la partie');
+        }
         this.socketService.send(GameEvents.StartGame);
     }
 
@@ -124,6 +132,9 @@ export class GameService {
                         break;
                     case GameType.Test:
                         this.createTestGame(game);
+                        break;
+                    case GameType.Random:
+                        this.createRandomGame(game);
                         break;
                     default:
                         break;
@@ -182,6 +193,10 @@ export class GameService {
     }
 
     private createDefaultGame(game: Game) {
+        this.router.navigateByUrl('/waiting-room/' + game.code);
+        this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
+    }
+    private createRandomGame(game: Game) {
         this.router.navigateByUrl('/waiting-room/' + game.code);
         this.client.next({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
     }
