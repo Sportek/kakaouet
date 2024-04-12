@@ -1,6 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HistoryService } from '@app/services/history/history.service';
 import { SelectorService } from '@app/services/selector/selector.service';
 import { GameRecords, Ordering, OrderingField } from '@common/types';
@@ -11,29 +9,43 @@ import { Subscription } from 'rxjs';
     templateUrl: './history.component.html',
     styleUrls: ['./history.component.scss'],
 })
-export class HistoryComponent implements OnInit {
+export class HistoryComponent implements OnInit, OnDestroy {
     gameRecords: GameRecords[] = [];
     currentSortField: OrderingField = OrderingField.GameTitle;
     currentSortOrder: Ordering = Ordering.Ascendant;
-    recordsSubscription: Subscription;
+    recordsSubscription: Subscription[] = [];
     historyCleared: boolean = false;
 
     constructor(
         private historyService: HistoryService,
-        public dialog: MatDialog,
         private selectorService: SelectorService,
     ) {}
 
     ngOnInit(): void {
-        this.recordsSubscription = this.historyService.getAllRecords().subscribe((data: GameRecords[]) => {
-            this.gameRecords = data;
-            this.sortRecords();
-            this.historyCleared = !this.gameRecords.length;
-        });
+        this.recordsSubscription.push(
+            this.historyService.getAllRecords().subscribe((data: GameRecords[]) => {
+                this.gameRecords = data;
+                this.sortRecords();
+                this.historyCleared = !this.gameRecords.length;
+            }),
+        );
 
-        this.selectorService.getCurrentChoice().subscribe((choice) => {
-            this.updateSort(choice);
-        });
+        this.recordsSubscription.push(
+            this.historyService.getHistory().subscribe((gameRecords: GameRecords[]) => {
+                this.gameRecords = gameRecords;
+                this.historyCleared = !this.gameRecords.length;
+            }),
+        );
+
+        this.recordsSubscription.push(
+            this.selectorService.getCurrentChoice().subscribe((choice) => {
+                this.updateSort(choice);
+            }),
+        );
+    }
+
+    ngOnDestroy() {
+        this.recordsSubscription.forEach((subscription: Subscription) => subscription.unsubscribe());
     }
 
     updateSort(choice: string): void {
@@ -62,25 +74,6 @@ export class HistoryComponent implements OnInit {
                     break;
             }
             return this.currentSortOrder === Ordering.Ascendant ? comparison : -comparison;
-        });
-    }
-
-    clearHistory(): void {
-        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            width: '350px',
-            data: {
-                title: 'Confirmation de la suppression',
-                message: 'Êtes-vous sûr de vouloir supprimer votre historique?',
-            },
-        });
-
-        dialogRef.afterClosed().subscribe((confirm) => {
-            if (confirm) {
-                this.historyService.clearHistory().subscribe(() => {
-                    this.gameRecords = [];
-                    this.historyCleared = true;
-                });
-            }
         });
     }
 }
