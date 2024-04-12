@@ -1,7 +1,7 @@
 import { Quiz, QuizDocument } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { QuestionService } from '@app/services/question/question.service';
-import { RANDOM_ID, cinq, unDemi } from '@common/constants';
+import { NUMBRE_OF_QCM_QUESTION, RANDOM_ID, RANDOM_PARAM } from '@common/constants';
 import { QuestionFeedback, Quiz as QuizObjet } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -110,7 +110,7 @@ export class QuizService {
 
     async generateRandomQuiz(): Promise<QuizObjet> {
         const qcmQuestions = await this.questionService.getQCMQuestions();
-        const randomQuestions = qcmQuestions.sort(() => unDemi - Math.random()).slice(0, cinq);
+        const randomQuestions = qcmQuestions.sort(() => RANDOM_PARAM - Math.random()).slice(0, NUMBRE_OF_QCM_QUESTION);
         const randomQuiz: QuizObjet = {
             _id: this.randomId,
             title: 'Mode Aléatoire',

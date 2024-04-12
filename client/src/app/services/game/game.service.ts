@@ -17,9 +17,9 @@ import {
     GameEvents,
     GameEventsData,
     GameRestricted,
+    InteractionStatus,
     PlayerClient,
     SoundType,
-    InteractionStatus,
 } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
