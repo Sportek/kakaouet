@@ -15,4 +15,5 @@ export enum Variables {
     QCMMaxChoicesAmount = 4,
     QCMRequiredTimeLeft = 10,
     QRLRequiredTimeLeft = 20,
+    HistrogramCooldown = 5,
 }

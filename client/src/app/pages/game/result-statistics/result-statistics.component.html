@@ -38,7 +38,7 @@
                         {{ getQuestion()?.text }}
                     </div>
                 </div>
-                <div class="stats-container">
+                <div class="stats-container" *ngIf="getQuestion()?.type === 'QCM'">
                     <div class="columns">
                         <div
                             *ngFor="let column of answers.choices[currentQuestion]; let i = index"
@@ -51,6 +51,33 @@
                                 [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
                             ></div>
                             <div class="column-label">{{ 'Choix ' + (i + 1) }} ({{ column.amount }})</div>
+                        </div>
+                    </div>
+                    <div class="legend">
+                        <div class="state">
+                            <div class="color isCorrect"></div>
+                            <div class="label">Correct</div>
+                        </div>
+
+                        <div class="state">
+                            <div class="color isIncorrect"></div>
+                            <div class="label">Incorrect</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-container" *ngIf="getQuestion()?.type === 'QRL'">
+                    <div class="columns">
+                        <div
+                            *ngFor="let column of answers.choices[currentQuestion]; let i = index"
+                            class="column-container"
+                            [matTooltip]="column.text"
+                        >
+                            <div
+                                class="column"
+                                [style]="'height: ' + calculatePercentage(column.amount) * 100 + '%'"
+                                [ngClass]="{ isCorrect: column.isCorrect, isIncorrect: !column.isCorrect }"
+                            ></div>
+                            <div class="column-label">{{ column.text }} ({{ column.amount }})</div>
                         </div>
                     </div>
                     <div class="legend">

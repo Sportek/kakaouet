@@ -9,9 +9,11 @@ export class Player {
     socket: Socket;
     bonus: number;
     score: number;
+    currentQuestionMultiplier: number;
     isExcluded: boolean;
     isMuted: boolean;
     hasGiveUp: boolean;
+    hasAnswered: boolean;
     private room: Room;
     private game: GameSession;
     private answers: PlayerAnswers;
@@ -24,6 +26,7 @@ export class Player {
         this.score = 0;
         this.bonus = 0;
         this.hasGiveUp = false;
+        this.hasAnswered = false;
     }
 
     setRoom(room: Room): void {

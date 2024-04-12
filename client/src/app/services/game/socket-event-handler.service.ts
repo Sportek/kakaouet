@@ -64,13 +64,20 @@ export class SocketEventHandlerService {
         }
     }
 
-    handlePlayerSelectAnswer(data: GameEventsData.PlayerSelectAnswer, players: BehaviorSubject<PlayerClient[]>) {
+    // eslint-disable-next-line max-params -- tous les params sont utilisés
+    handlePlayerSelectAnswer(
+        data: GameEventsData.PlayerSelectAnswer,
+        players: BehaviorSubject<PlayerClient[]>,
+        recentInteractions: Map<string, number>,
+        cooldown: number,
+    ) {
         const player = players.getValue().find((p) => p.name === data.name);
         if (player) {
             player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
             player.interactionStatus = InteractionStatus.interacted;
             players.next([...players.getValue()]);
         }
+        recentInteractions.set(data.name, cooldown);
     }
 
     // eslint-disable-next-line max-params -- tous les params sont utilisés
