@@ -3,6 +3,7 @@ import { Room } from '@app/classes/room/room';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
 import { HistoryService } from '@app/services/history/history.service';
+import { QuizService } from '@app/services/quiz/quiz.service';
 import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH } from '@common/constants';
 import { GameType } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
@@ -23,6 +24,7 @@ export class GameService {
         @InjectModel(Quiz.name) public quizModel: Model<Quiz>,
         private readonly logger: Logger,
         private historyService: HistoryService,
+        private quizService: QuizService,
     ) {
         this.start();
     }
@@ -98,24 +100,29 @@ export class GameService {
     }
 
     async createNewGame(quizId: string, type: GameType): Promise<Game> {
-        try {
-            const quiz = await this.quizModel.findById(quizId);
-            const newGame = new this.gameModel({
-                code: await this.generateUniqueGameCode(),
-                quiz,
-                type,
-            });
-            return newGame.save();
-        } catch (error) {
-            this.logger.error('Error adding new game: ', error);
+        let quiz: Quiz;
+        if (type === GameType.Random) {
+            quiz = (await this.quizService.generateRandomQuiz()) as unknown as Quiz;
+        } else {
+            quiz = await this.quizModel.findById(quizId);
         }
+        const newGame = new this.gameModel({
+            code: await this.generateUniqueGameCode(),
+            quiz,
+            type,
+        });
+        return newGame.save();
     }
-
     // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
     async createGameSession(code: string, server: Server, quizId: string, gameType: GameType): Promise<GameSession> {
         const room = new Room(code, server, this);
-        const quiz = await this.quizModel.findById(quizId);
-        const gameSession = new GameSession(code, room, quiz.toObject(), gameType, this.historyService);
+        let quiz;
+        if (gameType === GameType.Random) {
+            quiz = await this.quizService.generateRandomQuiz();
+        } else {
+            quiz = await this.quizModel.findById(quizId);
+        }
+        const gameSession = new GameSession(code, room, quiz, gameType, this.historyService);
         this.gameSessions.set(code, gameSession);
         return gameSession;
     }

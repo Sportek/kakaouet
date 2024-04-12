@@ -1,6 +1,8 @@
 import { Quiz, QuizDocument } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
-import { QuestionFeedback } from '@common/types';
+import { QuestionService } from '@app/services/question/question.service';
+import { NUMBRE_OF_QCM_QUESTION, RANDOM_ID, RANDOM_PARAM } from '@common/constants';
+import { QuestionFeedback, Quiz as QuizObjet } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,9 +10,11 @@ import { mockQuizTable } from './mock-quiz';
 
 @Injectable()
 export class QuizService {
+    randomId = RANDOM_ID;
     constructor(
         @InjectModel(Quiz.name) public quizModel: Model<QuizDocument>,
         private readonly logger: Logger,
+        private questionService: QuestionService,
     ) {
         this.start();
     }
@@ -102,5 +106,22 @@ export class QuizService {
             }
         }
         return null;
+    }
+
+    async generateRandomQuiz(): Promise<QuizObjet> {
+        const qcmQuestions = await this.questionService.getQCMQuestions();
+        const randomQuestions = qcmQuestions.sort(() => RANDOM_PARAM - Math.random()).slice(0, NUMBRE_OF_QCM_QUESTION);
+        const randomQuiz: QuizObjet = {
+            _id: this.randomId,
+            title: 'Mode Aléatoire',
+            description: 'Ce quiz est généré aléatoirement à partir des questions QCM.',
+            duration: 20,
+            visibility: true,
+            questions: randomQuestions,
+            createdAt: new Date(),
+            lastModification: new Date(),
+        };
+
+        return randomQuiz;
     }
 }
