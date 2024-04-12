@@ -63,12 +63,12 @@ export interface BaseQuestion {
 
 export type Question =
     | ({
-        type: QuestionType.QCM;
-        choices: Choice[];
-    } & BaseQuestion)
+          type: QuestionType.QCM;
+          choices: Choice[];
+      } & BaseQuestion)
     | ({
-        type: QuestionType.QRL;
-    } & BaseQuestion);
+          type: QuestionType.QRL;
+      } & BaseQuestion);
 
 export interface BaseUserResponse {
     _id: string;
@@ -78,13 +78,13 @@ export interface BaseUserResponse {
 }
 export type UserResponse =
     | ({
-        type: QuestionType.QCM;
-        choicesId: string[];
-    } & BaseUserResponse)
+          type: QuestionType.QCM;
+          choicesId: string[];
+      } & BaseUserResponse)
     | {
-        type: QuestionType.QRL;
-        answer: string;
-    };
+          type: QuestionType.QRL;
+          answer: string;
+      };
 
 export interface Quiz {
     _id: string;
@@ -139,4 +139,21 @@ export interface QuestionFeedback {
     correctChoicesIndices: number[];
     incorrectSelectedChoicesIndices: number[];
     correctSelectedChoicesIndices: number[];
+}
+
+export interface GameRecords {
+    gameTitle: string;
+    startTime: Date;
+    numberOfPlayers: number;
+    bestScore: number;
+}
+
+export enum OrderingField {
+    StartTime = 'startTime',
+    GameTitle = 'gameTitle',
+}
+
+export enum Ordering {
+    Ascendant = 'asc',
+    Descendant = 'desc',
 }

@@ -16,10 +16,10 @@ import { BankQuestionListComponent } from './components/bank-question-list/bank-
 import { ChatComponent } from './components/chat/chat.component';
 import { ConfirmationDialogComponent } from './components/dialog-component/dialog-delete.component';
 import { HeaderComponent } from './components/header/header.component';
+import { HistoryComponent } from './components/history/history.component';
 import { QuestionBankImportComponent } from './components/import-bank-question/import-bank-question.component';
 import { ImportGameComponent } from './components/import-game/import-game.component';
 import { QuestionOverlayComponent } from './components/question-overlay/question-overlay.component';
-import { QuizHistoryComponent } from './components/quiz-history/quiz-history.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { SelectorComponent } from './components/selector/selector.component';
 import { UpdateNameComponent } from './components/update-name/update-name.component';
@@ -59,7 +59,6 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         QuizComponent,
         ImportGameComponent,
         CreateUpdateQuizComponent,
-        QuizHistoryComponent,
         SelectorComponent,
         BankQuestionListComponent,
         DescriptonPageComponent,
@@ -74,6 +73,7 @@ import { WaitingRoomComponent } from './pages/game/waiting-room/waiting-room.com
         UpdateNameComponent,
         OrganisatorComponent,
         ResultsComponent,
+        HistoryComponent,
     ],
     imports: [
         AppMaterialModule,

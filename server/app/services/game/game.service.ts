@@ -2,6 +2,7 @@ import { GameSession } from '@app/classes/game/game-session';
 import { Room } from '@app/classes/room/room';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
+import { HistoryService } from '@app/services/history/history.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH } from '@common/constants';
 import { GameType } from '@common/types';
@@ -17,12 +18,12 @@ const GAME_CODE_MAX_ATTEMPTS = 10;
 export class GameService {
     private gameSessions: Map<string, GameSession> = new Map();
 
-    // on a besoin de tous ces parametres
     // eslint-disable-next-line max-params
     constructor(
         @InjectModel(Game.name) public gameModel: Model<Game>,
         @InjectModel(Quiz.name) public quizModel: Model<Quiz>,
         private readonly logger: Logger,
+        private historyService: HistoryService,
         private quizService: QuizService,
     ) {
         this.start();
@@ -121,7 +122,7 @@ export class GameService {
         } else {
             quiz = await this.quizModel.findById(quizId);
         }
-        const gameSession = new GameSession(code, room, quiz, gameType);
+        const gameSession = new GameSession(code, room, quiz, gameType, this.historyService);
         this.gameSessions.set(code, gameSession);
         return gameSession;
     }

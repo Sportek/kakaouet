@@ -57,7 +57,7 @@ describe('Player', () => {
             rooms: new Set('roomCode'),
         };
         room = new Room('roomCode', mockserver, mockgameService);
-        gameSession = new GameSession('gameCode', room, quiz, GameType.Default);
+        gameSession = new GameSession('gameCode', room, quiz, GameType.Default, undefined);
         player = new Player('John Doe', socketMock as Socket, GameRole.Player);
     });
 

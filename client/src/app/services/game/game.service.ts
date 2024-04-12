@@ -40,6 +40,8 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
+    startTime: BehaviorSubject<Date | null> = new BehaviorSubject<Date | null>(null);
+
     recentInteractions: Map<string, number> = new Map();
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
@@ -83,6 +85,8 @@ export class GameService {
         if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length) {
             return this.notificationService.error('Il doit y avoir au moins un joueur pour démarrer la partie');
         }
+
+        this.startTime.next(new Date());
         this.socketService.send(GameEvents.StartGame);
     }
 

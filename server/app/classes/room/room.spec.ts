@@ -91,7 +91,7 @@ describe('Room', () => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         mockGameService = new (require('@app/services/game/game.service').GameService)();
         room = new Room(roomCode, mockServer, mockGameService);
-        mockGameSession = new GameSession(roomCode, room, mockQuiz, GameType.Default);
+        mockGameSession = new GameSession(roomCode, room, mockQuiz, GameType.Default, undefined);
         room.setGame(mockGameSession);
     });
 
