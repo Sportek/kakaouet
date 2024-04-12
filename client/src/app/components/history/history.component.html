@@ -1,0 +1,10 @@
+<div class="background">
+    <div class="history-container">
+        <div *ngFor="let record of gameRecords" class="history-item">
+            <span class="game-title">{{ record.gameTitle }}</span>
+            <span class="number-players">Joueurs: {{ record.numberOfPlayers }}</span>
+            <span class="best-score">Meilleur score: {{ record.bestScore }}</span>
+            <span class="start-time">{{ record.startTime | date: 'yyyy/MM/dd HH:mm:ss' }}</span>
+        </div>
+    </div>
+</div>

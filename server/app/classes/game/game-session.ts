@@ -1,6 +1,7 @@
 import { Player } from '@app/classes/player/player';
 import { Room } from '@app/classes/room/room';
 import { Timer } from '@app/classes/timer';
+import { HistoryService } from '@app/services/history/history.service';
 import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';
 import { ActualQuestion, ChoiceData, GameEvents, GameEventsData, Score } from '@common/game-types';
 import { GameState, GameType, Question, QuestionType, Quiz } from '@common/types';
@@ -19,10 +20,12 @@ export class GameSession {
     gameQuestionIndex: number;
     isLocked: boolean;
     private isAlreadyChangingQuestion: boolean;
+    private startTime: Date;
+    private historyService: HistoryService;
     private ratingAmounts: Map<string, number[]>;
 
     // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
-    constructor(code: string, room: Room, quiz: Quiz, gameType: GameType) {
+    constructor(code: string, room: Room, quiz: Quiz, gameType: GameType, historyService: HistoryService) {
         this.gameState = GameState.WaitingPlayers;
         this.gameQuestionIndex = 0;
         this.code = code;
@@ -32,6 +35,8 @@ export class GameSession {
         this.room.setGame(this);
         this.type = gameType;
         this.isAlreadyChangingQuestion = false;
+        this.startTime = new Date();
+        this.historyService = historyService;
         this.ratingAmounts = new Map<string, number[]>();
     }
 
@@ -83,6 +88,7 @@ export class GameSession {
         this.simpleDelay(NEXT_QUESTION_DELAY, () => {
             this.changeGameState(GameState.DisplayQuizResults);
             this.sendResultsToPlayers();
+            this.endGame();
         });
     }
 
@@ -97,9 +103,17 @@ export class GameSession {
         this.broadcastPlayerResults(scores, this.calculateCorrectChoices());
     }
 
-    endGame(): void {
+    async endGame(): Promise<void> {
         this.changeGameState(GameState.End);
-        // TODO: Fermer les différentes connections à la room, delete, sauvegarde, etc : sprint 3.
+
+        const historyData = {
+            gameTitle: this.quiz.title,
+            startTime: this.startTime,
+            numberOfPlayers: this.room.getOnlyGamePlayers().length,
+            bestScore: Math.max(...this.room.getOnlyGamePlayers().map((player) => player.score)),
+        };
+
+        await this.historyService.createNewHistory(historyData);
     }
 
     changeGameState(gameState: GameState): void {
