@@ -166,8 +166,7 @@ export class GameGateway {
             gameSession.broadcastMessage(data.content, player);
             return { isSuccess: true, message: 'Message envoyé' };
         }
-        client.emit(GameEvents.MutedNotification, { message: "Vous n'êtes pas autorisé à effectuer cette action" });
-        return { isSuccess: false, message: 'Non-authorisé' };
+        return { isSuccess: true, message: 'Non-authorisé' };
     }
 
     afterInit(server: Server): void {

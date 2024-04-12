@@ -46,11 +46,11 @@
             gap: 1rem;
             padding: 1rem 0;
             .green {
-                background-color: $green;
+                background-color: $green-700;
             }
 
             .red {
-                background-color: $red;
+                background-color: $red-700;
             }
         }
 
@@ -69,7 +69,6 @@
                     border-radius: 5px;
                     text-align: center;
                     align-items: center;
-                    padding: 0.5rem;
                     .input {
                         background-color: transparent;
                         border: none;
@@ -113,11 +112,4 @@
     align-items: center;
     flex-direction: row;
     justify-content: center;
-    > * {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        vertical-align: middle;
-    }
 }

@@ -19,7 +19,9 @@
             </div>
             <div class="buttons-container">
                 <button routerLink="/create" mat-raised-button class="large-text quit-button" color="primary">Retour</button>
-                <button (click)="testGame(quiz._id)" mat-raised-button class="large-text test-button" color="primary">Tester le jeu</button>
+                <button *ngIf="quiz._id !== ramdomId" (click)="testGame(quiz._id)" mat-raised-button class="large-text test-button" color="primary">
+                    Tester le jeu
+                </button>
                 <button mat-raised-button (click)="createGame(quiz._id)" class="large-text create-button" color="primary">Créer une partie</button>
             </div>
         </div>

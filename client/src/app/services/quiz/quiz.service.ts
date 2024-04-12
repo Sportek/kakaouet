@@ -2,15 +2,18 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
 import { ValidateService } from '@app/services/validate/validate.service';
+import { NUMBRE_OF_QCM_QUESTION, RANDOM_ID } from '@common/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
 import { saveAs } from 'file-saver';
-import { Observable, Subject, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, Subject, of, throwError } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
+import { QuestionService } from './question.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class QuizService {
+    randomId = RANDOM_ID;
     private baseURL = BASE_URL + '/quiz';
     private quizUpdateSubject = new Subject<void>();
     private quizUpdates: Observable<void> = this.quizUpdateSubject.asObservable();
@@ -21,6 +24,7 @@ export class QuizService {
     constructor(
         private http: HttpClient,
         private validateService: ValidateService,
+        private questionService: QuestionService,
     ) {}
 
     getAllQuizzes(): Observable<Quiz[]> {
@@ -30,6 +34,13 @@ export class QuizService {
     getQuizById(id: string): Observable<Quiz> {
         const url = `${BASE_URL}/quiz/${id}`;
         return this.http.get<Quiz>(url);
+    }
+    getQuizDetailsById(id: string): Observable<Quiz> {
+        if (id === this.randomId) {
+            return this.getRandomQuiz();
+        } else {
+            return this.getQuizById(id);
+        }
     }
 
     addNewQuiz(quiz: Quiz): Observable<Quiz> {
@@ -148,5 +159,17 @@ export class QuizService {
         const fileContent = JSON.stringify(quizNoVisibilityNoId, null, space);
         const blob = new Blob([fileContent], { type: 'application/json' });
         saveAs(blob, quiz.title + '.json');
+    }
+
+    getRandomQuiz(): Observable<Quiz> {
+        return this.questionService.hasEnoughQCMQuestions(NUMBRE_OF_QCM_QUESTION).pipe(
+            switchMap((hasEnough) => {
+                if (hasEnough) {
+                    return this.http.get<Quiz>(`${BASE_URL}/quiz/generate/random`);
+                } else {
+                    return throwError(() => new Error('Pas assez de questions QCM pour créer un quiz aléatoire.'));
+                }
+            }),
+        );
     }
 }
