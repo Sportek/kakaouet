@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { QuestionOverlayComponent } from '@app/components/question-overlay/question-overlay.component';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
@@ -34,6 +35,7 @@ export class CreateUpdateQuizComponent implements OnInit {
         private route: ActivatedRoute,
         private questionService: QuestionService,
         private overlayService: OverlayService,
+        private confirmationService: ConfirmationService,
     ) {}
 
     ngOnInit() {
@@ -62,7 +64,9 @@ export class CreateUpdateQuizComponent implements OnInit {
     }
 
     removeQuestion(question: Question): void {
-        this.questionService.removeQuestion(question, this.quiz);
+        this.confirmationService.confirm('Êtes-vous certain de vouloir supprimer cette question?', () => {
+            this.questionService.removeQuestion(question, this.quiz);
+        });
     }
 
     handleQuestionsImported(importedQuestions: Question[]): void {
