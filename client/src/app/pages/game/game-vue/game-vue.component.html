@@ -38,6 +38,22 @@
                     >
                 </div>
             </div>
+            <div class="textbox-container">
+                <div *ngIf="actualQuestion">
+                    <ng-container *ngIf="actualQuestion.question.type === 'QRL'">
+                        <div>{{ displayCharactersLeft() }}</div>
+                        <mat-form-field class="textbox-container">
+                            <textarea
+                                matInput
+                                placeholder="Veuillez entrer votre réponse"
+                                [(ngModel)]="answer"
+                                [disabled]="gameService.isFinalAnswer.getValue()"
+                                (ngModelChange)="modifyAnswerQRL()"
+                            ></textarea>
+                        </mat-form-field>
+                    </ng-container>
+                </div>
+            </div>
             <div class="buttons-container">
                 <button mat-raised-button color="primary" class="button" (click)="giveUp()">
                     <span class="button-text">Abandonner</span>

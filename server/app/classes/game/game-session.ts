@@ -8,6 +8,7 @@ import { GameState, GameType, Question, QuestionType, Quiz } from '@common/types
 
 const START_GAME_DELAY = 5;
 const NEXT_QUESTION_DELAY = 3;
+const QRL_DELAY = 60;
 
 export class GameSession {
     code: string;
@@ -21,6 +22,7 @@ export class GameSession {
     private isAlreadyChangingQuestion: boolean;
     private startTime: Date;
     private historyService: HistoryService;
+    private ratingAmounts: Map<string, number[]>;
 
     // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
     constructor(code: string, room: Room, quiz: Quiz, gameType: GameType, historyService: HistoryService) {
@@ -35,6 +37,7 @@ export class GameSession {
         this.isAlreadyChangingQuestion = false;
         this.startTime = new Date();
         this.historyService = historyService;
+        this.ratingAmounts = new Map<string, number[]>();
     }
 
     startGameDelayed(): void {
@@ -54,7 +57,10 @@ export class GameSession {
 
     startQuestionCooldown(): void {
         if (this.gameState !== GameState.PlayersAnswerQuestion) return;
-        this.simpleDelay(this.quiz.duration, () => {
+        const delay = this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QCM ? this.quiz.duration : QRL_DELAY;
+        this.simpleDelay(delay, () => {
+            if (this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QRL && this.type !== GameType.Test)
+                return this.changeGameState(GameState.OrganisatorCorrectingAnswers);
             this.displayQuestionResults();
         });
     }
@@ -72,6 +78,7 @@ export class GameSession {
         if (++this.gameQuestionIndex >= this.quiz.questions.length) return this.displayResults();
         this.simpleDelay(NEXT_QUESTION_DELAY, () => {
             this.changeGameState(GameState.PlayersAnswerQuestion);
+            this.room.players.forEach((player) => (player.hasAnswered = false));
             this.broadcastGameNextQuestion();
             this.startQuestionCooldown();
         });
@@ -110,6 +117,7 @@ export class GameSession {
     }
 
     changeGameState(gameState: GameState): void {
+        if (gameState === GameState.OrganisatorCorrectingAnswers) this.filterNullAnswers();
         this.gameState = gameState;
         this.room.broadcast(GameEvents.GameStateChanged, {}, { gameState: this.gameState });
         this.isAlreadyChangingQuestion = false;
@@ -137,6 +145,28 @@ export class GameSession {
         this.room.broadcast(GameEvents.PlayerSendMessage, {}, { name: playerName, content, createdAt: newDate });
     }
 
+    saveAnswerRatings(player: Player, score: number) {
+        player.hasAnswered = true;
+        player.confirmAnswer();
+        player.score += score;
+        const rating = score / (this.quiz.questions[this.gameQuestionIndex].points ?? 1);
+        const questionTitle: string = this.quiz.questions[this.gameQuestionIndex].text;
+        if (!this.ratingAmounts[questionTitle]) {
+            this.ratingAmounts[questionTitle] = [0, 0, 0];
+        }
+        this.ratingAmounts[questionTitle][rating * 2]++;
+    }
+
+    private filterNullAnswers() {
+        for (const player of this.room.players) {
+            if (!player.getAnswer(this.gameQuestionIndex) && !player.hasGiveUp) {
+                player.setAnswer(' ');
+                player.confirmAnswer();
+                this.room.broadcast(GameEvents.PlayerConfirmAnswers, {}, { name: player.name });
+            }
+        }
+    }
+
     private broadcastCorrectAnswers(question: Question): void {
         if (question.type !== QuestionType.QCM) return;
         const correctAnswers = question.choices.flatMap((choice) => (choice.isCorrect ? choice : []));
@@ -159,7 +189,11 @@ export class GameSession {
         const correctAnswerPlayers: Player[] = players.flatMap((player) => {
             const answer = player.getAnswer(this.gameQuestionIndex);
             if (answer && this.isCorrectAnswer(answer.answer as number[], correctAnswersIndex)) {
-                player.score += question.points;
+                if (question.type === QuestionType.QCM) {
+                    player.score += question.points;
+                } else {
+                    player.score += question.points * player.currentQuestionMultiplier;
+                }
                 return player;
             }
             return [];
@@ -178,8 +212,6 @@ export class GameSession {
 
     private calculateScores(): { player: Player; hasAnsweredFirst: boolean }[] {
         const question = this.quiz.questions[this.gameQuestionIndex];
-
-        // TODO: Je ne gère pas les autres types de questions pour l'instant : Sprint 3
         if (question.type !== QuestionType.QCM) return this.room.players.map((player) => ({ player, hasAnsweredFirst: false }));
         const correctAnswersIndex = question.choices.flatMap((choice, index) => (choice.isCorrect ? index : []));
         this.broadcastCorrectAnswers(question);
@@ -196,6 +228,9 @@ export class GameSession {
 
     private sendScores(): void {
         this.calculateScores().forEach(({ player, hasAnsweredFirst }) => {
+            if (this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QRL && this.type === GameType.Test) {
+                return player.send(GameEvents.UpdateScore, { score: this.quiz.questions[this.gameQuestionIndex].points, hasAnsweredFirst: false });
+            }
             player.send(GameEvents.UpdateScore, { score: player.score, hasAnsweredFirst });
         });
         const scores = this.room.getOnlyGamePlayers().map((player) => ({ name: player.name, score: player.score }));
@@ -219,18 +254,33 @@ export class GameSession {
     private calculateCorrectChoices() {
         const choices: ChoiceData[][] = [];
         this.quiz.questions.forEach((question, index) => {
-            if (question.type !== QuestionType.QCM) return;
-            const globalPlayerAnswers = this.getAmountOfPlayersWhoAnswered(index);
-            const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
-                const amount = globalPlayerAnswers[i];
-                const name = choice.text;
-                const isCorrect = choice.isCorrect;
-                return { text: name, amount, isCorrect };
-            });
-            choices.push(choiceData);
+            if (question.type === QuestionType.QRL) {
+                return choices.push(this.qrlRatings(question));
+            }
+            choices.push(this.qcmCorrectChoices(question, index));
         });
 
         return choices;
+    }
+
+    private qrlRatings(question: Question): ChoiceData[] | null {
+        if (this.type === GameType.Test || question.type !== QuestionType.QRL) return;
+        return [
+            { text: '0%', amount: this.ratingAmounts[question.text][0], isCorrect: true },
+            { text: '50%', amount: this.ratingAmounts[question.text][1], isCorrect: true },
+            { text: '100%', amount: this.ratingAmounts[question.text][2], isCorrect: true },
+        ];
+    }
+
+    private qcmCorrectChoices(question: Question, index: number) {
+        if (question.type !== QuestionType.QCM) return;
+        const choiceData: ChoiceData[] = question.choices.flatMap((choice, i) => {
+            const amount = this.getAmountOfPlayersWhoAnswered(index)[i];
+            const name = choice.text;
+            const isCorrect = choice.isCorrect;
+            return { text: name, amount, isCorrect };
+        });
+        return choiceData;
     }
 
     private broadcastPlayerResults(scores: Score[], choices: ChoiceData[][]): void {

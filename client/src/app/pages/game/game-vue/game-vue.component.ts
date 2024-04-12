@@ -1,5 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
+import { Variables } from '@common/enum-variables';
 import { ActualQuestion, Answer } from '@common/game-types';
 import { Choice, GameState, QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
@@ -44,6 +45,14 @@ export class GameVueComponent implements OnInit, OnDestroy {
 
     selectAnswer(index: number): void {
         this.gameService.selectAnswer(index);
+    }
+
+    displayCharactersLeft() {
+        return 'Il reste ' + (Variables.MaxCharacters - (this.answer?.length ?? 0)) + ' caractères à la réponse.';
+    }
+
+    modifyAnswerQRL(): void {
+        this.gameService.modifyAnswerQRL(this.answer as string);
     }
 
     giveUp() {
@@ -98,6 +107,7 @@ export class GameVueComponent implements OnInit, OnDestroy {
     }
 
     setResponseAsFinal(): void {
+        if (this.actualQuestion?.question.type === QuestionType.QRL && this.answer) this.gameService.enterAnswer(this.answer as string);
         this.gameService.setResponseAsFinal();
     }
 
