@@ -6,7 +6,7 @@ import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
 import { QuestionType } from '@common/types';
 import { cloneDeep } from 'lodash';
 
-const baseQRLRatings = [
+export const baseQRLRatings = [
     { text: '0', amount: 0, isCorrect: true },
     { text: '0.5', amount: 0, isCorrect: true },
     { text: '1', amount: 0, isCorrect: true },
