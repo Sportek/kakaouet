@@ -1,4 +1,4 @@
-import { GameEvents, GameEventsData, GameState } from '@common/game-types';
+import { GameEvents, GameEventsData, GameState, InteractionStatus, SoundType } from '@common/game-types';
 import { GameRole, GameType, QuestionType } from '@common/types';
 import { GameService } from './game.service';
 
@@ -46,13 +46,30 @@ export class GameEventsListener {
 
     private sendPlayerScoresListener() {
         this.gameService.socketService.listen(GameEvents.SendPlayersScores, (data: GameEventsData.SendPlayersScores) => {
-            this.gameService.socketEventHandlerService.handleSendPlayerScores(data, this.gameService.players);
+            this.gameService.players.next(
+                this.gameService.players.getValue().map((player) => {
+                    const score = data.scores.find((s) => s.name === player.name);
+                    if (score) player.score = score.score;
+                    return player;
+                }),
+            );
         });
     }
 
     private playerJoinGameListener() {
         this.gameService.socketService.listen(GameEvents.PlayerJoinGame, (data: GameEventsData.PlayerJoinGame) => {
-            this.gameService.socketEventHandlerService.handlePlayerJoinGame(data, this.gameService.players);
+            this.gameService.players.next([
+                ...this.gameService.players.getValue(),
+                {
+                    name: data.name,
+                    role: data.role,
+                    isExcluded: data.isExcluded,
+                    score: data.score,
+                    hasGiveUp: data.hasGiveUp,
+                    isMuted: data.isMuted,
+                    interactionStatus: InteractionStatus.noInteraction,
+                },
+            ]);
         });
     }
 
@@ -71,7 +88,8 @@ export class GameEventsListener {
 
     private gameClosedListener() {
         this.gameService.socketService.listen(GameEvents.GameClosed, () => {
-            this.gameService.socketEventHandlerService.handleGameClosed();
+            this.gameService.router.navigateByUrl('/home', { replaceUrl: true });
+            this.gameService.notificationService.success('La partie a été fermée');
         });
     }
 
@@ -96,23 +114,21 @@ export class GameEventsListener {
 
     private gameQuestionListener() {
         this.gameService.socketService.listen(GameEvents.GameQuestion, (data: GameEventsData.GameQuestion) => {
-            this.gameService.socketEventHandlerService.handleGameQuestion(
-                data,
-                this.gameService.actualQuestion,
-                this.gameService.answer,
-                this.gameService.isFinalAnswer,
-            );
+            this.gameService.actualQuestion.next(data.actualQuestion);
+            this.gameService.answer.next(data.actualQuestion.question.type === QuestionType.QCM ? [] : '');
+            this.gameService.isFinalAnswer.next(false);
         });
     }
 
     private receiveAnswerListener() {
         this.gameService.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
-            this.gameService.socketEventHandlerService.handlePlayerSelectAnswer(
-                data,
-                this.gameService.players,
-                this.gameService.recentInteractions,
-                this.gameService.cooldown.getValue(),
-            );
+            const player = this.gameService.players.getValue().find((p) => p.name === data.name);
+            if (player) {
+                player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
+                player.interactionStatus = InteractionStatus.interacted;
+                this.gameService.players.next([...this.gameService.players.getValue()]);
+            }
+            this.gameService.recentInteractions.set(data.name, this.gameService.cooldown.getValue());
         });
     }
 
@@ -124,13 +140,21 @@ export class GameEventsListener {
 
     private receiveConfirmAnswerListener() {
         this.gameService.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmAnswers) => {
-            this.gameService.socketEventHandlerService.handlePlayerConfirmAnswers(data, this.gameService.players);
+            const player = this.gameService.players.getValue().find((p) => p.name === data.name);
+            if (player) {
+                if (player.answers) {
+                    player.interactionStatus = InteractionStatus.finalized;
+                    player.answers.hasConfirmed = true;
+                }
+                this.gameService.players.next([...this.gameService.players.getValue()]);
+            }
         });
     }
 
     private receiveUpdateScoreListener() {
         this.gameService.socketService.listen(GameEvents.UpdateScore, (data: GameEventsData.UpdateScore) => {
-            this.gameService.socketEventHandlerService.handleUpdateScore(data, this.gameService.client);
+            if (data.hasAnsweredFirst) this.gameService.notificationService.info('Vous avez répondu en premier !');
+            this.gameService.client.next({ ...this.gameService.client.getValue(), score: data.score });
         });
     }
 
@@ -142,25 +166,48 @@ export class GameEventsListener {
 
     private receiveBannedPlayers() {
         this.gameService.socketService.listen(GameEvents.PlayerBanned, (data: GameEventsData.PlayerBanned) => {
-            this.gameService.socketEventHandlerService.handlePlayerBanned(data, this.gameService.players, this.gameService.client);
+            this.gameService.players.next(
+                this.gameService.players.getValue().map((player) => (player.name === data.name ? { ...player, isExcluded: true } : player)),
+            );
+            if (data.name === this.gameService.client.getValue().name) {
+                this.gameService.router.navigateByUrl('/home', { replaceUrl: true });
+                this.gameService.notificationService.error('Vous avez été banni de la partie');
+            }
         });
     }
 
     private receiveMutedPlayers() {
         this.gameService.socketService.listen(GameEvents.PlayerMuted, (data: GameEventsData.PlayerMuted) => {
-            this.gameService.socketEventHandlerService.handlePlayerMuted(data, this.gameService.players, this.gameService.client);
+            this.gameService.players.next(
+                this.gameService.players.getValue().map((player) => (player.name === data.name ? { ...player, isMuted: data.isMuted } : player)),
+            );
+            if (data.name === this.gameService.client.getValue().name) {
+                if (data.isMuted) {
+                    this.gameService.notificationService.error("Vous n'avez pas droit de clavarder");
+                } else {
+                    this.gameService.notificationService.error('Vous avez le droit de clavarder a nouveau');
+                }
+            }
         });
     }
 
     private receiveGiveUpPlayers() {
         this.gameService.socketService.listen(GameEvents.PlayerHasGiveUp, (data: GameEventsData.PlayerHasGiveUp) => {
-            this.gameService.socketEventHandlerService.handlePlayerGivesUp(data, this.gameService.players);
+            this.gameService.players.next(
+                this.gameService.players.getValue().map((player) => {
+                    if (player.name === data.name) {
+                        player.interactionStatus = InteractionStatus.abandoned;
+                        player.hasGiveUp = true;
+                    }
+                    return player;
+                }),
+            );
         });
     }
 
     private receiveSpeedUpTimer() {
         this.gameService.socketService.listen(GameEvents.GameSpeedUpTimer, () => {
-            this.gameService.socketEventHandlerService.handleSpeedUpTimer();
+            this.gameService.soundService.startPlayingSound(SoundType.TimerSpeedUp);
         });
     }
 

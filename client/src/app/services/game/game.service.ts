@@ -23,7 +23,6 @@ import {
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
 import { GameEventsListener } from './game-event-listener';
-import { SocketEventHandlerService } from './socket-event-handler.service';
 
 @Injectable({
     providedIn: 'root',
@@ -52,8 +51,7 @@ export class GameService {
         public socketService: SocketService,
         public notificationService: NotificationService,
         private chatService: ChatService,
-        public socketEventHandlerService: SocketEventHandlerService,
-        private soundService: SoundService,
+        public soundService: SoundService,
     ) {
         this.initialise();
         this.gameEventsListener.setGameService(this);
