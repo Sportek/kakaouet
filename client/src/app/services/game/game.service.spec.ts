@@ -395,7 +395,7 @@ describe('GameService', () => {
         ]);
         service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, actualIndex: 1, totalQuestion: 2 });
         // @ts-ignore
-        service.resetPlayerAnswers();
+        service.gameEventsListener.resetPlayerAnswers();
         expect(service.players.getValue()).toEqual([
             {
                 name: 'Sportek',
@@ -419,7 +419,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.playerJoinGameListener();
+        service.gameEventsListener.playerJoinGameListener();
 
         expect(service.players.getValue()).toEqual([cloneDeep(mockPlayer)]);
     });
@@ -433,7 +433,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.playerQuitGameListener();
+        service.gameEventsListener.playerQuitGameListener();
 
         expect(service.players.getValue()).toEqual([]);
     });
@@ -448,7 +448,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.gameCooldownListener();
+        service.gameEventsListener.gameCooldownListener();
 
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.cooldown.getValue()).toEqual(5);
@@ -461,7 +461,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.gameClosedListener();
+        service.gameEventsListener.gameClosedListener();
 
         expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home', { replaceUrl: true });
         expect(mockNotificationService.success).toHaveBeenCalledWith('La partie a été fermée');
@@ -477,7 +477,7 @@ describe('GameService', () => {
             });
 
             // @ts-ignore
-            service.gameChangeStateListener();
+            service.gameEventsListener.gameChangeStateListener();
 
             expect(service.gameState.getValue()).toEqual(GameState.WaitingPlayers);
         });
@@ -488,7 +488,7 @@ describe('GameService', () => {
             service.game.next({ code: mockGame.code, quizName: 'Quiz Test', type: mockGame.type });
 
             // @ts-ignore
-            const resetPlayerAnswersSpy = spyOn(service, 'resetPlayerAnswers');
+            const resetPlayerAnswersSpy = spyOn(service.gameEventsListener, 'resetPlayerAnswers');
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
@@ -496,7 +496,7 @@ describe('GameService', () => {
             });
 
             // @ts-ignore
-            service.gameChangeStateListener();
+            service.gameEventsListener.gameChangeStateListener();
 
             expect(service.gameState.getValue()).toEqual(GameState.PlayersAnswerQuestion);
             expect(resetPlayerAnswersSpy).toHaveBeenCalled();
@@ -509,7 +509,7 @@ describe('GameService', () => {
             service.game.next({ code: mockGame.code, quizName: 'Quiz Test', type: mockGame.type });
 
             // @ts-ignore
-            const resetPlayerAnswersSpy = spyOn(service, 'resetPlayerAnswers');
+            const resetPlayerAnswersSpy = spyOn(service.gameEventsListener, 'resetPlayerAnswers');
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
@@ -517,7 +517,7 @@ describe('GameService', () => {
             });
 
             // @ts-ignore
-            service.gameChangeStateListener();
+            service.gameEventsListener.gameChangeStateListener();
 
             expect(service.gameState.getValue()).toEqual(GameState.PlayersAnswerQuestion);
             expect(resetPlayerAnswersSpy).toHaveBeenCalled();
@@ -531,7 +531,7 @@ describe('GameService', () => {
             });
 
             // @ts-ignore
-            service.gameChangeStateListener();
+            service.gameEventsListener.gameChangeStateListener();
 
             expect(service.gameState.getValue()).toEqual(GameState.DisplayQuestionResults);
             expect(service.isFinalAnswer.getValue()).toBeTrue();
@@ -546,7 +546,7 @@ describe('GameService', () => {
             });
 
             // @ts-ignore
-            service.gameChangeStateListener();
+            service.gameEventsListener.gameChangeStateListener();
 
             expect(service.gameState.getValue()).toEqual(GameState.DisplayQuizResults);
             expect(mockRouter.navigate).toHaveBeenCalledWith(['/create/'], { replaceUrl: true });
@@ -561,7 +561,7 @@ describe('GameService', () => {
             });
 
             // @ts-ignore
-            service.gameChangeStateListener();
+            service.gameEventsListener.gameChangeStateListener();
 
             expect(service.gameState.getValue()).toEqual(GameState.DisplayQuizResults);
             expect(mockRouter.navigate).toHaveBeenCalledWith(['/results', mockGame.code], { replaceUrl: true });
@@ -579,7 +579,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.playerSendResultsListener();
+        service.gameEventsListener.playerSendResultsListener();
         expect(service.answers.getValue()).toEqual({
             scores: [{ name: 'Sportek', score: 12, bonus: 1 }],
             choices: [[{ text: 'choice1', amount: 1, isCorrect: true }]],
@@ -595,7 +595,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.sendPlayerScoresListener();
+        service.gameEventsListener.sendPlayerScoresListener();
 
         expect(service.players.getValue()).toEqual([
             {
@@ -617,7 +617,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.gameQuestionListener();
+        service.gameEventsListener.gameQuestionListener();
 
         expect(service.actualQuestion.getValue()).toEqual({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 2, actualIndex: 1 });
         expect(service.answer.getValue()).toEqual([]);
@@ -632,7 +632,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveAnswerListener();
+        service.gameEventsListener.receiveAnswerListener();
 
         expect(service.players.getValue()[0].answers).toEqual({ hasInterracted: true, hasConfirmed: false, answer: [0] });
     });
@@ -644,7 +644,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveCorrectAnswersListener();
+        service.gameEventsListener.receiveCorrectAnswersListener();
 
         expect(service.correctAnswers.getValue()).toEqual(WORKING_QUIZ.questions[0].choices as Choice[]);
     });
@@ -668,7 +668,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveConfirmAnswerListener();
+        service.gameEventsListener.receiveConfirmAnswerListener();
 
         expect(service.players.getValue()[0].answers).toEqual({ hasInterracted: false, hasConfirmed: true, answer: [0] });
     });
@@ -681,7 +681,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveConfirmAnswerListener();
+        service.gameEventsListener.receiveConfirmAnswerListener();
 
         expect(service.players.getValue()[0].answers).toBeUndefined();
     });
@@ -694,7 +694,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveUpdateScoreListener();
+        service.gameEventsListener.receiveUpdateScoreListener();
 
         expect(mockNotificationService.info).toHaveBeenCalledWith('Vous avez répondu en premier !');
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -709,7 +709,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveGameLockedStateChanged();
+        service.gameEventsListener.receiveGameLockedStateChanged();
 
         expect(service.isLocked.getValue()).toBeTrue();
     });
@@ -723,7 +723,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveBannedPlayers();
+        service.gameEventsListener.receiveBannedPlayers();
 
         expect(service.players.getValue()).toEqual([
             {
@@ -749,7 +749,7 @@ describe('GameService', () => {
         });
 
         // @ts-ignore
-        service.receiveGiveUpPlayers();
+        service.gameEventsListener.receiveGiveUpPlayers();
 
         expect(service.players.getValue()).toEqual([
             {
