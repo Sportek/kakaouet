@@ -229,7 +229,11 @@ export class GameSession {
     private sendScores(): void {
         this.calculateScores().forEach(({ player, hasAnsweredFirst }) => {
             if (this.quiz.questions[this.gameQuestionIndex].type === QuestionType.QRL && this.type === GameType.Test) {
-                return player.send(GameEvents.UpdateScore, { score: this.quiz.questions[this.gameQuestionIndex].points, hasAnsweredFirst: false });
+                player.score += this.quiz.questions[this.gameQuestionIndex].points;
+                return player.send(GameEvents.UpdateScore, {
+                    score: player.score,
+                    hasAnsweredFirst: false,
+                });
             }
             player.send(GameEvents.UpdateScore, { score: player.score, hasAnsweredFirst });
         });
