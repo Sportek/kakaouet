@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -23,6 +22,7 @@ import {
 } from '@common/game-types';
 import { Choice, Game, GameRole, GameState, GameType, QuestionType } from '@common/types';
 import { BehaviorSubject, Observable, catchError, throwError } from 'rxjs';
+import { GameEventsListener } from './game-event-listener';
 import { SocketEventHandlerService } from './socket-event-handler.service';
 
 @Injectable({
@@ -43,19 +43,21 @@ export class GameService {
     startTime: BehaviorSubject<Date | null> = new BehaviorSubject<Date | null>(null);
 
     recentInteractions: Map<string, number> = new Map();
+    gameEventsListener: GameEventsListener = GameEventsListener.getInstance();
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
-        private router: Router,
+        public router: Router,
         private httpService: HttpClient,
-        private socketService: SocketService,
-        private notificationService: NotificationService,
+        public socketService: SocketService,
+        public notificationService: NotificationService,
         private chatService: ChatService,
-        private socketEventHandlerService: SocketEventHandlerService, // private questionService: QuestionService,
+        public socketEventHandlerService: SocketEventHandlerService,
         private soundService: SoundService,
     ) {
         this.initialise();
-        this.registerListeners();
+        this.gameEventsListener.setGameService(this);
+        this.gameEventsListener.registerListeners();
     }
 
     initialise() {
@@ -275,173 +277,5 @@ export class GameService {
             return throwError(() => new Error('Impossible to find this game'));
         }
         return throwError(() => new Error(error.message));
-    }
-
-    private resetPlayerAnswers() {
-        this.recentInteractions = new Map();
-        this.players.next(
-            this.players.getValue().map((player) => {
-                if (player.answers)
-                    player.answers = {
-                        hasInterracted: false,
-                        hasConfirmed: false,
-                        answer: this.actualQuestion.getValue()?.question?.type === QuestionType.QCM ? [] : '',
-                    };
-                return player;
-            }),
-        );
-    }
-
-    private handlePlayersAnswerQuestion() {
-        this.resetPlayerAnswers();
-        if (this.client.getValue().role === GameRole.Organisator) {
-            this.router.navigate(['/organisator', this.game.getValue().code], { replaceUrl: true });
-            return;
-        }
-        this.router.navigate(['/game', this.game.getValue().code], { replaceUrl: true });
-    }
-
-    private handleDisplayQuizResults() {
-        if (this.game.getValue().type === GameType.Test) {
-            this.router.navigate(['/create/'], { replaceUrl: true });
-            return;
-        }
-        this.router.navigate(['/results', this.game.getValue().code], { replaceUrl: true });
-    }
-
-    private playerSendResultsListener() {
-        this.socketService.listen(GameEvents.PlayerSendResults, (data: GameEventsData.PlayerSendResults) => {
-            this.answers.next(data);
-        });
-    }
-
-    private sendPlayerScoresListener() {
-        this.socketService.listen(GameEvents.SendPlayersScores, (data: GameEventsData.SendPlayersScores) => {
-            this.socketEventHandlerService.handleSendPlayerScores(data, this.players);
-        });
-    }
-
-    private playerJoinGameListener() {
-        this.socketService.listen(GameEvents.PlayerJoinGame, (data: GameEventsData.PlayerJoinGame) => {
-            this.socketEventHandlerService.handlePlayerJoinGame(data, this.players);
-        });
-    }
-
-    private playerQuitGameListener() {
-        this.socketService.listen(GameEvents.PlayerQuitGame, (data: GameEventsData.PlayerQuitGame) => {
-            this.recentInteractions.delete(data.name);
-            this.players.next(this.players.getValue().filter((player) => player.name !== data.name));
-        });
-    }
-
-    private gameCooldownListener() {
-        this.socketService.listen(GameEvents.GameCooldown, (data: GameEventsData.GameCooldown) => {
-            this.cooldown.next(data.cooldown);
-        });
-    }
-
-    private gameClosedListener() {
-        this.socketService.listen(GameEvents.GameClosed, () => {
-            this.socketEventHandlerService.handleGameClosed();
-        });
-    }
-
-    private gameChangeStateListener(): void {
-        this.socketService.listen(GameEvents.GameStateChanged, (data: GameEventsData.GameStateChanged) => {
-            this.gameState.next(data.gameState);
-            switch (data.gameState) {
-                case GameState.PlayersAnswerQuestion:
-                    this.handlePlayersAnswerQuestion();
-                    break;
-                case GameState.DisplayQuestionResults:
-                    this.isFinalAnswer.next(true);
-                    break;
-                case GameState.DisplayQuizResults:
-                    this.handleDisplayQuizResults();
-                    break;
-                default:
-                    break;
-            }
-        });
-    }
-
-    private gameQuestionListener() {
-        this.socketService.listen(GameEvents.GameQuestion, (data: GameEventsData.GameQuestion) => {
-            this.socketEventHandlerService.handleGameQuestion(data, this.actualQuestion, this.answer, this.isFinalAnswer);
-        });
-    }
-
-    private receiveAnswerListener() {
-        this.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
-            this.socketEventHandlerService.handlePlayerSelectAnswer(data, this.players, this.recentInteractions, this.cooldown.getValue());
-        });
-    }
-
-    private receiveCorrectAnswersListener() {
-        this.socketService.listen(GameEvents.SendCorrectAnswers, (data: GameEventsData.SendCorrectAnswers) => {
-            this.correctAnswers.next(data.choices);
-        });
-    }
-
-    private receiveConfirmAnswerListener() {
-        this.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmAnswers) => {
-            this.socketEventHandlerService.handlePlayerConfirmAnswers(data, this.players);
-        });
-    }
-
-    private receiveUpdateScoreListener() {
-        this.socketService.listen(GameEvents.UpdateScore, (data: GameEventsData.UpdateScore) => {
-            this.socketEventHandlerService.handleUpdateScore(data, this.client);
-        });
-    }
-
-    private receiveGameLockedStateChanged() {
-        this.socketService.listen(GameEvents.GameLockedStateChanged, (data: GameEventsData.GameLockedStateChanged) => {
-            this.isLocked.next(data.isLocked);
-        });
-    }
-
-    private receiveBannedPlayers() {
-        this.socketService.listen(GameEvents.PlayerBanned, (data: GameEventsData.PlayerBanned) => {
-            this.socketEventHandlerService.handlePlayerBanned(data, this.players, this.client);
-        });
-    }
-
-    private receiveMutedPlayers() {
-        this.socketService.listen(GameEvents.PlayerMuted, (data: GameEventsData.PlayerMuted) => {
-            this.socketEventHandlerService.handlePlayerMuted(data, this.players, this.client);
-        });
-    }
-
-    private receiveGiveUpPlayers() {
-        this.socketService.listen(GameEvents.PlayerHasGiveUp, (data: GameEventsData.PlayerHasGiveUp) => {
-            this.socketEventHandlerService.handlePlayerGivesUp(data, this.players);
-        });
-    }
-
-    private receiveSpeedUpTimer() {
-        this.socketService.listen(GameEvents.GameSpeedUpTimer, () => {
-            this.socketEventHandlerService.handleSpeedUpTimer();
-        });
-    }
-
-    private registerListeners() {
-        this.playerJoinGameListener();
-        this.playerQuitGameListener();
-        this.gameCooldownListener();
-        this.gameClosedListener();
-        this.gameChangeStateListener();
-        this.gameQuestionListener();
-        this.receiveAnswerListener();
-        this.receiveConfirmAnswerListener();
-        this.receiveUpdateScoreListener();
-        this.receiveGameLockedStateChanged();
-        this.receiveBannedPlayers();
-        this.sendPlayerScoresListener();
-        this.receiveGiveUpPlayers();
-        this.playerSendResultsListener();
-        this.receiveCorrectAnswersListener();
-        this.receiveMutedPlayers();
-        this.receiveSpeedUpTimer();
     }
 }
