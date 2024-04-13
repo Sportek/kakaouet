@@ -23,6 +23,24 @@ describe('OrganisatorService', () => {
             ],
         });
         service = TestBed.inject(OrganisatorService);
+        service.actualQuestion = {
+            question: {
+                _id: 'newID',
+                type: QuestionType.QCM,
+                text: 'What is 2 + 1 ?',
+                points: 5,
+                createdAt: new Date(),
+                lastModification: new Date(),
+                choices: [],
+            },
+            totalQuestion: 5,
+            actualIndex: 1,
+        };
+        service.choices = [
+            { text: '0', amount: 1, isCorrect: true },
+            { text: '0.5', amount: 2, isCorrect: false },
+            { text: '1', amount: 0, isCorrect: true },
+        ];
         service.playerRatings.set('Alice', 2);
         service.players = [
             {
@@ -69,6 +87,17 @@ describe('OrganisatorService', () => {
             },
         ]);
         expect(gameServiceMock.filterPlayers).toHaveBeenCalled();
+    });
+
+    it('should correctly update choice amounts and player ratings', () => {
+        service.rateAnswerQRL('Alice', '1');
+
+        const choiceForOldRating = service.choices.find((choice) => choice.text === '0.5');
+        const choiceForNewRating = service.choices.find((choice) => choice.text === '1');
+
+        expect(choiceForOldRating?.amount).toBe(2);
+        expect(choiceForNewRating?.amount).toBe(1);
+        expect(service.playerRatings.get('Alice')).toBe(5);
     });
 
     describe('sendRating', () => {
