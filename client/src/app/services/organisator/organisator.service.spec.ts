@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -10,11 +11,10 @@ import { OrganisatorService, baseQRLRatings } from './organisator.service';
 
 describe('OrganisatorService', () => {
     let service: OrganisatorService;
-    // let mockSnackbar: jasmine.SpyObj<MatSnackBar>;
     let gameServiceMock: jasmine.SpyObj<GameService>;
 
     beforeEach(() => {
-        gameServiceMock = jasmine.createSpyObj('GameService', ['filterPlayers', 'recentInteractions']);
+        gameServiceMock = jasmine.createSpyObj('GameService', ['filterPlayers', 'recentInteractions', 'rateAnswerQRL']);
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
             providers: [
@@ -23,11 +23,12 @@ describe('OrganisatorService', () => {
             ],
         });
         service = TestBed.inject(OrganisatorService);
+        service.playerRatings.set('Alice', 2);
         service.players = [
             {
                 name: 'Alice',
                 role: GameRole.Player,
-                score: 0,
+                score: 10,
                 isExcluded: false,
                 hasGiveUp: false,
                 isMuted: false,
@@ -36,9 +37,9 @@ describe('OrganisatorService', () => {
             {
                 name: 'Bob',
                 role: GameRole.Player,
-                score: 0,
+                score: 5,
                 isExcluded: false,
-                hasGiveUp: false,
+                hasGiveUp: true,
                 isMuted: false,
                 interactionStatus: InteractionStatus.noInteraction,
             },
@@ -50,26 +51,7 @@ describe('OrganisatorService', () => {
     });
 
     it('should return players who have not given up', () => {
-        const players: PlayerClient[] = [
-            {
-                name: 'Alice',
-                hasGiveUp: false,
-                role: GameRole.Player,
-                score: 10,
-                isExcluded: false,
-                isMuted: false,
-                interactionStatus: InteractionStatus.interacted,
-            },
-            {
-                name: 'Bob',
-                hasGiveUp: true,
-                role: GameRole.Player,
-                score: 5,
-                isExcluded: true,
-                isMuted: false,
-                interactionStatus: InteractionStatus.noInteraction,
-            },
-        ];
+        const players: PlayerClient[] = service.players;
         gameServiceMock.filterPlayers.and.returnValue(players);
 
         const filteredPlayers = service.filterPlayers();
@@ -87,6 +69,15 @@ describe('OrganisatorService', () => {
             },
         ]);
         expect(gameServiceMock.filterPlayers).toHaveBeenCalled();
+    });
+
+    describe('sendRating', () => {
+        it('should call filterPlayers and rateAnswerQRL on sendRating', () => {
+            spyOn(service, 'filterPlayers').and.returnValue([service.players[0]]);
+            service.sendRating('Alice');
+            expect(service.filterPlayers).toHaveBeenCalled();
+            expect(gameServiceMock.rateAnswerQRL).toHaveBeenCalledWith('Alice', 2);
+        });
     });
 
     describe('calculateChoices', () => {
