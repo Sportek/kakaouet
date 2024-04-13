@@ -123,7 +123,11 @@ export class GameService {
     }
 
     giveUp() {
-        this.router.navigateByUrl('/home', { replaceUrl: true });
+        if (this.game.getValue().type === GameType.Test) {
+            this.router.navigateByUrl('/create', { replaceUrl: true });
+        } else {
+            this.router.navigateByUrl('/home', { replaceUrl: true });
+        }
     }
 
     createNewGame(quizId: string, type: GameType): void {
