@@ -154,6 +154,6 @@ export enum OrderingField {
 }
 
 export enum Ordering {
-    Ascendant = 'asc',
-    Descendant = 'desc',
+    ascending = 'asc',
+    descending = 'desc',
 }

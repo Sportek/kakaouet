@@ -57,7 +57,7 @@ describe('HistoryComponent', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Temps de début de partie Ascendant'));
         component.ngOnInit();
         expect(component.currentSortField).toEqual(OrderingField.StartTime);
-        expect(component.currentSortOrder).toEqual(Ordering.Ascendant);
+        expect(component.currentSortOrder).toEqual(Ordering.ascending);
     });
 
     it('should sort records by game title in ascending order', () => {
@@ -69,7 +69,7 @@ describe('HistoryComponent', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Ascendant'));
         component.ngOnInit();
         expect(component.gameRecords[0].gameTitle).toEqual('Mario');
-        expect(component.currentSortOrder).toEqual(Ordering.Ascendant);
+        expect(component.currentSortOrder).toEqual(Ordering.ascending);
     });
 
     it('should sort records by game title in descending order', () => {
@@ -81,7 +81,7 @@ describe('HistoryComponent', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Descendant'));
         component.ngOnInit();
         expect(component.gameRecords[0].gameTitle).toEqual('Zelda');
-        expect(component.currentSortOrder).toEqual(Ordering.Descendant);
+        expect(component.currentSortOrder).toEqual(Ordering.descending);
     });
 
     it('should sort records by start time in descending order', () => {
@@ -93,14 +93,14 @@ describe('HistoryComponent', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Temps de début de partie Descendant'));
         component.ngOnInit();
         expect(component.gameRecords[0].gameTitle).toEqual('Game D');
-        expect(component.currentSortOrder).toEqual(Ordering.Descendant);
+        expect(component.currentSortOrder).toEqual(Ordering.descending);
     });
 
     it('should sort records by game title in descending order', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Descendant'));
         component.ngOnInit();
         expect(component.currentSortField).toEqual(OrderingField.GameTitle);
-        expect(component.currentSortOrder).toEqual(Ordering.Descendant);
+        expect(component.currentSortOrder).toEqual(Ordering.descending);
     });
 
     it('should unsubscribe on destroy', () => {

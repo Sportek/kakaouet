@@ -14,7 +14,7 @@ export class PlayerService {
     sortPlayers(players: PlayerClient[], selectedCriterion: SortingCriteria, sortOrder: Ordering): PlayerClient[] {
         return players.sort((a, b) => {
             let comparison = this.getComparison(a, b, selectedCriterion);
-            if (sortOrder === Ordering.Descendant) {
+            if (sortOrder === Ordering.descending) {
                 comparison *= SORT_MULTIPLYER;
             }
             return comparison;

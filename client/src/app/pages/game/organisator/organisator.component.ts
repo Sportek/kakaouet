@@ -18,7 +18,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     timerIsRunning: boolean;
     currentRating: string;
     selectedCriterion: SortingCriteria = SortingCriteria.name;
-    sortingOrder: Ordering = Ordering.Ascendant;
+    sortingOrder: Ordering = Ordering.ascending;
     sortingCriteria = SortingCriteria;
     sortOrder = Ordering;
     currentQuestion: number;
@@ -174,7 +174,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     toggleSortOrder(): void {
-        this.sortingOrder = this.sortingOrder === this.sortOrder.Ascendant ? this.sortOrder.Descendant : this.sortOrder.Ascendant;
+        this.sortingOrder = this.sortingOrder === this.sortOrder.ascending ? this.sortOrder.descending : this.sortOrder.descending;
         this.sortPlayers();
     }
 }

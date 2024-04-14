@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 export class HistoryComponent implements OnInit, OnDestroy {
     gameRecords: GameRecords[] = [];
     currentSortField: OrderingField = OrderingField.GameTitle;
-    currentSortOrder: Ordering = Ordering.Ascendant;
+    currentSortOrder: Ordering = Ordering.ascending;
     recordsSubscription: Subscription[] = [];
     historyCleared: boolean = false;
 
@@ -55,9 +55,9 @@ export class HistoryComponent implements OnInit, OnDestroy {
             this.currentSortField = OrderingField.GameTitle;
         }
         if (choice.includes('Ascendant')) {
-            this.currentSortOrder = Ordering.Ascendant;
+            this.currentSortOrder = Ordering.ascending;
         } else if (choice.includes('Descendant')) {
-            this.currentSortOrder = Ordering.Descendant;
+            this.currentSortOrder = Ordering.descending;
         }
         this.sortRecords();
     }
@@ -73,7 +73,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
                     comparison = new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
                     break;
             }
-            return this.currentSortOrder === Ordering.Ascendant ? comparison : -comparison;
+            return this.currentSortOrder === Ordering.ascending ? comparison : -comparison;
         });
     }
 }

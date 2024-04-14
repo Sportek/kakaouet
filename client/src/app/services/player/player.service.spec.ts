@@ -45,21 +45,21 @@ describe('PlayerService', () => {
     });
 
     it('should sort players by name ascending', () => {
-        const sorted = service.sortPlayers(players, SortingCriteria.name, Ordering.Ascendant);
+        const sorted = service.sortPlayers(players, SortingCriteria.name, Ordering.ascending);
         expect(sorted[0].name).toBe('Alice');
         expect(sorted[1].name).toBe('Bob');
         expect(sorted[2].name).toBe('Charlie');
     });
 
     it('should sort players by score descending', () => {
-        const sorted = service.sortPlayers(players, SortingCriteria.score, Ordering.Descendant);
+        const sorted = service.sortPlayers(players, SortingCriteria.score, Ordering.descending);
         expect(sorted[0].name).toBe('Bob');
         expect(sorted[1].name).toBe('Charlie');
         expect(sorted[2].name).toBe('Alice');
     });
 
     it('should sort players by status and use name as tiebreaker', () => {
-        const sorted = service.sortPlayers(players, SortingCriteria.status, Ordering.Ascendant);
+        const sorted = service.sortPlayers(players, SortingCriteria.status, Ordering.ascending);
         expect(sorted[0].interactionStatus).toBe('finalized');
         expect(sorted[1].interactionStatus).toBe('interacted');
         expect(sorted[2].interactionStatus).toBe('noInteraction');
@@ -71,6 +71,6 @@ describe('PlayerService', () => {
             done();
         });
 
-        service.sortPlayers(players, SortingCriteria.score, Ordering.Descendant);
+        service.sortPlayers(players, SortingCriteria.score, Ordering.descending);
     });
 });
