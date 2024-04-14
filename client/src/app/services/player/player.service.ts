@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
+import { PlayerClient, SortingCriteria } from '@common/game-types';
+import { Ordering } from '@common/types';
 import { BehaviorSubject, Observable } from 'rxjs';
 const SORT_MULTIPLYER = -1;
 @Injectable({
@@ -10,10 +11,10 @@ export class PlayerService {
     getSortedPlayersObservable(): Observable<PlayerClient[]> {
         return this.sortedPlayersSubject.asObservable();
     }
-    sortPlayers(players: PlayerClient[], selectedCriterion: SortingCriteria, sortOrder: SortOrder): PlayerClient[] {
+    sortPlayers(players: PlayerClient[], selectedCriterion: SortingCriteria, sortOrder: Ordering): PlayerClient[] {
         return players.sort((a, b) => {
             let comparison = this.getComparison(a, b, selectedCriterion);
-            if (sortOrder === SortOrder.descending) {
+            if (sortOrder === Ordering.Descendant) {
                 comparison *= SORT_MULTIPLYER;
             }
             return comparison;

@@ -71,10 +71,7 @@ export enum SortingCriteria {
     status = 'status',
 }
 
-export enum SortOrder {
-    ascending = 'asc',
-    descending = 'desc',
-}
+
 
 export interface Client {
     name: string;

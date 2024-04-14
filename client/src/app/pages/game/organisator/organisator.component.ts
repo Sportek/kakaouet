@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
-import { ActualQuestion, ChoiceData, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
-import { GameState, QuestionType } from '@common/types';
+import { ActualQuestion, ChoiceData, PlayerClient, SortingCriteria } from '@common/game-types';
+import { GameState, Ordering, QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -18,9 +18,9 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     timerIsRunning: boolean;
     currentRating: string;
     selectedCriterion: SortingCriteria = SortingCriteria.name;
-    sortingOrder: SortOrder = SortOrder.ascending;
+    sortingOrder: Ordering = Ordering.Ascendant;
     sortingCriteria = SortingCriteria;
-    sortOrder = SortOrder;
+    sortOrder = Ordering;
     currentQuestion: number;
     private subscriptions: Subscription[];
 
@@ -174,7 +174,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     toggleSortOrder(): void {
-        this.sortingOrder = this.sortingOrder === this.sortOrder.ascending ? this.sortOrder.descending : this.sortOrder.ascending;
+        this.sortingOrder = this.sortingOrder === this.sortOrder.Ascendant ? this.sortOrder.Descendant : this.sortOrder.Ascendant;
         this.sortPlayers();
     }
 }

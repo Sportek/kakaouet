@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { InteractionStatus, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
-import { GameRole } from '@common/types';
+import { InteractionStatus, PlayerClient, SortingCriteria } from '@common/game-types';
+import { GameRole, Ordering } from '@common/types';
 import { PlayerService } from './player.service';
 
 describe('PlayerService', () => {
@@ -45,21 +45,21 @@ describe('PlayerService', () => {
     });
 
     it('should sort players by name ascending', () => {
-        const sorted = service.sortPlayers(players, SortingCriteria.name, SortOrder.ascending);
+        const sorted = service.sortPlayers(players, SortingCriteria.name, Ordering.Ascendant);
         expect(sorted[0].name).toBe('Alice');
         expect(sorted[1].name).toBe('Bob');
         expect(sorted[2].name).toBe('Charlie');
     });
 
     it('should sort players by score descending', () => {
-        const sorted = service.sortPlayers(players, SortingCriteria.score, SortOrder.descending);
+        const sorted = service.sortPlayers(players, SortingCriteria.score, Ordering.Descendant);
         expect(sorted[0].name).toBe('Bob');
         expect(sorted[1].name).toBe('Charlie');
         expect(sorted[2].name).toBe('Alice');
     });
 
     it('should sort players by status and use name as tiebreaker', () => {
-        const sorted = service.sortPlayers(players, SortingCriteria.status, SortOrder.ascending);
+        const sorted = service.sortPlayers(players, SortingCriteria.status, Ordering.Ascendant);
         expect(sorted[0].interactionStatus).toBe('finalized');
         expect(sorted[1].interactionStatus).toBe('interacted');
         expect(sorted[2].interactionStatus).toBe('noInteraction');
@@ -71,6 +71,6 @@ describe('PlayerService', () => {
             done();
         });
 
-        service.sortPlayers(players, SortingCriteria.score, SortOrder.descending);
+        service.sortPlayers(players, SortingCriteria.score, Ordering.Descendant);
     });
 });
