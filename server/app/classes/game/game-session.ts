@@ -158,9 +158,10 @@ export class GameSession {
     }
 
     private filterNullAnswers() {
+        // -----------------> erreur vient de la pour la couleur du joueur
         for (const player of this.room.players) {
             if (!player.getAnswer(this.gameQuestionIndex) && !player.hasGiveUp) {
-                player.setAnswer(' ');
+                player.setEmptyAnswer(' ');
                 player.confirmAnswer();
                 this.room.broadcast(GameEvents.PlayerConfirmAnswers, {}, { name: player.name });
             }

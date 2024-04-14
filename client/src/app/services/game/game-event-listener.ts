@@ -36,6 +36,7 @@ export class GameEventsListener {
         this.receiveCorrectAnswersListener();
         this.receiveMutedPlayers();
         this.receiveSpeedUpTimer();
+        this.receiveConfirmAnswerListenerQRLEmpty();
     }
 
     private playerSendResultsListener() {
@@ -125,11 +126,10 @@ export class GameEventsListener {
         this.gameService.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
             const player = this.gameService.players.getValue().find((p) => p.name === data.name);
             if (player) {
-                if (player.answers) {
-                    player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
-                    player.interactionStatus = InteractionStatus.interacted;
-                    this.gameService.players.next([...this.gameService.players.getValue()]);
-                }
+                player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
+                player.interactionStatus = InteractionStatus.interacted;
+                console.log('receiveAnswerListener');
+                this.gameService.players.next([...this.gameService.players.getValue()]);
             }
             this.gameService.recentInteractions.set(data.name, this.gameService.cooldown.getValue());
         });
@@ -138,6 +138,20 @@ export class GameEventsListener {
     private receiveCorrectAnswersListener() {
         this.gameService.socketService.listen(GameEvents.SendCorrectAnswers, (data: GameEventsData.SendCorrectAnswers) => {
             this.gameService.correctAnswers.next(data.choices);
+        });
+    }
+
+    private receiveConfirmAnswerListenerQRLEmpty() {
+        this.gameService.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmEmptyAnswersQRL) => {
+            const player = this.gameService.players.getValue().find((p) => p.name === data.name);
+            const question = this.gameService.actualQuestion.getValue()?.question.type === 'QRL' ? true : false;
+            if (player) {
+                if (player.answers && question) {
+                    player.interactionStatus = InteractionStatus.noInteraction;
+                    player.answers.hasConfirmed = true;
+                }
+                this.gameService.players.next([...this.gameService.players.getValue()]);
+            }
         });
     }
 

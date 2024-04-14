@@ -47,6 +47,13 @@ export class Player {
         this.room.sendToOrganizer(GameEvents.PlayerSelectAnswer, { name: this.name, answer: answerData.answer });
     }
 
+    setEmptyAnswer(answer: string | number[]): void {
+        const questionIndex = this.game.gameQuestionIndex;
+        const answerData = { hasInterracted: false, hasConfirmed: false, answer };
+        this.answers[questionIndex] = answerData;
+        this.room.sendToOrganizer(GameEvents.PlayerConfirmEmptyAnswersQRL, { name: this.name, answer: answerData.answer });
+    }
+
     getAnswer(index: number): CompletePlayerAnswer {
         return this.answers[index];
     }
