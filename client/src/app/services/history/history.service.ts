@@ -10,10 +10,11 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
     providedIn: 'root',
 })
 export class HistoryService {
-    private history$: BehaviorSubject<GameRecords[]> = new BehaviorSubject<GameRecords[]>([]);
-    private history: Observable<GameRecords[]> = this.history$.asObservable();
     currentSortField: OrderingField = OrderingField.GameTitle;
     currentSortOrder: Ordering = Ordering.ascending;
+    private history$: BehaviorSubject<GameRecords[]> = new BehaviorSubject<GameRecords[]>([]);
+    private history: Observable<GameRecords[]> = this.history$.asObservable();
+
     constructor(
         private http: HttpClient,
         public dialog: MatDialog,
@@ -26,13 +27,12 @@ export class HistoryService {
     getAllRecords(): Observable<GameRecords[]> {
         const url = `${BASE_URL}/history/`;
         return this.http.get<GameRecords[]>(url).pipe(
-            tap(records => {
+            tap((records) => {
                 this.history$.next(records); // Update the BehaviorSubject with new records
                 this.applySorting(); // Apply sorting to the new records
-            })
+            }),
         );
     }
-    
 
     getHistory(): Observable<GameRecords[]> {
         return this.history;
@@ -84,7 +84,7 @@ export class HistoryService {
     }
 
     applySorting(): void {
-        let sortedRecords = this.history$.getValue().sort((a, b) => {
+        const sortedRecords = this.history$.getValue().sort((a, b) => {
             let comparison = 0;
             switch (this.currentSortField) {
                 case OrderingField.GameTitle:
@@ -96,6 +96,6 @@ export class HistoryService {
             }
             return this.currentSortOrder === Ordering.ascending ? comparison : -comparison;
         });
-        this.history$.next(sortedRecords); 
+        this.history$.next(sortedRecords);
     }
 }
