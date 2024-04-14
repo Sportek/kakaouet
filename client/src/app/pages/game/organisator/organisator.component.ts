@@ -73,6 +73,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.filterPlayers().filter((player) => player.answers?.hasConfirmed).length;
     }
 
+    // done
     filterPlayers(): PlayerClient[] {
         return this.organisatorService.filterPlayers();
     }
@@ -145,14 +146,17 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         );
     }
 
+    // done
     getActualQuestion(): ActualQuestion | null {
         return this.organisatorService.actualQuestion;
     }
 
+    // done
     getPlayerArray(): PlayerClient[] {
         return this.organisatorService.players;
     }
 
+    // done
     getChoices(): ChoiceData[] {
         return this.organisatorService.choices;
     }
@@ -165,6 +169,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.organisatorService.histogram;
     }
 
+    // done
     getCurrentPlayer(): PlayerClient {
         return this.organisatorService.currentPlayer;
     }

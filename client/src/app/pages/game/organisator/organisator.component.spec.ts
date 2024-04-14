@@ -3,12 +3,26 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
-import { ActualQuestion, InteractionStatus, PlayerClient } from '@common/game-types';
+import { ActualQuestion, ChoiceData, InteractionStatus, PlayerClient } from '@common/game-types';
 import { GameRole, QuestionType } from '@common/types';
 import { BehaviorSubject } from 'rxjs';
 import { OrganisatorComponent } from './organisator.component';
 
 describe('OrganisatorComponent', () => {
+    const mockedCurrentPlayer: PlayerClient = {
+        name: 'obama',
+        role: GameRole.Player,
+        score: 15,
+        isExcluded: false,
+        hasGiveUp: false,
+        answers: {
+            answer: [0, 1],
+            hasInterracted: true,
+            hasConfirmed: true,
+        },
+        isMuted: false,
+        interactionStatus: InteractionStatus.interacted,
+    };
     const mockedPlayers: PlayerClient[] = [
         {
             name: 'Alice',
@@ -52,6 +66,10 @@ describe('OrganisatorComponent', () => {
         totalQuestion: 5,
         actualIndex: 1,
     };
+    const mockedChoices: ChoiceData[] = [
+        { text: 'Choice 1', amount: 100, isCorrect: true },
+        { text: 'Choice 2', amount: 200, isCorrect: false },
+    ];
     let fakeCooldown: 10;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let playerServiceSpy: jasmine.SpyObj<PlayerService>;
@@ -62,15 +80,16 @@ describe('OrganisatorComponent', () => {
     beforeEach(waitForAsync(() => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['filterPlayers', 'toggleMutePlayer', 'isLastQuestion']);
         playerServiceSpy = jasmine.createSpyObj('PlayerService', ['sortPlayers']);
-        organisatorServiceSpy = jasmine.createSpyObj('OrganisatorService', [
-            'filterPlayers',
-            'rateAnswerQRL',
-            'sendRating',
-            'calculateChoices',
-            'toggleTimer',
-            'speedUpTimer',
-            'nextQuestion',
-        ]);
+        organisatorServiceSpy = jasmine.createSpyObj(
+            'OrganisatorService',
+            ['filterPlayers', 'rateAnswerQRL', 'sendRating', 'calculateChoices', 'toggleTimer', 'speedUpTimer', 'nextQuestion'],
+            {
+                choices: mockedChoices,
+                actualQuestion: mockedActualQuestion,
+                players: mockedPlayers,
+                currentPlayer: mockedCurrentPlayer,
+            },
+        );
 
         gameServiceSpy.filterPlayers.and.returnValue(mockedPlayers);
 
@@ -97,5 +116,57 @@ describe('OrganisatorComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    describe('getChoices', () => {
+        it('should return choices from organisatorService', () => {
+            const choices = component.getChoices();
+            expect(choices).toEqual(mockedChoices);
+        });
+    });
+
+    describe('getActualQuestion', () => {
+        it('should return the actual question from organisatorService', () => {
+            const actualQuestion = component.getActualQuestion();
+            expect(actualQuestion).toEqual(mockedActualQuestion);
+        });
+    });
+
+    describe('getPlayerArray', () => {
+        it('should return the players from organisatorService', () => {
+            const players = component.getPlayerArray();
+            expect(players).toEqual(mockedPlayers);
+        });
+    });
+
+    describe('getCurrentPlayer', () => {
+        it('should return the player from organisatorService', () => {
+            const currentPlayer = component.getCurrentPlayer();
+            expect(currentPlayer).toEqual(mockedCurrentPlayer);
+        });
+    });
+
+    describe('filterPlayers', () => {
+        it('should return filtered players from organisatorService', () => {
+            const expectedPlayers: PlayerClient[] = [
+                {
+                    name: 'Alice',
+                    role: GameRole.Player,
+                    score: 10,
+                    isExcluded: false,
+                    hasGiveUp: true,
+                    answers: {
+                        answer: [0, 1],
+                        hasInterracted: true,
+                        hasConfirmed: true,
+                    },
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+            ];
+            organisatorServiceSpy.filterPlayers.and.returnValue(expectedPlayers);
+            const result = component.filterPlayers();
+            expect(result).toEqual(expectedPlayers);
+        });
     });
 });
