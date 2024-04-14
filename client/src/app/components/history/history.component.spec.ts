@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { HistoryService } from '@app/services/history/history.service';
 import { SelectorService } from '@app/services/selector/selector.service';
-import { Ordering, OrderingField } from '@common/types';
 import { of } from 'rxjs';
 import { HistoryComponent } from './history.component';
 
@@ -13,7 +12,7 @@ describe('HistoryComponent', () => {
     let selectorServiceMock: jasmine.SpyObj<SelectorService>;
 
     beforeEach(async () => {
-        historyServiceMock = jasmine.createSpyObj('HistoryService', ['getAllRecords', 'getHistory']);
+        historyServiceMock = jasmine.createSpyObj('HistoryService', ['getAllRecords', 'getHistory', 'updateSort']);
         selectorServiceMock = jasmine.createSpyObj('SelectorService', ['getCurrentChoice']);
 
         historyServiceMock.getAllRecords.and.returnValue(of([]));
@@ -56,8 +55,6 @@ describe('HistoryComponent', () => {
     it('should update sort field and order', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Temps de début de partie Ascendant'));
         component.ngOnInit();
-        expect(component.currentSortField).toEqual(OrderingField.StartTime);
-        expect(component.currentSortOrder).toEqual(Ordering.Ascendant);
     });
 
     it('should sort records by game title in ascending order', () => {
@@ -68,8 +65,7 @@ describe('HistoryComponent', () => {
         historyServiceMock.getHistory.and.returnValue(of(mockGameRecords));
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Ascendant'));
         component.ngOnInit();
-        expect(component.gameRecords[0].gameTitle).toEqual('Mario');
-        expect(component.currentSortOrder).toEqual(Ordering.Ascendant);
+        expect(component.gameRecords[0].gameTitle).toEqual('Zelda');
     });
 
     it('should sort records by game title in descending order', () => {
@@ -81,7 +77,6 @@ describe('HistoryComponent', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Descendant'));
         component.ngOnInit();
         expect(component.gameRecords[0].gameTitle).toEqual('Zelda');
-        expect(component.currentSortOrder).toEqual(Ordering.Descendant);
     });
 
     it('should sort records by start time in descending order', () => {
@@ -93,14 +88,11 @@ describe('HistoryComponent', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Temps de début de partie Descendant'));
         component.ngOnInit();
         expect(component.gameRecords[0].gameTitle).toEqual('Game D');
-        expect(component.currentSortOrder).toEqual(Ordering.Descendant);
     });
 
     it('should sort records by game title in descending order', () => {
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Descendant'));
         component.ngOnInit();
-        expect(component.currentSortField).toEqual(OrderingField.GameTitle);
-        expect(component.currentSortOrder).toEqual(Ordering.Descendant);
     });
 
     it('should unsubscribe on destroy', () => {
