@@ -106,8 +106,8 @@ export class GameGateway {
         gameSession.startGameDelayed();
         return { isSuccess: true, message: 'Partie démarrée' };
     }
-    @SubscribeMessage(GameEvents.StartGameWithRoleChange)
-    async handleStartGameWithRoleChange(@MessageBody() data: unknown, @ConnectedSocket() client: Socket): Promise<SocketResponse> {
+    @SubscribeMessage(GameEvents.GameRoleChange)
+    async handleGameRoleChange(@ConnectedSocket() client: Socket): Promise<SocketResponse> {
         const gameSession = await this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
         if (!player || player.role !== GameRole.Organisator) {
