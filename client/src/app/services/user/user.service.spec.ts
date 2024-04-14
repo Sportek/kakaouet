@@ -2,9 +2,11 @@
 import { HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BASE_URL } from '@app/constants';
+import { NotificationService } from '@app/services/notification/notification.service';
 import { AdminLoginState, UserService } from './user.service';
 
 describe('UserService', () => {
@@ -20,8 +22,9 @@ describe('UserService', () => {
                     { path: 'admin/some-route', component: class {} },
                     { path: 'admin/login', component: class {} },
                 ]),
+                MatSnackBarModule,
             ],
-            providers: [UserService],
+            providers: [UserService, NotificationService],
         });
 
         service = TestBed.inject(UserService);
