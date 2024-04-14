@@ -8,25 +8,25 @@ import { CreatePageComponent } from './create-page.component';
 describe('CreatePageComponent', () => {
     let component: CreatePageComponent;
     let fixture: ComponentFixture<CreatePageComponent>;
-    let quizServiceMock: any;
-    let matSnackBarMock: any;
+    let quizServiceMock: Partial<QuizService>;
+    let matSnackBarMock: Partial<MatSnackBar>;
 
     beforeEach(async () => {
         quizServiceMock = {
-            getAllQuizzes: jasmine.createSpy('getAllQuizzes').and.returnValue(of([{ id: '1', name: 'Quiz 1' }])),
-            getRandomQuiz: jasmine.createSpy('getRandomQuiz').and.returnValue(of({ id: 'random', name: 'Random Quiz' }))
+            getAllQuizzes: jasmine.createSpy().and.returnValue(of([{ id: '1', name: 'Quiz 1' }])),
+            getRandomQuiz: jasmine.createSpy().and.returnValue(of({ id: 'random', name: 'Random Quiz' })),
         };
         matSnackBarMock = {
-            open: jasmine.createSpy('open')
+            open: jasmine.createSpy(),
         };
 
         await TestBed.configureTestingModule({
             declarations: [CreatePageComponent],
             providers: [
                 { provide: QuizService, useValue: quizServiceMock },
-                { provide: MatSnackBar, useValue: matSnackBarMock }
+                { provide: MatSnackBar, useValue: matSnackBarMock },
             ],
-            schemas: [NO_ERRORS_SCHEMA]
+            schemas: [NO_ERRORS_SCHEMA],
         }).compileComponents();
 
         fixture = TestBed.createComponent(CreatePageComponent);
@@ -34,21 +34,21 @@ describe('CreatePageComponent', () => {
         fixture.detectChanges();
     });
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
-    });
+    it('should handle errors when fetching a random quiz', () => {
+        (quizServiceMock.getRandomQuiz as jasmine.Spy).and.returnValue(throwError(() => new Error('Error')));
+        component.getQuizzes();
+        fixture.detectChanges();
 
-    it('should fetch quizzes and a random quiz on init', () => {
+        expect(matSnackBarMock.open).toHaveBeenCalledWith('Pas assez de question pour générer un random quiz', 'Fermer', {
+            duration: 3000,
+        });
+    });
+    it('should combine random quiz with other quizzes correctly', () => {
+        component.getQuizzes();
+        fixture.detectChanges();
+
+        expect(component.games.length).toBe(2);
         expect(quizServiceMock.getAllQuizzes).toHaveBeenCalled();
         expect(quizServiceMock.getRandomQuiz).toHaveBeenCalled();
-        expect(component.games.length).toBe(2);
-    });
-
-    it('should handle errors when fetching a random quiz', () => {
-        quizServiceMock.getRandomQuiz.and.returnValue(throwError(() => new Error('Error')));
-        component.getQuizzes();
-        expect(matSnackBarMock.open).toHaveBeenCalledWith('Pas assez de question pour générer un random quiz', 'Fermer', {
-            duration: 3000
-        });
     });
 });
