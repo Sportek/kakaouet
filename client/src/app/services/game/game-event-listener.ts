@@ -193,7 +193,7 @@ export class GameEventsListener {
                 if (data.isMuted) {
                     this.gameService.notificationService.error("Vous n'avez pas droit de clavarder");
                 } else {
-                    this.gameService.notificationService.error('Vous avez le droit de clavarder a nouveau');
+                    this.gameService.notificationService.success('Vous avez le droit de clavarder a nouveau');
                 }
             }
         });
