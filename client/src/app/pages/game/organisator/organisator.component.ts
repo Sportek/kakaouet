@@ -161,10 +161,12 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.organisatorService.choices;
     }
 
+    // done
     getPlayerRatings(): Map<string, number> {
         return this.organisatorService.playerRatings;
     }
 
+    // done
     getHistogram(): { hasModified: number; hasNotModified: number } {
         return this.organisatorService.histogram;
     }
@@ -174,10 +176,12 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.organisatorService.currentPlayer;
     }
 
+    // done
     sortPlayers(): void {
         this.players = this.playerService.sortPlayers(this.players, this.selectedCriterion, this.sortingOrder);
     }
 
+    // done
     toggleSortOrder(): void {
         this.sortingOrder = this.sortingOrder === this.sortOrder.ascending ? this.sortOrder.descending : this.sortOrder.ascending;
         this.sortPlayers();

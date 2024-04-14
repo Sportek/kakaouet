@@ -1,14 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
-import { ActualQuestion, ChoiceData, InteractionStatus, PlayerClient } from '@common/game-types';
+import { ActualQuestion, ChoiceData, InteractionStatus, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
 import { GameRole, QuestionType } from '@common/types';
 import { BehaviorSubject } from 'rxjs';
 import { OrganisatorComponent } from './organisator.component';
 
 describe('OrganisatorComponent', () => {
+    const mockedHistogram = {
+        hasModified: 10,
+        hasNotModified: 5,
+    };
+
+    const mockedPlayerRatings = new Map<string, number>([
+        ['Alice', 95],
+        ['Bob', 88],
+    ]);
+
     const mockedCurrentPlayer: PlayerClient = {
         name: 'obama',
         role: GameRole.Player,
@@ -88,6 +99,8 @@ describe('OrganisatorComponent', () => {
                 actualQuestion: mockedActualQuestion,
                 players: mockedPlayers,
                 currentPlayer: mockedCurrentPlayer,
+                histogram: mockedHistogram,
+                playerRatings: mockedPlayerRatings,
             },
         );
 
@@ -146,6 +159,20 @@ describe('OrganisatorComponent', () => {
         });
     });
 
+    describe('getHistogram', () => {
+        it('should return histogram data from organisatorService', () => {
+            const histogram = component.getHistogram();
+            expect(histogram).toEqual(mockedHistogram);
+        });
+    });
+
+    describe('getPlayerRatings', () => {
+        it('should return player ratings from organisatorService', () => {
+            const playerRatings = component.getPlayerRatings();
+            expect(playerRatings).toEqual(mockedPlayerRatings);
+        });
+    });
+
     describe('filterPlayers', () => {
         it('should return filtered players from organisatorService', () => {
             const expectedPlayers: PlayerClient[] = [
@@ -167,6 +194,55 @@ describe('OrganisatorComponent', () => {
             organisatorServiceSpy.filterPlayers.and.returnValue(expectedPlayers);
             const result = component.filterPlayers();
             expect(result).toEqual(expectedPlayers);
+        });
+    });
+
+    describe('sortPlayers', () => {
+        it('should call sortPlayers on PlayerService and update players', () => {
+            playerServiceSpy.sortPlayers.and.callFake((players, criterion, order) => {
+                return players.sort((a: any, b: any) => {
+                    switch (criterion) {
+                        case SortingCriteria.score: {
+                            return order === SortOrder.ascending ? a.score - b.score : b.score - a.score;
+                        }
+                        case SortingCriteria.name: {
+                            return order === SortOrder.ascending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+                        }
+                        case SortingCriteria.status: {
+                            return order === SortOrder.ascending ? a.isExcluded - b.isExcluded : b.isExcluded - a.isExcluded;
+                        }
+                    }
+                    return 0;
+                });
+            });
+
+            component.players = [...mockedPlayers];
+            component.selectedCriterion = SortingCriteria.score;
+            component.sortingOrder = SortOrder.ascending;
+
+            component.sortPlayers();
+
+            expect(playerServiceSpy.sortPlayers).toHaveBeenCalledWith(component.players, SortingCriteria.score, SortOrder.ascending);
+
+            expect(component.players).toEqual([mockedPlayers[0], mockedPlayers[1]]);
+        });
+    });
+
+    describe('toggleSortOrder', () => {
+        it('should toggle sortingOrder and call sortPlayers', () => {
+            component.sortingOrder = SortOrder.ascending;
+            const sortPlayersSpy = spyOn(component, 'sortPlayers');
+
+            // First toggle: should change to descending
+            component.toggleSortOrder();
+            expect(component.sortingOrder).toEqual(SortOrder.descending);
+            expect(sortPlayersSpy).toHaveBeenCalled();
+            sortPlayersSpy.calls.reset();
+
+            // Second toggle: should change back to ascending
+            component.toggleSortOrder();
+            expect(component.sortingOrder).toEqual(SortOrder.ascending);
+            expect(sortPlayersSpy).toHaveBeenCalled();
         });
     });
 });
