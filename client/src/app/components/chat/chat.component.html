@@ -6,7 +6,7 @@
     <div #chat class="chat-messages">
         <div *ngFor="let message of messages; let i = index" [id]="'index-' + i" class="message-container">
             <div class="data">
-                <div class="username">
+                <div *ngIf="message.name !== ''" class="username">
                     {{ message.name }}
                 </div>
                 <div class="date">
