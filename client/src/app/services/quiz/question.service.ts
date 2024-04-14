@@ -57,9 +57,9 @@ export class QuestionService {
         return this.id$;
     }
 
-    deleteQuestionById(id: string): Observable<void> {
+    deleteQuestionById(id: string): void {
         const url = `${this.baseURL}/${id}`;
-        return this.http.delete<void>(url);
+        this.http.delete<void>(url).subscribe({});
     }
 
     removeQuestion(question: Question, quiz: Quiz) {

@@ -53,6 +53,8 @@ export class BankQuestionListComponent implements OnInit, OnDestroy {
         this.confirmationService.confirm('Êtes-vous certain de vouloir supprimer cette question?', () => {
             // eslint-disable-next-line no-underscore-dangle -- accepté le prof, car mongodb utilise _id
             this.questionList = this.questionList.filter((quest) => question._id !== quest._id);
+            // eslint-disable-next-line no-underscore-dangle
+            this.questionService.deleteQuestionById(question._id);
         });
     }
 
