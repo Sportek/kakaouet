@@ -65,13 +65,13 @@ export enum InteractionStatus {
     abandoned = 'abandoned',
 }
 
-export enum SortingCriteria{
-    name = 'name', 
+export enum SortingCriteria {
+    name = 'name',
     score = 'score',
     status = 'status',
 }
 
-export enum SortOrder{
+export enum SortOrder {
     ascending = 'asc',
     descending = 'desc',
 }

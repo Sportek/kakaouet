@@ -39,10 +39,11 @@ export class GameService {
     isLocked: BehaviorSubject<boolean>;
     answers: BehaviorSubject<GameEventsData.PlayerSendResults>;
     correctAnswers: BehaviorSubject<Choice[]>;
-    startTime: BehaviorSubject<Date | null> = new BehaviorSubject<Date | null>(null);
+    startTime: BehaviorSubject<Date | null>;
 
-    recentInteractions: Map<string, number> = new Map();
-    gameEventsListener: GameEventsListener = GameEventsListener.getInstance();
+    recentInteractions: Map<string, number>;
+    gameEventsListener: GameEventsListener;
+    isAlreadyAccelerated: boolean;
 
     // eslint-disable-next-line max-params -- On a besoin de tous ces paramètres
     constructor(
@@ -71,6 +72,10 @@ export class GameService {
         this.answers = new BehaviorSubject<GameEventsData.PlayerSendResults>({ choices: [], scores: [], questions: [] });
         this.correctAnswers = new BehaviorSubject<Choice[]>([]);
         this.chatService.initialize();
+        this.startTime = new BehaviorSubject<Date | null>(null);
+        this.recentInteractions = new Map<string, number>();
+        this.gameEventsListener = GameEventsListener.getInstance();
+        this.isAlreadyAccelerated = false;
     }
 
     startGame() {
@@ -117,9 +122,11 @@ export class GameService {
     }
 
     speedUpTimer() {
+        if (this.isAlreadyAccelerated) return this.notificationService.error('Vous avez déjà accéléré le timer');
         if (this.getRequiredTime() > this.cooldown.getValue())
             return this.notificationService.error('Le temps requis minimum pour accélérer le timer est dépassé');
         this.socketService.send(GameEvents.SpeedUpTimer);
+        this.isAlreadyAccelerated = true;
     }
 
     giveUp() {

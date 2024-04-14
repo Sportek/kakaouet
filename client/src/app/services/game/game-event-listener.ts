@@ -96,6 +96,7 @@ export class GameEventsListener {
     private gameChangeStateListener(): void {
         this.gameService.socketService.listen(GameEvents.GameStateChanged, (data: GameEventsData.GameStateChanged) => {
             this.gameService.gameState.next(data.gameState);
+            this.gameService.isAlreadyAccelerated = false;
             switch (data.gameState) {
                 case GameState.PlayersAnswerQuestion:
                     this.handlePlayersAnswerQuestion();
@@ -153,7 +154,14 @@ export class GameEventsListener {
 
     private receiveUpdateScoreListener() {
         this.gameService.socketService.listen(GameEvents.UpdateScore, (data: GameEventsData.UpdateScore) => {
-            if (data.hasAnsweredFirst) this.gameService.notificationService.info('Vous avez répondu en premier !');
+            const pointsEarned = data.score - this.gameService.client.getValue().score;
+            if (this.gameService.client.getValue().role === GameRole.Player) {
+                if (pointsEarned > 0) {
+                    if (data.hasAnsweredFirst)
+                        this.gameService.notificationService.info(`Vous avez répondu en premier et gagnez ${pointsEarned} points !`);
+                    else this.gameService.notificationService.info(`Vous avez gagné ${pointsEarned} points !`);
+                }
+            }
             this.gameService.client.next({ ...this.gameService.client.getValue(), score: data.score });
         });
     }
