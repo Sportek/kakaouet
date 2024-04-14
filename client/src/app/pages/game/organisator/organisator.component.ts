@@ -25,7 +25,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
 
     constructor(
-        private gameService: GameService, // private router: Router,
+        private gameService: GameService,
         private playerService: PlayerService,
         private organisatorService: OrganisatorService,
     ) {
@@ -33,6 +33,31 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.timerIsRunning = true;
         this.subscriptions = [];
         this.currentRating = '';
+    }
+
+    ngOnInit(): void {
+        this.subscriptions.push(
+            this.gameService.actualQuestion.subscribe((actualQuestion) => {
+                this.organisatorService.setActualQuestion(actualQuestion);
+                this.organisatorService.playerRatings = new Map();
+            }),
+        );
+
+        this.subscriptions.push(
+            this.gameService.cooldown.subscribe((cooldown) => {
+                this.cooldown = cooldown;
+                this.organisatorService.calculateHistogram(cooldown);
+            }),
+        );
+
+        this.subscriptions.push(
+            this.gameService.players.subscribe((players) => {
+                this.players = players;
+                this.organisatorService.setPlayers(players);
+                this.sortPlayers();
+                this.calculateChoices();
+            }),
+        );
     }
 
     calculatePercentage(amount: number): number {
@@ -92,31 +117,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     nextQuestion(): void {
         this.gameService.nextQuestion();
-    }
-
-    ngOnInit(): void {
-        this.subscriptions.push(
-            this.gameService.actualQuestion.subscribe((actualQuestion) => {
-                this.organisatorService.setActualQuestion(actualQuestion);
-                this.organisatorService.playerRatings = new Map();
-            }),
-        );
-
-        this.subscriptions.push(
-            this.gameService.cooldown.subscribe((cooldown) => {
-                this.cooldown = cooldown;
-                this.organisatorService.calculateHistogram(cooldown);
-            }),
-        );
-
-        this.subscriptions.push(
-            this.gameService.players.subscribe((players) => {
-                this.players = players;
-                this.organisatorService.setPlayers(players);
-                this.sortPlayers();
-                this.calculateChoices();
-            }),
-        );
     }
 
     toggleMutePlayer(player: PlayerClient) {

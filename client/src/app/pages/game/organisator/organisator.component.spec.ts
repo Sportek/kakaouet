@@ -1,113 +1,101 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-/* import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { ChatComponent } from '@app/components/chat/chat.component';
-import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
-import { HeaderComponent } from '@app/components/header/header.component';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { GameService } from '@app/services/game/game.service';
-import { QuestionType } from '@common/types';
-import { of } from 'rxjs';
+import { OrganisatorService } from '@app/services/organisator/organisator.service';
+import { PlayerService } from '@app/services/player/player.service';
+import { ActualQuestion, InteractionStatus, PlayerClient } from '@common/game-types';
+import { GameRole, QuestionType } from '@common/types';
+import { BehaviorSubject } from 'rxjs';
 import { OrganisatorComponent } from './organisator.component';
 
-class MockGameService {
-    actualQuestion = of({
-        question: {
-            _id: 'question1',
-            text: 'Sample Question',
-            type: QuestionType.QCM,
-            choices: [
-                { _id: 'choice1', text: 'Option 1', isCorrect: true },
-                { _id: 'choice2', text: 'Option 2', isCorrect: false },
-            ],
-        },
-        answer: [],
-    });
-    cooldown = of(10);
-    players = of([{ id: 'player1', name: 'Player One', answers: { hasConfirmed: true, answer: [0] } }]);
-    filterPlayers = jasmine
-        .createSpy('filterPlayers')
-        .and.returnValue([{ id: 'player1', name: 'Player One', answers: { hasConfirmed: true, answer: [0] } }]);
-    toggleTimer = jasmine.createSpy('toggleTimer');
-    speedUpTimer = jasmine.createSpy('speedUpTimer');
-    nextQuestion = jasmine.createSpy('nextQuestion');
-    isLastQuestion = jasmine.createSpy('isLastQuestion').and.returnValue(false);
-}
-
 describe('OrganisatorComponent', () => {
+    const mockedPlayers: PlayerClient[] = [
+        {
+            name: 'Alice',
+            role: GameRole.Player,
+            score: 10,
+            isExcluded: false,
+            hasGiveUp: false,
+            answers: {
+                answer: [0, 1],
+                hasInterracted: true,
+                hasConfirmed: true,
+            },
+            isMuted: false,
+            interactionStatus: InteractionStatus.interacted,
+        },
+        {
+            name: 'Bob',
+            role: GameRole.Player,
+            score: 15,
+            isExcluded: true,
+            hasGiveUp: true,
+            answers: {
+                answer: [0, 1],
+                hasInterracted: true,
+                hasConfirmed: true,
+            },
+            isMuted: true,
+            interactionStatus: InteractionStatus.interacted,
+        },
+    ];
+    const mockedActualQuestion: ActualQuestion = {
+        question: {
+            _id: 'newID',
+            type: QuestionType.QCM,
+            text: 'What is 2 + 1 ?',
+            points: 5,
+            createdAt: new Date(),
+            lastModification: new Date(),
+            choices: [],
+        },
+        totalQuestion: 5,
+        actualIndex: 1,
+    };
+    let fakeCooldown: 10;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let playerServiceSpy: jasmine.SpyObj<PlayerService>;
+    let organisatorServiceSpy: jasmine.SpyObj<OrganisatorService>;
     let component: OrganisatorComponent;
     let fixture: ComponentFixture<OrganisatorComponent>;
-    let gameService: GameService;
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [OrganisatorComponent, ChatComponent, GlobalLayoutComponent, HeaderComponent],
-            imports: [HttpClientTestingModule, MatTooltipModule, MatIconModule, MatSnackBarModule, FormsModule],
+    beforeEach(waitForAsync(() => {
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['filterPlayers', 'toggleMutePlayer', 'isLastQuestion']);
+        playerServiceSpy = jasmine.createSpyObj('PlayerService', ['sortPlayers']);
+        organisatorServiceSpy = jasmine.createSpyObj('OrganisatorService', [
+            'filterPlayers',
+            'rateAnswerQRL',
+            'sendRating',
+            'calculateChoices',
+            'toggleTimer',
+            'speedUpTimer',
+            'nextQuestion',
+        ]);
+
+        gameServiceSpy.filterPlayers.and.returnValue(mockedPlayers);
+
+        // Setup return values for observables
+        gameServiceSpy.actualQuestion = new BehaviorSubject<ActualQuestion | null>(mockedActualQuestion);
+        gameServiceSpy.cooldown = new BehaviorSubject<number>(fakeCooldown);
+        gameServiceSpy.players = new BehaviorSubject<PlayerClient[]>(mockedPlayers);
+
+        TestBed.configureTestingModule({
+            declarations: [OrganisatorComponent],
             providers: [
-                {
-                    provide: GameService,
-                    useClass: MockGameService,
-                },
+                { provide: GameService, useValue: gameServiceSpy },
+                { provide: PlayerService, useValue: playerServiceSpy },
+                { provide: OrganisatorService, useValue: organisatorServiceSpy },
             ],
         }).compileComponents();
+    }));
 
+    beforeEach(() => {
         fixture = TestBed.createComponent(OrganisatorComponent);
         component = fixture.componentInstance;
-        gameService = TestBed.inject(GameService);
         fixture.detectChanges();
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-
-    it('should initialize with subscriptions to gameService properties', () => {
-        expect(component.cooldown).toBe(10);
-        expect(component.actualQuestion).toBeTruthy();
-        expect(component.players.length).toBeGreaterThan(0);
-    });
-
-    it('calculatePercentage should return correct percentage', () => {
-        component.choices = [
-            { text: 'Option 1', amount: 2, isCorrect: true },
-            { text: 'Option 2', amount: 3, isCorrect: false },
-        ];
-        const percentage = component.calculatePercentage(component.choices[0].amount);
-        expect(percentage).toBeCloseTo(0.4, 1);
-    });
-
-    it('getAnswerAmount should return correct amount of players who have confirmed', () => {
-        expect(component.getAnswerAmount()).toBe(1);
-    });
-
-    it('calculateChoices should correctly calculate choices for QCM question', () => {
-        component.ngOnInit();
-        expect(component.choices.length).toBe(2);
-        expect(component.choices[0].amount).toBe(1);
-    });
-
-    it('toggleTimer should toggle the timer state and call gameService', () => {
-        const initialTimerState = component.timerIsRunning;
-        component.toggleTimer();
-        expect(component.timerIsRunning).not.toBe(initialTimerState);
-        expect(gameService.toggleTimer).toHaveBeenCalled();
-    });
-
-    it('speedUpTimer should call gameService.speedUpTimer', () => {
-        component.speedUpTimer();
-        expect(gameService.speedUpTimer).toHaveBeenCalled();
-    });
-
-    it('nextQuestion should call gameService.nextQuestion', () => {
-        component.nextQuestion();
-        expect(gameService.nextQuestion).toHaveBeenCalled();
-    });
-
-    it('isLastQuestion should return correct value', () => {
-        expect(component.isLastQuestion()).toBeFalse();
-    });
 });
-*/
