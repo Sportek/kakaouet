@@ -623,7 +623,7 @@ describe('GameSession', () => {
             gameSession.filterNullAnswers();
             expect(confirmAnswerSpy).toHaveBeenCalledTimes(1);
             expect(confirmAnswerSpy2).not.toHaveBeenCalled();
-            expect(roomBroadcastSpy).toHaveBeenCalledWith(GameEvents.PlayerConfirmAnswers, {}, { name: playerMock.name });
+            expect(roomBroadcastSpy).toHaveBeenCalledWith(GameEvents.PlayerNotInteractQrl, {}, { name: playerMock.name });
         });
     });
 
