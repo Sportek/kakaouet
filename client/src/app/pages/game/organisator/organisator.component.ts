@@ -78,48 +78,59 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.organisatorService.filterPlayers();
     }
 
+    // done
     getPlayers(): string[] {
         return this.getPlayerArray().map((player) => player.name);
     }
 
+    // done
     isCorrectingAnswers(): boolean {
         return this.gameService.gameState.getValue() === GameState.OrganisatorCorrectingAnswers;
     }
 
+    // done
     rateAnswerQRL(playerName: string): void {
         this.organisatorService.rateAnswerQRL(playerName, this.currentRating);
     }
 
+    // done
     sendRating(playerName: string) {
         this.organisatorService.sendRating(playerName);
         this.currentRating = '';
     }
 
+    // done
     getRatingForPlayer(playerName: string): number | undefined {
         return this.getPlayerRatings().get(playerName);
     }
 
+    // done
     formatColumn(column: ChoiceData): string {
         return parseFloat(column.text).toLocaleString('en', { style: 'percent' });
     }
 
+    // done
     calculateChoices(): void {
         this.organisatorService.calculateChoices();
     }
 
+    // done
     toggleTimer(): void {
         this.gameService.toggleTimer();
         this.timerIsRunning = !this.timerIsRunning;
     }
 
+    // done
     speedUpTimer(): void {
         this.gameService.speedUpTimer();
     }
 
+    // done
     nextQuestion(): void {
         this.gameService.nextQuestion();
     }
 
+    // done
     toggleMutePlayer(player: PlayerClient) {
         this.gameService.toggleMutePlayer(player);
     }
@@ -128,18 +139,22 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
 
+    // done
     isLastQuestion(): boolean {
         return this.gameService.isLastQuestion();
     }
 
+    // done
     isQRL(): boolean {
         return this.gameService.actualQuestion.getValue()?.question.type === QuestionType.QRL;
     }
 
+    // done
     isDisplayingResults(): boolean {
         return this.gameService.gameState.getValue() === GameState.DisplayQuestionResults;
     }
 
+    // TO FINISH------------------------------------------------>
     isAnsweringQRL(): boolean {
         return (
             this.gameService.gameState.getValue() === GameState.PlayersAnswerQuestion && this.getActualQuestion()?.question.type === QuestionType.QRL

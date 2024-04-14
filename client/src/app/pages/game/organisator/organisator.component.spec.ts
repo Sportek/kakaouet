@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
@@ -5,7 +6,7 @@ import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { ActualQuestion, ChoiceData, InteractionStatus, PlayerClient, SortOrder, SortingCriteria } from '@common/game-types';
-import { GameRole, QuestionType } from '@common/types';
+import { GameRole, GameState, QuestionType } from '@common/types';
 import { BehaviorSubject } from 'rxjs';
 import { OrganisatorComponent } from './organisator.component';
 
@@ -19,6 +20,21 @@ describe('OrganisatorComponent', () => {
         ['Alice', 95],
         ['Bob', 88],
     ]);
+
+    const mockedPlayer: PlayerClient = {
+        name: 'chirac',
+        role: GameRole.Player,
+        score: 15,
+        isExcluded: false,
+        hasGiveUp: false,
+        answers: {
+            answer: [0, 1],
+            hasInterracted: true,
+            hasConfirmed: true,
+        },
+        isMuted: false,
+        interactionStatus: InteractionStatus.interacted,
+    };
 
     const mockedCurrentPlayer: PlayerClient = {
         name: 'obama',
@@ -89,7 +105,15 @@ describe('OrganisatorComponent', () => {
     let fixture: ComponentFixture<OrganisatorComponent>;
 
     beforeEach(waitForAsync(() => {
-        gameServiceSpy = jasmine.createSpyObj('GameService', ['filterPlayers', 'toggleMutePlayer', 'isLastQuestion']);
+        gameServiceSpy = jasmine.createSpyObj('GameService', [
+            'filterPlayers',
+            'toggleMutePlayer',
+            'isLastQuestion',
+            'speedUpTimer',
+            'toggleTimer',
+            'nextQuestion',
+            'toggleMutePlayer',
+        ]);
         playerServiceSpy = jasmine.createSpyObj('PlayerService', ['sortPlayers']);
         organisatorServiceSpy = jasmine.createSpyObj(
             'OrganisatorService',
@@ -233,16 +257,226 @@ describe('OrganisatorComponent', () => {
             component.sortingOrder = SortOrder.ascending;
             const sortPlayersSpy = spyOn(component, 'sortPlayers');
 
-            // First toggle: should change to descending
             component.toggleSortOrder();
             expect(component.sortingOrder).toEqual(SortOrder.descending);
             expect(sortPlayersSpy).toHaveBeenCalled();
             sortPlayersSpy.calls.reset();
 
-            // Second toggle: should change back to ascending
             component.toggleSortOrder();
             expect(component.sortingOrder).toEqual(SortOrder.ascending);
             expect(sortPlayersSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('isAnsweringQRL', () => {
+        beforeEach(() => {
+            gameServiceSpy.gameState = new BehaviorSubject<GameState>(GameState.PlayersAnswerQuestion); // Set default state
+        });
+
+        /* it('should return true when the game state is PlayersAnswerQuestion and the question type is QRL', () => {
+            gameServiceSpy.gameState.next(GameState.PlayersAnswerQuestion);
+            expect(component.isAnsweringQRL()).toBeTrue();
+        });*/
+
+        it('should return false when the game state is not PlayersAnswerQuestion', () => {
+            gameServiceSpy.gameState.next(GameState.OrganisatorCorrectingAnswers);
+            expect(component.isAnsweringQRL()).toBeFalse();
+        });
+
+        /* it('should return false when the question type is not QRL', () => {
+            gameServiceSpy.gameState.next(GameState.PlayersAnswerQuestion);
+            expect(component.isAnsweringQRL()).toBeFalse();
+        });*/
+    });
+
+    describe('isDisplayingResults', () => {
+        beforeEach(() => {
+            gameServiceSpy.gameState = new BehaviorSubject<GameState>(GameState.PlayersAnswerQuestion); // Set default state
+        });
+        it('should return true when the game state is DisplayQuestionResults', () => {
+            gameServiceSpy.gameState.next(GameState.DisplayQuestionResults);
+            expect(component.isDisplayingResults()).toBeTrue();
+        });
+
+        it('should return false when the game state is not DisplayQuestionResults', () => {
+            gameServiceSpy.gameState.next(GameState.PlayersAnswerQuestion);
+            expect(component.isDisplayingResults()).toBeFalse();
+        });
+    });
+
+    describe('isCorrectingAnswers', () => {
+        beforeEach(() => {
+            gameServiceSpy.gameState = new BehaviorSubject<GameState>(GameState.PlayersAnswerQuestion); // Set default state
+        });
+        it('should return true when the game state is OrganisatorCorrectingAnswers', () => {
+            gameServiceSpy.gameState.next(GameState.OrganisatorCorrectingAnswers);
+            expect(component.isCorrectingAnswers()).toBeTrue();
+        });
+
+        it('should return false when the game state is not OrganisatorCorrectingAnswers', () => {
+            gameServiceSpy.gameState.next(GameState.PlayersAnswerQuestion);
+            expect(component.isCorrectingAnswers()).toBeFalse();
+        });
+    });
+
+    describe('isQRL', () => {
+        it('should return true when the question type is QRL', () => {
+            const qrlQuestion = new BehaviorSubject<ActualQuestion | null>({
+                question: {
+                    _id: 'q1',
+                    type: QuestionType.QRL,
+                    text: 'Example text',
+                    points: 5,
+                    createdAt: new Date(),
+                    lastModification: new Date(),
+                },
+                totalQuestion: 10,
+                actualIndex: 1,
+            });
+            gameServiceSpy.actualQuestion = qrlQuestion;
+            expect(component.isQRL()).toBeTrue();
+        });
+
+        it('should return false when the question type is not QRL', () => {
+            const qcmQuestion = new BehaviorSubject<ActualQuestion | null>({
+                question: {
+                    _id: 'q2',
+                    type: QuestionType.QCM,
+                    text: 'Example text',
+                    points: 5,
+                    createdAt: new Date(),
+                    lastModification: new Date(),
+                    choices: [],
+                },
+                totalQuestion: 10,
+                actualIndex: 1,
+            });
+            gameServiceSpy.actualQuestion = qcmQuestion;
+            expect(component.isQRL()).toBeFalse();
+        });
+    });
+
+    describe('isLastQuestion', () => {
+        it('should return true when the game service indicates it is the last question', () => {
+            gameServiceSpy.isLastQuestion.and.returnValue(true);
+            expect(component.isLastQuestion()).toBeTrue();
+        });
+
+        it('should return false when the game service indicates it is not the last question', () => {
+            gameServiceSpy.isLastQuestion.and.returnValue(false);
+            expect(component.isLastQuestion()).toBeFalse();
+        });
+    });
+
+    describe('speedUpTimer', () => {
+        it('should call speedUpTimer on GameService', () => {
+            component.speedUpTimer();
+            expect(gameServiceSpy.speedUpTimer).toHaveBeenCalled();
+        });
+    });
+
+    describe('calculateChoices', () => {
+        it('should call calculateChoices on OrganisatorService', () => {
+            component.calculateChoices();
+            expect(organisatorServiceSpy.calculateChoices).toHaveBeenCalled();
+        });
+    });
+
+    describe('toggleTimer', () => {
+        it('should toggle timerIsRunning and call toggleTimer on GameService', () => {
+            component.timerIsRunning = true;
+            component.toggleTimer();
+            expect(gameServiceSpy.toggleTimer).toHaveBeenCalled();
+            expect(component.timerIsRunning).toBeFalse();
+
+            component.toggleTimer();
+            expect(component.timerIsRunning).toBeTrue();
+        });
+    });
+
+    describe('nextQuestion', () => {
+        it('should call nextQuestion on gameService', () => {
+            component.nextQuestion();
+            expect(gameServiceSpy.nextQuestion).toHaveBeenCalled();
+        });
+    });
+
+    describe('toggleMutePlayer', () => {
+        it('should call toggleMutePlayer on GameService with the correct player', () => {
+            component.toggleMutePlayer(mockedPlayer);
+            expect(gameServiceSpy.toggleMutePlayer).toHaveBeenCalledWith(mockedPlayer);
+        });
+    });
+
+    describe('getPlayers', () => {
+        it('should return an array of player names', () => {
+            spyOn(component, 'getPlayerArray').and.returnValue(mockedPlayers);
+            const playerNames = component.getPlayers();
+            expect(playerNames).toEqual(['Alice', 'Bob']);
+        });
+    });
+
+    describe('rateAnswerQRL', () => {
+        it('should call rateAnswerQRL on OrganisatorService with the correct parameters', () => {
+            component.currentRating = 'Excellent';
+            const playerName = 'Alice';
+
+            component.rateAnswerQRL(playerName);
+            expect(organisatorServiceSpy.rateAnswerQRL).toHaveBeenCalledWith(playerName, 'Excellent');
+        });
+    });
+
+    describe('sendRating', () => {
+        it('should call sendRating on OrganisatorService with the correct player name and reset currentRating', () => {
+            const playerName = 'Alice';
+            component.currentRating = 'Good';
+            component.sendRating(playerName);
+
+            expect(organisatorServiceSpy.sendRating).toHaveBeenCalledWith(playerName);
+            expect(component.currentRating).toBe('');
+        });
+    });
+
+    describe('getRatingForPlayer', () => {
+        it('should return the correct rating for a given player', () => {
+            const mockRatings = new Map<string, number>([
+                ['Alice', 95],
+                ['Bob', 88],
+            ]);
+            spyOn(component, 'getPlayerRatings').and.returnValue(mockRatings);
+            const rating = component.getRatingForPlayer('Alice');
+            expect(rating).toEqual(95);
+        });
+
+        it('should return undefined if the player is not found in the ratings map', () => {
+            const rating = component.getRatingForPlayer('Charlie');
+            expect(rating).toBeUndefined();
+        });
+    });
+
+    describe('formatColumn', () => {
+        it('should format numeric text as a percentage string', () => {
+            const column: ChoiceData = { text: '0.1234', amount: 123, isCorrect: true };
+            const formattedText = component.formatColumn(column);
+            expect(formattedText).toEqual('12%');
+        });
+
+        it('should handle large numbers correctly', () => {
+            const column: ChoiceData = { text: '1.0', amount: 1000, isCorrect: false };
+            const formattedText = component.formatColumn(column);
+            expect(formattedText).toEqual('100%');
+        });
+
+        it('should handle very small numbers', () => {
+            const column: ChoiceData = { text: '0.001', amount: 1, isCorrect: true };
+            const formattedText = component.formatColumn(column);
+            expect(formattedText).toEqual('0%');
+        });
+
+        it('should return "NaN%" for non-numeric inputs', () => {
+            const column: ChoiceData = { text: 'abc', amount: 0, isCorrect: false };
+            const formattedText = component.formatColumn(column);
+            expect(formattedText).toEqual('NaN%');
         });
     });
 });
