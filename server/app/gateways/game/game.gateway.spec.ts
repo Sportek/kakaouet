@@ -844,6 +844,6 @@ describe('GameGateway', () => {
         const result = gateway.handleMessageSent({ content: 'Allo' }, mockClient as Socket);
 
         expect(mockSession.broadcastMessage).not.toHaveBeenCalled();
-        expect(result).toEqual({ isSuccess: true, message: 'Non-authorisé' });
+        expect(result).toEqual({ isSuccess: false, message: 'Non-authorisé' });
     });
 });

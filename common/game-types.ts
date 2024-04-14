@@ -38,7 +38,8 @@ export enum GameEvents {
     SendCorrectAnswers = 'playerSendCorrectAnswers', // Event sent to all players containing the correct answers
     PlayerMuted = 'playerMuted',
     GameSpeedUpTimer = 'gameSpeedUpTimer', // Event sent to all players when the timer is speed up
-    GameRoleChange = 'gameRoleChange', // Event sent to all players when the game is started with organisator role change
+    MutedNotification = 'mutedNotification', // Event sent to player that is currently muted
+    GameRoleChange = 'gameRoleChange', // Event sent to all players when the game is started with 
 }
 
 // Différents types définis
