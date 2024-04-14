@@ -2,6 +2,7 @@ import { HttpClient, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BASE_URL } from '@app/constants';
+import { NotificationService } from '@app/services/notification/notification.service';
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 
 export enum AdminLoginState {
@@ -17,6 +18,7 @@ export class UserService {
     constructor(
         private http: HttpClient,
         private router: Router,
+        private notificationService: NotificationService,
     ) {
         this.checkLoginStatus();
         this.loggedState.subscribe((state) => {
@@ -45,6 +47,9 @@ export class UserService {
                 tap((response: HttpResponse<null>) => {
                     const isLogin = response.body ? response.body['success'] : false;
                     this.loggedState.next(isLogin ? AdminLoginState.LoggedIn : AdminLoginState.Failed);
+                    if (!isLogin) {
+                        this.notificationService.error('Mot de passe incorrect.');
+                    }
                 }),
             )
             .subscribe();
