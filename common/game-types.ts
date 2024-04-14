@@ -39,6 +39,7 @@ export enum GameEvents {
     PlayerMuted = 'playerMuted',
     GameSpeedUpTimer = 'gameSpeedUpTimer', // Event sent to all players when the timer is speed up
     MutedNotification = 'mutedNotification', // Event sent to player that is currently muted
+    GameRoleChange = 'gameRoleChange', // Event sent to all players when the game is started with 
 }
 
 // Différents types définis
@@ -72,10 +73,7 @@ export enum SortingCriteria {
     status = 'status',
 }
 
-export enum SortOrder {
-    ascending = 'asc',
-    descending = 'desc',
-}
+
 
 export interface Client {
     name: string;

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
@@ -29,6 +30,7 @@ describe('JoinComponent', () => {
                 MatSelectModule,
                 BrowserAnimationsModule,
                 HttpClientTestingModule,
+                MatSnackBarModule,
             ],
             providers: [{ provide: JoinService, useValue: joinServiceMock }],
         });

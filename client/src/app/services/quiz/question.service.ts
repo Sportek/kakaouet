@@ -109,11 +109,11 @@ export class QuestionService {
             const questionExistsInBank = questionsFromBank.some((existingQuestion: Question) => existingQuestion.text === partialQuestionNoId.text);
             if (!questionExistsInBank) {
                 this.createQuestion(partialQuestionNoId as Question).subscribe({});
-                this.dialog.open('La question a bien était importé à la banque de question', 'Fermer', {
+                this.dialog.open('La question a bien été exporté à la banque de question', 'Fermer', {
                     duration: 3000,
                 });
             } else {
-                this.dialog.open('La question existe deja dans la banque de question', 'Fermer', {
+                this.dialog.open('La question existe déjà dans la banque de question', 'Fermer', {
                     duration: 3000,
                 });
             }

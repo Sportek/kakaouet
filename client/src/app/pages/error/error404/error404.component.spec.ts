@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BackgroundComponent } from '@app/components/background/background.component';
 import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -13,7 +14,7 @@ describe('Error404Component', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [Error404Component, BackgroundComponent, GlobalLayoutComponent, HeaderComponent],
-            imports: [HttpClientTestingModule],
+            imports: [HttpClientTestingModule, MatSnackBarModule],
         });
         fixture = TestBed.createComponent(Error404Component);
         component = fixture.componentInstance;
