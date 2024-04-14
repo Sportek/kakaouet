@@ -138,8 +138,16 @@ export class Room {
     }
 
     private shouldDeleteGame(): void {
+        if (this.game.type === GameType.Random) {
+            const noPlayersOutsideWaiting = !(this.getPlayingPlayers().length > 0) && this.game.gameState !== GameState.WaitingPlayers;
+            const organizerLeavesDuringWaiting = !this.getOrganisator() && this.game.gameState === GameState.WaitingPlayers;
+            if (noPlayersOutsideWaiting || organizerLeavesDuringWaiting) {
+                this.deleteRoom();
+                return;
+            }
+        }
         const noPlayers = !(this.getPlayingPlayers().length > 0) && this.game.gameState !== GameState.WaitingPlayers;
-        const noOrganisator = !this.getOrganisator() && (this.game.type === GameType.Default || this.game.type === GameType.Random);
+        const noOrganisator = !this.getOrganisator() && this.game.type === GameType.Default;
         if (noPlayers || noOrganisator) this.deleteRoom();
     }
 }
