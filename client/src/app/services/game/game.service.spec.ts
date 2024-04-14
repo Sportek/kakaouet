@@ -696,7 +696,7 @@ describe('GameService', () => {
         // @ts-ignore
         service.gameEventsListener.receiveUpdateScoreListener();
 
-        expect(mockNotificationService.info).toHaveBeenCalledWith('Vous avez répondu en premier !');
+        expect(mockNotificationService.info).toHaveBeenCalledWith('Vous avez répondu en premier et gagnez 12 points !');
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(service.client.getValue().score).toEqual(12);
     });
