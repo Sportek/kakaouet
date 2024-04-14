@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { BASE_URL } from '@app/constants';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { GameRecords, Ordering, OrderingField } from '@common/types';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
@@ -18,6 +18,7 @@ export class HistoryService {
     constructor(
         private http: HttpClient,
         public dialog: MatDialog,
+        private confirmation: ConfirmationService,
     ) {}
 
     addRecord(record: GameRecords) {
@@ -44,20 +45,10 @@ export class HistoryService {
     }
 
     confirmClearHistory(): void {
-        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            width: '350px',
-            data: {
-                title: 'Confirmation de la suppression',
-                message: 'Êtes-vous sûr de vouloir supprimer votre historique?',
-            },
-        });
-
-        dialogRef.afterClosed().subscribe((confirm) => {
-            if (confirm) {
-                this.clearHistory().subscribe(() => {
-                    this.history$.next([]);
-                });
-            }
+        this.confirmation.confirm("Êtes-vous sûr de vouloir supprimer l'historique?", () => {
+            this.clearHistory().subscribe(() => {
+                this.history$.next([]);
+            });
         });
     }
 

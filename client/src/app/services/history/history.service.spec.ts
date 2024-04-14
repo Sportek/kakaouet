@@ -71,21 +71,9 @@ describe('HistoryService', () => {
     });
 
     it('confirmClearHistory should clear history on user confirmation', () => {
-        const dialogRefStub: Partial<MatDialogRef<typeof ConfirmationDialogComponent, unknown>> = {
-            afterClosed: () => of(true),
-        };
-        spyOn(dialog, 'open').and.returnValue(dialogRefStub as MatDialogRef<typeof ConfirmationDialogComponent, unknown>);
+        spyOn(dialog, 'open').and.returnValue({ afterClosed: () => of(true) } as MatDialogRef<ConfirmationDialogComponent>);
         spyOn(service, 'clearHistory').and.returnValue(of([]));
-
         service.confirmClearHistory();
-
-        expect(dialog.open).toHaveBeenCalledWith(ConfirmationDialogComponent, {
-            width: '350px',
-            data: {
-                title: 'Confirmation de la suppression',
-                message: 'Êtes-vous sûr de vouloir supprimer votre historique?',
-            },
-        });
         expect(service.clearHistory).toHaveBeenCalled();
     });
 
