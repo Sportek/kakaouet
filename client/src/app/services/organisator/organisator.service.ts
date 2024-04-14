@@ -46,7 +46,7 @@ export class OrganisatorService {
     }
 
     filterPlayers(): PlayerClient[] {
-        return this.gameService.filterPlayers().filter((player) => !player.hasGiveUp);
+        return this.gameService.filterPlayers().filter((player) => !player.isExcluded);
     }
 
     calculateChoices() {
