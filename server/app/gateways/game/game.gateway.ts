@@ -93,7 +93,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.CreateGame)
     async handleCreateGame(@MessageBody() data: GameEventsData.CreateGame, @ConnectedSocket() client: Socket): Promise<SocketResponse> {
         const gameSession = await this.gameService.createGameSession(data.code, this.server, data.quizId, data.gameType);
-        const playerRole = data.gameType === GameType.Default ? GameRole.Organisator : GameRole.Player;
+        const playerRole = data.gameType === GameType.Default || GameType.Random ? GameRole.Organisator : GameRole.Player;
         gameSession.room.addPlayer(new Player('Organisateur', client, playerRole));
         return { isSuccess: true, message: 'Partie créée' };
     }
