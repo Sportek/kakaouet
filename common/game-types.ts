@@ -38,6 +38,7 @@ export enum GameEvents {
     SendCorrectAnswers = 'playerSendCorrectAnswers', // Event sent to all players containing the correct answers
     PlayerMuted = 'playerMuted',
     GameSpeedUpTimer = 'gameSpeedUpTimer', // Event sent to all players when the timer is speed up
+    MutedNotification = 'mutedNotification',
 }
 
 // Différents types définis
