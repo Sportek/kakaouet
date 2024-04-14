@@ -60,6 +60,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         );
     }
 
+    // to finish
     calculatePercentage(amount: number): number {
         return (
             amount /
@@ -69,6 +70,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         );
     }
 
+    // done
     getAnswerAmount(): number {
         return this.gameService.filterPlayers().filter((player) => player.answers?.hasConfirmed).length;
     }
@@ -154,7 +156,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.gameState.getValue() === GameState.DisplayQuestionResults;
     }
 
-    // TO FINISH------------------------------------------------>
+    // to finish
     isAnsweringQRL(): boolean {
         return (
             this.gameService.gameState.getValue() === GameState.PlayersAnswerQuestion && this.getActualQuestion()?.question.type === QuestionType.QRL

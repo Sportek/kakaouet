@@ -30,7 +30,7 @@ describe('OrganisatorComponent', () => {
         answers: {
             answer: [0, 1],
             hasInterracted: true,
-            hasConfirmed: true,
+            hasConfirmed: false,
         },
         isMuted: false,
         interactionStatus: InteractionStatus.interacted,
@@ -477,6 +477,67 @@ describe('OrganisatorComponent', () => {
             const column: ChoiceData = { text: 'abc', amount: 0, isCorrect: false };
             const formattedText = component.formatColumn(column);
             expect(formattedText).toEqual('NaN%');
+        });
+    });
+
+    describe('getAnswerAmount', () => {
+        it('should return the count of players with confirmed answers', () => {
+            gameServiceSpy.filterPlayers.and.returnValue(mockedPlayers);
+            const confirmedCount = component.getAnswerAmount();
+            expect(confirmedCount).toEqual(2);
+        });
+
+        it('should return zero when no players have confirmed answers', () => {
+            const mockedPlayersV2: PlayerClient[] = [
+                {
+                    name: 'Alice',
+                    role: GameRole.Player,
+                    score: 10,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    answers: {
+                        answer: [0, 1],
+                        hasInterracted: true,
+                        hasConfirmed: false,
+                    },
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+                {
+                    name: 'Bob',
+                    role: GameRole.Player,
+                    score: 15,
+                    isExcluded: true,
+                    hasGiveUp: true,
+                    answers: {
+                        answer: [0, 1],
+                        hasInterracted: true,
+                        hasConfirmed: false,
+                    },
+                    isMuted: true,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+            ];
+            gameServiceSpy.filterPlayers.and.returnValue(mockedPlayersV2);
+            const confirmedCount = component.getAnswerAmount();
+            expect(confirmedCount).toBe(0);
+        });
+    });
+
+    describe('calculatePercentage', () => {
+        beforeEach(() => {
+            spyOn(component, 'getChoices').and.returnValue([
+                { text: 'Choice 1', amount: 100, isCorrect: true },
+                { text: 'Choice 2', amount: 200, isCorrect: false },
+                { text: 'Choice 3', amount: 700, isCorrect: true },
+            ]);
+        });
+        it('should calculate the correct percentage for a given amount', () => {
+            const testAmount = 100;
+            const expectedPercentage = testAmount / 1000;
+
+            const percentage = component.calculatePercentage(testAmount);
+            expect(percentage).toEqual(expectedPercentage);
         });
     });
 });
