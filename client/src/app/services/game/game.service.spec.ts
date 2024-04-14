@@ -763,4 +763,96 @@ describe('GameService', () => {
             },
         ]);
     });
+
+    //       private receiveUpdateScoreListener() {
+    //     this.gameService.socketService.listen(GameEvents.UpdateScore, (data: GameEventsData.UpdateScore) => {
+    //         const pointsEarned = data.score - this.gameService.client.getValue().score;
+    //         if (this.gameService.client.getValue().role === GameRole.Player) {
+    //             if (pointsEarned > 0) {
+    //                 if (data.hasAnsweredFirst)
+    //                     this.gameService.notificationService.info(`Vous avez répondu en premier et gagnez ${pointsEarned} points !`);
+    //                 else this.gameService.notificationService.info(`Vous avez gagné ${pointsEarned} points !`);
+    //             }
+    //         }
+    //         this.gameService.client.next({ ...this.gameService.client.getValue(), score: data.score });
+    //     });
+    // }
+
+    it('should receive points earned', () => {
+        service.client.next(cloneDeep(mockPlayer));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ score: 12, hasAnsweredFirst: false });
+        });
+
+        // @ts-ignore
+        service.gameEventsListener.receiveUpdateScoreListener();
+
+        expect(mockNotificationService.info).toHaveBeenCalledWith('Vous avez gagné 12 points !');
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        expect(service.client.getValue().score).toEqual(12);
+    });
+
+    it('should not have right to write messages', () => {
+        service.client.next(cloneDeep(mockPlayer));
+        service.players.next([cloneDeep(mockPlayer)]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ name: 'Sportek', isMuted: true });
+        });
+
+        // @ts-ignore
+        service.gameEventsListener.receiveMutedPlayers();
+
+        expect(service.players.getValue()).toEqual([
+            {
+                name: 'Sportek',
+                role: GameRole.Player,
+                score: 0,
+                isExcluded: false,
+                hasGiveUp: false,
+                isMuted: true,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
+        ]);
+        expect(mockNotificationService.error).toHaveBeenCalledWith("Vous n'avez pas droit de clavarder");
+    });
+
+    it('should have right to write messages', () => {
+        service.client.next(cloneDeep(mockPlayer));
+        service.players.next([cloneDeep(mockPlayer)]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback({ name: 'Sportek', isMuted: false });
+        });
+
+        // @ts-ignore
+        service.gameEventsListener.receiveMutedPlayers();
+
+        expect(service.players.getValue()).toEqual([
+            {
+                name: 'Sportek',
+                role: GameRole.Player,
+                score: 0,
+                isExcluded: false,
+                hasGiveUp: false,
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
+        ]);
+
+        expect(mockNotificationService.success).toHaveBeenCalledWith('Vous avez le droit de clavarder a nouveau');
+    });
+
+    it(' should speed up timer', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
+            callback(null);
+        });
+
+        // @ts-ignore
+        service.gameEventsListener.receiveSpeedUpTimer();
+
+        expect(soundServiceMocked.startPlayingSound).toHaveBeenCalled();
+    });
 });

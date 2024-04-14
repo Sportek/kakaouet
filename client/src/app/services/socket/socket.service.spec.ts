@@ -106,4 +106,25 @@ describe('SocketService', () => {
             done();
         }, 0);
     });
+
+    it('should debug heartbeat', () => {
+        spyOn(console, 'log');
+        service['debugHeartbeat']();
+        expect(mockSocket.on).toHaveBeenCalledWith('test', jasmine.any(Function));
+        mockSocket.on.calls.mostRecent().args[1]('test-data');
+        // eslint-disable-next-line no-console
+        expect(console.log).toHaveBeenCalledWith('test-data');
+    });
+
+    it('should return if disconnected', () => {
+        service['isConnected'] = false;
+        routerEvents.next(new NavigationEnd(1, '/non-whitelist-page', '/non-whitelist-page'));
+
+        expect(mockSocket.disconnect).toHaveBeenCalledTimes(0);
+    });
+
+    it('should return if instance of event isnt NavigationEnd', () => {
+        routerEvents.next({});
+        expect(mockSocket.disconnect).toHaveBeenCalledTimes(0);
+    });
 });
