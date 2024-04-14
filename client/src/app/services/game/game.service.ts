@@ -84,7 +84,8 @@ export class GameService {
         }
         if (this.game.getValue().type === GameType.Random) {
             this.client.next({ ...this.client.getValue(), role: GameRole.Player });
-            this.socketService.send(GameEvents.StartGame);
+            this.startTime.next(new Date());
+            this.socketService.send(GameEvents.GameRoleChange);
             return;
         }
         if (!this.players.getValue().filter((player) => player.role === GameRole.Player && !player.isExcluded).length) {

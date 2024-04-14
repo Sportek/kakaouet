@@ -139,7 +139,7 @@ export class Room {
 
     private shouldDeleteGame(): void {
         const noPlayers = !(this.getPlayingPlayers().length > 0) && this.game.gameState !== GameState.WaitingPlayers;
-        const noOrganisator = !this.getOrganisator() && this.game.type === GameType.Default;
+        const noOrganisator = !this.getOrganisator() && (this.game.type === GameType.Default || this.game.type === GameType.Random);
         if (noPlayers || noOrganisator) this.deleteRoom();
     }
 }

@@ -11,7 +11,7 @@
                 </div>
             </div>
             <div class="game-questions-container">
-                <div class="box-description">
+                <div *ngIf="quiz._id !== ramdomId" class="box-description">
                     <div *ngFor="let quest of question; let i = index">
                         <p>{{ i + 1 }} - {{ quest.text }} ({{ quest.type }})</p>
                     </div>
