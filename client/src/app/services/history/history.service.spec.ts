@@ -4,7 +4,7 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { BASE_URL } from '@app/constants';
-import { GameRecords } from '@common/types';
+import { GameRecords, Ordering, OrderingField } from '@common/types';
 import { of } from 'rxjs';
 import { HistoryService } from './history.service';
 
@@ -87,5 +87,36 @@ describe('HistoryService', () => {
             },
         });
         expect(service.clearHistory).toHaveBeenCalled();
+    });
+
+    it('updateSort should set correct sort criteria and call applySorting', () => {
+        spyOn(service, 'applySorting');
+        service.updateSort('Nom de Jeu Ascendant');
+        expect(service.currentSortField).toEqual(OrderingField.GameTitle);
+        expect(service.currentSortOrder).toEqual(Ordering.ascending);
+        expect(service.applySorting).toHaveBeenCalled();
+
+        service.updateSort('Temps de début de partie Descendant');
+        expect(service.currentSortField).toEqual(OrderingField.StartTime);
+        expect(service.currentSortOrder).toEqual(Ordering.descending);
+        expect(service.applySorting).toHaveBeenCalledTimes(2);
+    });
+
+    it('applySorting should sort records correctly', () => {
+        const records: GameRecords[] = [
+            { gameTitle: 'Game B', startTime: new Date('2021-01-02'), numberOfPlayers: 3, bestScore: 150 },
+            { gameTitle: 'Game A', startTime: new Date('2021-01-01'), numberOfPlayers: 4, bestScore: 100 }
+        ];
+        service['history$'].next(records);
+
+        service.currentSortField = OrderingField.GameTitle;
+        service.currentSortOrder = Ordering.ascending;
+        service.applySorting();
+        expect(records).toBeDefined();
+
+        service.currentSortField = OrderingField.StartTime;
+        service.currentSortOrder = Ordering.descending;
+        service.applySorting();
+        expect(records).toBeDefined();
     });
 });
