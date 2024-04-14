@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { BASE_URL } from '@app/constants';
-import { GameRecords } from '@common/types';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { GameRecords, Ordering, OrderingField } from '@common/types';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -12,7 +12,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class HistoryService {
     private history$: BehaviorSubject<GameRecords[]> = new BehaviorSubject<GameRecords[]>([]);
     private history: Observable<GameRecords[]> = this.history$.asObservable();
-
+    currentSortField: OrderingField = OrderingField.GameTitle;
+    currentSortOrder: Ordering = Ordering.ascending;
     constructor(
         private http: HttpClient,
         public dialog: MatDialog,
@@ -24,8 +25,14 @@ export class HistoryService {
 
     getAllRecords(): Observable<GameRecords[]> {
         const url = `${BASE_URL}/history/`;
-        return this.http.get<GameRecords[]>(url);
+        return this.http.get<GameRecords[]>(url).pipe(
+            tap(records => {
+                this.history$.next(records); // Update the BehaviorSubject with new records
+                this.applySorting(); // Apply sorting to the new records
+            })
+        );
     }
+    
 
     getHistory(): Observable<GameRecords[]> {
         return this.history;
@@ -60,5 +67,35 @@ export class HistoryService {
             this.history$.next(records);
         });
         return this.getHistory();
+    }
+
+    updateSort(choice: string): void {
+        if (choice.includes('Temps de début de partie')) {
+            this.currentSortField = OrderingField.StartTime;
+        } else if (choice.includes('Nom de Jeu')) {
+            this.currentSortField = OrderingField.GameTitle;
+        }
+        if (choice.includes('Ascendant')) {
+            this.currentSortOrder = Ordering.ascending;
+        } else if (choice.includes('Descendant')) {
+            this.currentSortOrder = Ordering.descending;
+        }
+        this.applySorting();
+    }
+
+    applySorting(): void {
+        let sortedRecords = this.history$.getValue().sort((a, b) => {
+            let comparison = 0;
+            switch (this.currentSortField) {
+                case OrderingField.GameTitle:
+                    comparison = a.gameTitle.localeCompare(b.gameTitle);
+                    break;
+                case OrderingField.StartTime:
+                    comparison = new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+                    break;
+            }
+            return this.currentSortOrder === Ordering.ascending ? comparison : -comparison;
+        });
+        this.history$.next(sortedRecords); 
     }
 }
