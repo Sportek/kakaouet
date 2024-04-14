@@ -6,7 +6,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BASE_URL } from '@app/constants';
-import { NotificationService } from '../notification/notification.service';
+import { NotificationService } from '@app/services/notification/notification.service';
 import { AdminLoginState, UserService } from './user.service';
 
 describe('UserService', () => {
@@ -22,7 +22,7 @@ describe('UserService', () => {
                     { path: 'admin/some-route', component: class {} },
                     { path: 'admin/login', component: class {} },
                 ]),
-                MatSnackBarModule
+                MatSnackBarModule,
             ],
             providers: [UserService, NotificationService],
         });

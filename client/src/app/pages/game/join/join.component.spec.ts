@@ -30,7 +30,7 @@ describe('JoinComponent', () => {
                 MatSelectModule,
                 BrowserAnimationsModule,
                 HttpClientTestingModule,
-                MatSnackBarModule
+                MatSnackBarModule,
             ],
             providers: [{ provide: JoinService, useValue: joinServiceMock }],
         });

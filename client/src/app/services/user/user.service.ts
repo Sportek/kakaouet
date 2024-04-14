@@ -2,8 +2,8 @@ import { HttpClient, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BASE_URL } from '@app/constants';
+import { NotificationService } from '@app/services/notification/notification.service';
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
-import { NotificationService } from '../notification/notification.service';
 
 export enum AdminLoginState {
     LoggedIn = 'LoggedIn',
