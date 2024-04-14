@@ -132,7 +132,7 @@ describe('QuestionService', () => {
 
     describe('deleteQuestionById', () => {
         it('should send a DELETE request to the correct URL', fakeAsync(() => {
-            service.deleteQuestionById('1').subscribe();
+            service.deleteQuestionById('1');
             tick();
             const req = httpTestingController.expectOne('http://localhost:3000/api/question/1');
             expect(req.request.method).toEqual('DELETE');
