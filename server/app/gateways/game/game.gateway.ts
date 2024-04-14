@@ -106,6 +106,17 @@ export class GameGateway {
         gameSession.startGameDelayed();
         return { isSuccess: true, message: 'Partie démarrée' };
     }
+    @SubscribeMessage(GameEvents.StartGameWithRoleChange)
+    async handleStartGameWithRoleChange(@MessageBody() data: unknown, @ConnectedSocket() client: Socket): Promise<SocketResponse> {
+        const gameSession = await this.gameService.getGameSessionBySocketId(client.id);
+        const player = gameSession.room.getPlayerWithSocketId(client.id);
+        if (!player || player.role !== GameRole.Organisator) {
+            return { isSuccess: false, message: 'Action non autorisée ' };
+        }
+        player.role = GameRole.Player;
+        gameSession.startGameDelayed();
+        return { isSuccess: true, message: 'La partie a été démarrée avec changement de rôle' };
+    }
 
     @SubscribeMessage(GameEvents.GameClosed)
     handleGameClosed(@ConnectedSocket() client: Socket): SocketResponse {
