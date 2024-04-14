@@ -3,12 +3,21 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { GameSession } from '@app/classes/game/game-session';
+import { Player } from '@app/classes/player/player';
 import { GameService } from '@app/services/game/game.service';
 import { Answer, GameEvents } from '@common/game-types';
-import { GameRole, GameType } from '@common/types';
+import { GameRole, GameState, GameType } from '@common/types';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Socket } from 'socket.io';
 import { GameGateway } from './game.gateway';
+
+const playerMock: Player = new Player('Sportek', {} as Socket, GameRole.Player);
+playerMock.send = jest.fn();
+playerMock.on = jest.fn();
+playerMock.off = jest.fn();
+playerMock.joinRoom = jest.fn();
+playerMock.leaveRoom = jest.fn();
+playerMock.leaveAllRooms = jest.fn();
 
 class MockGameService {
     getGameSessionBySocketId() {}
@@ -40,6 +49,73 @@ describe('GameGateway', () => {
         expect(gateway).toBeDefined();
     });
 
+    describe('GameGateway - handleRateAnswerQRL', () => {
+        it('should return failure if game session does not exist', () => {
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(undefined);
+
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleRateAnswerQRL({ playerName: 'Sportek', score: 10 }, client);
+
+            expect(response).toEqual({ isSuccess: false, message: "La partie n'existe pas" });
+        });
+
+        it('should return failure if player is not found or is excluded', () => {
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue(null),
+                    getPlayer: jest.fn().mockReturnValue(null),
+                },
+            } as unknown as GameSession;
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleRateAnswerQRL({ playerName: 'Sportek', score: 10 }, client);
+
+            expect(response).toEqual({ isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" });
+        });
+
+        it('should save answer ratings', () => {
+            playerMock.hasAnswered = true;
+            const mockSession = {
+                room: {
+                    getPlayer: jest.fn().mockReturnValue(playerMock),
+                    getPlayers: jest.fn().mockReturnValue([playerMock]),
+                },
+                saveAnswerRatings: jest.fn(),
+                displayQuestionResults: jest.fn(),
+            } as unknown as GameSession;
+            const saveAnswerRatingsSpy = jest.spyOn(mockSession, 'saveAnswerRatings');
+            const displayQuestionResultsSpy = jest.spyOn(mockSession, 'displayQuestionResults');
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleRateAnswerQRL({ playerName: 'Sportek', score: 10 }, client);
+
+            expect(response).toEqual({ isSuccess: true, message: 'La question a été notée' });
+            expect(saveAnswerRatingsSpy).toHaveBeenCalled();
+            expect(displayQuestionResultsSpy).toHaveBeenCalled();
+        });
+
+        it('should save answer ratings', () => {
+            playerMock.hasAnswered = false;
+            playerMock.hasGiveUp = true;
+            const mockSession = {
+                room: {
+                    getPlayer: jest.fn().mockReturnValue(playerMock),
+                    getPlayers: jest.fn().mockReturnValue([playerMock]),
+                },
+                saveAnswerRatings: jest.fn(),
+                displayQuestionResults: jest.fn(),
+            } as unknown as GameSession;
+            const displayQuestionResultsSpy = jest.spyOn(mockSession, 'displayQuestionResults');
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+            const client = { id: 'testSocketId' } as Socket;
+            gateway.handleRateAnswerQRL({ playerName: 'Sportek', score: 10 }, client);
+            expect(displayQuestionResultsSpy).toHaveBeenCalled();
+        });
+    });
+
     describe('GameGateway - handleDisconnect', () => {
         let gateway: GameGateway;
         let mockGameService: GameService;
@@ -62,7 +138,22 @@ describe('GameGateway', () => {
             expect(response).toEqual({ isSuccess: false, message: "La partie n'existe pas" });
         });
 
-        it('should return failure if player is not found or is excluded', () => {
+        it('should return failure if player is not found', () => {
+            playerMock.isExcluded = true;
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue(playerMock),
+                },
+            } as unknown as GameSession;
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleDisconnect(client);
+
+            expect(response).toEqual({ isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" });
+        });
+
+        it('should return failure if player is excluded', () => {
             const mockSession = {
                 room: {
                     getPlayerWithSocketId: jest.fn().mockReturnValue(null),
@@ -76,40 +167,62 @@ describe('GameGateway', () => {
             expect(response).toEqual({ isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" });
         });
 
-        // it('should remove player and return success if game is waiting for players', () => {
-        //     const mockSession = {
-        //         gameState: GameState.WaitingPlayers,
-        //         room: {
-        //             getPlayerWithSocketId: jest.fn().mockReturnValue({ name: 'JohnDoe', isExcluded: false }),
-        //             removePlayer: jest.fn(),
-        //         },
-        //     } as unknown as GameSession;
-        //     jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+        it('should broadcast if player leaves', () => {
+            playerMock.isExcluded = false;
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue(playerMock),
+                    removePlayer: jest.fn(),
+                },
+                gameState: GameState.WaitingPlayers,
+                broadcastMessage: jest.fn(),
+            } as unknown as GameSession;
+            const broadcastSpy = jest.spyOn(mockSession, 'broadcastMessage').mockImplementation(() => {
+                return;
+            });
+            const removePlayerSpy = jest.spyOn(mockSession.room, 'removePlayer');
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
 
-        //     const client = { id: 'testSocketId' } as Socket;
-        //     const response = gateway.handleDisconnect(client);
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleDisconnect(client);
 
-        //     expect(response).toEqual({ isSuccess: true, message: 'Vous avez quitté la partie' });
-        //     expect(mockSession.room.removePlayer).toHaveBeenCalledWith('JohnDoe');
-        // });
+            expect(response).toEqual({ isSuccess: true, message: 'Vous avez quitté la partie' });
+            expect(broadcastSpy).toHaveBeenCalled();
+            expect(removePlayerSpy).toHaveBeenCalled();
+        });
 
-        // it('should abandon player', () => {
-        //     const mockSession = {
-        //         gameState: GameState.DisplayQuestionResults,
-        //         room: {
-        //             getPlayerWithSocketId: jest.fn().mockReturnValue({ name: 'JohnDoe', isExcluded: false }),
-        //             giveUpPlayer: jest.fn(),
-        //         },
-        //     } as unknown as GameSession;
-        //     jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+        it('should broadcast if player leaves', () => {
+            playerMock.isExcluded = false;
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue(playerMock),
+                    giveUpPlayer: jest.fn(),
+                    allPlayerAnswered: jest.fn().mockReturnValue(true),
+                },
+                gameState: GameState.DisplayQuestionResults,
+                broadcastMessage: jest.fn(),
+                timer: {
+                    stop: jest.fn(),
+                },
+            } as unknown as GameSession;
+            const timerSpy = jest.spyOn(mockSession.timer, 'stop').mockImplementation(() => {
+                return;
+            });
+            const giveUpPlayerSpy = jest.spyOn(mockSession.room, 'giveUpPlayer').mockImplementation(() => {
+                return;
+            });
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
 
-        //     const client = { id: 'testSocketId' } as Socket;
-        //     const response = gateway.handleDisconnect(client);
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleDisconnect(client);
 
-        //     expect(response).toEqual({ isSuccess: true, message: 'Vous avez abandonné la partie' });
-        //     expect(mockSession.room.giveUpPlayer).toHaveBeenCalledWith('JohnDoe');
-        // });
+            expect(response).toEqual({ isSuccess: true, message: 'Vous avez abandonné la partie' });
+            expect(timerSpy).toHaveBeenCalled();
+            expect(giveUpPlayerSpy).toHaveBeenCalled();
+        });
+    });
 
+    describe('Game Gateway - handleSelectAnswer', () => {
         it('should return failure if game session does not exist', () => {
             jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(undefined);
 
@@ -300,6 +413,24 @@ describe('GameGateway', () => {
         jest.spyOn(mockGameService, 'createGameSession').mockResolvedValue(mockGameSession);
 
         const data = { code: 'newGameCode', quizId: 'quiz123', gameType: GameType.Default };
+        const response = await gateway.handleCreateGame(data, mockClient as Socket);
+
+        expect(response).toEqual({ isSuccess: true, message: 'Partie créée' });
+        expect(mockGameService.createGameSession).toHaveBeenCalledWith(data.code, null, data.quizId, data.gameType);
+        expect(mockAddPlayer).toHaveBeenCalledWith(expect.anything());
+    });
+
+    it('should successfully create a game session and add an organizer', async () => {
+        const mockAddPlayer = jest.fn();
+        const mockGameSession = {
+            room: {
+                addPlayer: mockAddPlayer,
+            },
+        } as unknown as GameSession;
+
+        jest.spyOn(mockGameService, 'createGameSession').mockResolvedValue(mockGameSession);
+
+        const data = { code: 'newGameCode', quizId: 'quiz123', gameType: GameType.Test };
         const response = await gateway.handleCreateGame(data, mockClient as Socket);
 
         expect(response).toEqual({ isSuccess: true, message: 'Partie créée' });
@@ -533,22 +664,84 @@ describe('GameGateway', () => {
             expect(mockSession.room.banPlayer).not.toHaveBeenCalled();
         });
 
-        // it('should successfully ban a player when requested by an organizer', () => {
-        //     const banPlayerSpy = jest.fn();
-        //     const mockSession = {
-        //         room: {
-        //             getPlayerWithSocketId: jest.fn().mockReturnValue({ role: GameRole.Organisator }),
-        //             banPlayer: banPlayerSpy,
-        //         },
-        //     } as unknown as GameSession;
-        //     jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+        it('should successfully ban a player when requested by an organizer', () => {
+            const banPlayerSpy = jest.fn();
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue({ role: GameRole.Organisator }),
+                    banPlayer: banPlayerSpy,
+                },
+                broadcastMessage: jest.fn(),
+            } as unknown as GameSession;
+            const broadcastSpy = jest.spyOn(mockSession, 'broadcastMessage');
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
 
-        //     const data = { name: 'PlayerToBan' };
-        //     const response = gateway.handleBanPlayer(data, mockClient as Socket);
+            const data = { name: 'PlayerToBan' };
+            const response = gateway.handleBanPlayer(data, mockClient as Socket);
 
-        //     expect(response).toEqual({ isSuccess: true, message: 'Joueur banni' });
-        //     expect(banPlayerSpy).toHaveBeenCalledWith(data.name);
-        // });
+            expect(response).toEqual({ isSuccess: true, message: 'Joueur banni' });
+            expect(banPlayerSpy).toHaveBeenCalledWith(data.name);
+            expect(broadcastSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('GameGateway - handleMutedPlayer', () => {
+        it('should return failure if player is not found or is excluded', () => {
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue(null),
+                    getPlayer: jest.fn().mockReturnValue(null),
+                },
+            } as unknown as GameSession;
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleMutedPlayer({ name: 'Sportek' }, client);
+
+            expect(response).toEqual({ isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" });
+        });
+
+        it('should mute player', () => {
+            playerMock.isMuted = false;
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue(playerMock),
+                    getPlayer: jest.fn().mockReturnValue(playerMock),
+                    mutePlayer: jest.fn(),
+                },
+            } as unknown as GameSession;
+            const mutePlayerSpy = jest.spyOn(mockSession.room, 'mutePlayer');
+            // @ts-ignore
+            jest.spyOn(gateway, 'hasAutorisation').mockReturnValue(true);
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleMutedPlayer({ name: 'Sportek' }, client);
+
+            expect(response).toEqual({ isSuccess: true, message: 'Droit au clavardage desactivé' });
+            expect(mutePlayerSpy).toHaveBeenCalled();
+        });
+
+        it('should unmute player', () => {
+            playerMock.isMuted = true;
+            const mockSession = {
+                room: {
+                    getPlayerWithSocketId: jest.fn().mockReturnValue(playerMock),
+                    getPlayer: jest.fn().mockReturnValue(playerMock),
+                    mutePlayer: jest.fn(),
+                },
+            } as unknown as GameSession;
+            const mutePlayerSpy = jest.spyOn(mockSession.room, 'mutePlayer');
+            // @ts-ignore
+            jest.spyOn(gateway, 'hasAutorisation').mockReturnValue(true);
+            jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+            const client = { id: 'testSocketId' } as Socket;
+            const response = gateway.handleMutedPlayer({ name: 'Sportek' }, client);
+
+            expect(response).toEqual({ isSuccess: true, message: 'Droit au clavardage activé' });
+            expect(mutePlayerSpy).toHaveBeenCalled();
+        });
     });
 
     describe('GameGateway - handleToggleTimer', () => {
@@ -636,5 +829,21 @@ describe('GameGateway', () => {
 
         expect(mockSession.broadcastMessage).toHaveBeenCalled();
         expect(result).toEqual({ isSuccess: true, message: 'Message envoyé' });
+    });
+
+    it('should broadcast message to room', () => {
+        playerMock.isMuted = true;
+        const mockSession = {
+            room: {
+                getPlayerWithSocketId: jest.fn().mockReturnValue(playerMock),
+            },
+            broadcastMessage: jest.fn(),
+        } as unknown as GameSession;
+        jest.spyOn(mockGameService, 'getGameSessionBySocketId').mockReturnValue(mockSession);
+
+        const result = gateway.handleMessageSent({ content: 'Allo' }, mockClient as Socket);
+
+        expect(mockSession.broadcastMessage).not.toHaveBeenCalled();
+        expect(result).toEqual({ isSuccess: true, message: 'Non-authorisé' });
     });
 });
