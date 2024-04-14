@@ -31,4 +31,14 @@ describe('ConfirmationComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('should close with false', () => {
+        component.cancel();
+        expect(component.dialogRef.close).toHaveBeenCalledWith(false);
+    });
+
+    it('should close with true', () => {
+        component.confirm();
+        expect(component.dialogRef.close).toHaveBeenCalledWith(true);
+    });
 });
