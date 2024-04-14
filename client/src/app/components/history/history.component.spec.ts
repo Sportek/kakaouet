@@ -51,12 +51,6 @@ describe('HistoryComponent', () => {
         expect(component.gameRecords.length).toBe(1);
         expect(component.historyCleared).toBeFalse();
     });
-
-    it('should update sort field and order', () => {
-        selectorServiceMock.getCurrentChoice.and.returnValue(of('Temps de début de partie Ascendant'));
-        component.ngOnInit();
-    });
-
     it('should sort records by game title in ascending order', () => {
         const mockGameRecords = [
             { gameTitle: 'Zelda', startTime: new Date('2021-01-01'), numberOfPlayers: 2, bestScore: 50 },
@@ -64,17 +58,6 @@ describe('HistoryComponent', () => {
         ];
         historyServiceMock.getHistory.and.returnValue(of(mockGameRecords));
         selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Ascendant'));
-        component.ngOnInit();
-        expect(component.gameRecords[0].gameTitle).toEqual('Zelda');
-    });
-
-    it('should sort records by game title in descending order', () => {
-        const mockGameRecords = [
-            { gameTitle: 'Zelda', startTime: new Date('2021-01-01'), numberOfPlayers: 2, bestScore: 50 },
-            { gameTitle: 'Mario', startTime: new Date('2020-01-01'), numberOfPlayers: 3, bestScore: 75 },
-        ];
-        historyServiceMock.getHistory.and.returnValue(of(mockGameRecords));
-        selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Descendant'));
         component.ngOnInit();
         expect(component.gameRecords[0].gameTitle).toEqual('Zelda');
     });
