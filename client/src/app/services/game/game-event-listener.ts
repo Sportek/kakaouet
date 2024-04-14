@@ -125,9 +125,11 @@ export class GameEventsListener {
         this.gameService.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
             const player = this.gameService.players.getValue().find((p) => p.name === data.name);
             if (player) {
-                player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
-                player.interactionStatus = InteractionStatus.interacted;
-                this.gameService.players.next([...this.gameService.players.getValue()]);
+                if (player.answers) {
+                    player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
+                    player.interactionStatus = InteractionStatus.interacted;
+                    this.gameService.players.next([...this.gameService.players.getValue()]);
+                }
             }
             this.gameService.recentInteractions.set(data.name, this.gameService.cooldown.getValue());
         });

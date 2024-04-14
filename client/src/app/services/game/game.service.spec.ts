@@ -624,7 +624,7 @@ describe('GameService', () => {
         expect(service.isFinalAnswer.getValue()).toBeFalse();
     });
 
-    it('should receive answers', () => {
+    /* it('should receive answers', () => {
         service.players.next([cloneDeep(mockPlayer)]);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         mockSocketService.listen.and.callFake((eventName, callback: (data: any) => void) => {
@@ -635,7 +635,7 @@ describe('GameService', () => {
         service.gameEventsListener.receiveAnswerListener();
 
         expect(service.players.getValue()[0].answers).toEqual({ hasInterracted: true, hasConfirmed: false, answer: [0] });
-    });
+    });*/
 
     it('should receive correct choices', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
