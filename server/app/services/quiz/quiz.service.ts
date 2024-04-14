@@ -81,8 +81,8 @@ export class QuizService {
         }
     }
 
-    async doesQuizExist(name: string): Promise<boolean> {
-        const quiz = await this.quizModel.findOne({ name });
+    async doesQuizExist(title: string): Promise<boolean> {
+        const quiz = await this.quizModel.findOne({ title });
         if (quiz) {
             return true;
         }
