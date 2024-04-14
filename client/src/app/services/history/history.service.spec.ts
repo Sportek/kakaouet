@@ -105,7 +105,7 @@ describe('HistoryService', () => {
     it('applySorting should sort records correctly', () => {
         const records: GameRecords[] = [
             { gameTitle: 'Game B', startTime: new Date('2021-01-02'), numberOfPlayers: 3, bestScore: 150 },
-            { gameTitle: 'Game A', startTime: new Date('2021-01-01'), numberOfPlayers: 4, bestScore: 100 }
+            { gameTitle: 'Game A', startTime: new Date('2021-01-01'), numberOfPlayers: 4, bestScore: 100 },
         ];
         service['history$'].next(records);
 
