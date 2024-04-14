@@ -149,7 +149,7 @@ export class GameSession {
         player.hasAnswered = true;
         player.confirmAnswer();
         player.score += score;
-        const rating = score / (this.quiz.questions[this.gameQuestionIndex].points ?? 1);
+        const rating = score / this.quiz.questions[this.gameQuestionIndex].points;
         const questionTitle: string = this.quiz.questions[this.gameQuestionIndex].text;
         if (!this.ratingAmounts[questionTitle]) {
             this.ratingAmounts[questionTitle] = [0, 0, 0];
