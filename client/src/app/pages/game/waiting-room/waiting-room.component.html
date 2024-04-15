@@ -86,7 +86,7 @@
 
         <div class="player-data-container">
             <div class="player-name">{{ client.name }}</div>
-            <div *ngIf="client.role === 'organisator' && !isCooldownStarted" class="organizer-container">
+            <div *ngIf="canStartGame()" class="organizer-container">
                 <div class="organisator-button clickable" (click)="start()">
                     <mat-icon><span class="material-symbols-outlined" matTooltip="Démarrer la partie"> play_arrow </span></mat-icon>
                 </div>
