@@ -98,4 +98,10 @@ export class DescriptonPageComponent implements OnInit {
             }),
         );
     }
+
+    isNotRandomQuiz(): boolean {
+        // Permettre un nommage non-standard
+        // eslint-disable-next-line no-underscore-dangle
+        return this.quiz._id !== this.ramdomId;
+    }
 }
