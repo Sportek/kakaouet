@@ -32,10 +32,9 @@ describe('QuizController', () => {
                         addNewQuiz: jest.fn().mockResolvedValue(mockQuiz),
                         updateQuizById: jest.fn().mockResolvedValue({ ...mockQuiz, name: 'Updated Test Quiz' }),
                         deleteQuizById: jest.fn().mockResolvedValue(null),
-                        validateQuizObject: jest.fn(),
-                        validateQuestionObject: jest.fn(),
                         validateAnswers: jest.fn(),
                         doesQuizExist: jest.fn(),
+                        generateRandomQuiz: jest.fn(), // Add this line to mock the method
                     },
                 },
             ],
@@ -140,7 +139,6 @@ describe('QuizController', () => {
 
     describe('validateAnswers', () => {
         it('should return correct feedback for a valid request', async () => {
-            // Mock the service method to return a valid feedback
             const mockFeedback: QuestionFeedback = {
                 correctChoicesIndices: [0],
                 isCorrect: true,
@@ -150,19 +148,37 @@ describe('QuizController', () => {
             };
             jest.spyOn(service, 'validateAnswers').mockResolvedValueOnce(mockFeedback);
 
-            // Act
             const result = await controller.validateAnswers('quizId', 1, { answers: [0] });
 
-            // Assert
             expect(result).toEqual(mockFeedback);
         });
 
         it('should throw an HttpException for an invalid request', async () => {
-            // Mock the service method to return null (invalid request)
             jest.spyOn(service, 'validateAnswers').mockResolvedValueOnce(null);
 
-            // Act and Assert
             await expect(controller.validateAnswers('invalidQuizId', 1, { answers: [0] })).rejects.toThrowError(HttpException);
+        });
+    });
+
+    describe('getRandomQuiz', () => {
+        it('should return a random quiz successfully', async () => {
+            const expectedRandomQuiz = {
+                _id: 'randomQuizId',
+                title: 'Random Quiz',
+                description: 'A randomly generated quiz',
+                questions: [],
+                duration: 30,
+                visibility: true,
+                createdAt: new Date(),
+                lastModification: new Date(),
+            };
+
+            jest.spyOn(service, 'generateRandomQuiz').mockResolvedValue(expectedRandomQuiz);
+
+            const result = await controller.getRandomQuiz();
+
+            expect(result).toEqual(expectedRandomQuiz);
+            expect(service.generateRandomQuiz).toHaveBeenCalled();
         });
     });
 });
