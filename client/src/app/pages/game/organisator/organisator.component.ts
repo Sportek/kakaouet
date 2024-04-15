@@ -144,6 +144,10 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.gameState.getValue() === GameState.PlayersAnswerQuestion;
     }
 
+    canGoToNextQuestion(): boolean {
+        return this.gameService.gameState.getValue() === GameState.DisplayQuestionResults;
+    }
+
     ngOnDestroy(): void {
         this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }

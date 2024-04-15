@@ -120,16 +120,16 @@
             <div class="game-controller-container">
                 <div class="title">Panneau de contrôle</div>
                 <div class="controls" *ngIf="true">
-                    <div *ngIf="!canDisableTimer(); else buttondisabled">
+                    <div *ngIf="canGoToNextQuestion(); else buttondisabled">
                         <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
                         <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button>
                     </div>
 
                     <ng-template #buttondisabled>
-                        <button *ngIf="!isLastQuestion()" matTooltip="Attendez les réponses des joueurs" mat-raised-button color="disabled">
+                        <button disabled *ngIf="!isLastQuestion()" matTooltip="Attendez les réponses des joueurs" mat-raised-button color="disabled">
                             Question suivante
                         </button>
-                        <button *ngIf="isLastQuestion()" matTooltip="Attendez les réponses des joueurs" mat-raised-button color="disabled">
+                        <button disabled *ngIf="isLastQuestion()" matTooltip="Attendez les réponses des joueurs" mat-raised-button color="disabled">
                             Afficher les statistiques
                         </button>
                     </ng-template>
