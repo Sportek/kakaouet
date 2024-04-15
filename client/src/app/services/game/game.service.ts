@@ -162,11 +162,6 @@ export class GameService {
     }
 
     nextQuestion(): void {
-        this.players.getValue().forEach((player) => {
-            if (player.interactionStatus !== InteractionStatus.abandoned) {
-                player.interactionStatus = InteractionStatus.noInteraction;
-            }
-        });
         this.socketService.send(GameEvents.NextQuestion);
     }
 
