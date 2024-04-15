@@ -109,4 +109,35 @@ describe('Timer class', () => {
         expect(timer).toHaveProperty('isAccelerated', true);
         expect(timer).toHaveProperty('multiplicator', CUSTOM_MULTIPLICATOR);
     });
+
+    it('should not perform any action when stop is called on an inactive timer', () => {
+        const mockDone = jest.fn();
+        const mockIncrement = jest.fn();
+
+        const timer = new Timer(INITIAL_COUNTDOWN, {
+            whenDone: mockDone,
+            whenIncrement: mockIncrement,
+        });
+
+        timer.stop();
+        jest.clearAllTimers();
+        timer.stop();
+
+        expect(mockIncrement).not.toHaveBeenCalled();
+        expect(mockDone).not.toHaveBeenCalled();
+        expect(timer.getTimer()).toBe(INITIAL_COUNTDOWN);
+    });
+
+    it('should not resume or pause when timer is zero', () => {
+        const mockIncrement = jest.fn();
+
+        const timer = new Timer(0, {
+            whenIncrement: mockIncrement,
+        });
+
+        timer.togglePlayPause();
+
+        expect(mockIncrement).not.toHaveBeenCalled();
+        expect(jest.getTimerCount()).toBe(0);
+    });
 });
