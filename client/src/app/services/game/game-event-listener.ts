@@ -181,7 +181,7 @@ export class GameEventsListener {
             }
         });
     }
-    
+
     private receiveGameLockedStateChanged() {
         this.gameService.socketService.listen(GameEvents.GameLockedStateChanged, (data: GameEventsData.GameLockedStateChanged) => {
             this.gameService.isLocked.next(data.isLocked);
@@ -268,7 +268,7 @@ export class GameEventsListener {
     }
 
     private notifyScoreGain(pointsEarned: number, hasAnsweredFirst: boolean) {
-        const message = hasAnsweredFirst 
+        const message = hasAnsweredFirst
             ? `Vous avez répondu en premier et gagnez ${pointsEarned} points !`
             : `Vous avez gagné ${pointsEarned} points !`;
         this.gameService.notificationService.info(message);
