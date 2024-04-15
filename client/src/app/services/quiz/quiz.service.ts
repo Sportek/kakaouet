@@ -22,6 +22,7 @@ export class QuizService {
     private amountOfQuestionsSubject = new Subject<number>();
     private amountOfQuestions: Observable<number> = this.amountOfQuestionsSubject.asObservable();
 
+    // eslint-disable-next-line max-params
     constructor(
         private http: HttpClient,
         private validateService: ValidateService,
