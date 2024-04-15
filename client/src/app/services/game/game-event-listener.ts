@@ -138,7 +138,7 @@ export class GameEventsListener {
         this.gameService.socketService.listen(GameEvents.PlayerNotInteractQrl, (data: GameEventsData.PlayerSelectAnswer) => {
             const player = this.gameService.players.getValue().find((p) => p.name === data.name);
             if (player) {
-                player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
+                player.answers = { hasInterracted: false, hasConfirmed: false, answer: data.answer };
                 player.interactionStatus = InteractionStatus.noInteraction;
                 this.gameService.players.next([...this.gameService.players.getValue()]);
             }
