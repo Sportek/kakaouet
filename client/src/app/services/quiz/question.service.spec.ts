@@ -195,4 +195,30 @@ describe('QuestionService', () => {
             expect(quiz.questions[0] as Question).toEqual(question);
         });
     });
+
+    it('should return true if there are enough QCM questions', () => {
+        const mockQuestions: Question[] = [
+            { _id: '1', type: QuestionType.QCM, text: 'Q1', points: 10, choices: [], createdAt: new Date(), lastModification: new Date() },
+            { _id: '2', type: QuestionType.QCM, text: 'Q2', points: 10, choices: [], createdAt: new Date(), lastModification: new Date() },
+            { _id: '3', type: QuestionType.QCM, text: 'Q3', points: 10, choices: [], createdAt: new Date(), lastModification: new Date() },
+        ];
+
+        spyOn(service, 'getQuestions').and.returnValue(of(mockQuestions));
+
+        service.hasEnoughQCMQuestions(3).subscribe((hasEnough) => {
+            expect(hasEnough).toBeTrue();
+        });
+    });
+
+    it('should return false if there are not enough QCM questions', () => {
+        const mockQuestions: Question[] = [
+            { _id: '1', type: QuestionType.QCM, text: 'Q1', points: 10, choices: [], createdAt: new Date(), lastModification: new Date() },
+        ];
+
+        spyOn(service, 'getQuestions').and.returnValue(of(mockQuestions));
+
+        service.hasEnoughQCMQuestions(3).subscribe((hasEnough) => {
+            expect(hasEnough).toBeFalse();
+        });
+    });
 });
