@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GameService } from '@app/services/game/game.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { GameType } from '@common/types';
 import { of, throwError } from 'rxjs'; // Ensure you have this import for creating observables
 import { DescriptonPageComponent } from './descripton-page.component';
 
@@ -117,5 +118,12 @@ describe('DescriptionPageComponent', () => {
         });
     });
     
+    describe('testGame', () => {
+        it('should call createNewGame on GameService with the correct parameters', () => {
+            const quizId = 'testQuizId';
+            component.testGame(quizId);
+            expect(gameServiceMock.createNewGame).toHaveBeenCalledWith(quizId, GameType.Test);
+        });
+    });
     
 });
