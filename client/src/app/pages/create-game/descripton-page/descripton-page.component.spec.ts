@@ -32,13 +32,13 @@ describe('DescriptionPageComponent', () => {
                     name: 'Test Quiz',
                     questions: [],
                 }),
-            ), 
+            ),
             getQuizById: jasmine.createSpy().and.returnValue(
                 of({
                     id: '1',
                     visibility: true,
                 }),
-            ), 
+            ),
         };
         routerMock = {
             navigate: jasmine.createSpy(),
