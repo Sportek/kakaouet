@@ -101,7 +101,7 @@ describe('DescriptionPageComponent', () => {
             expect(changeDetectorRefMock.detectChanges).not.toHaveBeenCalled();
         });
 
-        it('should update quiz and question properties and call detectChanges when quiz is found', () => {
+        it('should not update quiz and question properties and call detectChanges when quiz is not found', () => {
             const quizId = 'validQuizId';
             quizServiceMock.getQuizDetailsById.and.returnValue(of(null)); 
             component.getQuizDetails(quizId);
