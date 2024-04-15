@@ -87,4 +87,8 @@ export class WaitingRoomComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
+
+    canStartGame(): boolean {
+        return this.client.role === 'organisator' && !this.isCooldownStarted;
+    }
 }
