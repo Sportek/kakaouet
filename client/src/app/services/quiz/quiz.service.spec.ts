@@ -1,9 +1,12 @@
-/* import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+/* eslint-disable max-lines */
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BASE_URL } from '@app/constants';
 import { QuestionFeedback, QuestionType, Quiz } from '@common/types';
 import * as FileSaver from 'file-saver';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { QuizService } from './quiz.service';
 
 describe('QuizService', () => {
@@ -38,8 +41,8 @@ describe('QuizService', () => {
     };
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [QuizService],
+            imports: [HttpClientTestingModule, MatSnackBarModule],
+            providers: [QuizService, MatSnackBar],
         });
 
         service = TestBed.inject(QuizService);
@@ -72,6 +75,28 @@ describe('QuizService', () => {
         const req = httpTestingController.expectOne(`${BASE_URL}/quiz/${quizId}`);
         expect(req.request.method).toEqual('GET');
         req.flush(mockQuiz);
+    });
+
+    describe('getQuizDetailsById', () => {
+        it('should return a random quiz if the provided id matches the randomId', () => {
+            const randomId = service['randomId']; // Assurez-vous que vous avez accès à randomId
+            const spy = spyOn(service, 'getRandomQuiz').and.returnValue(of(mockQuiz));
+
+            service.getQuizDetailsById(randomId).subscribe((quiz) => {
+                expect(quiz).toEqual(mockQuiz);
+                expect(spy).toHaveBeenCalled();
+            });
+        });
+
+        it('should return the specific quiz if the provided id does not match the randomId', () => {
+            const nonRandomId = 'someOtherId';
+            const spy = spyOn(service, 'getQuizById').and.returnValue(of(mockQuiz));
+
+            service.getQuizDetailsById(nonRandomId).subscribe((quiz) => {
+                expect(quiz).toEqual(mockQuiz);
+                expect(spy).toHaveBeenCalled();
+            });
+        });
     });
 
     it('should add a new quiz', () => {
@@ -215,5 +240,100 @@ describe('QuizService', () => {
         const args = saveAsSpy.calls.first().args;
         expect(args[1]).toEqual(expectedFileName);
     });
+
+    describe('createQuiz', () => {
+        it('should call addNewQuiz with the new quiz details', () => {
+            const quiz: Quiz = {
+                _id: 'uniqueId',
+                title: 'New Quiz',
+                description: 'Description of new quiz',
+                duration: 15,
+                visibility: true,
+                questions: [],
+                createdAt: new Date(),
+                lastModification: new Date(),
+            };
+            const expectedQuiz: Partial<Quiz> = {
+                title: quiz.title,
+                description: quiz.description,
+                duration: quiz.duration,
+                visibility: false,
+                questions: quiz.questions,
+            };
+
+            // Mock the return value to match the expected structure of a Quiz
+            const addNewQuizSpy = spyOn(service, 'addNewQuiz').and.returnValue(
+                of({
+                    _id: 'returnedId',
+                    title: 'Returned Quiz',
+                    description: 'Returned description',
+                    duration: 10,
+                    visibility: false,
+                    questions: [],
+                    createdAt: new Date(),
+                    lastModification: new Date(),
+                }),
+            );
+
+            // @ts-ignore
+            const notificationSpy = spyOn(service.notificationService, 'error');
+
+            service.createQuiz(quiz);
+
+            expect(addNewQuizSpy).toHaveBeenCalledWith(jasmine.objectContaining(expectedQuiz));
+            expect(notificationSpy).not.toHaveBeenCalled();
+        });
+
+        it('should handle HttpErrorResponse with status BadRequest', () => {
+            const quiz: Quiz = {
+                _id: 'uniqueId',
+                title: 'Existing Quiz',
+                description: 'Description of existing quiz',
+                duration: 20,
+                visibility: true,
+                questions: [],
+                createdAt: new Date(),
+                lastModification: new Date(),
+            };
+
+            const errorResponse = new HttpErrorResponse({
+                status: HttpStatusCode.BadRequest,
+                error: 'BadRequest',
+            });
+
+            spyOn(service, 'addNewQuiz').and.returnValue(throwError(() => errorResponse));
+            // @ts-ignore
+            const notificationSpy = spyOn(service.notificationService, 'error');
+
+            service.createQuiz(quiz);
+
+            expect(notificationSpy).toHaveBeenCalledWith('Un quiz avec ce nom existe déjà.');
+        });
+
+        it('should handle general HttpErrorResponse', () => {
+            const quiz: Quiz = {
+                _id: 'uniqueId',
+                title: 'Some Quiz',
+                description: 'General error quiz',
+                duration: 30,
+                visibility: true,
+                questions: [],
+                createdAt: new Date(),
+                lastModification: new Date(),
+            };
+
+            const errorResponse = new HttpErrorResponse({
+                status: 500,
+                error: 'ServerError',
+            });
+
+            spyOn(service, 'addNewQuiz').and.returnValue(throwError(() => errorResponse));
+            // @ts-ignore
+            const notificationSpy = spyOn(service.notificationService, 'error');
+
+            service.createQuiz(quiz);
+
+            expect(notificationSpy).toHaveBeenCalledWith("Erreur lors de l'import du quiz");
+        });
+    });
 });
- */
