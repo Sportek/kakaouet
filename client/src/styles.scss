@@ -112,7 +112,7 @@ $green-theme: (
 $indigo-pink-theme: mat.define-light-theme(
     (
         color: (
-            primary: mat.define-palette($purple-theme, 900),
+            primary: mat.define-palette($purple-theme, 400),
             accent: mat.define-palette($magenta-theme, 500),
             // warn: mat.define-palette($purple-theme),
             success: mat.define-palette($green-theme, 700),
@@ -176,4 +176,14 @@ body {
 
 .not-clickable {
     cursor: not-allowed;
+}
+
+.bad {
+    background-color: $bad;
+    color: white;
+}
+
+.good {
+    background-color: $good;
+    color: white;
 }

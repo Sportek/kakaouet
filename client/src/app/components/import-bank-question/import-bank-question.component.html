@@ -2,12 +2,12 @@
     <div class="title title-text">Importer des questions</div>
     <div class="questions-container">
         <div class="question" *ngFor="let question of questionsFromBank">
-            <input title="question" type="checkbox" (change)="toggleQuestionSelection(question)" [checked]="isQuestionSelected(question)" />
+            <mat-checkbox title="question" type="checkbox" (change)="toggleQuestionSelection(question)" [checked]="isQuestionSelected(question)" />
             {{ question.text }}
         </div>
     </div>
     <div class="buttons-container">
-        <button class="import-button" mat-raised-button (click)="importQuestions()">Importer les Questions Sélectionnées</button>
-        <button (click)="cancelImportQuestions()" mat-raised-button class="cancel-button" color="warn">Annuler</button>
+        <button class="good" mat-raised-button (click)="importQuestions()">Importer les Questions Sélectionnées</button>
+        <button (click)="cancelImportQuestions()" mat-raised-button class="bad">Annuler</button>
     </div>
 </div>

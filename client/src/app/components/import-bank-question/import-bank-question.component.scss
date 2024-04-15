@@ -1,7 +1,7 @@
 @import '../../../colors.scss';
 .question-import-overlay {
     position: fixed;
-    background: $magenta-800;
+    background: $purple-800;
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 4;
@@ -32,6 +32,9 @@
             padding: 0.5rem;
             box-sizing: border-box;
             width: 100%;
+            border-radius: 5px;
+            background-color: $purple-100;
+            color: black;
         }
     }
 
@@ -40,10 +43,15 @@
         flex-direction: row;
         gap: 1rem;
         padding: 0.5rem 0;
+    }
 
-        .import-button {
-            background-color: $green;
-            color: white;
-        }
+    .bad {
+        background-color: $bad;
+        color: white;
+    }
+
+    .good {
+        background-color: $good;
+        color: white;
     }
 }
