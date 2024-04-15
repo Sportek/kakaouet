@@ -196,7 +196,7 @@
             <div class="sort-controls">
                 <mat-form-field appearance="fill">
                     <mat-label>Trier par</mat-label>
-                    <mat-select [(value)]="selectedCriterion" (selectionChange)="sortPlayers()">
+                    <mat-select [(value)]="selectedCriterion" (selectionChange)="sendSortedPlayers()">
                         <mat-option [value]="sortingCriteria.name">Nom</mat-option>
                         <mat-option [value]="sortingCriteria.score">Points</mat-option>
                         <mat-option [value]="sortingCriteria.status">Status</mat-option>
