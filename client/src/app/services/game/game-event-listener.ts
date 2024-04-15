@@ -30,6 +30,7 @@ export class GameEventsListener {
         this.receiveUpdateScoreListener();
         this.receiveGameLockedStateChanged();
         this.receiveBannedPlayers();
+        this.receiveEmptyAnswerListener();
         this.sendPlayerScoresListener();
         this.receiveGiveUpPlayers();
         this.playerSendResultsListener();
@@ -127,6 +128,18 @@ export class GameEventsListener {
             if (player) {
                 player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
                 player.interactionStatus = InteractionStatus.interacted;
+                this.gameService.players.next([...this.gameService.players.getValue()]);
+            }
+            this.gameService.recentInteractions.set(data.name, this.gameService.cooldown.getValue());
+        });
+    }
+
+    private receiveEmptyAnswerListener() {
+        this.gameService.socketService.listen(GameEvents.PlayerNotInteractQrl, (data: GameEventsData.PlayerSelectAnswer) => {
+            const player = this.gameService.players.getValue().find((p) => p.name === data.name);
+            if (player) {
+                player.answers = { hasInterracted: false, hasConfirmed: false, answer: data.answer };
+                player.interactionStatus = InteractionStatus.noInteraction;
                 this.gameService.players.next([...this.gameService.players.getValue()]);
             }
             this.gameService.recentInteractions.set(data.name, this.gameService.cooldown.getValue());
