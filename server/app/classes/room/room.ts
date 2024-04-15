@@ -94,6 +94,13 @@ export class Room {
             .emit(event, ...args);
     }
 
+    changeOrganisatorToPlayer(): void {
+        const organisators = this.players.filter((p) => p.role === GameRole.Organisator);
+        organisators.forEach((organisator) => {
+            organisator.role = GameRole.Player;
+        });
+    }
+
     sendToOrganizer(event: string, ...args: unknown[]): void {
         const organizer = this.players.find((p) => p.role === GameRole.Organisator);
         if (organizer) {
@@ -137,17 +144,18 @@ export class Room {
         return this.players.find((p) => p.role === GameRole.Organisator && !p.hasGiveUp);
     }
 
+    private isRandomGame() {
+        return this.game.type === GameType.Random;
+    }
+
+    private isWaitingPlayersPhase() {
+        return this.game.gameState === GameState.WaitingPlayers;
+    }
+
     private shouldDeleteGame(): void {
-        if (this.game.type === GameType.Random) {
-            const noPlayersOutsideWaiting = !(this.getPlayingPlayers().length > 0) && this.game.gameState !== GameState.WaitingPlayers;
-            const organizerLeavesDuringWaiting = !this.getOrganisator() && this.game.gameState === GameState.WaitingPlayers;
-            if (noPlayersOutsideWaiting || organizerLeavesDuringWaiting) {
-                this.deleteRoom();
-                return;
-            }
-        }
         const noPlayers = !(this.getPlayingPlayers().length > 0) && this.game.gameState !== GameState.WaitingPlayers;
-        const noOrganisator = !this.getOrganisator() && this.game.type === GameType.Default;
-        if (noPlayers || noOrganisator) this.deleteRoom();
+        const noOrganisator = !this.getOrganisator() && this.game.type !== GameType.Test;
+        const shouldConsiderOrganisator = this.isRandomGame() && !this.isWaitingPlayersPhase() ? false : noOrganisator;
+        if (noPlayers || shouldConsiderOrganisator) this.deleteRoom();
     }
 }
