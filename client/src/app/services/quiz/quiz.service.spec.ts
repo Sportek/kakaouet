@@ -219,22 +219,12 @@ describe('QuizService', () => {
     });
 
     it('should generate and save a quiz as a JSON file', () => {
-        const quiz: Quiz = {
-            _id: 'exampleId',
-            title: 'Example Quiz',
-            description: 'A sample quiz for testing.',
-            duration: 30,
-            visibility: true,
-            questions: [],
-            createdAt: new Date(),
-            lastModification: new Date(),
-        };
-        const expectedFileName = `${quiz.title}.json`;
+        const expectedFileName = `${mockQuiz.title}.json`;
 
         // eslint-disable-next-line deprecation/deprecation
         const saveAsSpy = spyOn(FileSaver, 'saveAs');
 
-        service.generateQuizAsFile(quiz);
+        service.generateQuizAsFile(mockQuiz);
 
         expect(saveAsSpy).toHaveBeenCalled();
         const args = saveAsSpy.calls.first().args;
@@ -285,17 +275,6 @@ describe('QuizService', () => {
         });
 
         it('should handle HttpErrorResponse with status BadRequest', () => {
-            const quiz: Quiz = {
-                _id: 'uniqueId',
-                title: 'Existing Quiz',
-                description: 'Description of existing quiz',
-                duration: 20,
-                visibility: true,
-                questions: [],
-                createdAt: new Date(),
-                lastModification: new Date(),
-            };
-
             const errorResponse = new HttpErrorResponse({
                 status: HttpStatusCode.BadRequest,
                 error: 'BadRequest',
@@ -305,7 +284,7 @@ describe('QuizService', () => {
             // @ts-ignore
             const notificationSpy = spyOn(service.notificationService, 'error');
 
-            service.createQuiz(quiz);
+            service.createQuiz(mockQuiz);
 
             expect(notificationSpy).toHaveBeenCalledWith('Un quiz avec ce nom existe déjà.');
         });
