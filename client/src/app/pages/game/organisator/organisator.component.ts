@@ -207,4 +207,18 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.sortPlayers();
         this.gameService.players.next(this.playerService.sortPlayers(this.gameService.players.getValue(), this.selectedCriterion, this.sortingOrder));
     }
+
+    shouldDisplayQRLResults(): boolean {
+        return this.isDisplayingResults() && this.isQRL();
+    }
+
+    shouldCorrectQRLAnswers(): boolean {
+        return this.isCorrectingAnswers() && this.isQRL();
+    }
+
+    hasRatingForCurrentPlayer(): boolean {
+        const currentPlayerName = this.getCurrentPlayer().name;
+        const rating = this.getRatingForPlayer(currentPlayerName);
+        return !!rating;
+    }
 }
