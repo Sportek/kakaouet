@@ -116,6 +116,11 @@ export class GameEventsListener {
 
     private gameQuestionListener() {
         this.gameService.socketService.listen(GameEvents.GameQuestion, (data: GameEventsData.GameQuestion) => {
+            this.gameService.players.value.forEach((player) => {
+                if (player.interactionStatus !== InteractionStatus.abandoned) {
+                    player.interactionStatus = InteractionStatus.noInteraction;
+                }
+            });
             this.gameService.actualQuestion.next(data.actualQuestion);
             this.gameService.answer.next(data.actualQuestion.question.type === QuestionType.QCM ? [] : '');
             this.gameService.isFinalAnswer.next(false);

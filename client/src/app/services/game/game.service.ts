@@ -162,8 +162,6 @@ export class GameService {
     }
 
     nextQuestion(): void {
-        this.players.getValue().forEach((player) => {
-        });
         this.socketService.send(GameEvents.NextQuestion);
     }
 
