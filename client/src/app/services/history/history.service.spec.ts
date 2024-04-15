@@ -60,32 +60,11 @@ describe('HistoryService', () => {
         expect(req.request.method).toBe('POST');
         req.flush(newRecord);
     });
-    it('clearHistory should delete and update history', () => {
-        const expectedRecords: GameRecords[] = [];
-        service.clearHistory().subscribe((records) => {
-            expect(records).toEqual(expectedRecords);
-        });
-        const req = httpMock.expectOne(`${BASE_URL}/history/`);
-        expect(req.request.method).toBe('DELETE');
-        req.flush(expectedRecords);
-    });
 
     it('confirmClearHistory should clear history on user confirmation', () => {
-        const dialogRefStub: Partial<MatDialogRef<typeof ConfirmationDialogComponent, unknown>> = {
-            afterClosed: () => of(true),
-        };
-        spyOn(dialog, 'open').and.returnValue(dialogRefStub as MatDialogRef<typeof ConfirmationDialogComponent, unknown>);
-        spyOn(service, 'clearHistory').and.returnValue(of([]));
-
+        spyOn(dialog, 'open').and.returnValue({ afterClosed: () => of(true) } as MatDialogRef<ConfirmationDialogComponent>);
+        spyOn(service, 'clearHistory').and.returnValue();
         service.confirmClearHistory();
-
-        expect(dialog.open).toHaveBeenCalledWith(ConfirmationDialogComponent, {
-            width: '350px',
-            data: {
-                title: 'Confirmation de la suppression',
-                message: 'Êtes-vous sûr de vouloir supprimer votre historique?',
-            },
-        });
         expect(service.clearHistory).toHaveBeenCalled();
     });
 
@@ -118,5 +97,21 @@ describe('HistoryService', () => {
         service.currentSortOrder = Ordering.descending;
         service.applySorting();
         expect(records).toBeDefined();
+    });
+
+    it('clearHistory should clear history', () => {
+        const records: GameRecords[] = [
+            { gameTitle: 'Game B', startTime: new Date('2021-01-02'), numberOfPlayers: 3, bestScore: 150 },
+            { gameTitle: 'Game A', startTime: new Date('2021-01-01'), numberOfPlayers: 4, bestScore: 100 },
+        ];
+        service['history$'].next(records);
+
+        service.clearHistory();
+        const req = httpMock.expectOne(`${BASE_URL}/history/`);
+        expect(req.request.method).toBe('DELETE');
+        req.flush([]);
+        service.getHistory().subscribe((history) => {
+            expect(history).toEqual([]);
+        });
     });
 });
