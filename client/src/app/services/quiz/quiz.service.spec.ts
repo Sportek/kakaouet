@@ -290,17 +290,6 @@ describe('QuizService', () => {
         });
 
         it('should handle general HttpErrorResponse', () => {
-            const quiz: Quiz = {
-                _id: 'uniqueId',
-                title: 'Some Quiz',
-                description: 'General error quiz',
-                duration: 30,
-                visibility: true,
-                questions: [],
-                createdAt: new Date(),
-                lastModification: new Date(),
-            };
-
             const errorResponse = new HttpErrorResponse({
                 status: 500,
                 error: 'ServerError',
@@ -310,7 +299,7 @@ describe('QuizService', () => {
             // @ts-ignore
             const notificationSpy = spyOn(service.notificationService, 'error');
 
-            service.createQuiz(quiz);
+            service.createQuiz(mockQuiz);
 
             expect(notificationSpy).toHaveBeenCalledWith("Erreur lors de l'import du quiz");
         });
@@ -320,24 +309,13 @@ describe('QuizService', () => {
         it('should return a random quiz if there are enough QCM questions', () => {
             // @ts-ignore
             spyOn(service.questionService, 'hasEnoughQCMQuestions').and.returnValue(of(true));
-            const mockRandomQuiz: Quiz = {
-                _id: 'randomQuizId',
-                title: 'Random Quiz Title',
-                description: 'A randomly generated quiz.',
-                duration: 25,
-                visibility: true,
-                questions: [],
-                createdAt: new Date(),
-                lastModification: new Date(),
-            };
-
             service.getRandomQuiz().subscribe((quiz) => {
-                expect(quiz).toEqual(mockRandomQuiz);
+                expect(quiz).toEqual(mockQuiz);
             });
 
             const req = httpTestingController.expectOne(`${BASE_URL}/quiz/generate/random`);
             expect(req.request.method).toBe('GET');
-            req.flush(mockRandomQuiz);
+            req.flush(mockQuiz);
         });
 
         it('should error if there are not enough QCM questions', () => {
