@@ -40,18 +40,15 @@ export class Player {
         this.answers[questionIndex].hasConfirmedAt = new Date();
     }
 
-    setAnswer(answer: string | number[]): void {
+    setAnswer(answer: string | number[], gameEvent: GameEvents = GameEvents.PlayerSelectAnswer): void {
         const questionIndex = this.game.gameQuestionIndex;
         const answerData = { hasInterracted: true, hasConfirmed: false, answer };
         this.answers[questionIndex] = answerData;
-        this.room.sendToOrganizer(GameEvents.PlayerSelectAnswer, { name: this.name, answer: answerData.answer });
+        this.room.sendToOrganizer(gameEvent, { name: this.name, answer: answerData.answer });
     }
 
     setEmptyAnswer(): void {
-        const questionIndex = this.game.gameQuestionIndex;
-        const answerData = { hasInterracted: true, hasConfirmed: false, answer: '' };
-        this.answers[questionIndex] = answerData;
-        this.room.sendToOrganizer(GameEvents.PlayerNotInteractQrl, { name: this.name, answer: answerData });
+        this.setAnswer('', GameEvents.PlayerNotInteractQrl);
     }
 
     getAnswer(index: number): CompletePlayerAnswer {
