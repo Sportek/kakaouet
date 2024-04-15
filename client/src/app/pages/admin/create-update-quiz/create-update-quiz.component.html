@@ -50,14 +50,14 @@
                     <div *ngFor="let quest of quiz.questions; let i = index" class="question-bar">
                         <div class="question">{{ i + 1 }}. ({{ quest.type }}) {{ quest.text }}</div>
                         <div class="icons">
-                            <mat-icon matTooltip="Monter la question" class="clickable" (click)="moveQuestionUp(i)" *ngIf="i > 0"
+                            <mat-icon matTooltip="Monter la question" class="clickable" (click)="moveQuestionUp(i)" *ngIf="canMoveQuestionUp(i)"
                                 >arrow_upward</mat-icon
                             >
                             <mat-icon
                                 matTooltip="Descendre la question"
                                 class="clickable"
                                 (click)="moveQuestionDown(i)"
-                                *ngIf="i < quiz.questions.length - 1"
+                                *ngIf="canMoveQuestionDown(i)"
                                 >arrow_downward</mat-icon
                             >
                             <mat-icon
