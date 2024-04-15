@@ -105,6 +105,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.cooldown.subscribe((cooldown) => {
                 this.cooldown = cooldown;
+                this.players = this.players.filter((player) => !player.hasGiveUp);
                 this.organisatorService.calculateHistogram(cooldown);
             }),
         );
@@ -150,7 +151,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     getPlayerArray(): PlayerClient[] {
-        return this.organisatorService.players;
+        return this.organisatorService.players.filter((player) => !player.hasGiveUp);
     }
 
     getChoices(): ChoiceData[] {
