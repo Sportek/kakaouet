@@ -130,52 +130,47 @@ export class GameEventsListener {
 
     private receiveAnswerListener() {
         this.gameService.socketService.listen(GameEvents.PlayerSelectAnswer, (data: GameEventsData.PlayerSelectAnswer) => {
-            this.updatePlayer(data.name, {
-                hasInterracted: true,
-                hasConfirmed: false,
-                answer: data.answer
-            }, InteractionStatus.interacted);
+            const player = this.gameService.players.getValue().find((p) => p.name === data.name);
+            if (player) {
+                player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
+                player.interactionStatus = InteractionStatus.interacted;
+                this.gameService.players.next([...this.gameService.players.getValue()]);
+            }
+            this.gameService.recentInteractions.set(data.name, this.gameService.cooldown.getValue());
         });
     }
-    
+
     private receiveEmptyAnswerListener() {
         this.gameService.socketService.listen(GameEvents.PlayerNotInteractQrl, (data: GameEventsData.PlayerSelectAnswer) => {
-            this.updatePlayer(data.name, {
-                hasInterracted: false,
-                hasConfirmed: false,
-                answer: data.answer
-            }, InteractionStatus.noInteraction);
+            const player = this.gameService.players.getValue().find((p) => p.name === data.name);
+            if (player) {
+                player.answers = { hasInterracted: false, hasConfirmed: false, answer: data.answer };
+                player.interactionStatus = InteractionStatus.noInteraction;
+                this.gameService.players.next([...this.gameService.players.getValue()]);
+            }
+            this.gameService.recentInteractions.set(data.name, this.gameService.cooldown.getValue());
         });
     }
-    
-    private receiveConfirmAnswerListener() {
-        this.gameService.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmAnswers) => {
-            this.updatePlayer(data.name, {
-                hasConfirmed: true
-            }, InteractionStatus.finalized);
-        });
-    }
-    
-    private updatePlayer(name: string, answerUpdates: any, status: InteractionStatus) {
-        const players = this.gameService.players.getValue();
-        const playerIndex = players.findIndex(p => p.name === name);
-        
-        if (playerIndex !== -1) {
-            const player = players[playerIndex];
-            player.answers = { ...player.answers, ...answerUpdates };
-            player.interactionStatus = status;
-            this.gameService.players.next([...players]);
-        }
-    
-        this.gameService.recentInteractions.set(name, this.gameService.cooldown.getValue());
-    }
-    
+
     private receiveCorrectAnswersListener() {
         this.gameService.socketService.listen(GameEvents.SendCorrectAnswers, (data: GameEventsData.SendCorrectAnswers) => {
             this.gameService.correctAnswers.next(data.choices);
         });
     }
-    
+
+    private receiveConfirmAnswerListener() {
+        this.gameService.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmAnswers) => {
+            const player = this.gameService.players.getValue().find((p) => p.name === data.name);
+            if (player) {
+                if (player.answers) {
+                    player.interactionStatus = InteractionStatus.finalized;
+                    player.answers.hasConfirmed = true;
+                }
+                this.gameService.players.next([...this.gameService.players.getValue()]);
+            }
+        });
+    }
+
     private receiveUpdateScoreListener() {
         this.gameService.socketService.listen(GameEvents.UpdateScore, (data: GameEventsData.UpdateScore) => {
             const currentClient = this.gameService.client.getValue();
