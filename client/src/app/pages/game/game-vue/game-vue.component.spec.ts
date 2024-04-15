@@ -9,6 +9,7 @@ import { GlobalLayoutComponent } from '@app/components/global-layout/global-layo
 import { HeaderComponent } from '@app/components/header/header.component';
 import { WORKING_QUIZ } from '@app/fake-quizzes';
 import { GameService } from '@app/services/game/game.service';
+import { Variables } from '@common/enum-variables';
 import { GameState, Question } from '@common/types';
 import { cloneDeep } from 'lodash';
 import { GameVueComponent } from './game-vue.component';
@@ -135,5 +136,24 @@ describe('GameVueComponent', () => {
             const result = component.isIncorrectAnswer({ _id: 1, text: 'Choix 1', isCorrect: true });
             expect(result).toBeFalse();
         });
+    });
+
+    it('should display the correct number of characters left', () => {
+        component.answer = 'test';
+        const remaining = Variables.MaxCharacters - component.answer.length;
+        expect(component.displayCharactersLeft()).toEqual(`Il reste ${remaining} caractères à la réponse.`);
+
+        component.answer = '';
+        expect(component.displayCharactersLeft()).toEqual(`Il reste ${Variables.MaxCharacters} caractères à la réponse.`);
+
+        component.answer = null;
+        expect(component.displayCharactersLeft()).toEqual(`Il reste ${Variables.MaxCharacters} caractères à la réponse.`);
+    });
+
+    it('should call modifyAnswerQRL on gameService with the current answer', () => {
+        const modifyAnswerSpy = spyOn(gameService, 'modifyAnswerQRL');
+        component.answer = 'new answer';
+        component.modifyAnswerQRL();
+        expect(modifyAnswerSpy).toHaveBeenCalledWith('new answer');
     });
 });

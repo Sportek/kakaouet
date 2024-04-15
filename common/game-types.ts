@@ -19,6 +19,7 @@ export enum GameEvents {
 
     // Events launched by the server
     PlayerSelectAnswer = 'playerSelectedAnswer', // Event sent to organizer a player has selected an answer
+    PlayerConfirmEmptyAnswersQRL = 'PlayerEmptyAnswerQRL', // Event sent to organizer when a player has selected no answer and did not interact
     PlayerConfirmAnswers = 'playerConfirmedAnswers', // Event sent to organizer a player has confirmed his answers
     PlayerQuitGame = 'playerQuitGame', // Event sent to all players when a player quits the game
     PlayerJoinGame = 'playerJoinGame', // Event sent to all players when a new player joins the game
@@ -147,6 +148,10 @@ export namespace GameEventsData {
     }
 
     export interface PlayerConfirmAnswers {
+        name: string;
+    }
+
+    export interface PlayerConfirmEmptyAnswersQRL {
         name: string;
     }
 
