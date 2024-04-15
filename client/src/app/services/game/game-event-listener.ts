@@ -103,6 +103,7 @@ export class GameEventsListener {
                     this.handlePlayersAnswerQuestion();
                     break;
                 case GameState.DisplayQuestionResults:
+                case GameState.OrganisatorCorrectingAnswers:
                     this.gameService.isFinalAnswer.next(true);
                     break;
                 case GameState.DisplayQuizResults:
