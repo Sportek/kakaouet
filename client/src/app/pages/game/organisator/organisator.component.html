@@ -120,31 +120,68 @@
             <div class="game-controller-container">
                 <div class="title">Panneau de contrôle</div>
                 <div class="controls" *ngIf="true">
-                    <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
-                    <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button>
+                    <div *ngIf="!canDisableTimer(); else buttondisabled">
+                        <button *ngIf="!isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Question suivante</button>
+                        <button *ngIf="isLastQuestion()" mat-raised-button color="primary" (click)="nextQuestion()">Afficher les statistiques</button>
+                    </div>
+
+                    <ng-template #buttondisabled>
+                        <button *ngIf="!isLastQuestion()" matTooltip="Attendez les réponses des joueurs" mat-raised-button color="disabled">
+                            Question suivante
+                        </button>
+                        <button *ngIf="isLastQuestion()" matTooltip="Attendez les réponses des joueurs" mat-raised-button color="disabled">
+                            Afficher les statistiques
+                        </button>
+                    </ng-template>
+
                     <div class="timer">
                         <mat-icon>
                             <span
-                                *ngIf="timerIsRunning"
-                                (click)="toggleTimer()"
-                                class="material-symbols-outlined clickable"
-                                matTooltip="Arrêter le timer"
+                                *ngIf="!canDisableTimer(); else button"
+                                class="material-symbols-outlined not-clickable"
+                                matTooltip="Impossible d'arrêter le timer"
+                                style="color: gray"
                             >
-                                timer_pause
+                                timer_off
                             </span>
-                            <span
-                                *ngIf="!timerIsRunning"
-                                (click)="toggleTimer()"
-                                class="material-symbols-outlined clickable"
-                                matTooltip="Recommencer le timer"
-                            >
-                                timer_play
-                            </span>
+                            <ng-template #button>
+                                <span
+                                    *ngIf="timerIsRunning"
+                                    (click)="toggleTimer()"
+                                    class="material-symbols-outlined clickable"
+                                    matTooltip="Arrêter le timer"
+                                >
+                                    timer_pause
+                                </span>
+                                <span
+                                    *ngIf="!timerIsRunning"
+                                    (click)="toggleTimer()"
+                                    class="material-symbols-outlined clickable"
+                                    matTooltip="Recommencer le timer"
+                                >
+                                    timer_play
+                                </span>
+                            </ng-template>
                         </mat-icon>
                         <mat-icon>
-                            <span class="material-symbols-outlined clickable" (click)="speedUpTimer()" matTooltip="Activer le mode panique">
+                            <span
+                                *ngIf="canDisableTimer(); else speedbutton"
+                                class="material-symbols-outlined clickable"
+                                (click)="speedUpTimer()"
+                                matTooltip="Activer le mode panique"
+                            >
                                 acute
                             </span>
+                            <ng-template #speedbutton>
+                                <span
+                                    style="color: gray"
+                                    class="material-symbols-outlined not-clickable"
+                                    (click)="speedUpTimer()"
+                                    matTooltip="Impossible d'activer le mode panique"
+                                >
+                                    timer
+                                </span>
+                            </ng-template>
                         </mat-icon>
                     </div>
                 </div>
