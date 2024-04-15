@@ -38,6 +38,7 @@ export class QuizService {
         const url = `${BASE_URL}/quiz/${id}`;
         return this.http.get<Quiz>(url);
     }
+
     getQuizDetailsById(id: string): Observable<Quiz> {
         if (id === this.randomId) {
             return this.getRandomQuiz();
