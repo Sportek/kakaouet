@@ -36,7 +36,7 @@ export class GameEventsListener {
         this.receiveCorrectAnswersListener();
         this.receiveMutedPlayers();
         this.receiveSpeedUpTimer();
-        this.receiveConfirmAnswerListenerQRLEmpty();
+        this.receiveConfirmEmptyAnswerListenerQRL();
     }
 
     private playerSendResultsListener() {
@@ -128,7 +128,6 @@ export class GameEventsListener {
             if (player) {
                 player.answers = { hasInterracted: true, hasConfirmed: false, answer: data.answer };
                 player.interactionStatus = InteractionStatus.interacted;
-                console.log('receiveAnswerListener');
                 this.gameService.players.next([...this.gameService.players.getValue()]);
             }
             this.gameService.recentInteractions.set(data.name, this.gameService.cooldown.getValue());
@@ -141,8 +140,8 @@ export class GameEventsListener {
         });
     }
 
-    private receiveConfirmAnswerListenerQRLEmpty() {
-        this.gameService.socketService.listen(GameEvents.PlayerConfirmAnswers, (data: GameEventsData.PlayerConfirmEmptyAnswersQRL) => {
+    private receiveConfirmEmptyAnswerListenerQRL() {
+        this.gameService.socketService.listen(GameEvents.PlayerConfirmEmptyAnswersQRL, (data: GameEventsData.PlayerConfirmAnswers) => {
             const player = this.gameService.players.getValue().find((p) => p.name === data.name);
             const question = this.gameService.actualQuestion.getValue()?.question.type === 'QRL' ? true : false;
             if (player) {
