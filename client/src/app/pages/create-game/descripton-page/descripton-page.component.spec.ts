@@ -142,4 +142,48 @@ describe('DescriptionPageComponent', () => {
         });
     });
     
+    describe('checkQuizBeforeNavigation', () => {
+        it('should navigate to creation page if the quiz is not visible', () => {
+            const gameId = 'invisibleQuizId';
+            quizServiceMock.getQuizById.and.returnValue(of({ visibility: false }));
+            component.checkQuizBeforeNavigation(gameId, '/somepath');
+            expect(notificationServiceMock.error).toHaveBeenCalledWith('Ce jeu est actuellement invisible.');
+            expect(routerMock.navigate).toHaveBeenCalledWith(['/create']);
+        });
+    
+        it('should navigate to the specified path with gameId if quiz is visible and includeId is true', () => {
+            const gameId = 'visibleQuizId';
+            const path = '/game';
+            quizServiceMock.getQuizById.and.returnValue(of({ visibility: true }));
+            component.checkQuizBeforeNavigation(gameId, path, true);
+            expect(routerMock.navigate).toHaveBeenCalledWith([path, gameId]);
+        });
+    
+        it('should navigate to the specified path without gameId if quiz is visible and includeId is false', () => {
+            const gameId = 'visibleQuizId';
+            const path = '/game';
+            quizServiceMock.getQuizById.and.returnValue(of({ visibility: true }));
+            component.checkQuizBeforeNavigation(gameId, path, false);
+            expect(routerMock.navigate).toHaveBeenCalledWith([path]);
+        });
+    
+        it('should navigate to creation page with error notification if the quiz has been deleted', () => {
+            const gameId = 'deletedQuizId';
+            const errorResponse = { status: component.notFound }; 
+            quizServiceMock.getQuizById.and.returnValue(throwError(() => errorResponse));
+            component.checkQuizBeforeNavigation(gameId, '/game');
+            expect(notificationServiceMock.error).toHaveBeenCalledWith('Ce jeu a été supprimé, veuillez sélectionner un autre jeu');
+            expect(routerMock.navigate).toHaveBeenCalledWith(['/create']);
+        });
+    
+        it('should navigate to creation page with a generic error notification if there is an API error', () => {
+            const gameId = 'quizWithApiError';
+            const errorResponse = { status: 500 }; 
+            quizServiceMock.getQuizById.and.returnValue(throwError(() => errorResponse));
+            component.checkQuizBeforeNavigation(gameId, '/game');
+            expect(notificationServiceMock.error).toHaveBeenCalledWith('Une erreur est survenue. Veuillez réessayer.');
+            expect(routerMock.navigate).not.toHaveBeenCalledWith(['/create']);
+        });
+    });
+    
 });
