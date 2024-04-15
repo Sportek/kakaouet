@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '@app/components/dialog-component/dialog-delete.component';
 import { BASE_URL } from '@app/constants';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { GameRecords, Ordering, OrderingField } from '@common/types';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
@@ -18,6 +18,7 @@ export class HistoryService {
     constructor(
         private http: HttpClient,
         public dialog: MatDialog,
+        private confirmation: ConfirmationService,
     ) {}
 
     addRecord(record: GameRecords) {
@@ -28,8 +29,8 @@ export class HistoryService {
         const url = `${BASE_URL}/history/`;
         return this.http.get<GameRecords[]>(url).pipe(
             tap((records) => {
-                this.history$.next(records); // Update the BehaviorSubject with new records
-                this.applySorting(); // Apply sorting to the new records
+                this.history$.next(records);
+                this.applySorting();
             }),
         );
     }
@@ -44,29 +45,16 @@ export class HistoryService {
     }
 
     confirmClearHistory(): void {
-        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            width: '350px',
-            data: {
-                title: 'Confirmation de la suppression',
-                message: 'Êtes-vous sûr de vouloir supprimer votre historique?',
-            },
-        });
-
-        dialogRef.afterClosed().subscribe((confirm) => {
-            if (confirm) {
-                this.clearHistory().subscribe(() => {
-                    this.history$.next([]);
-                });
-            }
+        this.confirmation.confirm("Êtes-vous sûr de vouloir supprimer l'historique?", () => {
+            this.clearHistory();
         });
     }
 
-    clearHistory(): Observable<GameRecords[]> {
+    clearHistory(): void {
         const url = `${BASE_URL}/history/`;
-        this.http.delete<GameRecords[]>(url).subscribe((records: GameRecords[]) => {
-            this.history$.next(records);
+        this.http.delete<GameRecords[]>(url).subscribe(() => {
+            this.history$.next([]);
         });
-        return this.getHistory();
     }
 
     updateSort(choice: string): void {
