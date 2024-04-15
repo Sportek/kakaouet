@@ -121,12 +121,19 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.calculateChoices();
             }),
         );
+
+        this.subscriptions.push(
+            this.gameService.gameState.subscribe((state) => {
+                if (state === GameState.OrganisatorCorrectingAnswers) this.organisatorService.reinitialisePlayerToRate();
+            }),
+        );
     }
 
     calculateHistogram(cooldown: number) {
         this.histogram.hasNotModified = 0;
         this.histogram.hasModified = 0;
         for (const player of this.players) {
+            if (player.hasGiveUp) return;
             const interactionTime = this.gameService.recentInteractions.get(player.name);
             if (interactionTime && interactionTime - cooldown <= Variables.HistrogramCooldown) {
                 this.histogram.hasModified++;
@@ -219,6 +226,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     hasRatingForCurrentPlayer(): boolean {
         const currentPlayerName = this.getCurrentPlayer().name;
         const rating = this.getRatingForPlayer(currentPlayerName);
-        return !!rating;
+        return !!rating?.toString();
     }
 }
