@@ -140,7 +140,7 @@ describe('BankQuestionListComponent', () => {
                 type: QuestionType.QRL,
                 points: 10,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
-                lastModification: new Date('2024-02-12T19:05:00.000Z'), // Valid date
+                lastModification: new Date('2024-02-12T19:05:00.000Z'),
             },
             {
                 _id: '2',
@@ -148,7 +148,7 @@ describe('BankQuestionListComponent', () => {
                 type: QuestionType.QRL,
                 points: 20,
                 createdAt: new Date('2024-02-12T19:00:00.000Z'),
-                lastModification: new Date('invalid-date'), // Invalid date
+                lastModification: new Date('invalid-date'),
             },
         ];
         spyOn(questionService, 'getQuestions').and.returnValue(of(questionMocks));
@@ -159,5 +159,43 @@ describe('BankQuestionListComponent', () => {
         expect(component.questionList[0]._id).toBe('1');
         // eslint-disable-next-line no-underscore-dangle
         expect(component.questionList[1]._id).toBe('2');
+    }));
+
+    it('should delete a question if confirmation dialog is affirmed', fakeAsync(() => {
+        const questionMock: Question = {
+            _id: '1',
+            text: 'Question 1',
+            type: QuestionType.QRL,
+            points: 10,
+            createdAt: new Date(),
+            lastModification: new Date(),
+        };
+        component.questionList = [
+            questionMock,
+            {
+                _id: '2',
+                text: 'Question 2',
+                type: QuestionType.QRL,
+                points: 20,
+                createdAt: new Date(),
+                lastModification: new Date(),
+            },
+        ];
+
+        const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of(true), close: null });
+        spyOn(dialog, 'open').and.returnValue(dialogRefSpyObj);
+        spyOn(questionService, 'deleteQuestionById').and.callFake(() => of(null));
+
+        component.deleteQuestion(questionMock);
+        tick();
+        flush();
+
+        fixture.detectChanges();
+
+        expect(dialog.open).toHaveBeenCalled();
+        expect(component.questionList.length).toBe(1);
+        // eslint-disable-next-line no-underscore-dangle
+        expect(component.questionList.find((q) => q._id === '1')).toBeUndefined();
+        expect(questionService.deleteQuestionById).toHaveBeenCalledWith('1');
     }));
 });

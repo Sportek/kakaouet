@@ -427,4 +427,40 @@ describe('CreateUpdateQuizComponent', () => {
             expect(specifyAmountOfQuizzesSpy).toHaveBeenCalledWith(mockQuiz.questions.length);
         });
     });
+
+    describe('canMoveQuestionUp', () => {
+        it('should return true if index is greater than 0', () => {
+            expect(component.canMoveQuestionUp(1)).toBeTrue();
+        });
+
+        it('should return false if index is 0', () => {
+            expect(component.canMoveQuestionUp(0)).toBeFalse();
+        });
+
+        it('should return false if index is negative', () => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(component.canMoveQuestionUp(-1)).toBeFalse();
+        });
+    });
+
+    describe('canMoveQuestionDown', () => {
+        beforeEach(() => {
+            component.quiz = mockQuiz;
+        });
+
+        it('should return true if index is less than last index', () => {
+            const lastIndex = component.quiz.questions.length - 1;
+            expect(component.canMoveQuestionDown(lastIndex - 1)).toBeTrue();
+        });
+
+        it('should return false if index is the last index', () => {
+            const lastIndex = component.quiz.questions.length - 1;
+            expect(component.canMoveQuestionDown(lastIndex)).toBeFalse();
+        });
+
+        it('should return false if index is greater than the last index', () => {
+            const beyondLastIndex = component.quiz.questions.length;
+            expect(component.canMoveQuestionDown(beyondLastIndex)).toBeFalse();
+        });
+    });
 });
