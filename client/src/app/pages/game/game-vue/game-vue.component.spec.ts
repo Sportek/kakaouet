@@ -1,6 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
@@ -8,6 +9,7 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { WORKING_QUIZ } from '@app/fake-quizzes';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { GameService } from '@app/services/game/game.service';
 import { Variables } from '@common/enum-variables';
 import { GameState, Question } from '@common/types';
@@ -22,10 +24,11 @@ describe('GameVueComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [GameVueComponent, ChatComponent, GlobalLayoutComponent, HeaderComponent],
-            imports: [HttpClientTestingModule, MatIconModule, FormsModule],
+            imports: [HttpClientTestingModule, MatIconModule, FormsModule, MatDialogModule],
             providers: [
                 { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } },
                 { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map().set('id', 'test') } } },
+                ConfirmationService,
             ],
         }).compileComponents();
         fixture = TestBed.createComponent(GameVueComponent);
@@ -99,9 +102,10 @@ describe('GameVueComponent', () => {
     });
 
     it('should give up', () => {
-        const gameServiceSpy = spyOn(gameService, 'giveUp');
+        // @ts-ignore
+        const confirmationServiceSpy = spyOn(component.confirmationService, 'confirm');
         component.giveUp();
-        expect(gameServiceSpy).toHaveBeenCalled();
+        expect(confirmationServiceSpy).toHaveBeenCalled();
     });
 
     it('should return the answer', () => {
