@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { Variables } from '@common/enum-variables';
 import { ActualQuestion, ChoiceData, PlayerClient, SortingCriteria } from '@common/game-types';
 import { GameState, Ordering, QuestionType } from '@common/types';
 import { Subscription } from 'rxjs';
@@ -13,7 +14,7 @@ import { Subscription } from 'rxjs';
 })
 export class OrganisatorComponent implements OnInit, OnDestroy {
     cooldown: number;
-    players: PlayerClient[];
+    players: PlayerClient[] = [];
     choices: ChoiceData[];
     timerIsRunning: boolean;
     currentRating: string;
@@ -22,6 +23,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     sortingCriteria = SortingCriteria;
     sortOrder = Ordering;
     currentQuestion: number;
+    histogram: { hasModified: number; hasNotModified: number };
     private subscriptions: Subscription[];
 
     constructor(
@@ -29,6 +31,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         private playerService: PlayerService,
         private organisatorService: OrganisatorService,
     ) {
+        this.histogram = { hasModified: 0, hasNotModified: 0 };
         this.cooldown = 0;
         this.timerIsRunning = true;
         this.subscriptions = [];
@@ -106,7 +109,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
             this.gameService.cooldown.subscribe((cooldown) => {
                 this.cooldown = cooldown;
                 this.players = this.players.filter((player) => !player.hasGiveUp);
-                this.organisatorService.calculateHistogram(cooldown);
+                this.calculateHistogram(cooldown);
             }),
         );
 
@@ -118,6 +121,19 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
                 this.calculateChoices();
             }),
         );
+    }
+
+    calculateHistogram(cooldown: number) {
+        this.histogram.hasNotModified = 0;
+        this.histogram.hasModified = 0;
+        for (const player of this.players) {
+            const interactionTime = this.gameService.recentInteractions.get(player.name);
+            if (interactionTime && interactionTime - cooldown <= Variables.HistrogramCooldown) {
+                this.histogram.hasModified++;
+            } else {
+                this.histogram.hasNotModified++;
+            }
+        }
     }
 
     toggleMutePlayer(player: PlayerClient) {
@@ -163,7 +179,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     }
 
     getHistogram(): { hasModified: number; hasNotModified: number } {
-        return this.organisatorService.histogram;
+        return this.histogram;
     }
 
     getCurrentPlayer(): PlayerClient {

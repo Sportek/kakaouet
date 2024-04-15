@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { sortPlayerByName } from '@app/classes/utils';
 import { GameService } from '@app/services/game/game.service';
-import { Variables } from '@common/enum-variables';
 import { ActualQuestion, ChoiceData, PlayerClient } from '@common/game-types';
 import { QuestionType } from '@common/types';
 import { cloneDeep } from 'lodash';
@@ -22,13 +21,11 @@ export class OrganisatorService {
     players: PlayerClient[];
     currentPlayer: PlayerClient;
     currentPlayerIndex: number;
-    histogram: { hasModified: number; hasNotModified: number };
 
     constructor(private gameService: GameService) {
         this.actualQuestion = null;
         this.choices = [];
         this.players = [];
-        this.histogram = { hasModified: 0, hasNotModified: 0 };
     }
 
     rateAnswerQRL(playerName: string, currentRating: string) {
@@ -75,18 +72,5 @@ export class OrganisatorService {
         this.currentPlayer = this.players[0];
         this.currentPlayerIndex = 0;
         this.calculateChoices();
-    }
-
-    calculateHistogram(cooldown: number) {
-        this.histogram.hasNotModified = 0;
-        this.histogram.hasModified = 0;
-        for (const player of this.players) {
-            const interactionTime = this.gameService.recentInteractions.get(player.name);
-            if (interactionTime && interactionTime - cooldown <= Variables.HistrogramCooldown) {
-                this.histogram.hasModified++;
-            } else {
-                this.histogram.hasNotModified++;
-            }
-        }
     }
 }
