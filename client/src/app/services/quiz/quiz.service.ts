@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL } from '@app/constants';
+import { NotificationService } from '@app/services/notification/notification.service';
 import { ValidateService } from '@app/services/validate/validate.service';
 import { NUMBRE_OF_QCM_QUESTION, RANDOM_ID } from '@common/constants';
 import { QuestionFeedback, Quiz } from '@common/types';
@@ -21,10 +22,12 @@ export class QuizService {
     private amountOfQuestionsSubject = new Subject<number>();
     private amountOfQuestions: Observable<number> = this.amountOfQuestionsSubject.asObservable();
 
+    // eslint-disable-next-line max-params
     constructor(
         private http: HttpClient,
         private validateService: ValidateService,
         private questionService: QuestionService,
+        private notificationService: NotificationService,
     ) {}
 
     getAllQuizzes(): Observable<Quiz[]> {
@@ -90,7 +93,14 @@ export class QuizService {
             visibility: false,
             questions: quiz.questions,
         };
-        this.addNewQuiz(newQuiz as Quiz).subscribe({});
+        this.addNewQuiz(newQuiz as Quiz).subscribe({
+            error: (error) => {
+                if (error instanceof HttpErrorResponse && error.status === HttpStatusCode.BadRequest) {
+                    return this.notificationService.error('Un quiz avec ce nom existe déjà.');
+                }
+                this.notificationService.error("Erreur lors de l'import du quiz");
+            },
+        });
     }
 
     getQuiz(id: string, quiz: Quiz): void {
