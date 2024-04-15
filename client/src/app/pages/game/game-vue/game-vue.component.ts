@@ -1,4 +1,5 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ConfirmationService } from '@app/services/confirmation/confirmation.service';
 import { GameService } from '@app/services/game/game.service';
 import { Variables } from '@common/enum-variables';
 import { ActualQuestion, Answer } from '@common/game-types';
@@ -20,7 +21,10 @@ export class GameVueComponent implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[];
 
-    constructor(public gameService: GameService) {
+    constructor(
+        public gameService: GameService,
+        private confirmationService: ConfirmationService,
+    ) {
         this.actualQuestion = null;
         this.cooldown = 0;
         this.answer = null;
@@ -56,7 +60,9 @@ export class GameVueComponent implements OnInit, OnDestroy {
     }
 
     giveUp() {
-        this.gameService.giveUp();
+        this.confirmationService.confirm('Êtes-vous sûr de vouloir abandonner ?', () => {
+            this.gameService.giveUp();
+        });
     }
 
     ngOnInit(): void {

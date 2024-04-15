@@ -25,17 +25,12 @@
 }
 
 .history-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     button {
-        background: red;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        width: 39%;
-        margin-left: 29%;
-
-        &:hover {
-            background: lighten($color: red, $amount: 10);
-        }
+        background: $bad;
     }
 }
 
