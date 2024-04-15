@@ -29,8 +29,8 @@ export class HistoryService {
         const url = `${BASE_URL}/history/`;
         return this.http.get<GameRecords[]>(url).pipe(
             tap((records) => {
-                this.history$.next(records); // Update the BehaviorSubject with new records
-                this.applySorting(); // Apply sorting to the new records
+                this.history$.next(records);
+                this.applySorting();
             }),
         );
     }
@@ -46,18 +46,15 @@ export class HistoryService {
 
     confirmClearHistory(): void {
         this.confirmation.confirm("Êtes-vous sûr de vouloir supprimer l'historique?", () => {
-            this.clearHistory().subscribe(() => {
-                this.history$.next([]);
-            });
+            this.clearHistory();
         });
     }
 
-    clearHistory(): Observable<GameRecords[]> {
+    clearHistory(): void {
         const url = `${BASE_URL}/history/`;
-        this.http.delete<GameRecords[]>(url).subscribe((records: GameRecords[]) => {
-            this.history$.next(records);
+        this.http.delete<GameRecords[]>(url).subscribe(() => {
+            this.history$.next([]);
         });
-        return this.getHistory();
     }
 
     updateSort(choice: string): void {
