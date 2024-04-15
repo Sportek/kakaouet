@@ -36,6 +36,7 @@ export class GameEventsListener {
         this.receiveCorrectAnswersListener();
         this.receiveMutedPlayers();
         this.receiveSpeedUpTimer();
+        this.receiveConfirmEmptyAnswerListenerQRL();
     }
 
     private playerSendResultsListener() {
@@ -136,6 +137,20 @@ export class GameEventsListener {
     private receiveCorrectAnswersListener() {
         this.gameService.socketService.listen(GameEvents.SendCorrectAnswers, (data: GameEventsData.SendCorrectAnswers) => {
             this.gameService.correctAnswers.next(data.choices);
+        });
+    }
+
+    private receiveConfirmEmptyAnswerListenerQRL() {
+        this.gameService.socketService.listen(GameEvents.PlayerConfirmEmptyAnswersQRL, (data: GameEventsData.PlayerConfirmAnswers) => {
+            const player = this.gameService.players.getValue().find((p) => p.name === data.name);
+            const question = this.gameService.actualQuestion.getValue()?.question.type === 'QRL' ? true : false;
+            if (player) {
+                if (player.answers && question) {
+                    player.interactionStatus = InteractionStatus.noInteraction;
+                    player.answers.hasConfirmed = true;
+                }
+                this.gameService.players.next([...this.gameService.players.getValue()]);
+            }
         });
     }
 
