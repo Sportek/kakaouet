@@ -126,4 +126,20 @@ describe('DescriptionPageComponent', () => {
         });
     });
     
+    describe('createGame', () => {
+        it('should call createNewGame with GameType.Random when quizId matches ramdomId', () => {
+            const quizId = 'randomId';
+            component.ramdomId = quizId; 
+            component.createGame(quizId);
+            expect(gameServiceMock.createNewGame).toHaveBeenCalledWith(quizId, GameType.Random);
+        });
+    
+        it('should call createNewGame with GameType.Default when quizId does not match ramdomId', () => {
+            const quizId = 'someOtherId';
+            component.ramdomId = 'randomId';
+            component.createGame(quizId);
+            expect(gameServiceMock.createNewGame).toHaveBeenCalledWith(quizId, GameType.Default);
+        });
+    });
+    
 });
