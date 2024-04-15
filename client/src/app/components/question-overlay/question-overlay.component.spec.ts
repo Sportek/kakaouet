@@ -11,7 +11,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BAD_QUIZ, WORKING_QUIZ } from '@app/fake-quizzes';
 import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
-import { Choice, Question } from '@common/types';
+import { Variables } from '@common/enum-variables';
+import { Choice, Question, QuestionType } from '@common/types';
 import { cloneDeep } from 'lodash';
 import { of } from 'rxjs';
 import { QuestionOverlayComponent } from './question-overlay.component';
@@ -231,5 +232,70 @@ describe('QuestionOverlayComponent', () => {
         component.moveChoiceDown(1);
 
         expect(overlayServiceSpy).toHaveBeenCalled();
+    });
+
+    it('should return true if a choice is not modifying', () => {
+        const testChoice = { _id: 1, text: 'Test', isCorrect: false };
+        component.isModifyingChoiceMap.set(testChoice, false);
+        expect(component.isChoiceNotModifying(testChoice)).toBeTrue();
+    });
+
+    it('should return false if a choice is modifying', () => {
+        const testChoice = { _id: 1, text: 'Test', isCorrect: false };
+        component.isModifyingChoiceMap.set(testChoice, true);
+        expect(component.isChoiceNotModifying(testChoice)).toBeFalse();
+    });
+
+    it('should return true if a choice is modifying', () => {
+        const testChoice = { _id: 1, text: 'Test', isCorrect: false };
+        component.isModifyingChoiceMap.set(testChoice, true);
+        expect(component.isChoiceModifying(testChoice)).toBeTrue();
+    });
+
+    it('should return false if a choice is not modifying', () => {
+        const testChoice = { _id: 1, text: 'Test', isCorrect: false };
+        component.isModifyingChoiceMap.set(testChoice, false);
+        expect(component.isChoiceModifying(testChoice)).toBeFalse();
+    });
+
+    it('should allow adding more choices if the number of choices is below the maximum for QCM type', () => {
+        const currentDate = new Date();
+        component.currentQuestion = {
+            _id: '1',
+            type: QuestionType.QCM,
+            choices: new Array(Variables.QCMMaxChoicesAmount - 1).fill({}),
+            text: '',
+            points: 1,
+            createdAt: currentDate,
+            lastModification: currentDate,
+        };
+        expect(component.canAddMoreChoices()).toBeTrue();
+    });
+
+    it('should not allow adding more choices if the number of choices reaches the maximum for QCM type', () => {
+        const currentDate = new Date();
+        component.currentQuestion = {
+            _id: '1',
+            type: QuestionType.QCM,
+            choices: new Array(Variables.QCMMaxChoicesAmount).fill({}),
+            text: '',
+            points: 1,
+            createdAt: currentDate,
+            lastModification: currentDate,
+        };
+        expect(component.canAddMoreChoices()).toBeFalse();
+    });
+
+    it('should not allow adding more choices if the question type is not QCM', () => {
+        const currentDate = new Date();
+        component.currentQuestion = {
+            _id: '1',
+            type: QuestionType.QRL,
+            text: '',
+            points: 1,
+            createdAt: currentDate,
+            lastModification: currentDate,
+        };
+        expect(component.canAddMoreChoices()).toBeFalse();
     });
 });
