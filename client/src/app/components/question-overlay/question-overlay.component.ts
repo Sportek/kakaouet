@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { OverlayService } from '@app/services/overlay/overlay.service';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { ValidateService } from '@app/services/validate/validate.service';
+import { Variables } from '@common/enum-variables';
 import { Choice, Question } from '@common/types';
 import { Subscription } from 'rxjs';
 
@@ -117,5 +118,20 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
 
     moveChoiceDown(index: number): void {
         this.overlayService.moveChoiceDown(index);
+    }
+
+    isChoiceNotModifying(choice: Choice): boolean {
+        return !this.isModifyingChoiceMap.get(choice) || !this.isModifyingChoiceMap.has(choice);
+    }
+
+    isChoiceModifying(choice: Choice): boolean {
+        return this.isModifyingChoiceMap.has(choice) && this.isModifyingChoiceMap.get(choice) === true;
+    }
+
+    canAddMoreChoices(): boolean {
+        return (
+            this.currentQuestion.type === 'QCM' &&
+            (!this.currentQuestion.choices || this.currentQuestion.choices.length < Variables.QCMMaxChoicesAmount)
+        );
     }
 }
