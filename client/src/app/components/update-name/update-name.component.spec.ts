@@ -97,4 +97,19 @@ describe('UpdateNameComponent', () => {
         component.ngOnDestroy();
         expect(component.subscription.unsubscribe).toHaveBeenCalled();
     });
+
+    it('should not handle errors other than unique name violation', () => {
+        const errorResponse = new HttpErrorResponse({
+            error: { message: 'Other error' },
+            status: 500,
+            statusText: 'Internal Server Error',
+        });
+
+        quizServiceMock.addNewQuiz.and.returnValue(throwError(() => errorResponse));
+
+        component.sendNewName();
+        fixture.detectChanges();
+        expect(notificationService.error).not.toHaveBeenCalledWith('Le nom du quiz doit être unique, vous devez changer le nom.');
+        expect(dialogRefMock.close).not.toHaveBeenCalled();
+    });
 });
