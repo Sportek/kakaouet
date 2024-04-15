@@ -37,9 +37,19 @@ export class OrganisatorService {
     }
 
     sendRating(playerName: string) {
-        this.players = this.filterPlayers();
-        this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
+        const index = this.indexOfPlayer(playerName);
+        if (index >= 0) this.gameService.rateAnswerQRL(playerName, this.playerRatings.get(playerName) ?? 0);
+        this.setNewPlayer();
+    }
+
+    indexOfPlayer(playerName: string): number {
+        return this.players.filter((player) => !player.hasGiveUp).findIndex((player) => player.name === playerName);
+    }
+
+    setNewPlayer() {
         if (this.currentPlayerIndex + 1 < this.players.length) this.currentPlayer = this.players[++this.currentPlayerIndex];
+        else return;
+        if (this.currentPlayer.hasGiveUp) this.setNewPlayer();
     }
 
     filterPlayers(): PlayerClient[] {
@@ -69,8 +79,12 @@ export class OrganisatorService {
     setPlayers(players: PlayerClient[]) {
         this.players = sortPlayerByName(players);
         this.players = this.filterPlayers();
+        this.calculateChoices();
+    }
+
+    reinitialisePlayerToRate() {
         this.currentPlayer = this.players[0];
         this.currentPlayerIndex = 0;
-        this.calculateChoices();
+        if (this.currentPlayer.hasGiveUp) this.setNewPlayer();
     }
 }
