@@ -48,7 +48,7 @@
                 </div>
             </ng-container>
 
-            <ng-container *ngIf="isDisplayingResults() && isQRL()">
+            <ng-container *ngIf="shouldDisplayQRLResults()">
                 <div class="stats-container">
                     <div class="columns">
                         <div *ngFor="let column of getChoices(); let i = index" class="column-container" [matTooltip]="formatColumn(column)">
@@ -63,7 +63,7 @@
                 </div>
             </ng-container>
 
-            <div class="stats-container-qrl" *ngIf="isCorrectingAnswers() && isQRL()">
+            <div class="stats-container-qrl" *ngIf="shouldCorrectQRLAnswers()">
                 <div class="players-container-answer-qrl">
                     <div>{{ getCurrentPlayer().name }}: {{ getCurrentPlayer().answers?.answer }}</div>
                     <div>Veuillez noter sa réponse:</div>
@@ -78,12 +78,7 @@
                         </mat-form-field>
                         Note actuelle: {{ getRatingForPlayer(getCurrentPlayer().name)?.toString() }}
                     </div>
-                    <button
-                        *ngIf="getRatingForPlayer(getCurrentPlayer().name)?.toString()"
-                        mat-raised-button
-                        color="primary"
-                        (click)="sendRating(getCurrentPlayer().name)"
-                    >
+                    <button *ngIf="hasRatingForCurrentPlayer()" mat-raised-button color="primary" (click)="sendRating(getCurrentPlayer().name)">
                         Noter
                     </button>
                 </div>
