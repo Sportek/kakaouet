@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { GameEvents } from '@common/game-types';
-import { GameRole, GameType, Quiz } from '@common/types';
+import { GameRole, GameState, GameType, Quiz } from '@common/types';
 
 import { Server } from 'socket.io';
 
@@ -46,6 +46,7 @@ class MockPlayer {
     name;
     role = GameRole.Player;
     isExcluded = false;
+    isMuted = false;
     hasGiveUp = false;
     score = 0;
     socket;
@@ -193,7 +194,7 @@ describe('Room', () => {
         room.addPlayer(mockPlayer1);
         room.addPlayer(mockPlayer2);
 
-        expect(room.allPlayerAnswered()).toBeFalsy(); // supposed to be : toBeThuthy()
+        expect(room.allPlayerAnswered()).toBeFalsy();
     });
 
     it('returns false when not all players have answered the current question', () => {
@@ -206,5 +207,55 @@ describe('Room', () => {
         room.addPlayer(mockPlayer2);
 
         expect(room.allPlayerAnswered()).toBeFalsy();
+    });
+
+    it('should mute and unmute a player correctly', () => {
+        const mockPlayer = new MockPlayer('MutePlayer', mockSocket);
+        room.addPlayer(mockPlayer);
+        expect(mockPlayer.isMuted).toBeFalsy();
+
+        room.mutePlayer('MutePlayer');
+        expect(mockPlayer.isMuted).toBeTruthy();
+        expect(mockServer.to).toHaveBeenCalledWith(roomCode);
+        expect(mockServer.except).toHaveBeenCalledWith(mockPlayer.socket.id);
+        expect(mockServer.emit).toHaveBeenCalledWith(GameEvents.PlayerMuted, { name: 'MutePlayer', isMuted: true });
+
+        room.mutePlayer('MutePlayer');
+        expect(mockPlayer.isMuted).toBeFalsy();
+        expect(mockServer.emit).toHaveBeenCalledWith(GameEvents.PlayerMuted, { name: 'MutePlayer', isMuted: false });
+    });
+
+    it('should change the role of all organizers to players', () => {
+        const mockOrganizer1 = new MockPlayer('Organizer1', mockSocket);
+        mockOrganizer1.role = GameRole.Organisator;
+        const mockOrganizer2 = new MockPlayer('Organizer2', mockSocket);
+        mockOrganizer2.role = GameRole.Organisator;
+        const mockPlayer = new MockPlayer('Player1', mockSocket);
+
+        room.addPlayer(mockOrganizer1);
+        room.addPlayer(mockOrganizer2);
+        room.addPlayer(mockPlayer);
+
+        room.changeOrganisatorToPlayer();
+
+        expect(mockOrganizer1.role).toEqual(GameRole.Player);
+        expect(mockOrganizer2.role).toEqual(GameRole.Player);
+        expect(mockPlayer.role).toEqual(GameRole.Player);
+    });
+
+    describe('isWaitingPlayersPhase', () => {
+        it('should return true when the game state is WaitingPlayers', () => {
+            room.getGame().gameState = GameState.WaitingPlayers;
+
+            expect(room.isWaitingPlayersPhase()).toBeTruthy();
+        });
+
+        it('should return false when the game state is not WaitingPlayers', () => {
+            room.getGame().gameState = GameState.PlayersAnswerQuestion;
+            expect(room.isWaitingPlayersPhase()).toBeFalsy();
+
+            room.getGame().gameState = GameState.End;
+            expect(room.isWaitingPlayersPhase()).toBeFalsy();
+        });
     });
 });
