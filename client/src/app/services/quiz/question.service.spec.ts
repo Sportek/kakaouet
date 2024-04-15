@@ -191,7 +191,7 @@ describe('QuestionService', () => {
             };
             const question = quiz.questions[0] as Question;
             const testQuiz = quiz as Quiz;
-            service.onQuestionListUpdate(question, testQuiz);
+            service.onQuestionListUpdate(question, testQuiz, true);
             expect(quiz.questions[0] as Question).toEqual(question);
         });
     });

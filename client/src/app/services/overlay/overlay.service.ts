@@ -140,7 +140,7 @@ export class OverlayService {
             // eslint-disable-next-line no-underscore-dangle
             partialQuestionNoId._id = this.currentQuestion._id;
             this.currentQuestion = partialQuestionNoId as Question;
-            this.submitQuestionToQuiz();
+            this.submitQuestionToQuiz(isPatch);
         } else if (isPatch) {
             // _id est forcé par MongoDB, accepté par le prof
             // eslint-disable-next-line no-underscore-dangle
@@ -151,8 +151,8 @@ export class OverlayService {
         this.resetQuestion();
     }
 
-    submitQuestionToQuiz(): void {
-        this.questionService.onQuestionListUpdate(this.currentQuestion, this.currentQuiz);
+    submitQuestionToQuiz(isPatch: boolean): void {
+        this.questionService.onQuestionListUpdate(this.currentQuestion, this.currentQuiz, isPatch);
         this.resetQuestion();
     }
 

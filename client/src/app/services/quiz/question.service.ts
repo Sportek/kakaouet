@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BASE_URL } from '@app/constants';
+import { NotificationService } from '@app/services/notification/notification.service';
 import { Question, QuestionType, Quiz } from '@common/types';
 import { Observable, Subject } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -21,6 +22,7 @@ export class QuestionService {
     constructor(
         private http: HttpClient,
         private dialog: MatSnackBar,
+        private notificationService: NotificationService,
     ) {}
 
     getQuestions(): Observable<Question[]> {
@@ -120,13 +122,14 @@ export class QuestionService {
         });
     }
 
-    onQuestionListUpdate(modifiedQuestion: Question, quiz: Quiz) {
+    onQuestionListUpdate(modifiedQuestion: Question, quiz: Quiz, isPatch: boolean) {
         // _id est forcé par MongoDB, accepté par le prof
         // eslint-disable-next-line no-underscore-dangle
         const index = quiz.questions.findIndex((question) => question.text === modifiedQuestion.text);
         if (index < 0) {
             quiz.questions.push(modifiedQuestion);
         } else {
+            if (!isPatch) return this.notificationService.error("La question n'a pas été ajoutée car une question du même titre existe déjà");
             quiz.questions[index] = modifiedQuestion;
         }
     }
