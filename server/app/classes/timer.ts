@@ -15,6 +15,7 @@ export class Timer {
     private multiplicator: number;
     private interval: NodeJS.Timer;
     private isPaused: boolean = false;
+    private isActive: boolean = false;
     private whenDone: () => void;
     private whenIncrement: (timer: number) => void;
     constructor(countDown: number, options?: TimerOptions) {
@@ -30,6 +31,7 @@ export class Timer {
 
     start() {
         if (this.interval) clearInterval(this.interval);
+        this.isActive = true;
         this.whenIncrement(this.timer);
         this.interval = setInterval(
             () => {
@@ -42,11 +44,13 @@ export class Timer {
     }
 
     stop() {
+        if (!this.isActive) return;
         this.timer = 0;
         clearInterval(this.interval);
         this.interval = undefined;
         this.whenIncrement(this.timer);
         this.whenDone();
+        this.isActive = false;
     }
 
     togglePlayPause() {
