@@ -184,7 +184,7 @@ describe('OverlayService', () => {
         const onQuestionListUpdateSpy = spyOn(questionService, 'onQuestionListUpdate').and.callFake((question, quiz) => {
             return of(question, quiz);
         });
-        service.submitQuestionToQuiz();
+        service.submitQuestionToQuiz(true);
         expect(onQuestionListUpdateSpy).toHaveBeenCalled();
     });
 
