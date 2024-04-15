@@ -50,9 +50,14 @@ export class GameSession {
     }
 
     startGame() {
+        if (this.type === GameType.Random) this.changeOrganisatorToPlayer();
         this.changeGameState(GameState.PlayersAnswerQuestion);
         this.broadcastGameNextQuestion();
         this.startQuestionCooldown();
+    }
+
+    changeOrganisatorToPlayer() {
+        this.room.changeOrganisatorToPlayer();
     }
 
     startQuestionCooldown(): void {
