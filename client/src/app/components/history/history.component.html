@@ -1,5 +1,6 @@
 <div class="background">
     <div class="history-container">
+        <div class="no-games" *ngIf="!gameRecords.length">Aucune partie n'est actuellement enregistrée</div>
         <div *ngFor="let record of gameRecords" class="history-item">
             <span class="game-title">{{ record.gameTitle }}</span>
             <span class="number-players">Joueurs: {{ record.numberOfPlayers }}</span>
