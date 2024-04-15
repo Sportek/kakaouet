@@ -336,4 +336,46 @@ describe('QuizService', () => {
             expect(notificationSpy).toHaveBeenCalledWith("Erreur lors de l'import du quiz");
         });
     });
+
+    describe('getRandomQuiz', () => {
+        it('should return a random quiz if there are enough QCM questions', () => {
+            // @ts-ignore
+            spyOn(service.questionService, 'hasEnoughQCMQuestions').and.returnValue(of(true));
+            const mockRandomQuiz: Quiz = {
+                _id: 'randomQuizId',
+                title: 'Random Quiz Title',
+                description: 'A randomly generated quiz.',
+                duration: 25,
+                visibility: true,
+                questions: [],
+                createdAt: new Date(),
+                lastModification: new Date(),
+            };
+
+            service.getRandomQuiz().subscribe((quiz) => {
+                expect(quiz).toEqual(mockRandomQuiz);
+            });
+
+            const req = httpTestingController.expectOne(`${BASE_URL}/quiz/generate/random`);
+            expect(req.request.method).toBe('GET');
+            req.flush(mockRandomQuiz);
+        });
+
+        it('should error if there are not enough QCM questions', () => {
+            // @ts-ignore
+            spyOn(service.questionService, 'hasEnoughQCMQuestions').and.returnValue(of(false));
+
+            service.getRandomQuiz().subscribe({
+                next: () => {
+                    fail('Expected an error, not a quiz');
+                },
+                error: (e) => {
+                    expect(e.message).toBe('Pas assez de questions QCM pour créer un quiz aléatoire.');
+                },
+            });
+
+            // Verify that no requests were made to generate a random quiz
+            httpTestingController.expectNone(`${BASE_URL}/quiz/generate/random`);
+        });
+    });
 });
