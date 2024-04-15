@@ -16,18 +16,15 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.RateAnswerQRL)
     handleRateAnswerQRL(@MessageBody() data: GameEventsData.RateAnswerQRL, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
-
+        if (!gameSession) {
+            return this.generateErrorResponse("La partie n'existe pas");
+        }
         const player = gameSession.room.getPlayer(data.playerName);
-        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
-
+        if (!player) {
+            return this.generateErrorResponse("Vous n'êtes pas autorisé à effectuer cette action");
+        }
         gameSession.saveAnswerRatings(player, data.score);
-
-        if (
-            !gameSession.room
-                .getPlayers()
-                .some((currPlayer) => currPlayer.role === GameRole.Player && !currPlayer.hasAnswered && !currPlayer.hasGiveUp)
-        ) {
+        if (this.shouldDisplayResults(gameSession)) {
             gameSession.displayQuestionResults();
         }
         return { isSuccess: true, message: 'La question a été notée' };
@@ -231,5 +228,13 @@ export class GameGateway {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
         return player && player.role === role;
+    }
+
+    private generateErrorResponse(message: string): SocketResponse {
+        return { isSuccess: false, message };
+    }
+
+    private shouldDisplayResults(gameSession): boolean {
+        return !gameSession.room.getPlayers().some((player) => player.role === GameRole.Player && !player.hasAnswered && !player.hasGiveUp);
     }
 }
