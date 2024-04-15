@@ -173,15 +173,12 @@ export class GameEventsListener {
 
     private receiveUpdateScoreListener() {
         this.gameService.socketService.listen(GameEvents.UpdateScore, (data: GameEventsData.UpdateScore) => {
-            const pointsEarned = data.score - this.gameService.client.getValue().score;
-            if (this.gameService.client.getValue().role === GameRole.Player) {
-                if (pointsEarned > 0) {
-                    if (data.hasAnsweredFirst)
-                        this.gameService.notificationService.info(`Vous avez répondu en premier et gagnez ${pointsEarned} points !`);
-                    else this.gameService.notificationService.info(`Vous avez gagné ${pointsEarned} points !`);
-                }
+            const currentClient = this.gameService.client.getValue();
+            const pointsEarned = data.score - currentClient.score;
+            this.gameService.client.next({ ...currentClient, score: data.score });
+            if (currentClient.role === GameRole.Player && pointsEarned > 0) {
+                this.notifyScoreGain(pointsEarned, data.hasAnsweredFirst);
             }
-            this.gameService.client.next({ ...this.gameService.client.getValue(), score: data.score });
         });
     }
 
@@ -268,5 +265,12 @@ export class GameEventsListener {
                 return player;
             }),
         );
+    }
+
+    private notifyScoreGain(pointsEarned: number, hasAnsweredFirst: boolean) {
+        const message = hasAnsweredFirst
+            ? `Vous avez répondu en premier et gagnez ${pointsEarned} points !`
+            : `Vous avez gagné ${pointsEarned} points !`;
+        this.gameService.notificationService.info(message);
     }
 }
