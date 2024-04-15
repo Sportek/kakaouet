@@ -27,7 +27,7 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
 
     constructor(
-        private gameService: GameService, // private router: Router,
+        private gameService: GameService,
         private playerService: PlayerService,
         private organisatorService: OrganisatorService,
     ) {
@@ -138,6 +138,10 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
 
     toggleMutePlayer(player: PlayerClient) {
         this.gameService.toggleMutePlayer(player);
+    }
+
+    canDisableTimer(): boolean {
+        return this.gameService.gameState.getValue() === GameState.PlayersAnswerQuestion;
     }
 
     ngOnDestroy(): void {
