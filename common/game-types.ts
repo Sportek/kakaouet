@@ -20,7 +20,7 @@ export enum GameEvents {
     // Events launched by the server
     PlayerSelectAnswer = 'playerSelectedAnswer', // Event sent to organizer a player has selected an answer
     PlayerConfirmAnswers = 'playerConfirmedAnswers', // Event sent to organizer a player has confirmed his answers
-    PlayerNotInteractQrl = 'playerNotInteractQrl', //Event sent to server when didnt touch qrl
+    PlayerNotInteractQrl = 'playerNotInteractQrl', //Event sent to server when the player didn't interact with the qrl
     PlayerQuitGame = 'playerQuitGame', // Event sent to all players when a player quits the game
     PlayerJoinGame = 'playerJoinGame', // Event sent to all players when a new player joins the game
     PlayerConfirmJoinGame = 'playerConfirmJoinGame', // Event to confirm that the player has joined the game
