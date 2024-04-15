@@ -11,7 +11,7 @@
                 </div>
             </div>
             <div class="game-questions-container">
-                <div *ngIf="quiz._id !== ramdomId" class="box-description">
+                <div *ngIf="isNotRandomQuiz()" class="box-description">
                     <div *ngFor="let quest of question; let i = index">
                         <p>{{ i + 1 }} - {{ quest.text }} ({{ quest.type }})</p>
                     </div>
@@ -19,7 +19,7 @@
             </div>
             <div class="buttons-container">
                 <button routerLink="/create" mat-raised-button class="large-text quit-button" color="primary">Retour</button>
-                <button *ngIf="quiz._id !== ramdomId" (click)="testGame(quiz._id)" mat-raised-button class="large-text test-button" color="primary">
+                <button *ngIf="isNotRandomQuiz()" (click)="testGame(quiz._id)" mat-raised-button class="large-text test-button" color="primary">
                     Tester le jeu
                 </button>
                 <button mat-raised-button (click)="createGame(quiz._id)" class="large-text create-button" color="primary">Créer une partie</button>

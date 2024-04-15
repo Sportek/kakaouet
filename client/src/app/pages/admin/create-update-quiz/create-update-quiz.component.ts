@@ -112,4 +112,12 @@ export class CreateUpdateQuizComponent implements OnInit {
     hasError(): string | undefined {
         return this.quizService.hasError(this.quiz);
     }
+
+    canMoveQuestionUp(index: number): boolean {
+        return index > 0;
+    }
+
+    canMoveQuestionDown(index: number): boolean {
+        return index < this.quiz.questions.length - 1;
+    }
 }

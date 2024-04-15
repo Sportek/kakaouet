@@ -61,30 +61,30 @@
                             <div>
                                 {{ i + 1 + '.' }}
                             </div>
-                            <div *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)">
+                            <div *ngIf="isChoiceNotModifying(choice)">
                                 {{ choice.text }}
                             </div>
-                            <div *ngIf="isModifyingChoiceMap.get(choice) && isModifyingChoiceMap.has(choice)">
+                            <div *ngIf="isChoiceModifying(choice)">
                                 <input [(ngModel)]="choice.text" matInput placeholder="Titre de la question" name="title" class="input" />
                             </div>
                             <div class="icons">
                                 <mat-icon
                                     matTooltip="Modifier la réponse"
-                                    *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)"
+                                    *ngIf="isChoiceNotModifying(choice)"
                                     class="large-text clickable"
                                     (click)="modifyChoice(choice)"
                                     >edit</mat-icon
                                 >
                                 <mat-icon
                                     matTooltip="Supprimer la réponse"
-                                    *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)"
+                                    *ngIf="isChoiceNotModifying(choice)"
                                     class="large-text clickable"
                                     (click)="deleteChoice(choice)"
                                     >delete</mat-icon
                                 >
                                 <mat-icon
                                     matTooltip="Valider la réponse"
-                                    *ngIf="isModifyingChoiceMap.get(choice) && isModifyingChoiceMap.has(choice)"
+                                    *ngIf="isChoiceModifying(choice)"
                                     class="large-text clickable"
                                     (click)="modifyChoice(choice)"
                                     ><span class="material-symbols-outlined"> check </span></mat-icon
@@ -102,7 +102,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="choices-buttons" *ngIf="!currentQuestion.choices || currentQuestion.choices.length < 4">
+                    <div class="choices-buttons" *ngIf="canAddMoreChoices()">
                         <button mat-raised-button color="primary" (click)="addChoice()">Ajouter une réponse</button>
                     </div>
                 </div>
