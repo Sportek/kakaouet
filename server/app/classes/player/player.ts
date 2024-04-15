@@ -48,7 +48,7 @@ export class Player {
     }
 
     setEmptyAnswer(): void {
-        this.setAnswer('', GameEvents.PlayerNotInteractQrl);
+        this.setAnswer(' ', GameEvents.PlayerNotInteractQrl);
     }
 
     getAnswer(index: number): CompletePlayerAnswer {
