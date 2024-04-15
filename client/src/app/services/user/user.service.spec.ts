@@ -119,4 +119,24 @@ describe('UserService', () => {
         req.error(new ProgressEvent('Error'));
         flush();
     }));
+
+    it('should redirect to /admin/login when not logged in and accessing admin route', fakeAsync(() => {
+        spyOn(router, 'navigateByUrl').and.callThrough();
+        service.checkAndRedirect('/admin/login');
+        tick();
+        service.loggedState.next(AdminLoginState.Failed);
+        tick();
+        expect(router.navigateByUrl).toHaveBeenCalledWith('/admin/login', { replaceUrl: true });
+    }));
+
+    it("shouldn't login with bad password", () => {
+        spyOn(router, 'navigateByUrl').and.callThrough();
+        // @ts-ignore
+        spyOn(service.notificationService, 'error');
+        service.login(router, 'badPassword');
+        const req = httpTestingController.expectOne(`${BASE_URL}/user/auth/login`);
+        req.flush({ success: false }, { status: HttpStatusCode.Ok, statusText: 'OK' });
+        // @ts-ignore
+        expect(service.notificationService.error).toHaveBeenCalledWith('Mot de passe incorrect.');
+    });
 });

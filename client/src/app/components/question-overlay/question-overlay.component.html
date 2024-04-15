@@ -69,25 +69,34 @@
                             </div>
                             <div class="icons">
                                 <mat-icon
+                                    matTooltip="Modifier la réponse"
                                     *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)"
                                     class="large-text clickable"
                                     (click)="modifyChoice(choice)"
                                     >edit</mat-icon
                                 >
                                 <mat-icon
+                                    matTooltip="Supprimer la réponse"
                                     *ngIf="!isModifyingChoiceMap.get(choice) || !isModifyingChoiceMap.has(choice)"
                                     class="large-text clickable"
                                     (click)="deleteChoice(choice)"
                                     >delete</mat-icon
                                 >
                                 <mat-icon
+                                    matTooltip="Valider la réponse"
                                     *ngIf="isModifyingChoiceMap.get(choice) && isModifyingChoiceMap.has(choice)"
                                     class="large-text clickable"
                                     (click)="modifyChoice(choice)"
                                     ><span class="material-symbols-outlined"> check </span></mat-icon
                                 >
-                                <mat-icon class="clickable" (click)="moveChoiceUp(i)" *ngIf="i > 0">arrow_upward</mat-icon>
-                                <mat-icon class="clickable" (click)="moveChoiceDown(i)" *ngIf="i < currentQuestion.choices.length - 1"
+                                <mat-icon class="clickable" matTooltip="Monter la réponse" (click)="moveChoiceUp(i)" *ngIf="i > 0"
+                                    >arrow_upward</mat-icon
+                                >
+                                <mat-icon
+                                    class="clickable"
+                                    matTooltip="Descendre la réponse"
+                                    (click)="moveChoiceDown(i)"
+                                    *ngIf="i < currentQuestion.choices.length - 1"
                                     >arrow_downward</mat-icon
                                 >
                             </div>
