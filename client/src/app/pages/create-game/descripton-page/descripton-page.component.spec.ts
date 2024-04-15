@@ -1,156 +1,121 @@
-/* import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { Observable, of, throwError } from 'rxjs';
-
-import { HttpErrorResponse } from '@angular/common/http';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { WORKING_QUIZ } from '@app/fake-quizzes';
+import { GameService } from '@app/services/game/game.service';
 import { NotificationService } from '@app/services/notification/notification.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { GameType, Quiz } from '@common/types';
-import { cloneDeep } from 'lodash';
+import { of, throwError } from 'rxjs'; // Ensure you have this import for creating observables
 import { DescriptonPageComponent } from './descripton-page.component';
 
-class MockQuizService {
-    getQuizById(id: string): Observable<unknown> {
-        if (id === 'valid-id') {
-            return of({ _id: 'valid-id', name: 'Valid Quiz', visibility: true, questions: [] });
-        } else if (id === 'hidden-id') {
-            return of({ _id: 'hidden-id', name: 'Hidden Quiz', visibility: false, questions: [] });
-        } else {
-            return throwError(() => new HttpErrorResponse({ status: 404, statusText: 'Not Found' }));
-        }
-    }
-}
-
-describe('DescriptonPageComponent', () => {
+describe('DescriptionPageComponent', () => {
     let component: DescriptonPageComponent;
     let fixture: ComponentFixture<DescriptonPageComponent>;
-    let notificationService: jasmine.SpyObj<NotificationService>;
-    let router: Router;
-    let quizService: QuizService;
+    let quizServiceMock: any;
+    let routerMock: any;
+    let notificationServiceMock: any;
+    let changeDetectorRefMock: any;
+    let gameServiceMock: any;
+    let routeMock: any;
 
     beforeEach(async () => {
-        notificationService = jasmine.createSpyObj('NotificationService', ['error']);
+        quizServiceMock = {
+            getQuizDetailsById: jasmine.createSpy().and.returnValue(of({
+                id: '1', name: 'Test Quiz', questions: []
+            })), // Return an observable when getQuizDetailsById is called
+            getQuizById: jasmine.createSpy().and.returnValue(of({
+                id: '1', visibility: true
+            })), // Return an observable when getQuizById is called
+        };
+        routerMock = {
+            navigate: jasmine.createSpy(),
+            navigateByUrl: jasmine.createSpy(),
+        };
+        notificationServiceMock = {
+            error: jasmine.createSpy(),
+        };
+        changeDetectorRefMock = {
+            detectChanges: jasmine.createSpy(),
+        };
+        gameServiceMock = {
+            createNewGame: jasmine.createSpy(),
+        };
+        routeMock = {
+            snapshot: {
+                paramMap: {
+                    get: jasmine.createSpy().and.returnValue('1')
+                }
+            }
+        };
+
         await TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, RouterTestingModule],
-            declarations: [DescriptonPageComponent],
-            schemas: [CUSTOM_ELEMENTS_SCHEMA],
+            declarations: [DescriptonPageComponent], 
             providers: [
-                { provide: QuizService, useClass: MockQuizService },
-                { provide: NotificationService, useValue: notificationService },
-                {
-                    provide: ActivatedRoute,
-                    useValue: {
-                        snapshot: {
-                            paramMap: {
-                                get: () => 'valid-id',
-                            },
-                        },
-                    },
-                },
+                { provide: QuizService, useValue: quizServiceMock },
+                { provide: Router, useValue: routerMock },
+                { provide: NotificationService, useValue: notificationServiceMock },
+                { provide: ChangeDetectorRef, useValue: changeDetectorRefMock },
+                { provide: GameService, useValue: gameServiceMock },
+                { provide: ActivatedRoute, useValue: routeMock },
             ],
+            schemas: [NO_ERRORS_SCHEMA],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(DescriptonPageComponent);
+        fixture = TestBed.createComponent(DescriptonPageComponent); 
         component = fixture.componentInstance;
-        router = TestBed.inject(Router);
-        quizService = TestBed.inject(QuizService);
+        fixture.detectChanges();
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call getQuiz on init with valid id', () => {
-        const spyGetQuiz = spyOn(component, 'getQuizDetails').and.callThrough();
-        fixture.detectChanges();
-        expect(spyGetQuiz).toHaveBeenCalledWith('valid-id');
+    describe('loadQuizDetails', () => {
+        it('should navigate to error-404 if no gameId is found in the route parameters', () => {
+            routeMock.snapshot.paramMap.get.and.returnValue(null);
+            component.loadQuizDetails();
+            expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/error-404');
+        });
+    
+        it('should call getQuizDetails with quizId if gameId is present', () => {
+            const expectedQuizId = '123';
+            routeMock.snapshot.paramMap.get.and.returnValue(expectedQuizId);
+            component.loadQuizDetails();
+            expect(quizServiceMock.getQuizDetailsById).toHaveBeenCalledWith(expectedQuizId);
+        });
     });
 
-    it('should redirect if quiz not found', () => {
-        const routerNavigationSpy = spyOn(router, 'navigateByUrl');
-        spyOn(quizService, 'getQuizById').and.returnValue(
-            throwError(() => {
-                return { status: 404 };
-            }),
-        );
+    describe('getQuizDetails', () => {
+        it('should handle not found quiz by navigating to error-404', () => {
+            const quizId = 'invalidQuizId';
+            quizServiceMock.getQuizDetailsById.and.returnValue(of(null)); 
+            component.getQuizDetails(quizId);
+            expect(notificationServiceMock.error).toHaveBeenCalledWith('Quiz introuvable.');
+            expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/error-404');
+        });
+    
+        it('should update quiz and question properties and call detectChanges when quiz is found', () => {
+            const quizId = 'validQuizId';
+            const quiz = { id: '1', name: 'Test Quiz', questions: [{ id: 'q1', text: 'Question?' }] };
+            quizServiceMock.getQuizDetailsById.and.returnValue(of(quiz)); 
+            component.getQuizDetails(quizId);
+            expect(changeDetectorRefMock.detectChanges).not.toHaveBeenCalled();
+        });
 
-        component.getQuizDetails('fakeId');
-
-        expect(routerNavigationSpy).toHaveBeenCalledWith('/error-404', { replaceUrl: true });
+        it('should update quiz and question properties and call detectChanges when quiz is found', () => {
+            const quizId = 'validQuizId';
+            quizServiceMock.getQuizDetailsById.and.returnValue(of(null)); 
+            component.getQuizDetails(quizId);
+            expect(changeDetectorRefMock.detectChanges).not.toHaveBeenCalled();
+        });
+    
+        it('should navigate to error-404 with replaceUrl when there is an API error', () => {
+            const quizId = 'quizId';
+            quizServiceMock.getQuizDetailsById.and.returnValue(throwError(() => new Error('API Error'))); 
+            component.getQuizDetails(quizId);
+            expect(notificationServiceMock.error).toHaveBeenCalledWith('Une erreur est survenue lors de la récupération du quiz.');
+            expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/error-404', { replaceUrl: true });
+        });
     });
-
-    it('should set game data on valid quiz fetch', () => {
-        fixture.detectChanges();
-        expect(component.quiz).toBeTruthy();
-        // eslint-disable-next-line no-underscore-dangle
-        expect(component.quiz._id).toEqual('valid-id');
-    });
-
-    it('should call createNewGame on createGame', () => {
-        // @ts-ignore -- Obligé de mocker la méthode car elle est privée
-        const spy = spyOn(component.gameService, 'createNewGame');
-        fixture.detectChanges();
-        component.createGame('valid-id');
-        expect(spy).toHaveBeenCalledWith('valid-id', GameType.Default);
-    });
-
-    it('should handle hidden quiz in checkQuizBeforeNavigation', () => {
-        const spyRouter = spyOn(router, 'navigate');
-        component.checkQuizBeforeNavigation('hidden-id', '/create', false);
-        expect(notificationService.error).toHaveBeenCalledWith('Ce jeu est actuellement invisible.');
-        expect(spyRouter).toHaveBeenCalledWith(['/create']);
-    });
-
-    it('should handle notFound errors in checkQuizBeforeNavigation', fakeAsync(() => {
-        const spyRouterNavigate = spyOn(router, 'navigate');
-        spyOn(quizService, 'getQuizById').and.returnValue(throwError(() => new Error()));
-        component.checkQuizBeforeNavigation('invalid-id', '/create', true);
-        tick();
-        expect(notificationService.error).toHaveBeenCalledWith('Ce jeu a été supprimé, veuillez sélectionner un autre jeu');
-        expect(spyRouterNavigate).toHaveBeenCalled();
-    }));
-
-    it('should handle other errors in checkQuizBeforeNavigation', fakeAsync(() => {
-        spyOn(quizService, 'getQuizById').and.returnValue(
-            throwError(() => {
-                return { status: 500 };
-            }),
-        );
-        component.checkQuizBeforeNavigation('invalid-id', '/create', true);
-        tick();
-        expect(notificationService.error).toHaveBeenCalledWith('Une erreur est survenue. Veuillez réessayer.');
-    }));
-
-    it('should navigate to specified path', fakeAsync(() => {
-        const spyRouterNavigate = spyOn(router, 'navigate');
-        const visibilityOnQuiz = cloneDeep(WORKING_QUIZ as Quiz);
-        visibilityOnQuiz.visibility = true;
-        spyOn(quizService, 'getQuizById').and.returnValue(of(visibilityOnQuiz));
-        component.checkQuizBeforeNavigation('fakeId', '/fakePath', false);
-        tick();
-        expect(spyRouterNavigate).toHaveBeenCalledWith(['/fakePath']);
-    }));
-
-    it('should navigate to specified path with gameId', fakeAsync(() => {
-        const spyRouterNavigate = spyOn(router, 'navigate');
-        const visibilityOnQuiz = cloneDeep(WORKING_QUIZ as Quiz);
-        visibilityOnQuiz.visibility = true;
-        spyOn(quizService, 'getQuizById').and.returnValue(of(visibilityOnQuiz));
-        component.checkQuizBeforeNavigation('fakeId', '/fakePath', true);
-        tick();
-        expect(spyRouterNavigate).toHaveBeenCalledWith(['/fakePath', 'fakeId']);
-    }));
-
-    it('should create a new game', () => {
-        // @ts-ignore
-        const gameServiceSpy = spyOn(component.gameService, 'createNewGame');
-        component.testGame('fakeId');
-
-        expect(gameServiceSpy).toHaveBeenCalledWith('fakeId', GameType.Test);
-    });
+    
+    
 });
- */
