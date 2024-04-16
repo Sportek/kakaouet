@@ -386,4 +386,64 @@ describe('OrganisatorService', () => {
             expect(mockSetNewPlayer).not.toHaveBeenCalled();
         });
     });
+
+    describe('filterPlayers', () => {
+        beforeEach(() => {
+            gameServiceMock.filterPlayers.and.returnValue([
+                {
+                    name: 'Alice',
+                    score: 10,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+                {
+                    name: 'Charlie',
+                    score: 20,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+                {
+                    name: 'Bob',
+                    score: 20,
+                    isExcluded: true,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+            ]);
+        });
+
+        it('should call gameService.filterPlayers and filter out excluded players', () => {
+            const filteredPlayers = service.filterPlayers();
+            expect(gameServiceMock.filterPlayers).toHaveBeenCalled();
+            expect(filteredPlayers.length).toBe(2);
+            expect(filteredPlayers).toEqual([
+                {
+                    name: 'Alice',
+                    score: 10,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+                {
+                    name: 'Charlie',
+                    score: 20,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+            ]);
+        });
+    });
 });
