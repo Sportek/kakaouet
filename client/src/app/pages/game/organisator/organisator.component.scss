@@ -217,10 +217,12 @@
                 }
             }
         }
+    }
 
-        .chat {
-            width: 100%;
-            height: 15rem;
+    .chat {
+        > * {
+            width: 20rem;
+            height: 533.6px;
         }
     }
 
