@@ -4,6 +4,7 @@ import { Room } from '@app/classes/room/room';
 import { Timer } from '@app/classes/timer';
 import { GameService } from '@app/services/game/game.service';
 import { HistoryService } from '@app/services/history/history.service';
+import { NEXT_QUESTION_DELAY, QRL_DELAY, START_GAME_DELAY } from '@common/constants';
 import { ChoiceData, GameEvents } from '@common/game-types';
 import { GameRecords, GameRole, GameState, GameType, Quiz } from '@common/types';
 import { Server, Socket } from 'socket.io';
@@ -11,10 +12,6 @@ import { GameSession } from './game-session';
 
 const gameServiceMock = {} as GameService;
 const historyServiceMock = {} as HistoryService;
-
-const START_GAME_DELAY = 5;
-const QRL_DELAY = 60;
-const NEXT_QUESTION_DELAY = 3;
 
 const quizMock: Quiz = {
     title: 'Thomas',

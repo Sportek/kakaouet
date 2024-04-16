@@ -1,5 +1,6 @@
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { CHOICE_NOT_FOUND } from '@common/constants';
 import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -26,8 +27,6 @@ export class QuizController {
             if (!question) {
                 throw new HttpException('Question not found', HttpStatus.NOT_FOUND);
             }
-
-            const CHOICE_NOT_FOUND = -1;
 
             const correctChoicesIndices = question.choices
                 .map((choice, choiceIndex) => (choice.isCorrect ? choiceIndex : CHOICE_NOT_FOUND))

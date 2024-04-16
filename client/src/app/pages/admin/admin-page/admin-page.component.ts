@@ -1,4 +1,3 @@
-// import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '@app/services/user/user.service';
 
