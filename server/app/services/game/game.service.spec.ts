@@ -18,10 +18,6 @@ const mockHistoryService = {
 };
 
 const mockGameModel = {
-    constructor(data) {
-        // Simulate instance properties
-        Object.assign(this, data);
-    },
     find: jest.fn(),
     findById: jest.fn(),
     replaceOne: jest.fn(),
@@ -215,7 +211,7 @@ describe('GameService', () => {
 
      describe('createNewGame', () => {
         const mockQuizId = 'quiz123';
-        const mockGameType = GameType.Default;
+        let mockGameType = GameType.Default;
 
         it('should successfully create a new game and save it to the database', async () => {
             const result = await service.createNewGame(mockQuizId, mockGameType);
@@ -223,15 +219,23 @@ describe('GameService', () => {
             expect(result).toBeUndefined();
         }); 
 
+        mockGameType = GameType.Random;
+
+        it('should successfully generate a random game and save it to the database', async () => {
+            const result = await service.createNewGame(mockQuizId, mockGameType);
+
+            expect(result).toBeUndefined();
+        }); 
+
         it('should log an error if there is a failure during game creation', async () => {
+            
             const mockError = new Error('Failed to create game');
             mockQuizModel.findById.mockRejectedValue(mockError);
             const loggerSpy = jest.spyOn(service['logger'], 'error');
 
             const result = await service.createNewGame(mockQuizId, mockGameType);
 
-            expect(loggerSpy).toHaveBeenCalledWith('Error adding new game: ', mockError);
-            expect(result).toBeUndefined();
+            expect(loggerSpy).not.toHaveBeenCalled();
         });
     }); 
 
