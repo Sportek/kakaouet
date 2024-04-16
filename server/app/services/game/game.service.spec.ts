@@ -211,18 +211,13 @@ describe('GameService', () => {
 
      describe('createNewGame', () => {
         const mockQuizId = 'quiz123';
-        let mockGameType = GameType.Default;
-
         it('should successfully create a new game and save it to the database', async () => {
-            const result = await service.createNewGame(mockQuizId, mockGameType);
+            const result = await service.createNewGame(mockQuizId, GameType.Default);
 
             expect(result).toBeUndefined();
         }); 
-
-        mockGameType = GameType.Random;
-
         it('should successfully generate a random game and save it to the database', async () => {
-            const result = await service.createNewGame(mockQuizId, mockGameType);
+            const result = await service.createNewGame(mockQuizId, GameType.Random);
 
             expect(result).toBeUndefined();
         }); 
@@ -233,7 +228,7 @@ describe('GameService', () => {
             mockQuizModel.findById.mockRejectedValue(mockError);
             const loggerSpy = jest.spyOn(service['logger'], 'error');
 
-            const result = await service.createNewGame(mockQuizId, mockGameType);
+            const result = await service.createNewGame(mockQuizId, GameType.Random);
 
             expect(loggerSpy).not.toHaveBeenCalled();
         });
