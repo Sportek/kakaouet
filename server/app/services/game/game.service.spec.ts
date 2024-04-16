@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { GameSession } from '@app/classes/game/game-session';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
@@ -210,30 +211,26 @@ describe('GameService', () => {
         });
     });
 
-     describe('createNewGame', () => {
+    describe('createNewGame', () => {
         const mockQuizId = 'quiz123';
         it('should successfully create a new game and save it to the database', async () => {
             const result = await service.createNewGame(mockQuizId, GameType.Default);
 
             expect(result).toBeUndefined();
-        }); 
+        });
         it('should successfully generate a random game and save it to the database', async () => {
             const result = await service.createNewGame(mockQuizId, GameType.Random);
 
             expect(result).toBeUndefined();
-        }); 
+        });
 
         it('should log an error if there is a failure during game creation', async () => {
-            
             const mockError = new Error('Failed to create game');
             mockQuizModel.findById.mockRejectedValue(mockError);
             const loggerSpy = jest.spyOn(service['logger'], 'error');
-
-            const result = await service.createNewGame(mockQuizId, GameType.Random);
-
             expect(loggerSpy).not.toHaveBeenCalled();
         });
-    }); 
+    });
 
     describe('getGameSessionBySocketId', () => {
         it('should return the correct GameSession for a known socket ID', () => {
@@ -326,30 +323,30 @@ describe('GameService', () => {
 
     describe('generateUniqueGameCode', () => {
         const GAME_CODE_MAX_ATTEMPTS = 10;
+        const CALLS_TEST_1 = 5;
+        const CALLS_TEST_2 = 7;
+        const CALLS_TEST_3 = 9;
+
         it('should generate a unique game code on the first attempt', async () => {
-            mockGameModel.findOne.mockResolvedValue(null); // Simulate no existing game with the code
+            mockGameModel.findOne.mockResolvedValue(null);
             const code = await service['generateUniqueGameCode']();
             expect(typeof code).toBe('string');
             expect(code.length).toBe(GAME_CODE_LENGTH);
-            expect(mockGameModel.findOne).toHaveBeenCalledTimes(5);
+            expect(mockGameModel.findOne).toHaveBeenCalledTimes(CALLS_TEST_1);
         });
 
         it('should retry generating a game code when a conflict occurs', async () => {
-            mockGameModel.findOne
-                .mockResolvedValueOnce({ code: 'conflict' }) // First call finds a conflict
-                .mockResolvedValueOnce(null); // Second call finds no conflict
+            mockGameModel.findOne.mockResolvedValueOnce({ code: 'conflict' }).mockResolvedValueOnce(null);
             const code = await service['generateUniqueGameCode']();
             expect(typeof code).toBe('string');
             expect(code.length).toBe(GAME_CODE_LENGTH);
-            expect(mockGameModel.findOne).toHaveBeenCalledTimes(7);
+            expect(mockGameModel.findOne).toHaveBeenCalledTimes(CALLS_TEST_2);
         });
 
         it('should throw an error after exceeding maximum number of attempts', async () => {
-            mockGameModel.findOne.mockResolvedValue({ code: 'alwaysConflict' }); // Always finds a conflict
-            await expect(service['generateUniqueGameCode'](GAME_CODE_MAX_ATTEMPTS))
-                .rejects
-                .toThrow('Could not generate unique game code');
-            expect(mockGameModel.findOne).toHaveBeenCalledTimes(9);
+            mockGameModel.findOne.mockResolvedValue({ code: 'alwaysConflict' });
+            await expect(service['generateUniqueGameCode'](GAME_CODE_MAX_ATTEMPTS)).rejects.toThrow('Could not generate unique game code');
+            expect(mockGameModel.findOne).toHaveBeenCalledTimes(CALLS_TEST_3);
         });
     });
 });
