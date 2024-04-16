@@ -131,7 +131,7 @@ describe('QuestionOverlayComponent', () => {
     });
 
     it('should call changeChoiceCorrect in OverlayService', () => {
-        const overlayServiceSpy = spyOn(overlayService, 'changeChoiceCorrect');
+        const overlayServiceSpy = spyOn(overlayService, 'toggleCorrectChoice');
 
         component.changeChoiceCorrect(WORKING_CHOICE);
 
