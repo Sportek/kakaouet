@@ -385,6 +385,33 @@ describe('OrganisatorService', () => {
             expect(service.currentPlayerIndex).toBe(0);
             expect(mockSetNewPlayer).not.toHaveBeenCalled();
         });
+
+        it('should not call setNewPlayer if the first player has given up', () => {
+            service.players = [
+                {
+                    name: 'Alice',
+                    score: 10,
+                    isExcluded: false,
+                    hasGiveUp: true,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+                {
+                    name: 'Charlie',
+                    score: 20,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+            ];
+            service.reinitialisePlayerToRate();
+
+            expect(service.currentPlayerIndex).toBe(1);
+            expect(mockSetNewPlayer).toHaveBeenCalled();
+        });
     });
 
     describe('filterPlayers', () => {
