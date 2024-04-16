@@ -1,6 +1,17 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MatOptionModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
@@ -116,7 +127,7 @@ describe('OrganisatorComponent', () => {
         playerServiceSpy = jasmine.createSpyObj('PlayerService', ['sortPlayers']);
         organisatorServiceSpy = jasmine.createSpyObj(
             'OrganisatorService',
-            ['filterPlayers', 'rateAnswerQRL', 'sendRating', 'calculateChoices', 'toggleTimer', 'speedUpTimer', 'nextQuestion'],
+            ['filterPlayers', 'rateAnswerQRL', 'sendRating', 'calculateChoices', 'toggleTimer', 'speedUpTimer', 'nextQuestion', 'setPlayers'],
             {
                 choices: mockedChoices,
                 actualQuestion: mockedActualQuestion,
@@ -137,7 +148,17 @@ describe('OrganisatorComponent', () => {
         gameServiceSpy.gameState = new BehaviorSubject<GameState>(GameState.WaitingPlayers);
 
         TestBed.configureTestingModule({
-            declarations: [OrganisatorComponent],
+            imports: [
+                MatSnackBarModule,
+                MatTooltipModule,
+                MatIconModule,
+                MatOptionModule,
+                MatSelectModule,
+                BrowserAnimationsModule,
+                HttpClientModule,
+                FormsModule,
+            ],
+            declarations: [OrganisatorComponent, ChatComponent, GlobalLayoutComponent, HeaderComponent],
             providers: [
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: PlayerService, useValue: playerServiceSpy },
@@ -236,6 +257,32 @@ describe('OrganisatorComponent', () => {
             gameServiceSpy.gameState.next(GameState.PlayersAnswerQuestion);
             expect(component.isCorrectingAnswers()).toBeFalse();
         });
+    });
+
+    it('should return playerService array', () => {
+        component.players = [];
+        playerServiceSpy.sortPlayers.and.returnValue(mockedPlayers);
+        component.sortPlayers();
+        expect(component.players).toEqual(mockedPlayers);
+    });
+
+    it('should toggle players and call function', () => {
+        const sendSortedPlayersSpy = spyOn(component, 'sendSortedPlayers');
+        component.sortingOrder = component.sortOrder.ascending;
+        component.toggleSortOrder();
+        expect(component.sortingOrder).toEqual(component.sortOrder.descending);
+        expect(sendSortedPlayersSpy).toHaveBeenCalled();
+        component.toggleSortOrder();
+        expect(component.sortingOrder).toEqual(component.sortOrder.ascending);
+    });
+
+    it('should send sorted players', () => {
+        const sortPlayersSpy = spyOn(component, 'sortPlayers').and.callFake(() => {
+            return;
+        });
+        component.sendSortedPlayers();
+        expect(sortPlayersSpy).toHaveBeenCalled();
+        expect(playerServiceSpy.sortPlayers).toHaveBeenCalled();
     });
 
     describe('isQRL', () => {
@@ -443,24 +490,6 @@ describe('OrganisatorComponent', () => {
         });
     });
 
-    /* it('should call sortPlayers and calculateChoices when players are updated', () => {
-        spyOn(component, 'sortPlayers');
-        spyOn(component, 'calculateChoices');
-        gameServiceSpy.players.next(mockedPlayers);
-
-        expect(component.sortPlayers).toHaveBeenCalled();
-        expect(component.calculateChoices).toHaveBeenCalled();
-    }); */
-
-    /* it('should calculate histogram correctly based on player interactions and cooldown', () => {
-        component.players = mockedPlayers;
-        const cooldown = 10;
-        spyOn(gameServiceSpy.recentInteractions, 'get').and.returnValues(5, 20);
-        component.calculateHistogram(cooldown);
-        expect(component.getHistogram().hasModified).toEqual(2);
-        expect(component.getHistogram().hasNotModified).toEqual(3);
-    }); */
-
     it('should return the current histogram', () => {
         const expectedHistogram = { hasModified: 2, hasNotModified: 3 };
         component.histogram = expectedHistogram;
@@ -488,6 +517,43 @@ describe('OrganisatorComponent', () => {
         componentOrg.calculateHistogram(cooldown);
         expect(componentOrg.histogram).toEqual({ hasModified: 2, hasNotModified: 1 });
     });
+
+    it('should calculate histogram and omit player that gave up', () => {
+        const players = [
+            { name: 'Player1', hasGiveUp: false },
+            { name: 'Player2', hasGiveUp: false },
+            { name: 'Player3', hasGiveUp: true },
+        ] as PlayerClient[];
+        const cooldown = 10;
+        const HISTOGRAM_COOLDOWN = 5;
+        const recentInteractions = new Map<string, number>([
+            ['Player1', cooldown - HISTOGRAM_COOLDOWN - 1],
+            ['Player2', cooldown + HISTOGRAM_COOLDOWN + 1],
+            ['Player3', cooldown],
+        ]);
+        const gameServiceMock = {
+            recentInteractions,
+        } as GameService;
+        const componentOrg = new OrganisatorComponent(gameServiceMock, TestBed.inject(PlayerService), TestBed.inject(OrganisatorService));
+        componentOrg.players = players;
+        componentOrg.calculateHistogram(cooldown);
+        expect(componentOrg.histogram).toEqual({ hasModified: 1, hasNotModified: 1 });
+    });
+
+    it('should return true if QRL', () => {
+        gameServiceSpy.gameState.next(GameState.PlayersAnswerQuestion);
+        organisatorServiceSpy.actualQuestion = mockedActualQuestion;
+        const result = component.isAnsweringQRL();
+        expect(result).toEqual(false);
+    });
+
+    it('should return true if rating exists', () => {
+        organisatorServiceSpy.currentPlayer = mockedPlayer;
+        spyOn(component, 'getRatingForPlayer').and.returnValue(1);
+        const result = component.hasRatingForCurrentPlayer();
+        expect(result).toEqual(true);
+    });
+
     it('should call toggleMutePlayer on gameService', () => {
         const player = { name: 'Player1' } as PlayerClient;
         const gameServiceMock = {
