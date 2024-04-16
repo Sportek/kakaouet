@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -10,7 +10,7 @@ import { NotificationService } from '@app/services/notification/notification.ser
 import { SocketService } from '@app/services/socket/socket.service';
 import { SoundService } from '@app/services/sound/sound.service';
 import { GameEvents, InteractionStatus, PlayerClient } from '@common/game-types';
-import { Choice, Game, GameRole, GameState, GameType, Question, Quiz } from '@common/types';
+import { Choice, Game, GameRole, GameState, GameType, Question, QuestionType, Quiz } from '@common/types';
 import { cloneDeep } from 'lodash';
 import { of } from 'rxjs';
 import { GameService } from './game.service';
@@ -854,5 +854,236 @@ describe('GameService', () => {
         service.gameEventsListener.receiveSpeedUpTimer();
 
         expect(soundServiceMocked.startPlayingSound).toHaveBeenCalled();
+    });
+    it('should add answer index if not already selected', () => {
+        service.answer.next([1, 2]);
+        service.selectAnswer(3);
+        expect(service.answer.getValue()).toEqual([1, 2, 3]);
+    });
+
+    it('should remove answer index if already selected', () => {
+        service.answer.next([1, 2, 3]);
+        service.selectAnswer(2);
+        expect(service.answer.getValue()).toEqual([1, 3]);
+    });
+
+    it('should not modify answer if isFinalAnswer is true', () => {
+        service.isFinalAnswer.next(true);
+        service.answer.next([1, 2]);
+        service.selectAnswer(3);
+        expect(service.answer.getValue()).toEqual([1, 2]);
+    });
+
+    it('should set player as answered and update answer value for QRL', () => {
+        const mockPlayers = [cloneDeep(mockPlayer)];
+        service.players.next(mockPlayers);
+        service.client.next(cloneDeep(mockPlayer));
+
+        service.modifyAnswerQRL('Test answer');
+
+        const updatedPlayer = mockPlayers[0];
+        expect(updatedPlayer.answers?.hasInterracted).toBeUndefined();
+        expect(service.answer.getValue()).toBe('Test answer');
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.SelectAnswer, { answers: 'Test answer' });
+    });
+
+    it('should update answer value and send answer for QCM', () => {
+        service.enterAnswer('Test answer');
+
+        expect(service.answer.getValue()).toBe('Test answer');
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.SelectAnswer, { answers: 'Test answer' });
+    });
+
+    it('should not update answer if isFinalAnswer is true', () => {
+        service.isFinalAnswer.next(true);
+        service.enterAnswer('Test answer');
+
+        expect(service.answer.getValue()).toBeNull();
+        expect(mockSocketService.send).not.toHaveBeenCalled();
+    });
+
+    it('should send RateAnswerQRL event with correct player name and score', () => {
+        const mockPlayers = [
+            cloneDeep(mockPlayer),
+            {
+                name: 'Player2',
+                role: GameRole.Player,
+                score: 0,
+                isExcluded: false,
+                hasGiveUp: false,
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
+        ];
+        service.players.next(mockPlayers);
+
+        service.rateAnswerQRL('Player2', score);
+
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.RateAnswerQRL, { playerName: 'Player2', score });
+    });
+
+    const score = 5;
+
+    it('should not send event if player not found', () => {
+        service.rateAnswerQRL('NonExistentPlayer', score);
+        expect(mockSocketService.send).not.toHaveBeenCalled();
+    });
+
+    it('should set isFinalAnswer to true and call confirmAnswer for QCM with answer', () => {
+        service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
+        service.answer.next([1, 2]);
+
+        service.setResponseAsFinal();
+
+        expect(service.isFinalAnswer.getValue()).toBeTrue();
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.ConfirmAnswers);
+    });
+
+    it('should show error and not confirm for QCM without answer', () => {
+        service.actualQuestion.next({ question: WORKING_QUIZ.questions[0] as Question, totalQuestion: 3, actualIndex: 1 });
+        service.answer.next([]);
+
+        service.setResponseAsFinal();
+
+        expect(mockNotificationService.error).toHaveBeenCalledWith('Veuillez sélectionner au moins une réponse');
+        expect(service.isFinalAnswer.getValue()).toBeFalse();
+        expect(mockSocketService.send).not.toHaveBeenCalled();
+    });
+
+    it('should show error and not confirm for QRL with empty answer', () => {
+        service.actualQuestion.next({
+            question: { ...WORKING_QUIZ.questions[0], type: QuestionType.QRL } as unknown as Question,
+            totalQuestion: 3,
+            actualIndex: 1,
+        });
+        service.answer.next('');
+
+        service.setResponseAsFinal();
+
+        expect(mockNotificationService.error).toHaveBeenCalledWith('Veuillez entrer une réponse');
+        expect(service.isFinalAnswer.getValue()).toBeFalse();
+        expect(mockSocketService.send).not.toHaveBeenCalled();
+    });
+
+    it('should show error and not confirm for QRL with too long answer', () => {
+        service.actualQuestion.next({
+            question: { ...WORKING_QUIZ.questions[0], type: QuestionType.QRL } as unknown as Question,
+            totalQuestion: 3,
+            actualIndex: 1,
+        });
+        const maxAnswerLength = 200;
+        const answer = 'a'.repeat(maxAnswerLength + 1);
+        service.answer.next(answer);
+
+        service.setResponseAsFinal();
+
+        expect(mockNotificationService.error).toHaveBeenCalledWith('Le texte doit faire moins de 200 caractères');
+        expect(service.isFinalAnswer.getValue()).toBeFalse();
+        expect(mockSocketService.send).not.toHaveBeenCalled();
+    });
+
+    it('should send BanPlayer event with correct player name', () => {
+        service.banPlayer(cloneDeep(mockPlayer));
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.BanPlayer, { name: mockPlayer.name });
+    });
+
+    it('should send MutePlayer event with correct player name', () => {
+        service.toggleMutePlayer(cloneDeep(mockPlayer));
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.MutePlayer, { name: mockPlayer.name });
+    });
+    it('should return observable of correctAnswers', () => {
+        const mockChoices: Choice[] = [
+            { _id: 1, text: 'Choice 1', isCorrect: true },
+            { _id: 2, text: 'Choice 2', isCorrect: false },
+        ];
+        service.correctAnswers.next(mockChoices);
+
+        service.getCorrectAnswers().subscribe((choices) => {
+            expect(choices).toEqual(mockChoices);
+        });
+    });
+
+    it('should not modify players if player is undefined', () => {
+        const initialPlayers = [cloneDeep(mockPlayer)];
+        service.players.next(initialPlayers);
+        // @ts-ignore
+        service.setPlayerHasAnswered(undefined);
+
+        expect(service.players.getValue()).toEqual(initialPlayers);
+    });
+
+    it('should navigate to waiting room and set client as organizer for default game', () => {
+        // @ts-ignore
+        service.createDefaultGame(mockGame);
+
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/waiting-room/' + mockGame.code);
+        expect(service.client.getValue()).toEqual({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
+    });
+    it('should navigate to waiting room and set client as organizer for random game', () => {
+        // @ts-ignore
+        service.createRandomGame(mockGame);
+
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/waiting-room/' + mockGame.code);
+        expect(service.client.getValue()).toEqual({ name: 'Organisateur', role: GameRole.Organisator, score: 0 });
+    });
+    it('should navigate to game, lock game, set client as player and start game for test game', () => {
+        // @ts-ignore
+        service.createTestGame(mockTestGame);
+
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/game/' + mockTestGame.code);
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.ChangeLockedState);
+        expect(service.isLocked.getValue()).toBeTrue();
+        expect(service.client.getValue()).toEqual({ name: 'Organisateur', role: GameRole.Player, score: 0 });
+        expect(service.players.getValue()).toEqual([
+            {
+                name: 'Organisateur',
+                role: GameRole.Player,
+                isExcluded: false,
+                score: 0,
+                hasGiveUp: false,
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
+        ]);
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.StartGame);
+    });
+
+    it('should navigate to error page if 404 error', () => {
+        const error = { status: 404 } as HttpErrorResponse;
+        // @ts-ignore
+        service.handleError(error);
+
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/error-404', { replaceUrl: true });
+    });
+    it('should set client as player and send start game event if game type is random', () => {
+        service.isLocked.next(true);
+        service.game.next({ ...mockGame, type: GameType.Random, quizName: 'Mock Quiz' });
+        service.startGame();
+        expect(service.client.getValue().role).toEqual(GameRole.Player);
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.StartGame);
+        expect(service.startTime.getValue()).toBeTruthy();
+    });
+    it('should navigate to /create if game type is Test', () => {
+        service.game.next({ ...mockGame, type: GameType.Test, quizName: 'Mock Quiz' });
+        service.giveUp();
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/create', { replaceUrl: true });
+    });
+    it('should do nothing for unknown game type', () => {
+        const game = { ...mockGame, type: GameType.Default };
+        mockHttpService.post.and.returnValue(of(game));
+        // @ts-ignore
+        spyOn(service, 'createDefaultGame');
+        // @ts-ignore
+        spyOn(service, 'createTestGame');
+        // @ts-ignore
+        spyOn(service, 'createRandomGame');
+
+        service.createNewGame('dummyQuizId', 'Unknown' as GameType);
+        // @ts-ignore
+        expect(service.createDefaultGame).not.toHaveBeenCalled();
+        // @ts-ignore
+        expect(service.createTestGame).not.toHaveBeenCalled();
+        // @ts-ignore
+        expect(service.createRandomGame).not.toHaveBeenCalled();
     });
 });
