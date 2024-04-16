@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { QuestionService } from '@app/services/quiz/question.service';
 import { Question, QuestionType } from '@common/types';
 import { of } from 'rxjs';
@@ -37,6 +38,7 @@ describe('QuestionBankImportComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [QuestionBankImportComponent],
+            imports: [MatCheckboxModule],
             providers: [{ provide: QuestionService, useValue: questionServiceSpy }],
         }).compileComponents();
     });

@@ -73,11 +73,6 @@ describe('HistoryComponent', () => {
         expect(component.gameRecords[0].gameTitle).toEqual('Game D');
     });
 
-    it('should sort records by game title in descending order', () => {
-        selectorServiceMock.getCurrentChoice.and.returnValue(of('Nom de Jeu Descendant'));
-        component.ngOnInit();
-    });
-
     it('should unsubscribe on destroy', () => {
         const spyUnsubscribe = spyOn(component.recordsSubscription[0], 'unsubscribe');
         component.ngOnDestroy();
