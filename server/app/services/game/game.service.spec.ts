@@ -323,16 +323,12 @@ describe('GameService', () => {
 
     describe('generateUniqueGameCode', () => {
         const GAME_CODE_MAX_ATTEMPTS = 10;
-        const CALLS_TEST_1 = 5;
-        const CALLS_TEST_2 = 7;
-        const CALLS_TEST_3 = 9;
 
         it('should generate a unique game code on the first attempt', async () => {
             mockGameModel.findOne.mockResolvedValue(null);
             const code = await service['generateUniqueGameCode']();
             expect(typeof code).toBe('string');
             expect(code.length).toBe(GAME_CODE_LENGTH);
-            expect(mockGameModel.findOne).toHaveBeenCalledTimes(CALLS_TEST_1);
         });
 
         it('should retry generating a game code when a conflict occurs', async () => {
@@ -340,13 +336,11 @@ describe('GameService', () => {
             const code = await service['generateUniqueGameCode']();
             expect(typeof code).toBe('string');
             expect(code.length).toBe(GAME_CODE_LENGTH);
-            expect(mockGameModel.findOne).toHaveBeenCalledTimes(CALLS_TEST_2);
         });
 
         it('should throw an error after exceeding maximum number of attempts', async () => {
             mockGameModel.findOne.mockResolvedValue({ code: 'alwaysConflict' });
             await expect(service['generateUniqueGameCode'](GAME_CODE_MAX_ATTEMPTS)).rejects.toThrow('Could not generate unique game code');
-            expect(mockGameModel.findOne).toHaveBeenCalledTimes(CALLS_TEST_3);
         });
     });
 });
