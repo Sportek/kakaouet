@@ -11,7 +11,6 @@ interface BroadcastOptions {
 export class Room {
     code: string;
     players: Player[];
-    // Double link to GameSession
     private game: GameSession;
     private gameService: GameService;
     private server: Server;
@@ -153,7 +152,7 @@ export class Room {
     }
 
     private shouldDeleteGame(): void {
-        const noPlayers = !(this.getPlayingPlayers().length > 0) && this.game.gameState !== GameState.WaitingPlayers;
+        const noPlayers = this.getPlayingPlayers().length <= 0 && this.game.gameState !== GameState.WaitingPlayers;
         const noOrganisator = !this.getOrganisator() && this.game.type !== GameType.Test;
         const shouldConsiderOrganisator = this.isRandomGame() && !this.isWaitingPlayersPhase() ? false : noOrganisator;
         if (noPlayers || shouldConsiderOrganisator) this.deleteRoom();

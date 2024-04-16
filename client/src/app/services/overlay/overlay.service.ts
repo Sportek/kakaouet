@@ -101,7 +101,7 @@ export class OverlayService {
         this.sendChangesToComponent();
     }
 
-    changeChoiceCorrect(choice: Choice): void {
+    toggleCorrectChoice(choice: Choice): void {
         choice.isCorrect = !choice.isCorrect;
     }
 

@@ -2,13 +2,9 @@ import { Player } from '@app/classes/player/player';
 import { Room } from '@app/classes/room/room';
 import { Timer } from '@app/classes/timer';
 import { HistoryService } from '@app/services/history/history.service';
-import { FIRST_PLAYER_SCORE_MULTIPLICATOR } from '@common/constants';
+import { FIRST_PLAYER_SCORE_MULTIPLICATOR, NEXT_QUESTION_DELAY, QRL_DELAY, START_GAME_DELAY } from '@common/constants';
 import { ActualQuestion, ChoiceData, GameEvents, GameEventsData, Score } from '@common/game-types';
 import { GameState, GameType, Question, QuestionType, Quiz } from '@common/types';
-
-const START_GAME_DELAY = 5;
-const NEXT_QUESTION_DELAY = 3;
-const QRL_DELAY = 60;
 
 export class GameSession {
     code: string;
