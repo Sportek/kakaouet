@@ -225,6 +225,8 @@ export class GameGateway {
     }
 
     private shouldDisplayResults(gameSession): boolean {
-        return !gameSession.room.getPlayers().some((player) => player.role === GameRole.Player && !player.hasAnswered && !player.hasGiveUp);
+        return !gameSession.room
+            .getPlayers()
+            .some((player) => player.role === GameRole.Player && !player.hasAnswered && !player.hasGiveUp && !player.isExcluded);
     }
 }
