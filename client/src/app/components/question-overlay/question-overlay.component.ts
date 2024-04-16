@@ -66,7 +66,7 @@ export class QuestionOverlayComponent implements OnInit, OnDestroy {
     }
 
     changeChoiceCorrect(choice: Choice) {
-        this.overlayService.changeChoiceCorrect(choice);
+        this.overlayService.toggleCorrectChoice(choice);
     }
 
     newQuestion(): void {

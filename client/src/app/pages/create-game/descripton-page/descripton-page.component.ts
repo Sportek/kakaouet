@@ -38,7 +38,6 @@ export class DescriptonPageComponent implements OnInit {
         const quizId = this.route.snapshot.paramMap.get('gameId');
         if (!quizId) {
             this.router.navigateByUrl('/error-404');
-            return;
         } else {
             this.getQuizDetails(quizId);
         }

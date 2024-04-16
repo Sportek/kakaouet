@@ -135,7 +135,7 @@ describe('OverlayService', () => {
 
     it('should change correctness of choice', () => {
         WORKING_CHOICE.isCorrect = false;
-        service.changeChoiceCorrect(WORKING_CHOICE);
+        service.toggleCorrectChoice(WORKING_CHOICE);
         expect(WORKING_CHOICE.isCorrect).toBeTrue();
     });
 

@@ -26,7 +26,6 @@ describe('QuestionOverlayComponent', () => {
     let fixture: ComponentFixture<QuestionOverlayComponent>;
     let questionService: QuestionService;
     let overlayService: OverlayService;
-    // let validateService: ValidateService;
     const snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     beforeEach(waitForAsync(() => {
@@ -50,7 +49,6 @@ describe('QuestionOverlayComponent', () => {
         fixture = TestBed.createComponent(QuestionOverlayComponent);
         component = fixture.componentInstance;
         questionService = TestBed.inject(QuestionService);
-        //    validateService = TestBed.inject(ValidateService);
         overlayService = TestBed.inject(OverlayService);
         fixture.detectChanges();
 
@@ -133,7 +131,7 @@ describe('QuestionOverlayComponent', () => {
     });
 
     it('should call changeChoiceCorrect in OverlayService', () => {
-        const overlayServiceSpy = spyOn(overlayService, 'changeChoiceCorrect');
+        const overlayServiceSpy = spyOn(overlayService, 'toggleCorrectChoice');
 
         component.changeChoiceCorrect(WORKING_CHOICE);
 

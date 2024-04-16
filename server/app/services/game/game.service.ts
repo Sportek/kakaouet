@@ -4,15 +4,13 @@ import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
 import { HistoryService } from '@app/services/history/history.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH } from '@common/constants';
+import { GAME_CODE_CHARACTERS, GAME_CODE_LENGTH, GAME_CODE_MAX_ATTEMPTS } from '@common/constants';
 import { GameType } from '@common/types';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Server } from 'socket.io';
 import { mockGame } from './mock-game';
-
-const GAME_CODE_MAX_ATTEMPTS = 10;
 
 @Injectable()
 export class GameService {

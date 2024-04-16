@@ -93,7 +93,6 @@ export class QuizService {
         if (quiz) {
             const question = quiz.questions[questionId];
             if (question) {
-                // TODO: Seulement pour les QCM, les QRL ne sont pas encore supportées
                 const correctChoicesIndices = question.choices.filter((choice) => choice.isCorrect).map((choice, index) => index);
                 const isCorrect = correctChoicesIndices.length === answers.length && correctChoicesIndices.every((index) => answers.includes(index));
                 return {
