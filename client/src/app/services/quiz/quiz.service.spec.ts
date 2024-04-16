@@ -192,7 +192,7 @@ describe('QuizService', () => {
     });
 
     it('should call next on the amountOfQuestionsSubject with the specified length', () => {
-        const spy = spyOn(service as QuizService, 'specifyAmountOfQuizzes').and.callThrough();
+        const spy = spyOn(service, 'specifyAmountOfQuizzes').and.callThrough();
 
         service.specifyAmountOfQuizzes(1);
 

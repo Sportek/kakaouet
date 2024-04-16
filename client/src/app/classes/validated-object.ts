@@ -38,7 +38,7 @@ export class ValidatedObject<T> {
 
     // Permet de valider des chaines d'exécutions, en vérifiant que chaque étape est valide.
     // Sauvegarde tous les messages d'erreur.
-    check(validate: Validate): ValidatedObject<T> {
+    check(validate: Validate): this {
         if (!validate.callback(this.object)) {
             this.errors?.push(validate.errorMessage);
             this.isValid = false;
