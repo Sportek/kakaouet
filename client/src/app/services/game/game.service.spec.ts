@@ -917,13 +917,15 @@ describe('GameService', () => {
         ];
         service.players.next(mockPlayers);
 
-        service.rateAnswerQRL('Player2', 5);
+        service.rateAnswerQRL('Player2', score);
 
-        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.RateAnswerQRL, { playerName: 'Player2', score: 5 });
+        expect(mockSocketService.send).toHaveBeenCalledWith(GameEvents.RateAnswerQRL, { playerName: 'Player2', score });
     });
 
+    const score = 5;
+
     it('should not send event if player not found', () => {
-        service.rateAnswerQRL('NonExistentPlayer', 5);
+        service.rateAnswerQRL('NonExistentPlayer', score);
         expect(mockSocketService.send).not.toHaveBeenCalled();
     });
 
@@ -969,7 +971,9 @@ describe('GameService', () => {
             totalQuestion: 3,
             actualIndex: 1,
         });
-        service.answer.next('a'.repeat(201));
+        const maxAnswerLength = 200;
+        const answer = 'a'.repeat(maxAnswerLength + 1);
+        service.answer.next(answer);
 
         service.setResponseAsFinal();
 
