@@ -301,6 +301,25 @@ describe('GameService', () => {
         expect(mockQuizModel.findById).toHaveBeenCalledWith(quizId);
     });
 
+    it('should create a game session', async () => {
+        const code = 'testCode';
+        const quizId = 'quiz123';
+        const gameType = GameType.Random;
+
+        const mockServer = {} as unknown as Server;
+        const mockQuiz = {
+            id: quizId,
+            toObject: jest.fn().mockReturnValue({}),
+        };
+        mockQuizModel.findById.mockReturnValue(mockQuiz);
+
+        const result = await service.createGameSession(code, mockServer, quizId, gameType);
+
+        expect(result).toBeInstanceOf(GameSession);
+        expect(result.code).toEqual(code);
+        expect(mockQuizModel.findById).toHaveBeenCalledWith(quizId);
+    });
+
     it("shouldn't update game", async () => {
         const testCode = 'testCode';
         const testGame = { _id: testCode, name: 'Test Game', updatedAt: new Date() };
