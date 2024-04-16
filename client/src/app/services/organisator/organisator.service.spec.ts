@@ -175,7 +175,7 @@ describe('OrganisatorService', () => {
                 },
                 {
                     name: 'Charlie',
-                    answers: { answer: [2], hasInterracted: true, hasConfirmed: true },
+                    answers: undefined,
                     hasGiveUp: true,
                     role: GameRole.Player,
                     score: 0,
