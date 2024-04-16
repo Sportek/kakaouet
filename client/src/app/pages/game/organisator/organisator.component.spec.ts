@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { GlobalLayoutComponent } from '@app/components/global-layout/global-layout.component';
+import { HeaderComponent } from '@app/components/header/header.component';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
@@ -137,7 +147,8 @@ describe('OrganisatorComponent', () => {
         gameServiceSpy.gameState = new BehaviorSubject<GameState>(GameState.WaitingPlayers);
 
         TestBed.configureTestingModule({
-            declarations: [OrganisatorComponent],
+            declarations: [OrganisatorComponent, ChatComponent, GlobalLayoutComponent, HeaderComponent],
+            imports: [MatSelectModule, BrowserAnimationsModule, MatTooltipModule, MatIconModule, MatSnackBarModule, FormsModule, HttpClientModule],
             providers: [
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: PlayerService, useValue: playerServiceSpy },
