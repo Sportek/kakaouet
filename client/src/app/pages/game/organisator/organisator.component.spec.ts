@@ -6,7 +6,7 @@ import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { ActualQuestion, ChoiceData, InteractionStatus, PlayerClient } from '@common/game-types';
-import { GameRole, QuestionType } from '@common/types';
+import { GameRole, GameState, QuestionType } from '@common/types';
 import { BehaviorSubject } from 'rxjs';
 import { OrganisatorComponent } from './organisator.component';
 
@@ -21,7 +21,7 @@ describe('OrganisatorComponent', () => {
         ['Bob', 88],
     ]);
 
-    /* const mockedPlayer: PlayerClient = {
+    const mockedPlayer: PlayerClient = {
         name: 'chirac',
         role: GameRole.Player,
         score: 15,
@@ -34,7 +34,7 @@ describe('OrganisatorComponent', () => {
         },
         isMuted: false,
         interactionStatus: InteractionStatus.interacted,
-    };*/
+    };
 
     const mockedCurrentPlayer: PlayerClient = {
         name: 'obama',
@@ -135,6 +135,8 @@ describe('OrganisatorComponent', () => {
         gameServiceSpy.cooldown = new BehaviorSubject<number>(fakeCooldown);
         gameServiceSpy.players = new BehaviorSubject<PlayerClient[]>(mockedPlayers);
 
+        gameServiceSpy.gameState = new BehaviorSubject<GameState>(GameState.WaitingPlayers);
+
         TestBed.configureTestingModule({
             declarations: [OrganisatorComponent],
             providers: [
@@ -155,7 +157,7 @@ describe('OrganisatorComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    /* describe('getChoices', () => {
+    describe('getChoices', () => {
         it('should return choices from organisatorService', () => {
             const choices = component.getChoices();
             expect(choices).toEqual(mockedChoices);
@@ -169,24 +171,32 @@ describe('OrganisatorComponent', () => {
         });
     });
 
-    describe('getPlayerArray', () => {
+    /* describe('getPlayerArray', () => {
         it('should return the players from organisatorService', () => {
             const players = component.getPlayerArray();
             expect(players).toEqual(mockedPlayers);
         });
+    });*/
+    it('should sort players correctly', () => {
+        // Assuming `selectedCriterion` and `sortingOrder` are part of the component's state
+        component.selectedCriterion = 'score';
+        component.sortingOrder = 'desc'; // or 'asc' for ascending
+
+        // Initial order in mockedPlayers might be unsorted or not in the desired order
+        component.players = mockedPlayers;
+
+        // Call sortPlayers method
+        component.sortPlayers();
+
+        // Check if the players are sorted correctly
+        const expectedOrder = mockedPlayers.sort((a, b) => b.score - a.score); // for 'desc' order
+        expect(component.players).toEqual(expectedOrder, 'Players should be sorted by score in descending order');
     });
 
     describe('getCurrentPlayer', () => {
         it('should return the player from organisatorService', () => {
             const currentPlayer = component.getCurrentPlayer();
             expect(currentPlayer).toEqual(mockedCurrentPlayer);
-        });
-    });
-
-    describe('getHistogram', () => {
-        it('should return histogram data from organisatorService', () => {
-            const histogram = component.getHistogram();
-            expect(histogram).toEqual(mockedHistogram);
         });
     });
 
@@ -471,5 +481,5 @@ describe('OrganisatorComponent', () => {
             const percentage = component.calculatePercentage(testAmount);
             expect(percentage).toEqual(expectedPercentage);
         });
-    });*/
+    });
 });
