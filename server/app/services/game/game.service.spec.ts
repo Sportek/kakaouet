@@ -2,12 +2,12 @@ import { GameSession } from '@app/classes/game/game-session';
 import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
 import { HistoryService } from '@app/services/history/history.service';
+import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState, GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Server } from 'socket.io';
-import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameService } from './game.service';
 import { mockGame } from './mock-game';
 
@@ -18,6 +18,10 @@ const mockHistoryService = {
 };
 
 const mockGameModel = {
+    constructor(data) {
+        // Simulate instance properties
+        Object.assign(this, data);
+    },
     find: jest.fn(),
     findById: jest.fn(),
     replaceOne: jest.fn(),
@@ -209,7 +213,7 @@ describe('GameService', () => {
         });
     });
 
-    /* describe('createNewGame', () => {
+     describe('createNewGame', () => {
         const mockQuizId = 'quiz123';
         const mockGameType = GameType.Default;
 
@@ -229,7 +233,7 @@ describe('GameService', () => {
             expect(loggerSpy).toHaveBeenCalledWith('Error adding new game: ', mockError);
             expect(result).toBeUndefined();
         });
-    }); */
+    }); 
 
     describe('getGameSessionBySocketId', () => {
         it('should return the correct GameSession for a known socket ID', () => {

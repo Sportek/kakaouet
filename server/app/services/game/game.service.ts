@@ -106,12 +106,11 @@ export class GameService {
         } else {
             quiz = await this.quizModel.findById(quizId);
         }
-        const newGame = new this.gameModel({
+        return this.gameModel.create({
             code: await this.generateUniqueGameCode(),
             quiz,
             type,
         });
-        return newGame.save();
     }
     // eslint-disable-next-line max-params -- Ici, on a besoin de tous ces paramètres
     async createGameSession(code: string, server: Server, quizId: string, gameType: GameType): Promise<GameSession> {
