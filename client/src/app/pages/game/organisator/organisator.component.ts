@@ -116,7 +116,8 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this.gameService.players.subscribe((players) => {
                 this.players = players;
-                this.organisatorService.setPlayers(players);
+                this.players = this.filterPlayers();
+                this.organisatorService.setPlayers(this.players);
                 this.sortPlayers();
                 this.calculateChoices();
             }),
