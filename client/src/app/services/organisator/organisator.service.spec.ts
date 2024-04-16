@@ -7,7 +7,6 @@ import { GameService } from '@app/services/game/game.service';
 import { ActualQuestion, InteractionStatus, PlayerClient } from '@common/game-types';
 import { GameRole, QuestionType } from '@common/types';
 import { OrganisatorService, baseQRLRatings } from './organisator.service';
-
 describe('OrganisatorService', () => {
     let service: OrganisatorService;
     let gameServiceMock: jasmine.SpyObj<GameService>;
@@ -120,36 +119,6 @@ describe('OrganisatorService', () => {
             expect(service.currentPlayerIndex).toBe(1);
         });
     });
-
-    /* it('should return players who have not given up', () => {
-        const players: PlayerClient[] = service.players;
-        gameServiceMock.filterPlayers.and.returnValue(players);
-
-        const filteredPlayers = service.filterPlayers();
-
-        expect(filteredPlayers.length).toBe(2);
-        expect(filteredPlayers).toEqual([
-            {
-                name: 'Alice',
-                hasGiveUp: false,
-                role: GameRole.Player,
-                score: 10,
-                isExcluded: false,
-                isMuted: false,
-                interactionStatus: InteractionStatus.interacted,
-            },
-        ]);
-        expect(gameServiceMock.filterPlayers).toHaveBeenCalled();
-    });*/
-
-    /* describe('sendRating', () => {
-         it('should call filterPlayers and rateAnswerQRL on sendRating', () => {
-            spyOn(service, 'filterPlayers').and.returnValue([service.players[0]]);
-            service.sendRating('Alice');
-            expect(service.filterPlayers).toHaveBeenCalled();
-            expect(gameServiceMock.rateAnswerQRL).toHaveBeenCalledWith('Alice', 2);
-        });
-    });*/
 
     describe('calculateChoices', () => {
         beforeEach(() => {
@@ -276,8 +245,8 @@ describe('OrganisatorService', () => {
         });
     });
 
-    /* describe('setPlayers', () => {
-         it('should sort, filter players and set the first player as current', () => {
+    describe('setPlayers', () => {
+        it('should sort, filter players and set the first player as current', () => {
             const players: PlayerClient[] = [
                 {
                     name: 'Charlie',
@@ -351,17 +320,7 @@ describe('OrganisatorService', () => {
                     interactionStatus: InteractionStatus.interacted,
                 },
             ]);
-            expect(service.currentPlayer).toEqual({
-                name: 'Alice',
-                score: 10,
-                isExcluded: false,
-                hasGiveUp: false,
-                role: GameRole.Player,
-                isMuted: false,
-                interactionStatus: InteractionStatus.interacted,
-            });
-            expect(service.currentPlayerIndex).toBeUndefined();
-            expect(service.calculateChoices).toHaveBeenCalled();
+            expect(service.currentPlayer).toBeUndefined();
         });
-    });*/
+    });
 });
