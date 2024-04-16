@@ -19,6 +19,7 @@ export class OrganisatorService {
     choices: ChoiceData[];
     playerRatings: Map<string, number> = new Map<string, number>();
     players: PlayerClient[];
+    playersToRate: PlayerClient[];
     currentPlayer: PlayerClient;
     currentPlayerIndex: number;
 
@@ -43,11 +44,11 @@ export class OrganisatorService {
     }
 
     indexOfPlayer(playerName: string): number {
-        return this.players.filter((player) => !player.hasGiveUp).findIndex((player) => player.name === playerName);
+        return this.playersToRate.filter((player) => !player.hasGiveUp).findIndex((player) => player.name === playerName);
     }
 
     setNewPlayer() {
-        if (this.currentPlayerIndex + 1 < this.players.length) this.currentPlayer = this.players[++this.currentPlayerIndex];
+        if (this.currentPlayerIndex + 1 < this.playersToRate.length) this.currentPlayer = this.playersToRate[++this.currentPlayerIndex];
         else return;
         if (this.currentPlayer.hasGiveUp) this.setNewPlayer();
     }
@@ -83,6 +84,7 @@ export class OrganisatorService {
     }
 
     reinitialisePlayerToRate() {
+        this.playersToRate = cloneDeep(this.players);
         this.currentPlayer = this.players[0];
         this.currentPlayerIndex = 0;
         if (this.currentPlayer.hasGiveUp) this.setNewPlayer();
