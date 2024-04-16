@@ -6,6 +6,8 @@ import { Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+const UNAUTHORIZED = { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+
 @WebSocketGateway({ cors: true })
 export class GameGateway {
     @WebSocketServer()
@@ -36,15 +38,19 @@ export class GameGateway {
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!(player && !player.isExcluded)) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!(player && !player.isExcluded)) return UNAUTHORIZED;
 
         gameSession.broadcastMessage('Joueur ' + player.name + " n'est plus dans la partie.");
         if (gameSession.gameState === GameState.WaitingPlayers) {
             gameSession.room.removePlayer(player.name);
             return { isSuccess: true, message: 'Vous avez quitté la partie' };
         }
-
         gameSession.room.giveUpPlayer(player.name);
+
+        if (gameSession.gameState === GameState.OrganisatorCorrectingAnswers && this.shouldDisplayResults(gameSession)) {
+            gameSession.displayQuestionResults();
+        }
+
         if (gameSession.room.allPlayerAnswered()) gameSession.timer.stop();
         return { isSuccess: true, message: 'Vous avez abandonné la partie' };
     }
@@ -55,7 +61,7 @@ export class GameGateway {
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!player) return UNAUTHORIZED;
 
         player.setAnswer(data.answers);
         return { isSuccess: true, message: 'Réponse enregistrée' };
@@ -67,7 +73,7 @@ export class GameGateway {
         if (!gameSession) return { isSuccess: false, message: "La partie n'existe pas" };
 
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!player) return UNAUTHORIZED;
 
         player.confirmAnswer();
         gameSession.room.sendToOrganizer(GameEvents.PlayerConfirmAnswers, { name: player.name });
@@ -99,7 +105,7 @@ export class GameGateway {
     handleStartGame(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!player) return UNAUTHORIZED;
         gameSession.startGameDelayed();
         return { isSuccess: true, message: 'Partie démarrée' };
     }
@@ -116,7 +122,7 @@ export class GameGateway {
     handleChangeLockState(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!player) return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!player) return UNAUTHORIZED;
         gameSession.changeGameLockState();
         return { isSuccess: true, message: 'Verrouillage de la partie modifié' };
     }
@@ -124,8 +130,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.NextQuestion)
     handleNextQuestion(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        if (!this.hasAutorisation(client, GameRole.Organisator))
-            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!this.hasAutorisation(client, GameRole.Organisator)) return UNAUTHORIZED;
 
         gameSession.nextQuestion();
         return { isSuccess: true, message: 'Question suivante' };
@@ -134,8 +139,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.BanPlayer)
     handleBanPlayer(@MessageBody() data: GameEventsData.BanPlayer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        if (!this.hasAutorisation(client, GameRole.Organisator))
-            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!this.hasAutorisation(client, GameRole.Organisator)) return UNAUTHORIZED;
 
         gameSession.broadcastMessage('Joueur ' + data.name + " n'est plus dans la partie.");
         gameSession.room.banPlayer(data.name);
@@ -146,8 +150,7 @@ export class GameGateway {
     handleMutedPlayer(@MessageBody() data: GameEventsData.MutePlayer, @ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
         const player = gameSession.room.getPlayerWithSocketId(client.id);
-        if (!this.hasAutorisation(client, GameRole.Organisator))
-            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!this.hasAutorisation(client, GameRole.Organisator)) return UNAUTHORIZED;
         gameSession.room.mutePlayer(data.name);
         if (player.isMuted) {
             return { isSuccess: true, message: 'Droit au clavardage activé' };
@@ -159,8 +162,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.ToggleTimer)
     handleToggleTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        if (!this.hasAutorisation(client, GameRole.Organisator))
-            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!this.hasAutorisation(client, GameRole.Organisator)) return UNAUTHORIZED;
 
         gameSession.toggleTimer();
         return { isSuccess: true, message: 'Timer modifié' };
@@ -169,8 +171,7 @@ export class GameGateway {
     @SubscribeMessage(GameEvents.SpeedUpTimer)
     handleSpeedUpTimer(@ConnectedSocket() client: Socket): SocketResponse {
         const gameSession = this.gameService.getGameSessionBySocketId(client.id);
-        if (!this.hasAutorisation(client, GameRole.Organisator))
-            return { isSuccess: false, message: "Vous n'êtes pas autorisé à effectuer cette action" };
+        if (!this.hasAutorisation(client, GameRole.Organisator)) return UNAUTHORIZED;
         gameSession.speedUpTimer();
         return { isSuccess: true, message: 'Timer accéléré' };
     }
