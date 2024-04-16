@@ -323,4 +323,67 @@ describe('OrganisatorService', () => {
             expect(service.currentPlayer).toBeUndefined();
         });
     });
+
+    describe('reinitialisePlayerToRate', () => {
+        let mockSetNewPlayer: jasmine.Spy;
+
+        beforeEach(() => {
+            mockSetNewPlayer = spyOn(service, 'setNewPlayer').and.callThrough();
+        });
+
+        it('should set currentPlayer and currentPlayerIndex to the first player and zero', () => {
+            service.players = [
+                {
+                    name: 'Alice',
+                    score: 10,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+                {
+                    name: 'Charlie',
+                    score: 20,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+            ];
+            service.reinitialisePlayerToRate();
+
+            expect(service.currentPlayer).toEqual(service.players[0]);
+            expect(service.currentPlayerIndex).toBe(0);
+            expect(mockSetNewPlayer).not.toHaveBeenCalled();
+        });
+
+        it('should call setNewPlayer if the first player has given up', () => {
+            service.players = [
+                {
+                    name: 'Alice',
+                    score: 10,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+                {
+                    name: 'Charlie',
+                    score: 20,
+                    isExcluded: false,
+                    hasGiveUp: false,
+                    role: GameRole.Player,
+                    isMuted: false,
+                    interactionStatus: InteractionStatus.interacted,
+                },
+            ];
+            service.reinitialisePlayerToRate();
+
+            expect(service.currentPlayerIndex).toBe(0);
+            expect(mockSetNewPlayer).not.toHaveBeenCalled();
+        });
+    });
 });
