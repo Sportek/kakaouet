@@ -27,6 +27,7 @@ export class OrganisatorService {
         this.actualQuestion = null;
         this.choices = [];
         this.players = [];
+        this.playersToRate = [];
     }
 
     rateAnswerQRL(playerName: string, currentRating: string) {

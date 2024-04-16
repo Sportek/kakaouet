@@ -60,6 +60,26 @@ describe('OrganisatorService', () => {
                 interactionStatus: InteractionStatus.noInteraction,
             },
         ];
+        service.playersToRate = [
+            {
+                name: 'Alice',
+                role: GameRole.Player,
+                score: 10,
+                isExcluded: false,
+                hasGiveUp: false,
+                isMuted: false,
+                interactionStatus: InteractionStatus.interacted,
+            },
+            {
+                name: 'Bob',
+                role: GameRole.Player,
+                score: 5,
+                isExcluded: false,
+                hasGiveUp: true,
+                isMuted: false,
+                interactionStatus: InteractionStatus.noInteraction,
+            },
+        ];
     });
 
     it('should be created', () => {
@@ -102,7 +122,7 @@ describe('OrganisatorService', () => {
         it('should update currentPlayer to the next player in the list', () => {
             service.currentPlayerIndex = 0;
             service.setNewPlayer();
-            expect(service.currentPlayer).toEqual(service.players[1]);
+            expect(service.currentPlayer).toEqual(service.playersToRate[1]);
             expect(service.currentPlayerIndex).toBe(1);
         });
 
@@ -113,7 +133,7 @@ describe('OrganisatorService', () => {
         });
 
         it('should skip players who have given up and find the next available player', () => {
-            service.players[1].hasGiveUp = true;
+            service.playersToRate[1].hasGiveUp = true;
             service.currentPlayerIndex = 0;
             service.setNewPlayer();
             expect(service.currentPlayerIndex).toBe(1);
