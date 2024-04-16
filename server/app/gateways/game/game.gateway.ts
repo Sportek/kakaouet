@@ -43,8 +43,12 @@ export class GameGateway {
             gameSession.room.removePlayer(player.name);
             return { isSuccess: true, message: 'Vous avez quitté la partie' };
         }
-
         gameSession.room.giveUpPlayer(player.name);
+
+        if (gameSession.gameState === GameState.OrganisatorCorrectingAnswers && this.shouldDisplayResults(gameSession)) {
+            gameSession.displayQuestionResults();
+        }
+
         if (gameSession.room.allPlayerAnswered()) gameSession.timer.stop();
         return { isSuccess: true, message: 'Vous avez abandonné la partie' };
     }
