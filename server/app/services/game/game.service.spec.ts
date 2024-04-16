@@ -3,6 +3,7 @@ import { Game } from '@app/model/database/game';
 import { Quiz } from '@app/model/database/quiz';
 import { HistoryService } from '@app/services/history/history.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { GAME_CODE_LENGTH } from '@common/constants';
 import { GameState, GameType } from '@common/types';
 import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
@@ -321,5 +322,34 @@ describe('GameService', () => {
         mockGameModel.replaceOne.mockRejectedValue(new Error('Test error'));
         service.updateGameByCode(testCode, testGame as unknown as Game);
         expect(mockGameModel.findOne).toHaveBeenCalled();
+    });
+
+    describe('generateUniqueGameCode', () => {
+        const GAME_CODE_MAX_ATTEMPTS = 10;
+        it('should generate a unique game code on the first attempt', async () => {
+            mockGameModel.findOne.mockResolvedValue(null); // Simulate no existing game with the code
+            const code = await service['generateUniqueGameCode']();
+            expect(typeof code).toBe('string');
+            expect(code.length).toBe(GAME_CODE_LENGTH);
+            expect(mockGameModel.findOne).toHaveBeenCalledTimes(5);
+        });
+
+        it('should retry generating a game code when a conflict occurs', async () => {
+            mockGameModel.findOne
+                .mockResolvedValueOnce({ code: 'conflict' }) // First call finds a conflict
+                .mockResolvedValueOnce(null); // Second call finds no conflict
+            const code = await service['generateUniqueGameCode']();
+            expect(typeof code).toBe('string');
+            expect(code.length).toBe(GAME_CODE_LENGTH);
+            expect(mockGameModel.findOne).toHaveBeenCalledTimes(7);
+        });
+
+        it('should throw an error after exceeding maximum number of attempts', async () => {
+            mockGameModel.findOne.mockResolvedValue({ code: 'alwaysConflict' }); // Always finds a conflict
+            await expect(service['generateUniqueGameCode'](GAME_CODE_MAX_ATTEMPTS))
+                .rejects
+                .toThrow('Could not generate unique game code');
+            expect(mockGameModel.findOne).toHaveBeenCalledTimes(9);
+        });
     });
 });
