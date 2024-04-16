@@ -1,19 +1,18 @@
-/* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-lines */
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { GameService } from '@app/services/game/game.service';
 import { OrganisatorService } from '@app/services/organisator/organisator.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { ActualQuestion, ChoiceData, InteractionStatus, PlayerClient } from '@common/game-types';
 import { GameRole, GameState, QuestionType } from '@common/types';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { OrganisatorComponent } from './organisator.component';
 
 describe('OrganisatorComponent', () => {
     const mockedHistogram = {
-        hasModified: 0,
-        hasNotModified: 0,
+        hasModified: 10,
+        hasNotModified: 5,
     };
 
     const mockedPlayerRatings = new Map<string, number>([
@@ -97,7 +96,6 @@ describe('OrganisatorComponent', () => {
         { text: 'Choice 1', amount: 100, isCorrect: true },
         { text: 'Choice 2', amount: 200, isCorrect: false },
     ];
-
     let fakeCooldown: 10;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let playerServiceSpy: jasmine.SpyObj<PlayerService>;
@@ -118,7 +116,7 @@ describe('OrganisatorComponent', () => {
         playerServiceSpy = jasmine.createSpyObj('PlayerService', ['sortPlayers']);
         organisatorServiceSpy = jasmine.createSpyObj(
             'OrganisatorService',
-            ['filterPlayers', 'rateAnswerQRL', 'sendRating', 'calculateChoices', 'toggleTimer', 'speedUpTimer'],
+            ['filterPlayers', 'rateAnswerQRL', 'sendRating', 'calculateChoices', 'toggleTimer', 'speedUpTimer', 'nextQuestion'],
             {
                 choices: mockedChoices,
                 actualQuestion: mockedActualQuestion,
@@ -158,144 +156,7 @@ describe('OrganisatorComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('filterPlayers', () => {
-        it('should return filtered players from the OrganisatorService', () => {
-            organisatorServiceSpy.filterPlayers.and.returnValue(mockedPlayers);
-            const players = component.filterPlayers();
-            expect(players).toEqual(mockedPlayers);
-            expect(organisatorServiceSpy.filterPlayers).toHaveBeenCalled();
-        });
-    });
-
-    describe('getPlayers', () => {
-        it('should return an array of player names', () => {
-            spyOn(component, 'getPlayerArray').and.returnValue(mockedPlayers);
-            const playerNames = component.getPlayers();
-            expect(playerNames).toEqual(['Alice', 'Bob']);
-        });
-
-        it('should return an empty array when no players are available', () => {
-            spyOn(component, 'getPlayerArray').and.returnValue([]);
-            const playerNames = component.getPlayers();
-            expect(playerNames).toEqual([]);
-        });
-    });
-
-    /* describe('isCorrectingAnswers', () => {
-        it('should return true when the game state is OrganisatorCorrectingAnswers', () => {
-            gameServiceSpy.gameState.next(GameState.OrganisatorCorrectingAnswers);
-            expect(component.isCorrectingAnswers()).toBeTrue();
-        });
-
-        it('should return false when the game state is not OrganisatorCorrectingAnswers', () => {
-            gameServiceSpy.gameState.next(GameState.PlayersAnswerQuestion);
-            expect(component.isCorrectingAnswers()).toBeFalse();
-        });
-    });*/
-
-    describe('rateAnswerQRL', () => {
-        it('should call rateAnswerQRL on OrganisatorService with the correct parameters', () => {
-            const playerName = 'John Doe';
-            component.currentRating = 'Excellent';
-            component.rateAnswerQRL(playerName);
-            expect(organisatorServiceSpy.rateAnswerQRL).toHaveBeenCalledWith(playerName, 'Excellent');
-        });
-    });
-
-    describe('sendRating', () => {
-        it('should call sendRating on OrganisatorService with the correct player name and reset currentRating', () => {
-            const playerName = 'Alice';
-            component.currentRating = 'Excellent';
-            component.sendRating(playerName);
-            expect(organisatorServiceSpy.sendRating).toHaveBeenCalledWith(playerName);
-            expect(component.currentRating).toBe('');
-        });
-    });
-
-    describe('getRatingForPlayer', () => {
-        it('should return the correct rating for a given player', () => {
-            spyOn(component, 'getPlayerRatings').and.returnValue(mockedPlayerRatings);
-            const rating = component.getRatingForPlayer('Alice');
-            expect(rating).toEqual(95);
-        });
-
-        it('should return undefined if the player is not found in the ratings map', () => {
-            const rating = component.getRatingForPlayer('Charlie');
-            expect(rating).toBeUndefined();
-        });
-    });
-
-    describe('getHistogram', () => {
-        it('should return histogram data from organisatorService', () => {
-            const histogram = component.getHistogram();
-            expect(histogram).toEqual(mockedHistogram);
-        });
-    });
-
-    describe('calculateChoices', () => {
-        it('should call calculateChoices on OrganisatorService', () => {
-            component.calculateChoices();
-            expect(organisatorServiceSpy.calculateChoices).toHaveBeenCalled();
-        });
-    });
-
-    describe('toggleTimer', () => {
-        beforeEach(() => {
-            component.timerIsRunning = false;
-        });
-
-        it('should call toggleTimer on GameService and toggle the timerIsRunning state', () => {
-            component.toggleTimer();
-            expect(gameServiceSpy.toggleTimer).toHaveBeenCalled();
-            expect(component.timerIsRunning).toBeTrue();
-            component.toggleTimer();
-            expect(component.timerIsRunning).toBeFalse();
-        });
-    });
-
-    describe('speedUpTimer', () => {
-        it('should call speedUpTimer on GameService', () => {
-            component.speedUpTimer();
-            expect(gameServiceSpy.speedUpTimer).toHaveBeenCalled();
-        });
-    });
-
-    describe('nextQuestion', () => {
-        it('should call nextQuestion on GameService', () => {
-            component.nextQuestion();
-            expect(gameServiceSpy.nextQuestion).toHaveBeenCalled();
-        });
-    });
-
-    describe('toggleMutePlayer', () => {
-        it('should call toggleMutePlayer on GameService with the correct player', () => {
-            component.toggleMutePlayer(mockedPlayer);
-            expect(gameServiceSpy.toggleMutePlayer).toHaveBeenCalledWith(mockedPlayer);
-        });
-    });
-
-    describe('isLastQuestion', () => {
-        it('should return true when the game service indicates it is the last question', () => {
-            gameServiceSpy.isLastQuestion.and.returnValue(true);
-            expect(component.isLastQuestion()).toBeTrue();
-        });
-
-        it('should return false when the game service indicates it is not the last question', () => {
-            gameServiceSpy.isLastQuestion.and.returnValue(false);
-            expect(component.isLastQuestion()).toBeFalse();
-        });
-    });
-
-    describe('getCurrentPlayer', () => {
-        it('should return the current player from the OrganisatorService', () => {
-            organisatorServiceSpy.currentPlayer = mockedCurrentPlayer;
-            const currentPlayer = component.getCurrentPlayer();
-            expect(currentPlayer).toBe(mockedCurrentPlayer);
-        });
-    });
-});
-
-/* describe('getChoices', () => {
+    describe('getChoices', () => {
         it('should return choices from organisatorService', () => {
             const choices = component.getChoices();
             expect(choices).toEqual(mockedChoices);
@@ -307,25 +168,6 @@ describe('OrganisatorComponent', () => {
             const actualQuestion = component.getActualQuestion();
             expect(actualQuestion).toEqual(mockedActualQuestion);
         });
-    });*/
-
-/* describe('getPlayerArray', () => {
-        it('should return the players from organisatorService', () => {
-            const players = component.getPlayerArray();
-            expect(players).toEqual(mockedPlayers);
-        });
-    });*/
-
-/* it('should sort players correctly', () => {
-        component.selectedCriteria = 'name';
-        component.sortingOrder = 'desc';
-
-        component.players = mockedPlayers;
-
-        component.sortPlayers();
-
-        const expectedOrder = mockedPlayers.sort((a, b) => b.score - a.score);
-        expect(component.players).toEqual(expectedOrder);
     });
 
     describe('getCurrentPlayer', () => {
@@ -601,19 +443,104 @@ describe('OrganisatorComponent', () => {
         });
     });
 
-    describe('calculatePercentage', () => {
-        beforeEach(() => {
-            spyOn(component, 'getChoices').and.returnValue([
-                { text: 'Choice 1', amount: 100, isCorrect: true },
-                { text: 'Choice 2', amount: 200, isCorrect: false },
-                { text: 'Choice 3', amount: 700, isCorrect: true },
-            ]);
-        });
-        it('should calculate the correct percentage for a given amount', () => {
-            const testAmount = 100;
-            const expectedPercentage = testAmount / 1000;
+    /* it('should call sortPlayers and calculateChoices when players are updated', () => {
+        spyOn(component, 'sortPlayers');
+        spyOn(component, 'calculateChoices');
+        gameServiceSpy.players.next(mockedPlayers);
 
-            const percentage = component.calculatePercentage(testAmount);
-            expect(percentage).toEqual(expectedPercentage);
-        });
-    });*/
+        expect(component.sortPlayers).toHaveBeenCalled();
+        expect(component.calculateChoices).toHaveBeenCalled();
+    }); */
+
+    /* it('should calculate histogram correctly based on player interactions and cooldown', () => {
+        component.players = mockedPlayers;
+        const cooldown = 10;
+        spyOn(gameServiceSpy.recentInteractions, 'get').and.returnValues(5, 20);
+        component.calculateHistogram(cooldown);
+        expect(component.getHistogram().hasModified).toEqual(2);
+        expect(component.getHistogram().hasNotModified).toEqual(3);
+    }); */
+
+    it('should return the current histogram', () => {
+        const expectedHistogram = { hasModified: 2, hasNotModified: 3 };
+        component.histogram = expectedHistogram;
+        const histogram = component.getHistogram();
+        expect(histogram).toEqual(expectedHistogram);
+    });
+    it('should calculate histogram correctly', () => {
+        const players = [
+            { name: 'Player1', hasGiveUp: false },
+            { name: 'Player2', hasGiveUp: false },
+            { name: 'Player3', hasGiveUp: false },
+        ] as PlayerClient[];
+        const cooldown = 10;
+        const HISTOGRAM_COOLDOWN = 5;
+        const recentInteractions = new Map<string, number>([
+            ['Player1', cooldown - HISTOGRAM_COOLDOWN - 1],
+            ['Player2', cooldown + HISTOGRAM_COOLDOWN + 1],
+            ['Player3', cooldown],
+        ]);
+        const gameServiceMock = {
+            recentInteractions,
+        } as GameService;
+        const componentOrg = new OrganisatorComponent(gameServiceMock, TestBed.inject(PlayerService), TestBed.inject(OrganisatorService));
+        componentOrg.players = players;
+        componentOrg.calculateHistogram(cooldown);
+        expect(componentOrg.histogram).toEqual({ hasModified: 2, hasNotModified: 1 });
+    });
+    it('should call toggleMutePlayer on gameService', () => {
+        const player = { name: 'Player1' } as PlayerClient;
+        const gameServiceMock = {
+            toggleMutePlayer: jasmine.createSpy('toggleMutePlayer'),
+        } as unknown as GameService;
+        const componentOr = new OrganisatorComponent(gameServiceMock, TestBed.inject(PlayerService), TestBed.inject(OrganisatorService));
+        componentOr.toggleMutePlayer(player);
+        expect(gameServiceMock.toggleMutePlayer).toHaveBeenCalledWith(player);
+    });
+    it('should check if timer can be disabled and if it can go to the next question', () => {
+        const gameStateSpy = jasmine.createSpyObj('gameState', ['getValue']);
+        gameStateSpy.getValue.and.returnValues(
+            GameState.PlayersAnswerQuestion,
+            GameState.DisplayQuestionResults,
+            GameState.DisplayQuestionResults,
+            GameState.DisplayQuestionResults,
+        );
+        const gameServiceMock = {
+            gameState: gameStateSpy,
+        } as unknown as GameService;
+        const componentOr = new OrganisatorComponent(gameServiceMock, TestBed.inject(PlayerService), TestBed.inject(OrganisatorService));
+        expect(componentOr.canDisableTimer()).toBeTrue();
+        expect(componentOr.canGoToNextQuestion()).toBeTrue();
+        expect(componentOr.canDisableTimer()).toBeFalse();
+        expect(componentOr.canGoToNextQuestion()).toBeTrue();
+    });
+    it('should unsubscribe from all subscriptions on destroy', () => {
+        const subscription1 = new Subscription();
+        const subscription2 = new Subscription();
+        const componentOr = new OrganisatorComponent(TestBed.inject(GameService), TestBed.inject(PlayerService), TestBed.inject(OrganisatorService));
+        // @ts-ignore
+        componentOr.subscriptions = [subscription1, subscription2];
+        componentOr.ngOnDestroy();
+        expect(subscription1.closed).toBeTrue();
+        expect(subscription2.closed).toBeTrue();
+    });
+    it('should check if it should display QRL results and correct QRL answers', () => {
+        const gameStateSpy = jasmine.createSpyObj('gameState', ['getValue']);
+        const actualQuestionSpy = jasmine.createSpyObj('actualQuestion', ['getValue']);
+
+        gameStateSpy.getValue.and.returnValues(GameState.DisplayQuestionResults, GameState.OrganisatorCorrectingAnswers);
+        actualQuestionSpy.getValue.and.returnValue({ question: { type: QuestionType.QRL } } as ActualQuestion);
+
+        const gameServiceMock = {
+            gameState: gameStateSpy,
+            actualQuestion: actualQuestionSpy,
+        } as unknown as GameService;
+
+        const componentOr = new OrganisatorComponent(gameServiceMock, TestBed.inject(PlayerService), TestBed.inject(OrganisatorService));
+
+        expect(componentOr.shouldDisplayQRLResults()).toBeTrue();
+        expect(componentOr.shouldCorrectQRLAnswers()).toBeTrue();
+        expect(componentOr.shouldDisplayQRLResults()).toBeFalse();
+        expect(componentOr.shouldCorrectQRLAnswers()).toBeFalse();
+    });
+});

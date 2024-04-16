@@ -51,12 +51,10 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.filterPlayers().filter((player) => player.answers?.hasConfirmed).length;
     }
 
-    // done
     filterPlayers(): PlayerClient[] {
         return this.organisatorService.filterPlayers();
     }
 
-    // done
     getPlayers(): string[] {
         return this.getPlayerArray().map((player) => player.name);
     }
@@ -65,12 +63,10 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.gameService.gameState.getValue() === GameState.OrganisatorCorrectingAnswers;
     }
 
-    // done
     rateAnswerQRL(playerName: string): void {
         this.organisatorService.rateAnswerQRL(playerName, this.currentRating);
     }
 
-    // done
     sendRating(playerName: string) {
         this.organisatorService.sendRating(playerName);
         this.currentRating = '';
@@ -84,23 +80,19 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return parseFloat(column.text).toLocaleString('en', { style: 'percent' });
     }
 
-    // done
     calculateChoices(): void {
         this.organisatorService.calculateChoices();
     }
 
-    // done
     toggleTimer(): void {
         this.gameService.toggleTimer();
         this.timerIsRunning = !this.timerIsRunning;
     }
 
-    // done
     speedUpTimer(): void {
         this.gameService.speedUpTimer();
     }
 
-    // done
     nextQuestion(): void {
         this.gameService.nextQuestion();
     }
@@ -152,7 +144,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         }
     }
 
-    // done
     toggleMutePlayer(player: PlayerClient) {
         this.gameService.toggleMutePlayer(player);
     }
@@ -169,7 +160,6 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
 
-    // done
     isLastQuestion(): boolean {
         return this.gameService.isLastQuestion();
     }
@@ -200,17 +190,14 @@ export class OrganisatorComponent implements OnInit, OnDestroy {
         return this.organisatorService.choices;
     }
 
-    // done
     getPlayerRatings(): Map<string, number> {
         return this.organisatorService.playerRatings;
     }
 
-    // done
     getHistogram(): { hasModified: number; hasNotModified: number } {
         return this.histogram;
     }
 
-    // done
     getCurrentPlayer(): PlayerClient {
         return this.organisatorService.currentPlayer;
     }
